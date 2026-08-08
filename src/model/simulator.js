@@ -71,11 +71,15 @@ export class Simulator {
     }
   }
 
+  /**
+   * A scenario is a partial override of the defaults, so it has to be applied to
+   * the defaults — not to whatever the previous scenario left behind. Otherwise
+   * selecting a preset would give a different patient depending on which one you
+   * looked at first.
+   */
   applyScenario(scenario) {
-    for (const [k, v] of Object.entries(scenario.params)) {
-      if (k === 'stressedVolume') this.circ.vSv += v - this.params.stressedVolume;
-      this.params[k] = v;
-    }
+    this.params = { ...defaultParams(), ...scenario.params };
+    this.reset();
   }
 
   /** Advance simulated time by `seconds`, optionally without recording traces. */

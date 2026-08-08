@@ -26,6 +26,7 @@ const stats = createStats(el('stats'));
 const controls = createControls(el('controls'), sim, (id) => {
   if (id === 'mode') controls.sync();
   clearTrails();
+  markCustom();
 });
 
 // ---------------------------------------------------------------- scenarios
@@ -47,7 +48,6 @@ const scenarioNote = el('scenario-note');
 function applyScenario(id) {
   const scenario = SCENARIO_BY_ID.get(id);
   if (!scenario) { scenarioNote.textContent = ''; return; }
-  sim.reset();
   sim.applyScenario(scenario);
   sim.advance(20, true);
   controls.sync();
@@ -56,6 +56,15 @@ function applyScenario(id) {
 }
 
 scenarioSelect.addEventListener('change', () => applyScenario(scenarioSelect.value));
+
+// Touching any control means the state is no longer the preset, so say so
+// rather than leaving a scenario name attached to a patient it no longer
+// describes.
+function markCustom() {
+  if (!scenarioSelect.value) return;
+  scenarioSelect.value = '';
+  scenarioNote.textContent = '';
+}
 
 function clearTrails() {
   guyton.clearTrail();

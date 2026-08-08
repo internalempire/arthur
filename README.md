@@ -23,6 +23,10 @@ python3 -m http.server 8422
 
 Then open <http://localhost:8422>. Any static server works.
 
+While editing, note that browsers cache ES modules aggressively and a plain
+reload can leave you looking at the previous version of a module. Hard-reload,
+or serve with `Cache-Control: no-store`.
+
 ## What makes it a model rather than an animation
 
 Nothing in the display is scripted. The circulation is a closed loop of eight
