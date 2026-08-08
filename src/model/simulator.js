@@ -1,4 +1,5 @@
 import { defaultParams } from './parameters.js';
+import { resolveParams } from './position.js';
 import {
   createRespiratoryState, stepRespiratory, respiratorySystemCompliance, pvrComponents,
 } from './respiratory.js';
@@ -74,7 +75,8 @@ export class Simulator {
 
   reset() {
     this.resp = createRespiratoryState();
-    this.circ = createCirculationState(this.params);
+    this.effective = resolveParams(this.params);
+    this.circ = createCirculationState(this.effective);
     this.traces = {};
     this.scratch = {};
     for (const ch of CHANNELS) {
@@ -135,9 +137,13 @@ export class Simulator {
     const dt = this.dt;
     const steps = Math.min(Math.round(seconds / dt), 240000 * (DEFAULT_DT / dt));
     const sampleEvery = Math.max(1, Math.round(1 / (SAMPLE_HZ * dt)));
+    // Body position modifies chest wall compliance, abdominal pressure and
+    // resting lung volume. Resolved once here — the parameters cannot change
+    // mid-advance — so every consumer sees one consistent set.
+    this.effective = resolveParams(this.params);
     for (let s = 0; s < steps; s++) {
-      stepRespiratory(this.params, this.resp, dt);
-      stepCirculation(this.params, this.circ, this.resp, dt);
+      stepRespiratory(this.effective, this.resp, dt);
+      stepCirculation(this.effective, this.circ, this.resp, dt);
       this.time += dt;
       this.accumulate();
       if (!silent && s % sampleEvery === 0) this.sample();
@@ -216,7 +222,7 @@ export class Simulator {
   }
 
   computeMetrics() {
-    const p = this.params, c = this.circ, r = this.resp;
+    const p = this.effective ?? this.params, c = this.circ, r = this.resp;
     const hist = this.beatHistory;
     const period = 60 / p.rr;
     const recent = hist.filter((b) => b.t > this.time - period * 1.05);

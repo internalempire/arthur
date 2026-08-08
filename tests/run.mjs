@@ -203,6 +203,33 @@ describe('Physiological relations');
     `${rvFail.metrics.lvEdv.toFixed(0)} -> ${noSeptum.metrics.lvEdv.toFixed(0)} mL`);
 }
 
+describe('Body position');
+{
+  const ardsSupine = settled({ frc: 1.35, clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12 });
+  const ardsProne = settled({ frc: 1.35, clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12, position: 'prone' });
+  check('proning a recruitable lung raises its resting volume',
+    ardsProne.metrics.lungVolume > ardsSupine.metrics.lungVolume,
+    `${ardsSupine.metrics.lungVolume.toFixed(2)} -> ${ardsProne.metrics.lungVolume.toFixed(2)} L`);
+  check('proning a recruitable lung lowers pulmonary vascular resistance',
+    ardsProne.metrics.pvrCoefficientWood < ardsSupine.metrics.pvrCoefficientWood * 0.95,
+    `${ardsSupine.metrics.pvrCoefficientWood.toFixed(2)} -> ${ardsProne.metrics.pvrCoefficientWood.toFixed(2)} Wood units`);
+  check('proning a recruitable lung unloads the right ventricle',
+    ardsProne.metrics.rvLvRatio < ardsSupine.metrics.rvLvRatio,
+    `RV:LV ${ardsSupine.metrics.rvLvRatio.toFixed(2)} -> ${ardsProne.metrics.rvLvRatio.toFixed(2)}`);
+
+  const normalSupine = settled({});
+  const normalProne = settled({ position: 'prone' });
+  check('proning a normal lung recruits nothing',
+    Math.abs(normalProne.metrics.lungVolume - normalSupine.metrics.lungVolume) < 0.2,
+    `${normalSupine.metrics.lungVolume.toFixed(2)} -> ${normalProne.metrics.lungVolume.toFixed(2)} L`);
+  check('proning stiffens the chest wall, so pleural pressure rises',
+    normalProne.metrics.ppl > normalSupine.metrics.ppl && ardsProne.metrics.ppl > ardsSupine.metrics.ppl,
+    `normal ${normalSupine.metrics.ppl.toFixed(1)} -> ${normalProne.metrics.ppl.toFixed(1)} cmH2O`);
+  check('proning raises mean systemic filling pressure',
+    normalProne.metrics.pmsf > normalSupine.metrics.pmsf,
+    `${normalSupine.metrics.pmsf.toFixed(1)} -> ${normalProne.metrics.pmsf.toFixed(1)} mmHg`);
+}
+
 describe('The pulmonary vascular curve is J-shaped, not monotonic');
 {
   const p = defaultParams();

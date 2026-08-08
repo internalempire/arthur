@@ -41,7 +41,7 @@ export const SCENARIOS = [
   {
     id: 'ards-rv',
     name: 'ARDS with right ventricular failure',
-    note: 'A collapsed, stiff lung and a failing right ventricle. The RV dilates, the septum bows left and the left ventricle cannot fill. Try adding volume — then try taking PEEP away — and see which one the model rewards.',
+    note: 'A collapsed, stiff lung and a failing right ventricle. The RV dilates, the septum bows left and the left ventricle cannot fill. Try adding volume, then taking PEEP away, then turning the patient prone, and see which the model rewards.',
     params: {
       mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
       frc: 1.35, clung: 34, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6,

@@ -58,6 +58,18 @@ export const PARAMETERS = [
 
   // ------------------------------------------------------------------ mechanics
   {
+    id: 'position',
+    group: 'mechanics',
+    label: 'Body position',
+    type: 'choice',
+    options: [
+      { value: 'supine', label: 'Supine' },
+      { value: 'prone', label: 'Prone' },
+    ],
+    default: 'supine',
+    help: 'Proning stiffens the chest wall, raises abdominal pressure and recruits dorsal lung — three changes that pull in opposite directions haemodynamically. The controls keep showing the supine mechanics; turning someone over does not change how stiff their lung is.',
+  },
+  {
     id: 'clung', group: 'mechanics', label: 'Lung compliance', unit: 'mL/cmH₂O',
     min: 15, max: 260, step: 5, default: 200,
     help: 'Stiff lungs (ARDS) blunt transmission of airway pressure to the pleural space, so the same PEEP costs less venous return.',

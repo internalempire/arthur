@@ -407,6 +407,7 @@ appear in the UI and in every scenario.
 
 | Symbol | Meaning | Unit | Default | Range |
 |---|---|---|---|---|
+| `position` | Body position | — | `supine` | `supine` / `prone` |
 | `clung` | Lung compliance | mL/cmH₂O | 200 | 15 – 260 |
 | `ccw` | Chest wall compliance | mL/cmH₂O | 200 | 40 – 300 |
 | `raw` | Airway resistance | cmH₂O/L/s | 5 | 1 – 40 |
@@ -447,6 +448,32 @@ fluid bolus or a diuresis — rather than silently rescaling the model.
 
 To convert a resistance to clinical units: Wood units = mmHg·s/mL × 1000/60;
 dyn·s·cm⁻⁵ = mmHg·s/mL × 80000/60.
+
+### Body position
+
+Proning is not a single effect, and the model does not assert one. It applies
+three mechanical changes and lets the haemodynamics fall out of their balance:
+
+| Change | Value | Why |
+|---|---|---|
+| Chest wall compliance | × 0.65 | The anterior chest wall rests against the bed and cannot expand |
+| Abdominal pressure | + 2 cmH₂O | The abdomen is compressed unless deliberately suspended |
+| Resting lung volume | + 0.25 × (2.2 L − FRC) | Dorsal regions recruit, in proportion to how much is collapsed |
+
+The third term is why proning a normal lung is not a recruitment manoeuvre: with
+nothing collapsed, the gain is zero. The consequence is that the same
+intervention helps one patient and costs another, which is what the published
+haemodynamic findings look like:
+
+| | Lung volume | PVR | RV:LV | Cardiac output |
+|---|---|---|---|---|
+| ARDS preset, supine → prone | 1.70 → 1.89 L | 5.5 → 4.5 WU | 2.26 → 2.03 | 2.68 → 2.90 L/min |
+| Healthy preset, supine → prone | 2.77 → 2.64 L | 1.31 → 1.25 WU | 0.88 → 0.85 | 5.04 → 4.92 L/min |
+
+The recruitable lung gains; the normal one pays the stiffer chest wall and
+receives nothing back. The controls keep showing the supine mechanics
+throughout — turning someone over does not change how stiff their lung is — and
+`src/model/position.js` resolves the effective values the integrator uses.
 
 ### Two different pulmonary resistances
 
