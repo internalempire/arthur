@@ -67,7 +67,31 @@ numbers. The following all reproduce:
 
 ---
 
-## 2. Limitations
+## 2. What the occlusion manoeuvres show
+
+Holding the airway freezes lung volume and pleural pressure, and the circulation
+settles. Each hold contributes one measured pressure–flow pair, and a series of
+them draws a venous return curve — the bedside method.
+
+The model reproduces the method's known confound rather than hiding it. Four
+inspiratory holds at plateau pressures from 8 to 14 cmH₂O give a fitted slope of
+0.27 L/min per mmHg where the model's own resistance to venous return implies
+0.73, and an extrapolated mean systemic filling pressure of 20 mmHg where the
+model's is 8.8. Both protocols behave the same way — varying tidal volume at
+fixed PEEP, or varying PEEP between holds — so it is not a protocol artefact.
+
+The mechanism is the abdominal coupling: an occlusion holds the lung inflated,
+which pressurises the splanchnic reservoir, which raises mean systemic filling
+pressure. The curve therefore moves to the right by an amount that grows with
+the plateau pressure, and the points sample a family of curves rather than one.
+Reading the resulting intercept as a mean systemic filling pressure overestimates
+it. The magnitude here is larger than published comparisons suggest, which is a
+reason to treat the number as a demonstration of the bias rather than a
+calibrated estimate of it.
+
+---
+
+## 3. Limitations
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 

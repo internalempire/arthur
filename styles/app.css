@@ -609,3 +609,10 @@ input[type="range"]:disabled { cursor: not-allowed; }
 .tile[data-status="warning"] .tile-flag { color: var(--text-warning); }
 .tile[data-status="serious"] .tile-flag { color: var(--text-serious); }
 .tile[data-status="critical"] .tile-flag { color: var(--text-critical); }
+
+/* A manoeuvre in progress: the button is briefly unavailable because the model
+   is holding the airway. */
+.btn-busy {
+  opacity: 0.55;
+  pointer-events: none;
+}

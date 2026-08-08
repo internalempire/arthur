@@ -90,8 +90,23 @@ playPause.addEventListener('click', () => {
 
 el('speed').addEventListener('change', (e) => { speed = parseFloat(e.target.value); });
 
+// Occlusion manoeuvres. Each contributes a measured point to the Guyton
+// diagram; several at different airway pressures draw a venous return curve the
+// way it is done at the bedside.
+for (const [id, kind] of [['hold-exp', 'expiratory'], ['hold-insp', 'inspiratory']]) {
+  el(id).addEventListener('click', (e) => {
+    const started = sim.startHold(kind, 12);
+    if (started) {
+      e.currentTarget.classList.add('btn-busy');
+      setTimeout(() => e.currentTarget.classList.remove('btn-busy'), 1200);
+    }
+    dirty = true;
+  });
+}
+
 el('reset').addEventListener('click', () => {
   const current = scenarioSelect.value;
+  sim.clearMeasuredPoints();
   sim.reset();
   if (current) applyScenario(current); else controls.sync();
   clearTrails();

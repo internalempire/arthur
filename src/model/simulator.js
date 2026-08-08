@@ -102,6 +102,9 @@ export class Simulator {
       peri: new CycleRing(), ppl: new CycleRing(), pCrit: new CycleRing(),
     };
     this.cycleTick = 0;
+    // Occlusion manoeuvres, and the (pressure, flow) pairs they measure.
+    this.hold = null;
+    this.measuredPoints = [];
     // Settle the model so the first frame the user sees is a steady state.
     this.advance(15, true);
   }
@@ -132,6 +135,28 @@ export class Simulator {
     this.reset();
   }
 
+  /**
+   * Arm an occlusion. It engages at the matching point of the next breath and
+   * releases after `seconds`, contributing one measured (right atrial pressure,
+   * flow) pair — which is how a venous return curve is built at the bedside:
+   * several holds at different airway pressures, and the line through the
+   * points has mean systemic filling pressure as its x-intercept.
+   */
+  startHold(kind, seconds = 12) {
+    if (this.hold || this.resp.hold || this.resp.holdPending) return false;
+    this.resp.holdPending = kind;
+    this.hold = { kind, seconds, elapsed: 0, engaged: false, sumPra: 0, sumFlow: 0, n: 0 };
+    return true;
+  }
+
+  cancelHold() {
+    this.resp.hold = null;
+    this.resp.holdPending = null;
+    this.hold = null;
+  }
+
+  clearMeasuredPoints() { this.measuredPoints = []; }
+
   /** Advance simulated time by `seconds`, optionally without recording traces. */
   advance(seconds, silent = false) {
     const dt = this.dt;
@@ -153,6 +178,7 @@ export class Simulator {
 
   accumulate() {
     const c = this.circ;
+    this.trackHold();
     this.sysRun = Math.max(this.sysRun, c.p.sa);
     this.diaRun = Math.min(this.diaRun, c.p.sa);
     this.papSysRun = Math.max(this.papSysRun, c.p.pa);
@@ -197,6 +223,41 @@ export class Simulator {
       if (this.beatHistory.length > 40) this.beatHistory.shift();
       this.sysRun = -1e9; this.diaRun = 1e9;
       this.papSysRun = -1e9; this.papDiaRun = 1e9;
+    }
+  }
+
+  /**
+   * Run the clock on an active occlusion. Only the last 40% of the hold is
+   * averaged: the circulation needs the first part of it to settle at the new
+   * intrathoracic pressure, and averaging the transient would put the point
+   * somewhere the patient never was.
+   */
+  trackHold() {
+    const h = this.hold;
+    if (!h) return;
+    if (!h.engaged) {
+      if (!this.resp.hold) return; // still waiting for the right point in the breath
+      h.engaged = true;
+    }
+    h.elapsed += this.dt;
+    if (h.elapsed > h.seconds * 0.6) {
+      h.sumPra += this.circ.p.ra;
+      h.sumFlow += (this.circ.q.vr * 60) / 1000;
+      h.n++;
+    }
+    if (h.elapsed >= h.seconds) {
+      if (h.n > 0) {
+        this.measuredPoints.push({
+          kind: h.kind,
+          pra: h.sumPra / h.n,
+          flow: h.sumFlow / h.n,
+          airwayPressure: this.resp.paw,
+          at: this.time,
+        });
+        if (this.measuredPoints.length > 8) this.measuredPoints.shift();
+      }
+      this.resp.hold = null;
+      this.hold = null;
     }
   }
 

@@ -383,6 +383,25 @@ cannot drift away from the model. The simulated state sits on the drawn venous
 return curve to within 0.02–0.33 L/min across every preset, and a test asserts
 it.
 
+### Building the curve from measurements
+
+**Exp hold** and **Insp hold** occlude the airway for twelve seconds. With no
+flow, alveolar pressure equilibrates with the airway and the circulation settles
+at a fixed lung volume; the mean right atrial pressure and flow over the last
+part of the hold are plotted as a small square. Several holds at different
+airway pressures — vary the tidal volume, or the PEEP — draw a venous return
+curve the way Maas and Berger do at the bedside, with mean systemic filling
+pressure as the extrapolated x-intercept.
+
+The measured line does not lie on the analytic curve, and that is the point of
+having both. Four holds from 8 to 14 cmH₂O of plateau give a slope of
+0.27 L/min per mmHg against the model's own 0.73, and extrapolate to a mean
+systemic filling pressure of 20 mmHg against an actual 8.8. The reason is in the
+model and is real: every occlusion raises lung volume, which raises abdominal
+pressure, which raises mean systemic filling pressure — so each hold shifts the
+curve it is trying to sample, and the sampled line is flatter than the true one.
+The bedside method has exactly this confound.
+
 ---
 
 ## 9. Parameters

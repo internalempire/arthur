@@ -141,6 +141,47 @@ export function createGuyton(canvas) {
       color: colors.inkMuted, dx: 4, dy: 12, halo: colors.surface,
     });
 
+    // Points measured by occlusion, and the line through them. This is how a
+    // venous return curve is built at the bedside — and the line will not lie on
+    // the analytic curve, because each hold raises abdominal pressure and so
+    // shifts the very curve it is sampling. That gap is the lesson, not a fault.
+    const measured = sim.measuredPoints;
+    if (measured.length >= 2) {
+      const n = measured.length;
+      const sx = measured.reduce((a, m) => a + m.pra, 0);
+      const sy = measured.reduce((a, m) => a + m.flow, 0);
+      const sxx = measured.reduce((a, m) => a + m.pra * m.pra, 0);
+      const sxy = measured.reduce((a, m) => a + m.pra * m.flow, 0);
+      const denom = n * sxx - sx * sx;
+      if (Math.abs(denom) > 1e-9) {
+        const slope = (n * sxy - sx * sy) / denom;
+        const intercept = (sy - slope * sx) / n;
+        if (slope < 0) {
+          const xEnd = -intercept / slope;
+          panel.clip();
+          panel.line([xLo, slope * xLo + intercept, xEnd, 0], {
+            color: colors.inkSecondary, width: 1.6, dash: [6, 4], alpha: 0.9,
+          });
+          panel.unclip();
+          panel.label(`Pmsf ${xEnd.toFixed(1)} measured`, Math.min(xEnd, xHi), 0, {
+            color: colors.inkSecondary, dx: -4, dy: -22, align: 'right', halo: colors.surface,
+          });
+        }
+      }
+    }
+    for (const m of measured) {
+      ctx.save();
+      ctx.translate(panel.sx(m.pra), panel.sy(m.flow));
+      ctx.strokeStyle = colors.inkSecondary;
+      ctx.fillStyle = colors.surface;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.rect(-3.5, -3.5, 7, 7);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
     // The analytic equilibrium: hollow, because it is a construction.
     if (equilibrium) {
       ctx.save();

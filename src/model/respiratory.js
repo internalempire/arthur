@@ -27,6 +27,11 @@ export function createRespiratoryState() {
     prevPhase: 'exp',
     canTrigger: true,
     breathCount: 0,
+    // Occlusion manoeuvres. `holdPending` is armed by the caller and becomes an
+    // active hold at the right moment in the breath, because an end-expiratory
+    // hold has to start at end-expiration to mean anything.
+    holdPending: null,
+    hold: null,
     peakInspFlow: 0,
     // Latched once per breath for the readouts.
     lastPplat: 0,
@@ -88,6 +93,25 @@ export function stepRespiratory(p, r, dt) {
 
   r.pmus = musclePressure(p, r.tCycle, period);
 
+  // --- occlusion manoeuvres ------------------------------------------------
+  // A hold freezes the airway: no flow, so alveolar pressure equilibrates with
+  // the airway and the circulation settles at a fixed lung volume and pleural
+  // pressure. That steady state is the point of the manoeuvre.
+  if (r.hold) {
+    r.flow = 0;
+    const palvHeld = r.v / crs - r.pmus;
+    r.palv = palvHeld;
+    r.ppl = PPL_FRC + r.v / ccw - r.pmus;
+    // With no flow the airway reads alveolar pressure — that is what a hold is
+    // for, and it is why a plateau is measured this way.
+    r.paw = palvHeld;
+    r.pl = palvHeld - r.ppl;
+    r.lungVolume = p.frc + r.v;
+    r.pab = p.pab0 + p.abdCoupling * r.v;
+    r.prevPhase = r.phase;
+    return r;
+  }
+
   // --- phase machine -------------------------------------------------------
   if (p.mode === 'psv') {
     // Patient-triggered, flow-cycled. The ventilator will not trigger again
@@ -121,6 +145,15 @@ export function stepRespiratory(p, r, dt) {
     }
   }
   if (r.tCycle >= period && p.mode !== 'vcv' && p.mode !== 'pcv') r.tCycle = 0;
+
+  // An armed hold engages at the phase it is named after.
+  if (r.holdPending === 'expiratory' && r.prevPhase === 'exp' && r.tCycle > period * 0.9) {
+    r.hold = 'expiratory';
+    r.holdPending = null;
+  } else if (r.holdPending === 'inspiratory' && r.prevPhase === 'insp' && r.phase === 'exp') {
+    r.hold = 'inspiratory';
+    r.holdPending = null;
+  }
 
   // --- flow ----------------------------------------------------------------
   const palv = r.v / crs - r.pmus;

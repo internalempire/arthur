@@ -203,6 +203,59 @@ describe('Physiological relations');
     `${rvFail.metrics.lvEdv.toFixed(0)} -> ${noSeptum.metrics.lvEdv.toFixed(0)} mL`);
 }
 
+describe('Occlusion manoeuvres');
+{
+  const s = new Simulator();
+  s.advance(25, true);
+  const restingFlow = s.ema.flow;
+
+  check('a hold cannot be armed twice', s.startHold('inspiratory', 8) && !s.startHold('expiratory', 8));
+  s.advance(20, true);
+  check('the hold releases and leaves one measured point', s.measuredPoints.length === 1,
+    `${s.measuredPoints.length} points`);
+
+  const held = s.measuredPoints[0];
+  check('an inspiratory hold raises right atrial pressure above resting',
+    held.pra > s.metrics.operatingPoint.pra - 0.5,
+    `held ${held.pra.toFixed(2)} mmHg`);
+  check('an inspiratory hold lowers flow below resting',
+    held.flow < restingFlow,
+    `${restingFlow.toFixed(2)} -> ${held.flow.toFixed(2)} L/min`);
+
+  // Airway flow really is zero throughout, and the airway reads alveolar
+  // pressure, which is the whole point of an occlusion.
+  const u = new Simulator();
+  u.advance(20, true);
+  u.startHold('inspiratory', 8);
+  let maxFlow = 0;
+  let airwayMatchesAlveolar = true;
+  for (let i = 0; i < 400; i++) {
+    u.advance(0.02, true);
+    if (u.resp.hold) {
+      maxFlow = Math.max(maxFlow, Math.abs(u.resp.flow));
+      if (Math.abs(u.resp.paw - u.resp.palv) > 1e-9) airwayMatchesAlveolar = false;
+    }
+  }
+  check('no gas moves during a hold', maxFlow === 0, `peak |flow| ${maxFlow}`);
+  check('the airway reads alveolar pressure during a hold', airwayMatchesAlveolar);
+
+  // Several holds at rising airway pressures must trace a falling line.
+  const t = new Simulator();
+  t.advance(20, true);
+  for (const vt of [300, 500, 700, 900]) {
+    t.setParam('vt', vt);
+    t.advance(10, true);
+    t.startHold('inspiratory', 10);
+    t.advance(16, true);
+  }
+  const pts = t.measuredPoints;
+  check('four holds give four points', pts.length === 4, `${pts.length}`);
+  const rising = pts.every((p, i) => i === 0 || p.pra > pts[i - 1].pra);
+  const falling = pts.every((p, i) => i === 0 || p.flow < pts[i - 1].flow);
+  check('rising airway pressure gives rising Pra and falling flow', rising && falling,
+    pts.map((p) => `${p.pra.toFixed(1)}/${p.flow.toFixed(2)}`).join('  '));
+}
+
 describe('Body position');
 {
   const ardsSupine = settled({ frc: 1.35, clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12 });
