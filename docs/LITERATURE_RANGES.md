@@ -71,7 +71,14 @@ the opposite direction: the previous version referenced distension to the
 patient's own resting volume, so a chronically hyperinflated lung had zero strain
 by definition and hyperinflation was free. The COPD preset's resistance was 1.7
 Wood units where the preset's own note claimed the lung was being pushed up the
-right limb of the curve. It is now 4.2, and the note is true.
+right limb of the curve. It is now 3.75 over a breath, and the note is true.
+
+A caution about reading that number, which caught me out. Pulmonary vascular
+resistance here is instantaneous, and it follows lung volume, so in a patient
+with a large tidal excursion it swings within the breath — 3.16 to 4.49 Wood
+units in this preset, a swing of 1.33. A single reading is a reading at a phase,
+not a property of the patient, and I quoted one as though it were the latter. The
+figures in this file are cycle means where the swing is material.
 
 **A correction.** An earlier version of this file said the two-region lung was
 "the same structural change that would give the model a real right-to-left

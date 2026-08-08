@@ -340,7 +340,10 @@ resting volume rather than represented. It is now the `recruitable` parameter,
 and the response to PEEP 4 → 14 runs from +15% to −21% across its range. The same
 change fixed an error in the other direction: distension used to be referenced to
 the patient's own resting volume, so a chronically hyperinflated lung had zero
-strain by definition and hyperinflation was free.
+strain by definition and hyperinflation was free. Note that this resistance is
+instantaneous and follows lung volume, so in a patient with a large tidal
+excursion it swings within the breath — 3.16 to 4.49 Wood units in the COPD
+preset. Quote the cycle mean, not a sample.
 
 **What it deliberately does not do.** Recruited units add compliance in a real
 lung; here the pressure–volume relationship is still linear. Recruitment is a

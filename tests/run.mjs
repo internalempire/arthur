@@ -339,6 +339,23 @@ describe('The two-compartment lung');
       near(drawn, s.resp.pl, 0.01), `${s.resp.pl.toFixed(3)} vs ${drawn.toFixed(3)} cmH₂O`);
   }
 
+  // A reading of resistance is a reading at a phase of the breath, because it
+  // follows lung volume. In a patient with a large tidal excursion that is worth
+  // a third of the value, and quoting a sample as if it were the patient's
+  // number is a mistake this pins down.
+  {
+    const s = settled({ ...SCENARIOS.find((x) => x.id === 'copd').params }, 45);
+    let lo = Infinity, hi = -Infinity, sum = 0, n = 0;
+    for (let i = 0; i < (60 / s.params.rr) / 0.01; i++) {
+      s.advance(0.01, true);
+      const v = s.metrics.pvrCoefficientWood;
+      lo = Math.min(lo, v); hi = Math.max(hi, v); sum += v; n++;
+    }
+    check('resistance swings within a breath when the tidal excursion is large',
+      hi - lo > 1 && near(sum / n, 3.75, 0.25),
+      `mean ${(sum / n).toFixed(2)}, range ${lo.toFixed(2)}–${hi.toFixed(2)} Wood units`);
+  }
+
   // Hyperinflation must cost something. The previous model referenced strain to
   // the patient's own resting volume, so a chronically hyperinflated lung had
   // zero strain by definition and this was free.

@@ -68,7 +68,11 @@ numbers. The following all reproduce:
   consolidated rather than closed, gives 8.0 → 10.4 Wood units and 3.38 → 2.02
   L/min.
 - COPD with a short expiratory time: 6.4 cmH₂O of intrinsic PEEP appears with no
-  change in the set PEEP.
+  change in the set PEEP, and the hyperinflated lung sits on the right limb of
+  the J-curve at 3.75 Wood units averaged over a breath. That resistance swings
+  from 3.16 to 4.49 within the breath, because it is instantaneous and follows
+  lung volume; in presets with a smaller tidal excursion the swing is 0.3 or
+  less.
 - Intra-abdominal hypertension raises Pmsf to 19 mmHg while *lowering* cardiac
   output, because the closing pressure of the vena cava rises with it.
 
