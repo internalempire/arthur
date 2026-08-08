@@ -13,8 +13,9 @@ export function createThorax(canvas) {
   function resize() {
     const rect = canvas.getBoundingClientRect();
     const d = window.devicePixelRatio || 1;
-    const nw = Math.max(1, Math.round(rect.width));
-    const nh = Math.max(1, Math.round(rect.height));
+    const cap = 4096 / d;
+    const nw = Math.max(1, Math.min(cap, Math.round(rect.width)));
+    const nh = Math.max(1, Math.min(cap, Math.round(rect.height)));
     if (nw === w && nh === h && d === dpr) return;
     w = nw; h = nh; dpr = d;
     canvas.width = Math.round(w * dpr);

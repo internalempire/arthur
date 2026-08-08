@@ -83,8 +83,13 @@ export function createPvLoops(container) {
     { key: 'rv', label: 'Right ventricle', color: 'venous', eesParam: 'eesRv' },
     { key: 'lv', label: 'Left ventricle', color: 'arterial', eesParam: 'eesLv' },
   ].map((cfg) => {
+    // Each canvas gets its own positioned cell to be absolute inside, so its
+    // backing store can never feed back into the grid track that sizes it.
+    const cell = document.createElement('div');
+    cell.className = 'pv-cell';
     const canvas = document.createElement('canvas');
-    container.appendChild(canvas);
+    cell.appendChild(canvas);
+    container.appendChild(cell);
     return makeSide(canvas, cfg);
   });
 

@@ -215,6 +215,7 @@ select { min-width: 150px; }
 /* ------------------------------------------------------------------ panels */
 
 .panel {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -222,10 +223,29 @@ select { min-width: 150px; }
   min-width: 0;
 }
 
+/* A canvas's intrinsic size is its width/height attributes read as CSS pixels,
+   and those attributes are set from its own measured box each frame. Left in
+   the flow, inside any container whose height comes from its content, that is a
+   feedback loop with device-pixel-ratio as the gain: the box grows, the backing
+   store grows, the box grows again. Taking every canvas out of flow breaks it
+   structurally — a canvas can then only ever be the size of its container.
+   The width and height here have to be explicit. A canvas is a replaced
+   element, and an absolutely positioned replaced element with `width: auto`
+   takes its intrinsic width and ignores the opposite offset — which would feed
+   the loop rather than break it. */
 .panel canvas {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* Percentages resolve against the padding box, so subtract the panel's padding. */
+.panel > canvas {
+  inset: 8px;
+  width: calc(100% - 16px);
+  height: calc(100% - 16px);
 }
 
 .panel-waves { height: 340px; }
@@ -238,11 +258,10 @@ select { min-width: 150px; }
 }
 
 .waveform-stack .strip {
+  position: relative;
   flex-basis: 0;
   min-height: 0;
 }
-
-.waveform-stack .strip canvas { height: 100%; }
 
 .grid {
   display: grid;
@@ -253,12 +272,17 @@ select { min-width: 150px; }
 .grid .panel { height: 280px; }
 .grid .panel > div { height: 100%; }
 
+/* Explicit tracks, all `minmax(0, 1fr)`. An implicit `auto` row would be sized
+   by its content — and its content is a canvas. */
 .pv-pair {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   gap: 6px;
   height: 100%;
 }
+
+.pv-cell { position: relative; min-width: 0; min-height: 0; }
 
 /* The schematic is the panel that ties the others together, so it gets the full
    width of the grid rather than a cell. */
@@ -427,9 +451,12 @@ input[type="range"]:disabled { cursor: not-allowed; }
   .topbar { padding: 10px 12px; }
   .scenario-note { padding: 8px 12px 10px; }
   .layout { padding: 0 12px 20px; }
-  .pv-pair { grid-template-columns: 1fr; }
+  .pv-pair {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  }
   .grid .panel { height: 240px; }
-  .panel:has(#pvloops) { height: 420px; }
+  .grid .panel:has(#pvloops) { height: 420px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

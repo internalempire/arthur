@@ -16,8 +16,12 @@ export class Panel {
   resize() {
     const rect = this.canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
-    const w = Math.max(1, Math.round(rect.width));
-    const h = Math.max(1, Math.round(rect.height));
+    // Belt and braces against the layout feedback loop the CSS also guards
+    // against: whatever happens, never allocate a backing store larger than a
+    // screen's worth of pixels.
+    const cap = 4096 / dpr;
+    const w = Math.max(1, Math.min(cap, Math.round(rect.width)));
+    const h = Math.max(1, Math.min(cap, Math.round(rect.height)));
     if (w === this.w && h === this.h && dpr === this.dpr) return false;
     this.w = w; this.h = h; this.dpr = dpr;
     this.canvas.width = Math.round(w * dpr);
