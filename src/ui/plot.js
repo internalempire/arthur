@@ -223,6 +223,10 @@ export class Panel {
     ctx.restore();
   }
 
+  /**
+   * Panel heading, with the subtitle dropped rather than clipped when the panel
+   * is too narrow for both. A half-written label reads as a rendering fault.
+   */
   title(text, colors, sub) {
     const { ctx } = this;
     ctx.save();
@@ -232,10 +236,13 @@ export class Panel {
     ctx.fillStyle = colors.ink;
     ctx.fillText(text, 4, 2);
     if (sub) {
-      const wText = ctx.measureText(text).width;
+      const titleWidth = ctx.measureText(text).width;
       ctx.font = '11px system-ui, -apple-system, "Segoe UI", sans-serif';
-      ctx.fillStyle = colors.inkMuted;
-      ctx.fillText(sub, 4 + wText + 8, 3);
+      const x = 4 + titleWidth + 8;
+      if (x + ctx.measureText(sub).width <= this.w - 4) {
+        ctx.fillStyle = colors.inkMuted;
+        ctx.fillText(sub, x, 3);
+      }
     }
     ctx.restore();
   }

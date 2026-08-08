@@ -263,14 +263,20 @@ select { min-width: 150px; }
   min-height: 0;
 }
 
+/* Six columns so the five panels fall into two rows: the three analytical plots
+   across the top at two columns each, then the pulmonary vascular curve beside
+   the thoracic schematic at three each. */
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
 }
 
-.grid .panel { height: 280px; }
+.grid .panel { grid-column: span 2; height: 280px; }
 .grid .panel > div { height: 100%; }
+
+.grid .panel-pvr,
+.grid .panel-thorax { grid-column: span 3; height: 320px; }
 
 /* Explicit tracks, all `minmax(0, 1fr)`. An implicit `auto` row would be sized
    by its content — and its content is a canvas. */
@@ -284,12 +290,6 @@ select { min-width: 150px; }
 
 .pv-cell { position: relative; min-width: 0; min-height: 0; }
 
-/* The schematic is the panel that ties the others together, so it gets the full
-   width of the grid rather than a cell. */
-.grid .panel-thorax {
-  grid-column: 1 / -1;
-  height: 360px;
-}
 
 /* ---------------------------------------------------------------- controls */
 
@@ -444,7 +444,12 @@ input[type="range"]:disabled { cursor: not-allowed; }
   body.sidebar-open .sidebar { transform: none; }
 
   .panel-waves { height: 300px; }
-  .grid .panel { height: 260px; }
+
+  /* Two columns; the schematic keeps the full width. */
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid .panel { grid-column: span 1; height: 260px; }
+  .grid .panel-pvr { grid-column: span 1; height: 260px; }
+  .grid .panel-thorax { grid-column: 1 / -1; height: 300px; }
 }
 
 @media (max-width: 640px) {
@@ -455,8 +460,11 @@ input[type="range"]:disabled { cursor: not-allowed; }
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   }
-  .grid .panel { height: 240px; }
-  .grid .panel:has(#pvloops) { height: 420px; }
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .grid .panel,
+  .grid .panel-pvr { grid-column: 1 / -1; height: 240px; }
+  .grid .panel-thorax { height: 300px; }
+  .grid .panel-pv { height: 420px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

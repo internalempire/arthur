@@ -50,11 +50,13 @@
           <div id="waveforms"></div>
         </section>
 
+        <!-- Two rows: three analytical plots above, then the pulmonary vascular
+             curve beside the schematic that ties everything together. -->
         <div class="grid">
-          <section class="panel" aria-label="Guyton diagram"><canvas id="guyton"></canvas></section>
-          <section class="panel" aria-label="Campbell diagram"><canvas id="campbell"></canvas></section>
-          <section class="panel" aria-label="Ventricular pressure-volume loops"><div id="pvloops"></div></section>
-          <section class="panel" aria-label="Pulmonary vascular resistance against lung volume"><canvas id="pvr"></canvas></section>
+          <section class="panel panel-guyton" aria-label="Guyton diagram"><canvas id="guyton"></canvas></section>
+          <section class="panel panel-campbell" aria-label="Campbell diagram"><canvas id="campbell"></canvas></section>
+          <section class="panel panel-pv" aria-label="Ventricular pressure-volume loops"><div id="pvloops"></div></section>
+          <section class="panel panel-pvr" aria-label="Pulmonary vascular resistance against lung volume"><canvas id="pvr"></canvas></section>
           <section class="panel panel-thorax" aria-label="Thoracic schematic"><canvas id="thorax"></canvas></section>
         </div>
 
