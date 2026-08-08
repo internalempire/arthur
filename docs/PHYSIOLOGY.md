@@ -98,9 +98,19 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 - **The pulmonary circulation is lumped.** One PVR and one zone-III fraction for
   the whole lung. Regional heterogeneity — the thing that actually makes ARDS
   ARDS — is absent.
-- **Forward Euler.** Stable at the shipped time step and parameter ranges, but
-  extreme combinations at the ends of several sliders at once can be pushed into
-  oscillation. Reset restores a settled state.
+- **Forward Euler.** Stable across the shipped ranges, and flows are now limited
+  so no compartment can be drained past a 1 mL floor; a 250-configuration sweep
+  of the whole control space finds no negative volume, no non-finite value and
+  no ejection fraction outside 0–100%. Extreme combinations still reach states
+  the equations do not describe — those suspend the readouts and say why, rather
+  than continuing to print numbers.
+- **Face validity, not quantitative validation.** What is verified is internal
+  consistency, conservation, convergence and the *direction* of established
+  relationships. There is no calibration source for each empirical constant, no
+  sensitivity analysis, no comparison against experimental time series, and no
+  identifiability analysis — different parameter combinations can produce the
+  same output. This is a mechanistic teaching model calibrated to reproduce
+  qualitative relationships, not a patient-specific predictor.
 - **No valvular disease, no arrhythmia, no bronchospasm heterogeneity, no
   recruitment hysteresis.**
 

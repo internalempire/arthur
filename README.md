@@ -727,9 +727,17 @@ The full list, with the measurements behind it, is in
   cardiac cycle.
 - **Ejection fraction runs low** by roughly 5–10 points; stroke volume, cardiac
   output and loop shape are right, the ratio is pessimistic.
-- **Forward Euler**, stable across the shipped ranges but not proof against
-  several sliders being pushed to their extremes at once. Reset restores a
-  settled state.
+- **Forward Euler**, with flows limited so no compartment can be drained past a
+  1 mL floor. A 250-configuration sweep of the control space finds no negative
+  volume, no non-finite value and no ejection fraction outside 0–100%. Extreme
+  combinations still reach states the equations do not describe; those suspend
+  the readouts and say why.
+- **Face validity rather than quantitative validation.** Internal consistency,
+  conservation, convergence and the direction of established relationships are
+  tested. There is no calibration source for each empirical constant, no
+  sensitivity analysis, no comparison against experimental series and no
+  identifiability analysis. This is a mechanistic teaching model calibrated to
+  reproduce qualitative relationships, not a patient-specific predictor.
 
 ---
 
