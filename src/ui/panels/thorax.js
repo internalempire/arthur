@@ -92,44 +92,58 @@ export function createThorax(canvas) {
     const totalV = c.vRv + c.vLv;
     const R = Math.cbrt(totalV / 250) * 42 * scale;
     const rvFrac = clamp(c.vRv / totalV, 0.18, 0.82);
-    // Septum: nominal position splits the disc by volume; its curvature follows
-    // the end-diastolic transmural pressure across it, compressed through a
-    // tanh so a normal septum reads as a modest bulge into the right ventricle
-    // and the pathological finding — flattening, then reversal — stays legible.
-    const sepX = cx - R + 2 * R * rvFrac;
-    const bow = R * 0.45 * Math.tanh((c.septalShift ?? 0) / 18);
+
+    // The septum carries two things at once, and they have to stay independent:
+    // where it sits divides the disc by volume, and how it curves shows the
+    // end-diastolic transmural pressure across it. Solve for the position that
+    // keeps the areas honest given the curvature.
+    const bulgeFrac = 0.30 * Math.tanh((c.septalShift ?? 0) / 12);
+    const bulge = R * bulgeFrac;
+    const sepX = cx + R * chordForAreaFraction(rvFrac, bulgeFrac);
+    const ctrlX = sepX + 2 * bulge; // a quadratic reaches half way to its control
+
+    // The septum spans the full height of the disc, so it meets the free wall at
+    // the poles instead of being cut off part way along its own curve.
+    const top = cy - R;
+    const bottom = cy + R;
+    const septum = (path) => {
+      path.moveTo(sepX, top);
+      path.quadraticCurveTo(ctrlX, cy, sepX, bottom);
+    };
 
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, R, 0, Math.PI * 2);
     ctx.clip();
 
-    // Right ventricle: everything left of the septum.
-    ctx.beginPath();
-    ctx.moveTo(cx - R * 1.2, cy - R * 1.2);
-    ctx.lineTo(sepX, cy - R * 1.2);
-    ctx.quadraticCurveTo(sepX + bow, cy, sepX, cy + R * 1.2);
-    ctx.lineTo(cx - R * 1.2, cy + R * 1.2);
-    ctx.closePath();
-    ctx.fillStyle = colors.venous;
-    ctx.globalAlpha = 0.42;
-    ctx.fill();
+    // The chambers are translucent, so without an opaque backing the lung
+    // ellipses behind them show through and tint one ventricle and not the
+    // other — the lung edge visibly crosses the heart, and the two halves stop
+    // being comparable by eye.
+    ctx.fillStyle = colors.surface;
+    ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
 
-    // Left ventricle: everything right of it.
-    ctx.beginPath();
-    ctx.moveTo(cx + R * 1.2, cy - R * 1.2);
-    ctx.lineTo(sepX, cy - R * 1.2);
-    ctx.quadraticCurveTo(sepX + bow, cy, sepX, cy + R * 1.2);
-    ctx.lineTo(cx + R * 1.2, cy + R * 1.2);
-    ctx.closePath();
-    ctx.fillStyle = colors.arterial;
-    ctx.globalAlpha = 0.42;
-    ctx.fill();
+    for (const side of [
+      { sign: -1, color: colors.venous },
+      { sign: 1, color: colors.arterial },
+    ]) {
+      const edge = cx + side.sign * R * 1.2;
+      ctx.beginPath();
+      ctx.moveTo(edge, cy - R * 1.2);
+      ctx.lineTo(sepX, cy - R * 1.2);
+      ctx.lineTo(sepX, top);
+      ctx.quadraticCurveTo(ctrlX, cy, sepX, bottom);
+      ctx.lineTo(sepX, cy + R * 1.2);
+      ctx.lineTo(edge, cy + R * 1.2);
+      ctx.closePath();
+      ctx.fillStyle = side.color;
+      ctx.globalAlpha = 0.42;
+      ctx.fill();
+    }
 
     ctx.globalAlpha = 1;
     ctx.beginPath();
-    ctx.moveTo(sepX, cy - R * 1.2);
-    ctx.quadraticCurveTo(sepX + bow, cy, sepX, cy + R * 1.2);
+    septum(ctx);
     ctx.strokeStyle = colors.ink;
     ctx.lineWidth = 2;
     ctx.stroke();
@@ -218,6 +232,44 @@ export function createThorax(canvas) {
   }
 
   return { render };
+}
+
+const SLICES = 96;
+
+/** Fraction of a unit disc lying left of a septum at chord offset `d`, bowed by
+ *  `bulge` (both in units of the radius). */
+function leftAreaFraction(d, bulge) {
+  let area = 0;
+  const dy = 2 / SLICES;
+  for (let i = 0; i < SLICES; i++) {
+    const t = (i + 0.5) / SLICES;
+    const y = -1 + 2 * t;
+    const half = Math.sqrt(Math.max(0, 1 - y * y));
+    const x = d + 4 * bulge * t * (1 - t); // the septum's own parabola
+    area += (Math.min(Math.max(x, -half), half) + half) * dy;
+  }
+  return area / Math.PI;
+}
+
+/**
+ * Where to put the septum so that the ventricles get the share of the disc their
+ * volumes call for, given the bow already applied to it.
+ *
+ * Neither half of this can be done in closed form and guessed at. Spacing the
+ * chord evenly across the diameter fails because a disc is widest at its centre.
+ * Compensating the bow by its mean displacement fails too: bowing moves area
+ * across the whole height of the disc, whereas sliding the chord only moves area
+ * where the disc is wide. Both errors push the drawn ratio away from one — so
+ * the picture would disagree with the RV:LV number printed beside it, which is
+ * exactly the bug this replaced. Bisect on the real integral instead.
+ */
+function chordForAreaFraction(frac, bulge) {
+  let lo = -2, hi = 2;
+  for (let i = 0; i < 22; i++) {
+    const mid = (lo + hi) / 2;
+    if (leftAreaFraction(mid, bulge) < frac) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
 }
 
 function roundRect(ctx, x, y, w, h, r) {
