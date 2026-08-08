@@ -9,6 +9,7 @@ import { createCampbell } from './ui/panels/campbell.js';
 import { createPvLoops } from './ui/panels/pvloops.js';
 import { createPvrCurve } from './ui/panels/pvrcurve.js';
 import { createThorax } from './ui/panels/thorax.js';
+import { createDescriptions } from './ui/descriptions.js';
 
 theme.init();
 
@@ -22,11 +23,13 @@ const campbell = createCampbell(el('campbell'));
 const pvLoops = createPvLoops(el('pvloops'));
 const pvrCurve = createPvrCurve(el('pvr'));
 const thorax = createThorax(el('thorax'));
-const stats = createStats(el('stats'));
+const stats = createStats(el('stats'), { banner: el('invalid-banner') });
+const descriptions = createDescriptions();
 const controls = createControls(el('controls'), sim, (id) => {
   if (id === 'mode') controls.sync();
   clearTrails();
   markCustom();
+  dirty = true;
 });
 
 // ---------------------------------------------------------------- scenarios
@@ -52,6 +55,7 @@ function applyScenario(id) {
   sim.advance(20, true);
   controls.sync();
   clearTrails();
+  dirty = true;
   scenarioNote.textContent = scenario.note;
 }
 
@@ -104,9 +108,16 @@ sidebarToggle.addEventListener('click', () => {
   sidebarToggle.setAttribute('aria-expanded', String(open));
 });
 
+// Space toggles the transport only when nothing interactive has focus. A native
+// control must keep its own keyboard behaviour: with the old check, pressing
+// space on Reset or the theme button toggled Play/Pause instead of activating
+// the focused control.
 document.addEventListener('keydown', (e) => {
-  if (e.target.matches('input, select, textarea')) return;
-  if (e.code === 'Space') { e.preventDefault(); playPause.click(); }
+  if (e.code !== 'Space' || e.metaKey || e.ctrlKey || e.altKey) return;
+  const t = e.target;
+  if (t instanceof Element && t.closest('button, input, select, textarea, a[href], [tabindex], summary, details')) return;
+  e.preventDefault();
+  playPause.click();
 });
 
 // ----------------------------------------------------------------- main loop
@@ -121,24 +132,44 @@ function draw() {
   pvrCurve.render(sim, colors);
   thorax.render(sim, colors);
   stats.render(sim.metrics);
+  descriptions.render(sim);
+  dirty = false;
 }
+
+// Anything that changes what should be on screen without the model advancing.
+let dirty = true;
+export function invalidate() { dirty = true; }
+theme.onChange(() => { dirty = true; });
+new ResizeObserver(() => { dirty = true; }).observe(document.body);
 
 function frame(now) {
   const dtWall = Math.min((now - lastFrame) / 1000, 0.1);
   lastFrame = now;
 
-  if (running) sim.advance(dtWall * speed);
+  if (running) {
+    sim.advance(dtWall * speed);
+    dirty = true;
+  }
 
-  const colors = theme.colors;
-  waveforms.render(sim, colors);
-  guyton.render(sim, colors);
-  campbell.render(sim, colors);
-  pvLoops.render(sim, colors);
-  pvrCurve.render(sim, colors);
-  thorax.render(sim, colors);
+  // Paused and unchanged: nothing to redraw. The canvases hold their last
+  // frame, so this is free rather than blank.
+  if (dirty) {
+    const colors = theme.colors;
+    waveforms.render(sim, colors);
+    guyton.render(sim, colors);
+    campbell.render(sim, colors);
+    pvLoops.render(sim, colors);
+    pvrCurve.render(sim, colors);
+    thorax.render(sim, colors);
 
-  statsClock += dtWall;
-  if (statsClock > 0.12) { stats.render(sim.metrics); statsClock = 0; }
+    statsClock += dtWall;
+    if (statsClock > 0.12 || !running) {
+      stats.render(sim.metrics);
+      descriptions.render(sim);
+      statsClock = 0;
+    }
+    if (!running) dirty = false;
+  }
 
   requestAnimationFrame(frame);
 }

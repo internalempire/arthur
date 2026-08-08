@@ -60,6 +60,7 @@ export function createCirculationState(p) {
     lvEsp: 100, rvEsp: 25,
     sv: 70, co: 5.2,
     beatCount: 0,
+    limitTicks: 0,
     lastLoopLv: [], lastLoopRv: [], loopLv: [], loopRv: [],
   };
 }
@@ -88,6 +89,68 @@ function ventricularPressure(v, act, ees, v0s, edA, edB, v0d) {
 function valveFlow(pUp, pDown, r) {
   const dp = pUp - pDown;
   return dp > 0 ? dp / r : 0;
+}
+
+// Which compartment each flow drains, and which it fills, when the flow is
+// positive. Two of them (systemic capillary and pulmonary venous) can reverse,
+// so the source is decided by sign at the time.
+const FLOW_EDGES = [
+  ['av', 'vLv', 'vSa'], ['sys', 'vSa', 'vSv'], ['vr', 'vSv', 'vRa'], ['tv', 'vRa', 'vRv'],
+  ['pv', 'vRv', 'vPa'], ['pul', 'vPa', 'vPv'], ['pulVen', 'vPv', 'vLa'], ['mv', 'vLa', 'vLv'],
+];
+const VOLUME_FLOOR = 1; // mL a compartment may never be drained below
+
+// Collapse of the great veins is progressive rather than a hard knee: as right
+// atrial pressure approaches the closing pressure the vessel flutters, so
+// sensitivity to Pra fades over roughly a millimetre of mercury instead of
+// vanishing at a point.
+const COLLAPSE_KNEE = 1.1; // mmHg
+
+/**
+ * Venous return, in mL/s. The single definition — the integrator and the curve
+ * drawn on the Guyton diagram both call this, so the plot cannot drift away
+ * from the model the way it did when the curve used a hard `max()` against a
+ * softplus in the integrator.
+ */
+export function venousReturnBackPressure(pra, pCrit) {
+  return pCrit + COLLAPSE_KNEE * Math.log1p(Math.exp((pra - pCrit) / COLLAPSE_KNEE));
+}
+
+export function venousReturnFlow(pmsf, pra, pCrit, rvr) {
+  return Math.max(0, (pmsf - venousReturnBackPressure(pra, pCrit)) / rvr);
+}
+
+/**
+ * Scale back any flow that would drain its source compartment past the floor.
+ * Mutates `q` and returns true if anything was limited — which is the signal
+ * that the model has been driven outside the range where its equations mean
+ * anything, and that the readouts should say so rather than report a number.
+ */
+function limitFlows(c, q, dt) {
+  let demand = null;
+  for (const [key, from, to] of FLOW_EDGES) {
+    const f = q[key];
+    if (f === 0) continue;
+    const src = f > 0 ? from : to;
+    (demand ??= {})[src] = (demand[src] ?? 0) + Math.abs(f);
+  }
+  if (!demand) return false;
+
+  let scale = null;
+  for (const name in demand) {
+    const wanted = demand[name] * dt;
+    const available = Math.max(0, c[name] - VOLUME_FLOOR);
+    if (wanted > available) (scale ??= {})[name] = available / wanted;
+  }
+  if (!scale) return false;
+
+  for (const [key, from, to] of FLOW_EDGES) {
+    const f = q[key];
+    if (f === 0) continue;
+    const s = scale[f > 0 ? from : to];
+    if (s !== undefined) q[key] = f * s;
+  }
+  return true;
 }
 
 /**
@@ -168,12 +231,7 @@ export function stepCirculation(p, c, resp, dt) {
   // flow stops rising. This is the plateau of the venous return curve. The IVC
   // tolerates roughly 5 cmH2O of transmural compression before it collapses.
   const pCrit = pab - cmH2OtoMmHg(5);
-  // Collapse is progressive rather than a hard knee: as right atrial pressure
-  // approaches the closing pressure the vessel flutters, so sensitivity to Pra
-  // fades over roughly a millimetre of mercury instead of vanishing at a point.
-  const knee = 1.1;
-  const pEffDown = pCrit + knee * Math.log1p(Math.exp((pRa - pCrit) / knee));
-  const qVr = Math.max(0, (pmsf - pEffDown) / rvrEff);
+  const qVr = venousReturnFlow(pmsf, pRa, pCrit, rvrEff);
   const qSys = (pSa - pmsf) / p.svr;
 
   const pvr = pvrAt(p, resp.lungVolume);
@@ -188,15 +246,23 @@ export function stepCirculation(p, c, resp, dt) {
   const qMv = valveFlow(pLa, pLv, VALVE.mitral);
   const qAv = valveFlow(pLv, pSa, VALVE.aortic);
 
+  // A compartment cannot give up volume it does not have. Without this a large
+  // adverse gradient across the unvalved pulmonary venous connection empties the
+  // left atrium straight through zero — a randomised sweep of the control ranges
+  // reached −128 mL. Scaling both ends of a flow by the same factor keeps total
+  // volume conserved exactly.
+  const q = { av: qAv, sys: qSys, vr: qVr, tv: qTv, pv: qPv, pul: qPul, pulVen: qPulVen, mv: qMv };
+  const limited = limitFlows(c, q, dt);
+
   // --- integrate -----------------------------------------------------------
-  c.vSa += (qAv - qSys) * dt;
-  c.vSv += (qSys - qVr) * dt;
-  c.vRa += (qVr - qTv) * dt;
-  c.vRv += (qTv - qPv) * dt;
-  c.vPa += (qPv - qPul) * dt;
-  c.vPv += (qPul - qPulVen) * dt;
-  c.vLa += (qPulVen - qMv) * dt;
-  c.vLv += (qMv - qAv) * dt;
+  c.vSa += (q.av - q.sys) * dt;
+  c.vSv += (q.sys - q.vr) * dt;
+  c.vRa += (q.vr - q.tv) * dt;
+  c.vRv += (q.tv - q.pv) * dt;
+  c.vPa += (q.pv - q.pul) * dt;
+  c.vPv += (q.pul - q.pulVen) * dt;
+  c.vLa += (q.pulVen - q.mv) * dt;
+  c.vLv += (q.mv - q.av) * dt;
 
   // --- expose the instantaneous state --------------------------------------
   c.p = {
@@ -205,8 +271,13 @@ export function stepCirculation(p, c, resp, dt) {
     raTm: pRaTm, rvTm: pRvTm, lvTm: pLvTm, laTm: pLaTm,
     zone3, pvr, vHeart,
   };
-  c.q = { vr: qVr, sys: qSys, pul: qPul, tv: qTv, pv: qPv, mv: qMv, av: qAv };
+  c.q = { vr: q.vr, sys: q.sys, pul: q.pul, tv: q.tv, pv: q.pv, mv: q.mv, av: q.av, pulVen: q.pulVen };
   c.act = { v: actV, a: actA, tn };
+
+  // Latch the fact that limiting happened so it survives to the next readout,
+  // and decay it so the state clears once the model returns to a sane regime.
+  if (limited) c.limitTicks = 4000; // about a second of simulated time at the default step
+  else if (c.limitTicks > 0) c.limitTicks--;
 
   // End-systolic volume of the beat currently in progress. End-diastolic volume
   // is read at the beat boundary itself rather than as a maximum over the
@@ -214,8 +285,12 @@ export function stepCirculation(p, c, resp, dt) {
   // and smooth away the respiratory variation we are trying to show.
   c.lvEsvRun = Math.min(c.lvEsvRun, c.vLv);
   c.rvEsvRun = Math.min(c.rvEsvRun, c.vRv);
-  if (qAv > 0) c.lvEspRun = pLv;
-  if (qPv > 0) c.rvEspRun = pRv;
+  // Stored transmural. Two consumers used to correct these themselves and did
+  // it differently: the pressure–volume loops subtracted pleural pressure only,
+  // the cardiac function curve subtracted a pleural pressure from a different
+  // instant than the beat the pressure came from.
+  if (q.av > 0) c.lvEspRun = pLvTm;
+  if (q.pv > 0) c.rvEspRun = pRvTm;
 
   // Pressure-volume loop trace, subsampled.
   if (!c._loopTick) c._loopTick = 0;
@@ -272,7 +347,7 @@ export function venousReturnCurve(p, c, mean, nPoints = 90) {
   const lo = Math.min(pCrit - 6, -6);
   for (let i = 0; i < nPoints; i++) {
     const pra = lo + ((pmsf + 3 - lo) * i) / (nPoints - 1);
-    const q = Math.max(0, (pmsf - Math.max(pra, pCrit)) / c.p.rvrEff);
+    const q = venousReturnFlow(pmsf, pra, pCrit, c.p.rvrEff);
     pts.push(pra, (q * 60) / 1000);
   }
   return { points: pts, pmsf, pCrit };
@@ -291,7 +366,7 @@ export function cardiacFunctionCurve(p, c, mean, nPoints = 90) {
   // the beat-to-beat ripple that would otherwise jitter the intercept.
   const pExt = (mean?.ppl ?? c.p.ppl) + (mean?.pPeri ?? c.p.pPeri);
   const svRv = Math.max(4, c.svRv ?? c.sv);
-  const ea = Math.max(0.02, (c.rvEsp - c.p.ppl) / svRv);
+  const ea = Math.max(0.02, c.rvEsp / svRv); // both transmural, same beat
   const { edA, edB, v0d, v0s } = { ...CHAMBER.rv, v0s: CHAMBER.rv.v0s };
   const pts = [];
   for (let i = 0; i < nPoints; i++) {

@@ -20,7 +20,7 @@ function makeSide(canvas, cfg) {
     const prev = cfg.key === 'lv' ? c.lastLoopLv : c.lastLoopRv;
     const edv = cfg.key === 'lv' ? c.lvEdv : c.rvEdv;
     const esv = cfg.key === 'lv' ? c.lvEsv : c.rvEsv;
-    const esp = cfg.key === 'lv' ? c.lvEsp - c.p.ppl : c.rvEsp - c.p.ppl;
+    const esp = cfg.key === 'lv' ? c.lvEsp : c.rvEsp; // already transmural
 
     let vMax = 60, pMax = 20;
     for (const arr of [prev, live]) {

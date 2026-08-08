@@ -44,7 +44,19 @@
       </aside>
 
       <main class="stage">
+        <p class="invalid-banner" id="invalid-banner" role="status" hidden></p>
+
         <div class="tiles" id="stats"></div>
+
+        <p class="tile-legend">
+          Readouts are marked by what they are:
+          <span class="legend-key" data-kind="measured">measurement</span> the model makes directly,
+          <span class="legend-key" data-kind="derived">derived index</span> computed from those the way a
+          clinician would, and
+          <span class="legend-key" data-kind="coefficient">internal coefficient</span> of the model, which
+          shares a name with a clinical quantity but is not measured the same way.
+          A reading whose validity conditions are not met is withheld rather than shown.
+        </p>
 
         <section class="panel panel-waves" aria-label="Time-aligned waveforms">
           <div id="waveforms"></div>

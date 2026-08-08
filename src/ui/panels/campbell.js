@@ -6,10 +6,14 @@ import { PPL_FRC, respiratorySystemCompliance } from '../../model/respiratory.js
 // distance between the two loops at any volume is the pressure spent on the
 // lung — and the pleural loop is the one the heart lives inside.
 
+const LOOP_INTERVAL = 0.02; // s of simulated time between samples
+const LOOP_POINTS = 900;    // about three breaths at a normal rate
+
 export function createCampbell(canvas) {
   const panel = new Panel(canvas, { padding: [22, 58, 34, 48] });
   const pplLoop = [];
   const pawLoop = [];
+  let lastSample = -1;
 
   function render(sim, colors) {
     panel.resize();
@@ -17,9 +21,14 @@ export function createCampbell(canvas) {
     const { params: p, resp: r } = sim;
 
     const vMl = r.v * 1000;
-    pplLoop.push(r.ppl, vMl);
-    pawLoop.push(r.paw, vMl);
-    if (pplLoop.length > 2400) { pplLoop.splice(0, 600); pawLoop.splice(0, 600); }
+    // Sampled on simulated time, so the loop keeps its shape whatever the frame
+    // rate and does not accumulate while paused.
+    if (sim.time - lastSample >= LOOP_INTERVAL) {
+      lastSample = sim.time;
+      pplLoop.push(r.ppl, vMl);
+      pawLoop.push(r.paw, vMl);
+      if (pplLoop.length > LOOP_POINTS * 2) { pplLoop.splice(0, 2); pawLoop.splice(0, 2); }
+    }
 
     const vMax = Math.max(900, vMl * 1.25, p.vt * 1.6 + p.peep * respiratorySystemCompliance(p));
     let pLo = -12, pHi = 30;
@@ -56,27 +65,27 @@ export function createCampbell(canvas) {
 
     panel.unclip();
 
-    panel.label('Ppl', r.ppl, vMl, { color: colors.pleural, dx: -6, align: 'right', halo: colors.surface });
-    panel.label('Paw', r.paw, vMl, { color: colors.airway, dx: 6, halo: colors.surface });
+    panel.label('Ppl', r.ppl, vMl, { color: colors.text.pleural, dx: -6, align: 'right', halo: colors.surface });
+    panel.label('Paw', r.paw, vMl, { color: colors.text.airway, dx: 6, halo: colors.surface });
     // The three relaxation lines converge near the top of the plot, so each
     // label is anchored at a different height on its own line.
     panel.label('Ccw', PPL_FRC + (vMax * 0.92) / p.ccw, vMax * 0.92, {
-      color: colors.pleural, dx: -5, align: 'right', halo: colors.surface,
+      color: colors.text.pleural, dx: -5, align: 'right', halo: colors.surface,
     });
     panel.label('Crs', (vMax * 0.72) / crs, vMax * 0.72, {
-      color: colors.airway, dx: 5, halo: colors.surface,
+      color: colors.text.airway, dx: 5, halo: colors.surface,
     });
     panel.label('Clung', -PPL_FRC - (vMax * 0.25) / p.clung, vMax * 0.25, {
       color: colors.inkMuted, dx: 5, halo: colors.surface,
     });
 
-    panel.dot(r.ppl, vMl, { color: colors.pleural, r: 3.5, ring: colors.surface });
-    panel.dot(r.paw, vMl, { color: colors.airway, r: 3.5, ring: colors.surface });
+    panel.dot(r.ppl, vMl, { color: colors.text.pleural, r: 3.5, ring: colors.surface });
+    panel.dot(r.paw, vMl, { color: colors.text.airway, r: 3.5, ring: colors.surface });
 
     panel.title('Campbell diagram', colors, 'chest wall vs respiratory system');
   }
 
-  function clearTrail() { pplLoop.length = 0; pawLoop.length = 0; }
+  function clearTrail() { pplLoop.length = 0; pawLoop.length = 0; lastSample = -1; }
 
   return { render, clearTrail };
 }

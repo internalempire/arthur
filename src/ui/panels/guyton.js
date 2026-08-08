@@ -45,9 +45,13 @@ function intersection(vr, cf) {
   return { x, y: valueAt(vr, x) };
 }
 
+const TRAIL_INTERVAL = 0.025; // s of simulated time between trail samples
+const TRAIL_POINTS = 480;     // about 12 s of physiology
+
 export function createGuyton(canvas) {
   const panel = new Panel(canvas, { padding: [22, 16, 34, 46] });
   const trail = []; // operating point over the last few seconds
+  let lastSample = -1;
 
   function render(sim, colors) {
     panel.resize();
@@ -63,14 +67,31 @@ export function createGuyton(canvas) {
     const op = m.operatingPoint;
     const vr = venousReturnCurve(p, c, op);
     const cf = cardiacFunctionCurve(p, c, op);
-    const point = intersection(vr.points, cf.points) ?? { x: op.pra, y: op.flow };
 
-    trail.push(point.x, point.y);
-    if (trail.length > 1400) trail.splice(0, 300);
+    // Two different things, drawn as two different marks.
+    //
+    // `simulated` is where the integrated model actually is: the cycle-mean
+    // right atrial pressure against the cycle-mean venous return. `equilibrium`
+    // is where the graphical analysis says it should be — the crossing of the
+    // two curves. They are close but not identical, because the cardiac
+    // function curve is a single-beat approximation and because averaging a
+    // nonlinear venous return relation over a cycle is not the same as
+    // evaluating it at the mean pressure. Showing only the crossing, as this
+    // panel used to, presents a derived equilibrium as if it were the patient.
+    const simulated = { x: op.pra, y: op.flow };
+    const equilibrium = intersection(vr.points, cf.points);
+
+    // Sampled on simulated time so the trail covers a fixed span of physiology
+    // regardless of frame rate, and stops growing when the model is paused.
+    if (sim.time - lastSample >= TRAIL_INTERVAL) {
+      lastSample = sim.time;
+      trail.push(simulated.x, simulated.y);
+      if (trail.length > TRAIL_POINTS * 2) trail.splice(0, 2);
+    }
 
     const xLo = Math.min(-6, cf.xIntercept - 3, vr.pCrit - 3);
-    const xHi = Math.max(vr.pmsf + 2, point.x + 6, 14);
-    const yHi = Math.max(9, (vr.points[1] ?? 8) * 1.05, point.y * 1.6);
+    const xHi = Math.max(vr.pmsf + 2, simulated.x + 6, 14);
+    const yHi = Math.max(9, (vr.points[1] ?? 8) * 1.05, simulated.y * 1.6);
     panel.setDomain(xLo, xHi, 0, yHi);
 
     panel.grid(colors, {
@@ -106,27 +127,47 @@ export function createGuyton(canvas) {
     // Direct labels rather than a legend box.
     const vrLabelIdx = Math.floor(vr.points.length * 0.18) & ~1;
     panel.label('Venous return', vr.points[vrLabelIdx], vr.points[vrLabelIdx + 1], {
-      color: colors.venous, dx: 6, dy: -10, halo: colors.surface,
+      color: colors.text.venous, dx: 6, dy: -10, halo: colors.surface,
     });
     const cfLabelIdx = Math.floor(cf.points.length * 0.82) & ~1;
     panel.label('Cardiac function', cf.points[cfLabelIdx], cf.points[cfLabelIdx + 1], {
-      color: colors.arterial, dx: -6, dy: -10, align: 'right', halo: colors.surface,
+      color: colors.text.arterial, dx: -6, dy: -10, align: 'right', halo: colors.surface,
     });
 
     panel.label(`Pmsf ${vr.pmsf.toFixed(1)}`, vr.pmsf, 0, {
-      color: colors.venous, dx: -4, dy: -8, align: 'right', halo: colors.surface,
+      color: colors.text.venous, dx: -4, dy: -8, align: 'right', halo: colors.surface,
     });
     panel.label('Ppl', pplMmHg, yHi, {
       color: colors.inkMuted, dx: 4, dy: 12, halo: colors.surface,
     });
 
-    // The operating point itself: where the two curves cross.
-    panel.dot(point.x, point.y, { color: colors.ink, r: 4, ring: colors.surface });
+    // The analytic equilibrium: hollow, because it is a construction.
+    if (equilibrium) {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(panel.sx(equilibrium.x), panel.sy(equilibrium.y), 5, 0, Math.PI * 2);
+      ctx.strokeStyle = colors.ink;
+      ctx.lineWidth = 1.6;
+      ctx.globalAlpha = 0.55;
+      ctx.stroke();
+      ctx.restore();
+    }
+    // The simulated state: filled, because it is what the model is doing.
+    panel.dot(simulated.x, simulated.y, { color: colors.ink, r: 4, ring: colors.surface });
+
+    panel.label('simulated', simulated.x, simulated.y, {
+      color: colors.ink, dx: 9, dy: 9, halo: colors.surface,
+    });
+    if (equilibrium && Math.abs(equilibrium.y - simulated.y) > yHi * 0.03) {
+      panel.label('analytic', equilibrium.x, equilibrium.y, {
+        color: colors.inkMuted, dx: 9, dy: -9, halo: colors.surface,
+      });
+    }
 
     panel.title('Guyton diagram', colors, 'where venous return meets cardiac function');
   }
 
-  function clearTrail() { trail.length = 0; }
+  function clearTrail() { trail.length = 0; lastSample = -1; }
 
   return { render, clearTrail };
 }

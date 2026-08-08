@@ -2,14 +2,21 @@ import { defaultParams } from './parameters.js';
 import {
   createRespiratoryState, stepRespiratory, respiratorySystemCompliance, pvrComponents,
 } from './respiratory.js';
-import { createCirculationState, stepCirculation, VASC } from './circulation.js';
+import {
+  createCirculationState, stepCirculation, VASC, venousReturnBackPressure,
+} from './circulation.js';
 import { cmH2OtoMmHg, RESISTANCE_TO_DYN, RESISTANCE_TO_WOOD } from './units.js';
 
-const DT = 0.00025; // 0.25 ms — small enough for the low valve resistances
+export const DEFAULT_DT = 0.00025; // 0.25 ms — small enough for the low valve resistances
 const SAMPLE_HZ = 250;
 export const TRACE_SECONDS = 12;
 const TRACE_LEN = SAMPLE_HZ * TRACE_SECONDS;
 const MEAN_TIME_CONSTANT = 3; // s, for the mean-pressure moving averages
+const COMPARTMENTS = ['vSa', 'vSv', 'vRa', 'vRv', 'vPa', 'vPv', 'vLa', 'vLv'];
+// The compartment volumes, compliances and resistances are calibrated for an
+// adult of about this weight. It is stated because the validity condition for
+// pulse pressure variation is expressed per kilogram.
+const REFERENCE_WEIGHT_KG = 70;
 
 class Ring {
   constructor(n) { this.buf = new Float32Array(n); this.n = n; this.i = 0; this.filled = 0; }
@@ -58,7 +65,9 @@ class CycleRing {
 }
 
 export class Simulator {
-  constructor() {
+  /** `dt` is exposed so the convergence test can halve it. */
+  constructor({ dt = DEFAULT_DT } = {}) {
+    this.dt = dt;
     this.params = defaultParams();
     this.reset();
   }
@@ -123,12 +132,13 @@ export class Simulator {
 
   /** Advance simulated time by `seconds`, optionally without recording traces. */
   advance(seconds, silent = false) {
-    const steps = Math.min(Math.round(seconds / DT), 240000);
-    const sampleEvery = Math.round(1 / (SAMPLE_HZ * DT));
+    const dt = this.dt;
+    const steps = Math.min(Math.round(seconds / dt), 240000 * (DEFAULT_DT / dt));
+    const sampleEvery = Math.max(1, Math.round(1 / (SAMPLE_HZ * dt)));
     for (let s = 0; s < steps; s++) {
-      stepRespiratory(this.params, this.resp, DT);
-      stepCirculation(this.params, this.circ, this.resp, DT);
-      this.time += DT;
+      stepRespiratory(this.params, this.resp, dt);
+      stepCirculation(this.params, this.circ, this.resp, dt);
+      this.time += dt;
       this.accumulate();
       if (!silent && s % sampleEvery === 0) this.sample();
     }
@@ -143,16 +153,22 @@ export class Simulator {
     this.papDiaRun = Math.min(this.papDiaRun, c.p.pa);
 
     if (this.ema === null) {
-      this.ema = { map: c.p.sa, cvp: c.p.ra, pap: c.p.pa, paop: c.p.la };
+      this.ema = { map: c.p.sa, cvp: c.p.ra, pap: c.p.pa, paop: c.p.la,
+        ppl: c.p.ppl, peri: c.p.pPeri, pmsf: c.p.pmsf, pCrit: c.p.pCrit, flow: (c.q.vr * 60) / 1000 };
     } else {
-      const alpha = DT / MEAN_TIME_CONSTANT;
+      const alpha = this.dt / MEAN_TIME_CONSTANT;
       this.ema.map += alpha * (c.p.sa - this.ema.map);
       this.ema.cvp += alpha * (c.p.ra - this.ema.cvp);
       this.ema.pap += alpha * (c.p.pa - this.ema.pap);
       this.ema.paop += alpha * (c.p.la - this.ema.paop);
+      this.ema.ppl += alpha * (c.p.ppl - this.ema.ppl);
+      this.ema.peri += alpha * (c.p.pPeri - this.ema.peri);
+      this.ema.pmsf += alpha * (c.p.pmsf - this.ema.pmsf);
+      this.ema.pCrit += alpha * (c.p.pCrit - this.ema.pCrit);
+      this.ema.flow += alpha * ((c.q.vr * 60) / 1000 - this.ema.flow);
     }
 
-    if (this.cycleTick++ % Math.round(1 / (CYCLE_HZ * DT)) === 0) {
+    if (this.cycleTick++ % Math.max(1, Math.round(1 / (CYCLE_HZ * this.dt))) === 0) {
       this.cycle.ra.push(c.p.ra);
       this.cycle.flow.push((c.q.vr * 60) / 1000);
       this.cycle.pmsf.push(c.p.pmsf);
@@ -217,13 +233,30 @@ export class Simulator {
     }
 
     const last = hist[hist.length - 1] ?? {};
-    const { map, cvp, pap: papMean, paop } = this.ema ?? {
+    const ema = this.ema ?? {
       map: c.p.sa, cvp: c.p.ra, pap: c.p.pa, paop: c.p.la,
+      ppl: c.p.ppl, peri: c.p.pPeri, pmsf: c.p.pmsf, pCrit: c.p.pCrit, flow: 0,
     };
+    const { map, cvp, pap: papMean, paop } = ema;
 
     const co = (c.sv * p.hr) / 1000;
     const crs = respiratorySystemCompliance(p);
     const pvrComp = pvrComponents(p, r.lungVolume);
+
+    // Whether each derived index can be read as the clinical quantity it shares
+    // a name with. A dynamic index outside its validity conditions is not a
+    // borderline result — it is not a result. See `interpretability` below.
+
+    // Whether the numbers below mean anything at all. A model driven past the
+    // range where its equations hold should say so rather than keep reporting
+    // values in clinical units.
+    const lvEf = c.lvEdv > 0 ? (100 * c.sv) / c.lvEdv : 0;
+    const reasons = [];
+    if (c.limitTicks > 0) reasons.push('a compartment was being drained faster than it could supply');
+    const emptied = COMPARTMENTS.filter((k) => c[k] <= 1.5);
+    if (emptied.length) reasons.push(`${emptied.join(', ')} at the volume floor`);
+    if (!(lvEf >= 0 && lvEf <= 100)) reasons.push('ejection fraction outside 0–100%');
+    if (!Number.isFinite(co) || !Number.isFinite(map)) reasons.push('non-finite result');
 
     // One cardiac cycle's worth of samples: the cardiac ripple averages out, the
     // respiratory swing survives.
@@ -240,17 +273,58 @@ export class Simulator {
       pCrit: this.cycle.pCrit.mean(window),
     };
 
+    const spontaneousEffort = p.mode === 'spont' || p.pmus > 0.5;
+    const beatsPerBreath = p.hr / p.rr;
+
+    // Conditions under which the dynamic indices stop meaning what their names
+    // say. Levels: 'ok', 'caution', 'unavailable'.
+    const ppvReasons = [];
+    if (spontaneousEffort) ppvReasons.push('spontaneous effort — the index assumes a passive patient');
+    if (r.lastVt < 8 * REFERENCE_WEIGHT_KG) ppvReasons.push(`tidal volume below 8 mL/kg (${REFERENCE_WEIGHT_KG} kg assumed)`);
+    if (beatsPerBreath < 3.6) ppvReasons.push('fewer than 3.6 beats per breath');
+    if (c.lvEdv > 0 && c.rvEdv / c.lvEdv > 1.2) ppvReasons.push('right ventricular dilatation — variation may reflect afterload, not preload');
+    if (p.pab0 > 12) ppvReasons.push('raised intra-abdominal pressure');
+    const ppvLevel = spontaneousEffort ? 'unavailable' : ppvReasons.length ? 'caution' : 'ok';
+
+    const plateauLevel = spontaneousEffort ? 'unavailable' : 'ok';
+    const wedgeLevel = c.p.zone3 >= 0.95 ? 'ok' : 'caution';
+    const pvrDerivedLevel = co > 0.05 ? 'ok' : 'unavailable';
+
+    // ESC/ERS 2022: pulmonary hypertension is mPAP above 20 mmHg; the
+    // pre-capillary component additionally requires PVR above 2 Wood units with
+    // a wedge of 15 mmHg or less.
+    const pvrDerived = co > 0.05 ? (papMean - paop) / co : null;
+    const phPresent = papMean > 20;
+    const phClass = !phPresent ? null
+      : (paop > 15 ? (pvrDerived !== null && pvrDerived > 2 ? 'combined' : 'post-capillary')
+        : (pvrDerived !== null && pvrDerived > 2 ? 'pre-capillary' : 'unclassified'));
+
+    const interpretability = {
+      ppv: { level: ppvLevel, reasons: ppvReasons },
+      plateau: { level: plateauLevel, reasons: plateauLevel === 'unavailable' ? ['no passive plateau during spontaneous effort'] : [] },
+      wedge: {
+        level: wedgeLevel,
+        reasons: wedgeLevel === 'ok' ? []
+          : ['left atrial pressure is only a wedge surrogate under West zone 3 conditions'],
+      },
+      pvrDerived: { level: pvrDerivedLevel, reasons: pvrDerivedLevel === 'ok' ? [] : ['no forward flow to divide by'] },
+    };
+
     return {
+      spontaneousEffort, beatsPerBreath, interpretability, phPresent, phClass,
       co, sv: c.sv, hr: p.hr,
       map, sbp: last.sbp ?? c.p.sa, dbp: last.dbp ?? c.p.sa,
-      cvp, cvpTransmural: cvp - cmH2OtoMmHg(r.ppl) - c.p.pPeri,
+      cvp, cvpTransmural: cvp - ema.ppl - ema.peri,
       papSys: last.papSys ?? c.p.pa, papDia: last.papDia ?? c.p.pa, papMean, paop,
       ppv, svv,
-      lvEdv: c.lvEdv, lvEsv: c.lvEsv, lvEf: c.lvEdv > 0 ? (100 * c.sv) / c.lvEdv : 0,
+      valid: reasons.length === 0,
+      invalidReasons: reasons,
+      lvEdv: c.lvEdv, lvEsv: c.lvEsv, lvEf,
       rvEdv: c.rvEdv, rvEsv: c.rvEsv,
       rvLvRatio: c.lvEdv > 0 ? c.rvEdv / c.lvEdv : 1,
-      pmsf: c.p.pmsf, pCrit: c.p.pCrit, pPeri: c.p.pPeri, operatingPoint,
-      gradientVr: c.p.pmsf - Math.max(c.p.ra, c.p.pCrit),
+      pmsf: ema.pmsf, pCrit: ema.pCrit, pPeri: ema.peri, operatingPoint,
+      // Same collapse law as the integrator, same averaging window as its terms.
+      gradientVr: ema.pmsf - venousReturnBackPressure(cvp, ema.pCrit),
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
       lungVolume: r.lungVolume, pab: r.pab,
       pplat: r.lastPplat, ppeak: r.lastPpeak, autoPeep: r.lastAutoPeep,
@@ -259,13 +333,23 @@ export class Simulator {
       pplSwing: r.lastPplSwing,
       vtDelivered: r.lastVt,
       crs, expTimeConstant: (crs / 1000) * p.raw,
-      pvr: c.p.pvr, pvrWood: c.p.pvr * RESISTANCE_TO_WOOD,
+      pvr: c.p.pvr,
+      // The J-curve coefficient the model integrates with. Not the same number a
+      // clinician derives from a catheter, because the model also carries an
+      // alveolar waterfall and zone conditions that the catheter formula folds
+      // into its single resistance. Both are reported, separately named.
+      pvrCoefficientWood: c.p.pvr * RESISTANCE_TO_WOOD,
+      // null rather than NaN: at arrest there is no derivable resistance, and a
+      // readout should say so instead of propagating a number that is not one.
+      pvrDerivedWood: pvrDerived,
+      pvrWood: c.p.pvr * RESISTANCE_TO_WOOD,
       pvrDyn: c.p.pvr * RESISTANCE_TO_DYN,
       svrDyn: p.svr * RESISTANCE_TO_DYN,
       pvrAlveolar: pvrComp.alveolar, pvrExtra: pvrComp.extraAlveolar,
       zone3: c.p.zone3,
       minuteVentilation: (r.lastVt * p.rr) / 1000,
-      bloodVolume: c.vSa + c.vSv + c.vRa + c.vRv + c.vPa + c.vPv + c.vLa + c.vLv,
+      bloodVolume: COMPARTMENTS.reduce((t, k) => t + c[k], 0),
+      minCompartment: Math.min(...COMPARTMENTS.map((k) => c[k])),
       stressedVenous: c.vSv - VASC.vuSv,
     };
   }

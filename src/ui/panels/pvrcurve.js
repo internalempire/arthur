@@ -9,17 +9,22 @@ import { RESISTANCE_TO_WOOD } from '../../model/units.js';
 
 export function createPvrCurve(canvas) {
   const panel = new Panel(canvas, { padding: [22, 16, 34, 48] });
-  let vMinSeen = Infinity, vMaxSeen = -Infinity, decayTick = 0;
+  let vMinSeen = Infinity, vMaxSeen = -Infinity, breathSeen = -1;
 
   function render(sim, colors) {
     panel.resize();
     const ctx = panel.begin();
     const { params: p, resp: r } = sim;
 
-    // Track the excursion the current breath makes along the curve.
+    // The excursion the current breath makes along the curve — reset on a
+    // breath, not after a fixed number of frames.
+    if (r.breathCount !== breathSeen) {
+      breathSeen = r.breathCount;
+      vMinSeen = r.lungVolume;
+      vMaxSeen = r.lungVolume;
+    }
     vMinSeen = Math.min(vMinSeen, r.lungVolume);
     vMaxSeen = Math.max(vMaxSeen, r.lungVolume);
-    if (++decayTick % 240 === 0) { vMinSeen = r.lungVolume; vMaxSeen = r.lungVolume; }
 
     const xLo = 0.6;
     const xHi = Math.max(4.2, r.lungVolume + 0.6);
@@ -64,11 +69,11 @@ export function createPvrCurve(canvas) {
 
     const at = (arr, frac) => { const i = (Math.floor(arr.length * frac) & ~1); return [arr[i], arr[i + 1]]; };
     let [lx, ly] = at(alv, 0.86);
-    panel.label('Intra-alveolar', lx, ly, { color: colors.airway, align: 'right', dx: -4, dy: -8, halo: colors.surface });
+    panel.label('Intra-alveolar', lx, ly, { color: colors.text.airway, align: 'right', dx: -4, dy: -8, halo: colors.surface });
     [lx, ly] = at(ext, 0.1);
-    panel.label('Extra-alveolar', lx, ly, { color: colors.pleural, dx: 6, dy: -8, halo: colors.surface });
+    panel.label('Extra-alveolar', lx, ly, { color: colors.text.pleural, dx: 6, dy: -8, halo: colors.surface });
     [lx, ly] = at(tot, 0.45);
-    panel.label('Total', lx, ly, { color: colors.flow, dx: 4, dy: 12, halo: colors.surface });
+    panel.label('Total', lx, ly, { color: colors.text.flow, dx: 4, dy: 12, halo: colors.surface });
 
     const cur = pvrComponents(p, r.lungVolume).total * RESISTANCE_TO_WOOD;
     panel.dot(r.lungVolume, cur, { color: colors.ink, r: 4, ring: colors.surface });

@@ -7,6 +7,9 @@ import { TRACE_SECONDS } from '../../model/simulator.js';
 // other.
 
 const WINDOW_SECONDS = TRACE_SECONDS;
+// How long the data must sit comfortably inside the current range before it is
+// allowed to shrink, in seconds of simulated time.
+const SHRINK_DELAY = 4;
 
 const STRIPS = [
   {
@@ -51,8 +54,25 @@ export function createWaveforms(container) {
     const canvas = document.createElement('canvas');
     wrap.appendChild(canvas);
     container.appendChild(wrap);
-    return { spec, canvas, panel: new Panel(canvas, { padding: [16, 62, spec.axis ? 22 : 6, 46] }) };
+    return {
+      spec,
+      canvas,
+      panel: new Panel(canvas, { padding: [16, 62, spec.axis ? 22 : 6, 46] }),
+      domain: null,     // the y range currently displayed
+      insideSince: -1,  // when the data last started fitting comfortably inside it
+    };
   });
+
+  /**
+   * Rounds a range outwards to a readable step, so the axis labels do not churn
+   * through arbitrary values as the scale changes.
+   */
+  function roundOut(lo, hi) {
+    const span = Math.max(hi - lo, 1e-6);
+    const mag = Math.pow(10, Math.floor(Math.log10(span / 3)));
+    const step = (span / 3 / mag < 1.5 ? 1 : span / 3 / mag < 3.5 ? 2 : 5) * mag;
+    return { lo: Math.floor(lo / step) * step, hi: Math.ceil(hi / step) * step };
+  }
 
   function render(sim, colors) {
     // Inspiratory phase shading is shared by every strip.
@@ -60,11 +80,11 @@ export function createWaveforms(container) {
     const inspData = insp.data;
     const inspN = insp.n;
 
-    for (const { spec, panel } of strips) {
+    for (const strip of strips) {
+      const { spec, panel } = strip;
       panel.resize();
       const ctx = panel.begin();
 
-      // Establish the y domain from the data actually on screen.
       let lo = Infinity, hi = -Infinity;
       const buffers = [];
       for (const s of spec.series) {
@@ -74,9 +94,32 @@ export function createWaveforms(container) {
       }
       if (!isFinite(lo)) { lo = 0; hi = 1; }
       const pad = Math.max((hi - lo) * 0.12, 1);
-      panel.setDomain(0, WINDOW_SECONDS, lo - pad, hi + pad);
+      const wanted = roundOut(lo - pad, hi + pad);
 
-      const ticks = niceTicks(lo - pad, hi + pad, 3);
+      // Scaling with hysteresis. Rescaling on every frame makes two traces
+      // impossible to compare by eye — the amplitude on screen keeps changing
+      // while the physiology does not. So the range grows the moment data would
+      // be clipped, but only shrinks once the data has sat comfortably inside it
+      // for a few seconds of simulated time.
+      let d = strip.domain;
+      if (!d) {
+        d = strip.domain = wanted;
+        strip.insideSince = sim.time;
+      } else if (lo - pad < d.lo || hi + pad > d.hi) {
+        d = strip.domain = { lo: Math.min(d.lo, wanted.lo), hi: Math.max(d.hi, wanted.hi) };
+        strip.insideSince = sim.time;
+      } else {
+        const span = d.hi - d.lo;
+        const comfortable = (lo - pad) > d.lo + span * 0.18 && (hi + pad) < d.hi - span * 0.18;
+        if (!comfortable) strip.insideSince = sim.time;
+        else if (sim.time - strip.insideSince > SHRINK_DELAY) {
+          d = strip.domain = wanted;
+          strip.insideSince = sim.time;
+        }
+      }
+      panel.setDomain(0, WINDOW_SECONDS, d.lo, d.hi);
+
+      const ticks = niceTicks(d.lo, d.hi, 3);
       panel.grid(colors, {
         yTicks: ticks,
         yFormat: (v) => (Math.abs(v) >= 100 ? v.toFixed(0) : v.toFixed(Math.abs(v) < 10 ? 1 : 0)),
@@ -115,7 +158,7 @@ export function createWaveforms(container) {
         if (b.n === 0) continue;
         const v = b.data[b.n - 1];
         panel.label(b.label, WINDOW_SECONDS, v, {
-          color: colors[b.color], dx: 8, halo: colors.surface,
+          color: colors.text[b.color], dx: 8, halo: colors.surface,
         });
       }
 

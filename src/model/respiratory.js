@@ -26,6 +26,7 @@ export function createRespiratoryState() {
     pmus: 0,
     prevPhase: 'exp',
     canTrigger: true,
+    breathCount: 0,
     peakInspFlow: 0,
     // Latched once per breath for the readouts.
     lastPplat: 0,
@@ -160,6 +161,8 @@ export function stepRespiratory(p, r, dt) {
 
   // Everything reported per breath is latched exactly once, at the moment
   // inspiration ends — not on a time window that can fire twice.
+  if (r.prevPhase === 'exp' && r.phase === 'insp') r.breathCount++;
+
   if (r.prevPhase === 'insp' && r.phase === 'exp') {
     r.lastPplat = r.pplatCandidate ?? 0;
     r.lastPpeak = r.ppeakAccum;

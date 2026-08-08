@@ -3,6 +3,22 @@
 // which slot carries which signal follows clinical convention where one exists
 // — arterial red, venous blue, airway orange.
 
+// A colour that reads well as a 2 px stroke is often too light as 10 px text.
+// These are the same hues moved toward the surface's opposite until each clears
+// the WCAG AA body-text ratio of 4.5:1 against the panel it is drawn on, and are
+// used for every label, annotation and status word. Computed, not chosen.
+const LIGHT_TEXT = {
+  arterial: '#cf4242', venous: '#2974d0', pulmonary: '#008300', airway: '#be542a',
+  pleural: '#15855d', volume: '#9c6a00', flow: '#4a3aa7',
+  good: '#0a870a', warning: '#986d0f', serious: '#ac6042', critical: '#d03b3b',
+};
+
+const DARK_TEXT = {
+  arterial: '#e66767', venous: '#3987e5', pulmonary: '#269626', airway: '#d95b28',
+  pleural: '#199e70', volume: '#c98500', flow: '#9085e9',
+  good: '#0ca30c', warning: '#fab219', serious: '#ec835a', critical: '#d75858',
+};
+
 const LIGHT = {
   surface: '#fcfcfb',
   page: '#f9f9f7',
@@ -63,12 +79,16 @@ const listeners = new Set();
 function resolve() {
   const dark = mode === 'dark'
     || (mode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  current = dark ? DARK : LIGHT;
+  current = { ...(dark ? DARK : LIGHT), text: dark ? DARK_TEXT : LIGHT_TEXT };
   const root = document.documentElement;
   root.dataset.theme = dark ? 'dark' : 'light';
   root.style.colorScheme = dark ? 'dark' : 'light';
   for (const [k, v] of Object.entries(current)) {
+    if (typeof v !== 'string') continue;
     root.style.setProperty(`--${k.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase())}`, v);
+  }
+  for (const [k, v] of Object.entries(current.text)) {
+    root.style.setProperty(`--text-${k}`, v);
   }
   for (const fn of listeners) fn(current);
 }
