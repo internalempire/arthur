@@ -14,7 +14,7 @@ import { PARAMETERS, defaultParams } from '../src/model/parameters.js';
 import {
   venousReturnCurve, cardiacFunctionCurve, venousReturnFlow,
 } from '../src/model/circulation.js';
-import { pvrComponents, PVR_NADIR_VOLUME } from '../src/model/respiratory.js';
+import { pvrComponents, lungRegions, transpulmonaryAt, PVR_NADIR_VOLUME } from '../src/model/lung.js';
 import { readFileSync } from 'node:fs';
 import { SNAPSHOTS } from './snapshots.js';
 import { LITERATURE } from './literature.mjs';
@@ -299,12 +299,94 @@ describe('Occlusion manoeuvres');
     pts.map((p) => `${p.pra.toFixed(1)}/${p.flow.toFixed(2)}`).join('  '));
 }
 
+describe('The two-compartment lung');
+{
+  const p = defaultParams();
+  check('a normal lung at its resting volume is fully open and unstrained',
+    lungRegions(p, 2.2).openFraction > 0.97 && Math.abs(lungRegions(p, 2.2).strain) < 0.03,
+    `open ${lungRegions(p, 2.2).openFraction.toFixed(3)}, strain ${lungRegions(p, 2.2).strain.toFixed(3)}`);
+
+  // The arithmetic of the baby lung: the same tidal volume, delivered to each
+  // lung from its own resting volume, strains the collapsed one more because
+  // there are fewer units to share it.
+  const ards = { ...p, frc: 1.35, clung: 34, recruitable: 0 };
+  const small = lungRegions(ards, ards.frc + 0.4);
+  const whole = lungRegions(p, p.frc + 0.4);
+  check('the same tidal volume strains a collapsed lung more than a whole one',
+    small.strain > whole.strain + 0.05,
+    `strain ${whole.strain.toFixed(2)} whole vs ${small.strain.toFixed(2)} collapsed, `
+    + `on ${whole.openFraction.toFixed(2)} vs ${small.openFraction.toFixed(2)} of the lung`);
+
+  // The mechanism the single-compartment model could not express.
+  const closed = lungRegions({ ...ards, recruitable: 0 }, 1.8);
+  const opens = lungRegions({ ...ards, recruitable: 0.8, pOpen: 12 }, 1.8);
+  check('recruitment lowers strain per unit at an unchanged lung volume',
+    opens.openFraction > closed.openFraction && opens.strain < closed.strain,
+    `open ${closed.openFraction.toFixed(2)} -> ${opens.openFraction.toFixed(2)}, `
+    + `strain ${closed.strain.toFixed(2)} -> ${opens.strain.toFixed(2)}`);
+
+  check('recruitability does nothing to a lung that is not collapsed',
+    lungRegions({ ...p, recruitable: 0 }, 2.2).openFraction
+      === lungRegions({ ...p, recruitable: 1 }, 2.2).openFraction);
+
+  // Transpulmonary pressure has to be the same number the mechanics produce,
+  // otherwise the curve is drawn from one model and the patient lives in another.
+  {
+    const s = settled({ peep: 12, clung: 120 }, 20);
+    const drawn = transpulmonaryAt(s.params, s.resp.lungVolume);
+    check('the drawn transpulmonary pressure matches the integrator',
+      near(drawn, s.resp.pl, 0.01), `${s.resp.pl.toFixed(3)} vs ${drawn.toFixed(3)} cmH₂O`);
+  }
+
+  // Hyperinflation must cost something. The previous model referenced strain to
+  // the patient's own resting volume, so a chronically hyperinflated lung had
+  // zero strain by definition and this was free.
+  const emphysema = { ...p, frc: 3.0, clung: 240 };
+  check('a chronically hyperinflated lung sits on the right limb of the curve',
+    pvrComponents(emphysema, 3.0).total > pvrComponents(p, 2.2).total * 1.2,
+    `${(pvrComponents(emphysema, 3.0).total / pvrComponents(p, 2.2).total).toFixed(2)}× the normal nadir`);
+
+  // The claim the ARDS preset is built around, and the one that has drifted out
+  // of the documentation twice. Asserted by direction rather than by value so it
+  // survives retuning but still catches a sign flip.
+  {
+    const preset = SCENARIOS.find((x) => x.id === 'ards-rv').params;
+    const at = (peep, over) => settled({ ...preset, peep, ...over }, 45).metrics;
+    const recrLow = at(0, {}), recrHigh = at(20, {});
+    const consLow = at(0, { recruitable: 0 }), consHigh = at(20, { recruitable: 0 });
+    check('PEEP lowers resistance in the recruitable ARDS lung',
+      recrHigh.pvrCoefficientWood < recrLow.pvrCoefficientWood,
+      `${recrLow.pvrCoefficientWood.toFixed(1)} -> ${recrHigh.pvrCoefficientWood.toFixed(1)} Wood units`);
+    check('and raises it in the same lung consolidated',
+      consHigh.pvrCoefficientWood > consLow.pvrCoefficientWood,
+      `${consLow.pvrCoefficientWood.toFixed(1)} -> ${consHigh.pvrCoefficientWood.toFixed(1)} Wood units`);
+    check('so PEEP costs the consolidated lung more output',
+      consLow.co - consHigh.co > recrLow.co - recrHigh.co,
+      `${(recrLow.co - recrHigh.co).toFixed(2)} vs ${(consLow.co - consHigh.co).toFixed(2)} L/min lost`);
+  }
+
+  check('open fraction is bounded and monotone in volume',
+    (() => {
+      let prev = -1;
+      for (let v = 0.8; v <= 4.4; v += 0.05) {
+        const f = lungRegions(ards, v).openFraction;
+        if (!(f >= 0.05 && f <= 1) || f < prev - 1e-9) return false;
+        prev = f;
+      }
+      return true;
+    })());
+}
+
 describe('Body position');
 {
-  const ardsSupine = settled({ frc: 1.35, clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12 });
-  const ardsProne = settled({ frc: 1.35, clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12, position: 'prone' });
-  check('proning a recruitable lung raises its resting volume',
-    ardsProne.metrics.lungVolume > ardsSupine.metrics.lungVolume,
+  const ARDS = { frc: 1.35, clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12, recruitable: 0.55 };
+  const ardsSupine = settled(ARDS);
+  const ardsProne = settled({ ...ARDS, position: 'prone' });
+  check('proning a recruitable lung opens some of it',
+    ardsProne.metrics.openFraction > ardsSupine.metrics.openFraction + 0.02,
+    `open ${ardsSupine.metrics.openFraction.toFixed(2)} -> ${ardsProne.metrics.openFraction.toFixed(2)}`);
+  check('and it does so without adding lung volume, which the model does not claim',
+    Math.abs(ardsProne.metrics.lungVolume - ardsSupine.metrics.lungVolume) < 0.1,
     `${ardsSupine.metrics.lungVolume.toFixed(2)} -> ${ardsProne.metrics.lungVolume.toFixed(2)} L`);
   check('proning a recruitable lung lowers pulmonary vascular resistance',
     ardsProne.metrics.pvrCoefficientWood < ardsSupine.metrics.pvrCoefficientWood * 0.95,
@@ -315,9 +397,15 @@ describe('Body position');
 
   const normalSupine = settled({});
   const normalProne = settled({ position: 'prone' });
-  check('proning a normal lung recruits nothing',
-    Math.abs(normalProne.metrics.lungVolume - normalSupine.metrics.lungVolume) < 0.2,
-    `${normalSupine.metrics.lungVolume.toFixed(2)} -> ${normalProne.metrics.lungVolume.toFixed(2)} L`);
+  check('proning a normal lung recruits nothing, because there is nothing shut',
+    Math.abs(normalProne.metrics.openFraction - normalSupine.metrics.openFraction) < 0.01,
+    `open ${normalSupine.metrics.openFraction.toFixed(3)} -> ${normalProne.metrics.openFraction.toFixed(3)}`);
+
+  const consolidated = settled({ ...ARDS, recruitable: 0 });
+  const consolidatedProne = settled({ ...ARDS, recruitable: 0, position: 'prone' });
+  check('and proning a consolidated lung recruits nothing either — it is shut, not closed',
+    Math.abs(consolidatedProne.metrics.openFraction - consolidated.metrics.openFraction) < 0.01,
+    `open ${consolidated.metrics.openFraction.toFixed(3)} -> ${consolidatedProne.metrics.openFraction.toFixed(3)}`);
   check('proning stiffens the chest wall, so pleural pressure rises',
     normalProne.metrics.ppl > normalSupine.metrics.ppl && ardsProne.metrics.ppl > ardsSupine.metrics.ppl,
     `normal ${normalSupine.metrics.ppl.toFixed(1)} -> ${normalProne.metrics.ppl.toFixed(1)} cmH2O`);

@@ -7,7 +7,7 @@
 // you want the number rather than the pixel.
 
 import { RESISTANCE_TO_WOOD } from '../model/units.js';
-import { pvrComponents } from '../model/respiratory.js';
+import { pvrComponents, lungRegions } from '../model/lung.js';
 
 const n = (v, d = 1) => (Number.isFinite(v) ? v.toFixed(d) : '—');
 
@@ -116,7 +116,10 @@ const PANELS = [
     summary: (sim) => {
       const m = sim.metrics;
       const side = m.lungVolume < 2.2 ? 'below' : 'above';
-      return `Lung volume ${n(m.lungVolume, 2)} L, ${side} the 2.2 L nadir of the J-curve. The model's `
+      return `Lung volume ${n(m.lungVolume, 2)} L, ${side} the 2.2 L resting volume of a fully open lung. `
+        + `${n(m.openFraction * 100, 0)}% of the lung is open, so each open unit is holding `
+        + `${m.lungStrain >= 0 ? `${n(m.lungStrain * 100, 0)}% more` : `${n(-m.lungStrain * 100, 0)}% less`} `
+        + `than it would at rest. The model's `
         + `resistance coefficient is ${n(m.pvrCoefficientWood, 2)} Wood units; the value derived from mean `
         + `pulmonary artery pressure, wedge and cardiac output is `
         + `${m.pvrDerivedWood === null ? 'not derivable at this flow' : `${n(m.pvrDerivedWood, 2)} Wood units`}.`;
@@ -126,7 +129,9 @@ const PANELS = [
       const comp = pvrComponents(sim.params, m.lungVolume);
       return [
         ['Lung volume', `${n(m.lungVolume, 2)} L`],
-        ['J-curve nadir', '2.2 L'],
+        ['Open fraction', `${n(m.openFraction * 100, 0)}%`],
+        ['Strain per open unit', `${n(m.lungStrain * 100, 0)}%`],
+        ['Reopened by pressure', `${n(m.recruitedFraction * 100, 0)}% of the lung`],
         ['Intra-alveolar component', `${n(comp.alveolar * RESISTANCE_TO_WOOD, 2)} Wood units`],
         ['Extra-alveolar component', `${n(comp.extraAlveolar * RESISTANCE_TO_WOOD, 2)} Wood units`],
         ['Model resistance coefficient', `${n(m.pvrCoefficientWood, 2)} Wood units`],

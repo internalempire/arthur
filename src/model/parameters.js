@@ -160,6 +160,16 @@ export const PARAMETERS = [
     min: 0.03, max: 0.60, step: 0.01, default: 0.07,
   },
   {
+    id: 'recruitable', group: 'pulmonary', label: 'Recruitable fraction', unit: '×',
+    min: 0, max: 1, step: 0.05, default: 0.4,
+    help: 'Of the lung that is collapsed at rest, how much can be reopened at all. Consolidated lung is collapsed and stays collapsed however hard it is pushed, and that is the difference between a patient in whom PEEP lowers pulmonary vascular resistance and one in whom it only raises it. Has no effect on a lung that is not collapsed to begin with.',
+  },
+  {
+    id: 'pOpen', group: 'pulmonary', label: 'Opening pressure', unit: 'cmH₂O',
+    min: 5, max: 40, step: 1, default: 20,
+    help: 'The transpulmonary pressure at which half the recruitable lung is open. Units open along a distribution rather than at a threshold, which is why recruitment is a ramp.',
+  },
+  {
     id: 'hpv', group: 'pulmonary', label: 'Hypoxic vasoconstriction', unit: '×',
     min: 0, max: 3, step: 0.1, default: 1.0,
     help: 'Applied to derecruited lung below FRC. It is why lowering PEEP in RV failure can raise PVR rather than lower it.',

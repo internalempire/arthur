@@ -20,7 +20,8 @@ work, not excuses.
 | `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
 | `pvr-recruitability-low` | In a poorly recruitable lung, PEEP 4 → 14 raises pulmonary vascular resistance. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | In a highly recruitable lung, the same PEEP change leaves pulmonary vascular resistance essentially unchanged: within ±10%. Recruitment offsets the distension penalty rather than beating it. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | In a highly recruitable lung — the same collapsed lung, differing only in how much of it can be reopened — the same PEEP change leaves pulmonary vascular resistance essentially unchanged: within ±10%. Recruitment offsets the distension penalty rather than beating it. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-dissociation` | Sweeping recruitability from 0 to 1 with everything else held identical moves the response monotonically from a rise to a fall, crossing zero once. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `pvr-j-shape` | Pulmonary vascular resistance is minimal near functional residual capacity and at least 50% higher at both 1.2 L and 3.8 L. | agrees | Simmons et al., *Circ Res* 1961;9:465–71 |
@@ -29,39 +30,53 @@ work, not excuses.
 | `ph-classification` | A hypervolaemic failing left ventricle with a wedge above 15 mmHg and a mean pulmonary artery pressure above 20 is classified post-capillary; a lung with a high vascular resistance and a low wedge is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
 
-## Open rows
+## How the recruitability rows were closed
 
-**`pvr-recruitability-high`** — the model gives a highly recruitable lung a 15%
-fall in resistance where the trial found no change. Referencing distension to
-the patient's own resting volume improved this from 28%, but the rest is
-structural rather than a matter of tuning, and it is worth stating exactly why.
+These two rows were open for a while, and the reason they closed is worth
+recording, because the argument for why they *could not* close was wrong in an
+instructive way.
 
-In this model the two phenotypes are the same lung at different resting volumes,
-so raising PEEP from 4 to 14 gives them **identical** distending stimuli:
+The old model had one lung compartment. In it, a high recruiter and a low
+recruiter were the same lung at different resting volumes, so PEEP 4 → 14 gave
+them identical volume gain (0.116 → 0.407 L) and identical transpulmonary
+pressure (8.4 → 17.0 cmH₂O). Nothing was left to tell them apart, and I
+concluded — correctly, for that model — that no formulation of the resistance
+curve could separate them.
 
-| | volume gain | transpulmonary pressure | openness |
-|---|---|---|---|
-| High recruiter (FRC 1.35 L) | 0.116 → 0.407 L | 8.4 → 17.0 cmH₂O | −0.33 → −0.20 |
-| Low recruiter (FRC 2.10 L) | 0.116 → 0.407 L | 8.4 → 17.0 cmH₂O | +0.01 → +0.14 |
+The error was in treating that as a fact about resistance curves rather than
+about the lung. The missing variable was never on the vascular side: it was that
+recruitability had no representation at all. It was being *inferred* from resting
+volume, and two patients with the same resting volume are then necessarily the
+same patient.
 
-The only thing that differs is how much lung is open — and in a homogeneous
-model, more open lung always means less resistance. So no formulation of the
-distension limb, whether driven by volume, by strain or by transpulmonary
-pressure, can make the recruiter's resistance stay flat: the distending stimulus
-is literally the same in both.
+The lung is now two populations of units sorted by how hard they are to open, and
+recruitability is a parameter. That gives strain per *open* unit, which is the
+quantity a single compartment cannot produce: with a third of the lung open, a
+litre of gas strains each unit half again as much as it would with two thirds
+open. When PEEP opens units, the gas is shared among more of them, and strain per
+unit can fall while total volume rises. The recruiter has that route and the
+non-recruiter does not.
 
-What the trial measured is *heterogeneity* — units opening while their
-neighbours stretch, which is what the R/I ratio quantifies. A one-compartment
-lung cannot hold that. Reproducing it needs a lung split into at least two
-regions with different opening pressures, which is the same structural change
-that would give the model a real right-to-left transit delay. Two open rows,
-one fix.
+Across the full recruitability range at fixed everything else, the response now
+runs +15% → +2% → −7% → −15% → −21%. The dissociation row tests that sweep rather
+than a single phenotype, because a row that names one phenotype can always be
+satisfied by choosing it — and choosing it is exactly what I would be tempted to
+do.
 
-A parameter search was run before concluding this. Combinations that satisfy the
-row exist, but only by driving the distension exponent to the edge of the search
-space and making resistance at 3.8 L nearly seven times the nadir — far outside
-what Simmons and Permutt measured. Passing a row by deforming the curve is not
-passing it.
+**What this cost.** Nothing about the vascular model was tuned, but the resting
+volume of the *whole* J-curve reference changed, and that fixed a second error in
+the opposite direction: the previous version referenced distension to the
+patient's own resting volume, so a chronically hyperinflated lung had zero strain
+by definition and hyperinflation was free. The COPD preset's resistance was 1.7
+Wood units where the preset's own note claimed the lung was being pushed up the
+right limb of the curve. It is now 4.2, and the note is true.
+
+**A correction.** An earlier version of this file said the two-region lung was
+"the same structural change that would give the model a real right-to-left
+transit delay." That was wrong. The pulmonary circulation is already two
+compartments in series, and transit delay is a question about their volumes and
+compliances — parallel lung regions have nothing to do with it. Transit delay
+remains open and is unrelated to this work.
 
 ## A note on how these rows were written
 
@@ -76,8 +91,11 @@ source is actually about — the abdomen defending the gradient, worth 1–3 mmH
 mean systemic filling pressure — and bounds the output cost loosely.
 
 The `pvr-recruitability-high` row survives in its original form because that one
-*was* read: the trial reports resistance unchanged in high recruiters, and the
-model does not manage it.
+*was* read: the trial reports resistance unchanged in high recruiters. It now
+passes, but on a phenotype this file chose — 55% of the collapsed lung
+recruitable at an opening pressure of 20 cmH₂O — rather than on one calibrated
+against the R/I ratio the trial actually measured. That is why the dissociation
+row exists alongside it.
 
 If you have the Berger paper to hand, tightening this row against its actual
 figures would be a genuine improvement.

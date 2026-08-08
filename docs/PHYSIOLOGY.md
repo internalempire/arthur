@@ -56,15 +56,17 @@ numbers. The following all reproduce:
   and van den Berg describe.
 - Spontaneous inspiration lowers CVP below zero while cardiac output rises.
 - Hypovolaemia: pulse pressure variation 15%, and a 500 mL bolus raises cardiac
-  output from 3.7 to 6.2 L/min. At euvolaemia the same bolus gains about 20%
-  and variation is 3%.
-- ARDS with right ventricular failure: RV:LV end-diastolic ratio 1.9, PVR 4.1
-  Wood units. Across a PEEP titration PVR falls steadily (6.3 Wood units at
-  PEEP 0 to 3.3 at PEEP 20) as the collapsed lung is recruited toward the
-  J-curve nadir. Whether that buys output depends on filling: at the preset's
-  stressed volume it does not, and cardiac output falls throughout
-  (3.51 → 2.65 L/min); at 1050 mL of stressed volume a broad optimum appears
-  around PEEP 3–8.
+  output from 4.7 to 6.3 L/min. At euvolaemia the same bolus gains about 12%
+  and variation is 2%.
+- ARDS with right ventricular failure: RV:LV end-diastolic ratio 2.2, resistance
+  coefficient 6.6 Wood units against 9.2 derived from mean pulmonary artery
+  pressure, wedge and output. Across a PEEP titration from 0 to 20 the
+  coefficient falls 7.6 → 6.0 while cardiac output falls throughout,
+  3.56 → 2.89 L/min: the preload cost outruns the afterload benefit at every
+  step, and filling the patient lifts the curve without changing its shape.
+  Setting `recruitable` to zero inverts it — the same collapsed lung,
+  consolidated rather than closed, gives 8.0 → 10.4 Wood units and 3.38 → 2.02
+  L/min.
 - COPD with a short expiratory time: 6.4 cmH₂O of intrinsic PEEP appears with no
   change in the set PEEP.
 - Intra-abdominal hypertension raises Pmsf to 19 mmHg while *lowering* cardiac

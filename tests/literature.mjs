@@ -7,7 +7,7 @@
 
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams } from '../src/model/parameters.js';
-import { pvrComponents, PVR_NADIR_VOLUME } from '../src/model/respiratory.js';
+import { pvrComponents, PVR_NADIR_VOLUME } from '../src/model/lung.js';
 import { venousReturnFlow } from '../src/model/circulation.js';
 
 function settle(overrides, seconds = 30) {
@@ -20,9 +20,12 @@ function settle(overrides, seconds = 30) {
 
 const change = (before, after) => (after / before - 1) * 100;
 
-// A lung that is mostly collapsed recruits when PEEP is applied; one already at
-// a near-normal resting volume mostly distends.
-const ARDS = { clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6 };
+// The two phenotypes are the *same collapsed lung*. They differ only in how much
+// of the collapse can be reopened — which is what recruitability means, and what
+// the model could not express until the lung was split into two populations of
+// units. Holding the resting volume equal is the point: it is what makes the
+// comparison about recruitability rather than about size.
+const ARDS = { clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, frc: 1.35 };
 
 export const LITERATURE = {
   'peep-euvolaemia': () => {
@@ -50,17 +53,35 @@ export const LITERATURE = {
   },
 
   'pvr-recruitability-low': () => {
-    const a = settle({ ...ARDS, frc: 2.10, peep: 4 });
-    const b = settle({ ...ARDS, frc: 2.10, peep: 14 });
+    const a = settle({ ...ARDS, recruitable: 0.05, peep: 4 });
+    const b = settle({ ...ARDS, recruitable: 0.05, peep: 14 });
     const d = change(a.pvrCoefficientWood, b.pvrCoefficientWood);
     return { pass: d > 0, detail: `ΔPVR ${d.toFixed(0)}% (want a rise)` };
   },
 
   'pvr-recruitability-high': () => {
-    const a = settle({ ...ARDS, frc: 1.35, peep: 4 });
-    const b = settle({ ...ARDS, frc: 1.35, peep: 14 });
+    const a = settle({ ...ARDS, recruitable: 0.55, peep: 4 });
+    const b = settle({ ...ARDS, recruitable: 0.55, peep: 14 });
     const d = change(a.pvrCoefficientWood, b.pvrCoefficientWood);
     return { pass: Math.abs(d) <= 10, detail: `ΔPVR ${d.toFixed(0)}% (want within ±10%)` };
+  },
+
+  // The row above needs a phenotype chosen for it, so on its own it could be
+  // satisfied by picking one. This is the claim that cannot: across the whole
+  // recruitability range, with everything else identical, the sign of the
+  // response has to move one way and cross zero exactly once.
+  'pvr-recruitability-dissociation': () => {
+    const at = (recruitable) => {
+      const a = settle({ ...ARDS, recruitable, peep: 4 });
+      const b = settle({ ...ARDS, recruitable, peep: 14 });
+      return change(a.pvrCoefficientWood, b.pvrCoefficientWood);
+    };
+    const steps = [0, 0.25, 0.5, 0.75, 1].map(at);
+    const monotone = steps.every((d, i) => i === 0 || d < steps[i - 1]);
+    return {
+      pass: monotone && steps[0] > 0 && steps[steps.length - 1] < 0,
+      detail: `ΔPVR ${steps.map((d) => d.toFixed(0) + '%').join(' → ')} across recruitability 0 → 1`,
+    };
   },
 
   'transmission-chest-wall': () => {

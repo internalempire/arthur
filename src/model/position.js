@@ -18,14 +18,14 @@ export const PRONE = {
   // closes.
   abdominalRise: 2, // cmH2O
 
-  // Dorsal regions recruit. The gain is proportional to how much lung is
-  // collapsed in the first place: a normal lung has nothing to recruit and
-  // gains nothing, which is why proning a normal patient is not a lung
-  // recruitment manoeuvre.
-  recruitmentGain: 0.25,
+  // Dorsal regions recruit — but proning does not add lung, it redistributes the
+  // pleural pressure gradient so that dependent units reach their opening
+  // pressure at a lower airway pressure. So the change belongs to the opening
+  // pressure, not to the resting volume. A patient with nothing recruitable
+  // gains nothing from it, which is why proning is not a recruitment manoeuvre
+  // in a lung that is consolidated rather than collapsed.
+  openingPressureDrop: 6, // cmH2O
 };
-
-const NORMAL_FRC = 2.2; // L — the volume the recruitment gain aims at
 
 /**
  * The parameters the model actually integrates with. Supine returns the user's
@@ -34,6 +34,11 @@ const NORMAL_FRC = 2.2; // L — the volume the recruitment gain aims at
  * Position is resolved here rather than written back into the controls so that
  * the sliders keep showing the patient's supine mechanics — turning someone
  * over does not change how stiff their lung is.
+ *
+ * Note what is missing: end-expiratory lung volume does not rise here, though it
+ * does in a recruitable patient at the bedside. That is the same gap stated in
+ * lung.js — recruited units are a vascular and gas-exchange event in this model,
+ * not a mechanical one — and it is left in one place rather than patched here.
  */
 export function resolveParams(p) {
   if (p.position !== 'prone') return p;
@@ -41,6 +46,6 @@ export function resolveParams(p) {
     ...p,
     ccw: p.ccw * PRONE.chestWallFactor,
     pab0: p.pab0 + PRONE.abdominalRise,
-    frc: p.frc + PRONE.recruitmentGain * Math.max(0, NORMAL_FRC - p.frc),
+    pOpen: Math.max(5, (p.pOpen ?? 20) - PRONE.openingPressureDrop),
   };
 }

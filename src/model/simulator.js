@@ -2,8 +2,9 @@ import { defaultParams } from './parameters.js';
 import { resolveParams } from './position.js';
 import { createBaroreflexState, stepBaroreflex, applyBaroreflex } from './baroreflex.js';
 import {
-  createRespiratoryState, stepRespiratory, respiratorySystemCompliance, pvrComponents,
+  createRespiratoryState, stepRespiratory, respiratorySystemCompliance,
 } from './respiratory.js';
+import { pvrComponents, lungRegions } from './lung.js';
 import {
   createCirculationState, stepCirculation, VASC, venousReturnBackPressure,
 } from './circulation.js';
@@ -317,6 +318,7 @@ export class Simulator {
     const co = (c.sv * p.hr) / 1000;
     const crs = respiratorySystemCompliance(p);
     const pvrComp = pvrComponents(p, r.lungVolume);
+    const regions = lungRegions(p, r.lungVolume);
 
     // Whether each derived index can be read as the clinical quantity it shares
     // a name with. A dynamic index outside its validity conditions is not a
@@ -404,6 +406,10 @@ export class Simulator {
       gradientVr: ema.pmsf - venousReturnBackPressure(cvp, ema.pCrit),
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
       lungVolume: r.lungVolume, pab: r.pab,
+      openFraction: regions.openFraction,
+      closedFraction: regions.closedFraction,
+      recruitedFraction: regions.recruited,
+      lungStrain: regions.strain,
       pplat: r.lastPplat, ppeak: r.lastPpeak, autoPeep: r.lastAutoPeep,
       totalPeep: p.peep + r.lastAutoPeep,
       drivingPressure: r.lastPplat - (p.peep + r.lastAutoPeep),

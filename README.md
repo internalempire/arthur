@@ -230,32 +230,74 @@ the reference frame rather than being applied as a term.
 
 ## 5. The pulmonary circulation
 
-### The J-curve
+### The lung as two populations of units
 
-PVR is the sum of two exponential terms in lung volume:
+The lung is not one compartment. Its units are split by how hard they are to
+open: normal ones, which close as the lung empties and reopen at almost any
+distending pressure, and diseased ones, which are shut at rest and reopen only if
+they can be reopened at all. Consolidated lung is collapsed and stays collapsed
+however hard it is pushed.
 
 ```
-strain          = (V_lung − FRC_patient) / FRC_patient
-openness        = (V_lung − 2.2 L) / 2.2 L
-R_alveolar      = 0.6 · PVR₀ · exp( 1.6·strain)
-R_extraalveolar = 0.4 · PVR₀ · exp(−2.4·openness) · (1 + hpv·1.4·max(0, −openness))
+diseased    = clamp((2.2 L − FRC_patient) / 2.2 L, 0, 0.95)
+Pl(V)       = (V − FRC_patient)/C_lung + 5           transpulmonary pressure
+easy(Pl)    = 1 / (1 + exp(−(Pl − 0) / 1.3))         normal units
+hard(Pl)    = 1 / (1 + exp(−(Pl − pOpen) / 7))       diseased units
+open        = (1 − diseased)·easy(Pl) + diseased·recruitable·hard(Pl)
+strain      = V / (2.2 L · open) − 1
+```
+
+Units are treated as either open at full size or shut — the sponge idealisation.
+`strain` is therefore volume per **open** unit, and it is the quantity a
+single-compartment lung cannot produce. With a third of the lung open, a litre of
+gas strains each unit half again as much as it would with two thirds open: the
+baby lung, written as arithmetic. When PEEP opens units, the gas it adds is
+shared among more of them, so strain per unit can *fall* while total volume
+rises.
+
+Transpulmonary pressure is derived rather than assumed: Palv − Ppl cancels both
+the muscle pressure and the chest wall, leaving lung volume and lung compliance
+alone. The test suite checks that the value drawn on the curve equals the one the
+integrator produced.
+
+### The J-curve
+
+```
+R_alveolar      = 0.6 · PVR₀ · exp( 1.6·strain) / open · hypoxic
+R_extraalveolar = 0.4 · PVR₀ · exp(−2.4·strain) / open · hypoxic
+hypoxic         = 1 + hpv · 1.1 · (1 − open)
 PVR             = R_alveolar + R_extraalveolar
 ```
 
-Intra-alveolar vessels are compressed by inflation; extra-alveolar vessels are
-tethered open by it. Their sum is J-shaped with its nadir where the two
-references coincide, so both atelectasis and overdistension load the right
-ventricle.
+Intra-alveolar vessels are compressed by the units around them, so their
+resistance rises with strain. Extra-alveolar vessels are held open by radial
+traction from the same parenchyma, so theirs falls with it. Their sum is the J.
+The nadir sits where the two derivatives cancel, `F_ALV·K_ALV = F_EXTRA·K_EXTRA`
+— a constraint on the four constants rather than a fifth number to tune. For a
+normal lung it lands at 2.3 L.
 
-**The two limbs are referenced to two different volumes, and that is the point.**
-Distension of the alveolar vessels is a strain: it depends on how far the units
-that are already open have been stretched past the lung's *own* resting volume.
-A collapsed ARDS lung inflated from 1.35 to 1.76 L is not "20% below normal" as
-far as its open units are concerned — they are a third past their resting
-length. How much lung is open at all, and how much of it is hypoxic, is the
-different question, and that one is relative to a normal FRC. Referencing both
-limbs to a normal FRC — as this once did — flatters recruitment and penalises
-chronic hyperinflation as though it were acute strain.
+Two separate things push the left limb up, and separating them is what the two
+populations buy. Vessels in units that remain open are narrowed by low strain.
+Units that are *shut* remove their vessels from the circuit entirely, which is
+the `1/open` term, and hypoxic vasoconstriction makes what perfusion still
+reaches them expensive. In a badly collapsed lung the second effect dominates the
+first, which is why derecruitment costs so much more than deflation.
+
+**Why this replaced a single compartment.** With one compartment, a recruiter and
+a non-recruiter were the same lung at different resting volumes, so raising PEEP
+gave them identical volume gain and identical transpulmonary pressure and there
+was nothing left to tell them apart. Recruitability was being inferred from
+resting volume rather than represented. It is now the `recruitable` parameter,
+and the response to PEEP 4 → 14 runs from +15% to −21% across its range. The same
+change fixed an error in the other direction: distension used to be referenced to
+the patient's own resting volume, so a chronically hyperinflated lung had zero
+strain by definition and hyperinflation was free.
+
+**What it deliberately does not do.** Recruited units add compliance in a real
+lung; here the pressure–volume relationship is still linear. Recruitment is a
+vascular and gas-exchange event in this model, not a mechanical one. That is why
+proning changes the opening pressure rather than the resting volume, and why
+end-expiratory lung volume does not rise when units open.
 
 ### Vascular waterfall and West zones
 
@@ -465,6 +507,8 @@ fluid bolus or a diuresis — rather than silently rescaling the model.
 |---|---|---|---|---|
 | `pvrBase` | Resistance coefficient at the J-curve nadir | mmHg·s/mL | 0.07 | 0.03 – 0.60 |
 | `hpv` | Hypoxic vasoconstriction gain | × | 1.0 | 0 – 3 |
+| `recruitable` | Fraction of the collapsed lung that can be reopened | × | 0.4 | 0 – 1 |
+| `pOpen` | Transpulmonary pressure at which half the recruitable lung is open | cmH₂O | 20 | 5 – 40 |
 | `piston` | Pulmonary capacitance coupling | mL/L | 85 | 0 – 200 |
 
 To convert a resistance to clinical units: Wood units = mmHg·s/mL × 1000/60;
@@ -584,7 +628,7 @@ and septal gains in particular are for.
 | PEEP escalation (`peep-escalation`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=14`, `rr=14` |
 | Septic shock, fluid responsive (`septic-responder`) | `mode=vcv`, `pmus=0`, `vt=560`, `peep=8`, `rr=18`, `ccw=150`, `stressedVolume=330`, `svr=0.85`, `hr=105` |
 | Big pleural swings, no variation (`swing-no-variation`) | `mode=spont`, `pmus=22`, `peep=6`, `rr=24`, `ccw=100`, `stressedVolume=950`, `svr=0.75`, `hr=100` |
-| ARDS with right ventricular failure (`ards-rv`) | `mode=vcv`, `pmus=0`, `vt=350`, `peep=12`, `rr=24`, `frc=1.35`, `clung=34`, `eesRv=0.28`, `pvrBase=0.17`, `hpv=1.6` |
+| ARDS with right ventricular failure (`ards-rv`) | `mode=vcv`, `pmus=0`, `vt=350`, `peep=12`, `rr=24`, `frc=1.35`, `clung=34`, `eesRv=0.28`, `pvrBase=0.17`, `hpv=1.6`, `recruitable=0.55`, `pOpen=20` |
 | Acute pulmonary embolism (`pulmonary-embolism`) | `mode=spont`, `pmus=6`, `peep=0`, `rr=24`, `pvrBase=0.44`, `eesRv=0.32`, `stressedVolume=1050`, `svr=1.25`, `hr=118` |
 | Cardiogenic pulmonary oedema (`lv-failure`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=10`, `rr=18`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=95` |
 | Weaning the failing left ventricle (`weaning`) | `mode=spont`, `pmus=10`, `peep=0`, `rr=26`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=110` |
@@ -599,18 +643,18 @@ in Wood units.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.4 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
-| Healthy, passive volume control | 4.9 | 93 | 1.5 | 22/13 | 10 | 1.3 | 0.89 | 2% |
-| PEEP escalation | 4.3 | 89 | 4.3 | 27/18 | 9 | 2.1 | 0.93 | 6% |
-| Septic shock, fluid responsive | 4.2 | 80 | 1.9 | 19/13 | 4 | 1.5 | 0.79 | 18% |
-| Big pleural swings, no variation | 6.8 | 94 | 1.7 | 27/17 | 10 | 1.2 | 0.94 | 4% |
-| ARDS with right ventricular failure | 3.4 | 81 | 4.7 | 34/28 | 3 | 5.5 | 2.03 | 8% |
-| Acute pulmonary embolism | 4.1 | 94 | 5.5 | 39/33 | 4 | 7.3 | 2.02 | 8% |
-| Cardiogenic pulmonary oedema | 3.5 | 86 | 4.9 | 44/38 | 34 | 1.8 | 0.88 | 6% |
-| Weaning the failing left ventricle | 3.6 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
-| Stiff chest wall | 4.3 | 90 | 3.4 | 18/10 | 9 | 1.3 | 0.82 | 4% |
-| COPD with dynamic hyperinflation | 4.6 | 89 | 4.1 | 23/13 | 10 | 1.7 | 0.89 | 6% |
-| Intra-abdominal hypertension | 3.4 | 86 | 1.0 | 15/8 | 4 | 1.4 | 0.79 | 8% |
+| Healthy, breathing spontaneously | 5.40 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
+| Healthy, passive volume control | 4.93 | 93 | 1.5 | 22/13 | 10 | 1.3 | 0.89 | 2% |
+| PEEP escalation | 4.32 | 89 | 4.3 | 27/18 | 9 | 2.1 | 0.93 | 6% |
+| Septic shock, fluid responsive | 4.18 | 80 | 1.9 | 19/13 | 4 | 1.5 | 0.79 | 18% |
+| Big pleural swings, no variation | 6.80 | 94 | 1.7 | 27/17 | 10 | 1.2 | 0.94 | 4% |
+| ARDS with right ventricular failure | 3.18 | 79 | 4.9 | 34/28 | 3 | 5.5 | 2.03 | 8% |
+| Acute pulmonary embolism | 3.98 | 93 | 5.8 | 39/33 | 4 | 7.3 | 2.02 | 8% |
+| Cardiogenic pulmonary oedema | 3.48 | 86 | 4.9 | 44/38 | 34 | 1.8 | 0.88 | 6% |
+| Weaning the failing left ventricle | 3.62 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
+| Stiff chest wall | 4.27 | 90 | 3.4 | 18/10 | 9 | 1.3 | 0.82 | 4% |
+| COPD with dynamic hyperinflation | 4.17 | 88 | 4.4 | 23/13 | 10 | 1.7 | 0.89 | 6% |
+| Intra-abdominal hypertension | 3.42 | 86 | 1.0 | 15/8 | 4 | 1.4 | 0.79 | 8% |
 
 ### How the presets are built
 
@@ -630,15 +674,27 @@ smallest set that makes that question answerable.
   variation but the flat part of the Starling curve decides whether any of it
   reaches the stroke volume.
 - **ARDS** is a small, stiff, collapsed lung (`frc`, `clung`) with a weak right
-  ventricle and a raised `pvrBase`. Because `frc` sits well below the J-curve
-  nadir, PEEP recruits toward it and PVR falls steadily — 6.3 Wood units at
-  PEEP 0 down to 3.3 at PEEP 20. Whether that buys any output depends on
-  filling, which is the point worth making: as shipped the patient is
-  relatively underfilled and cardiac output falls throughout the titration
-  (3.51 → 2.65 L/min), because the preload cost outruns the afterload benefit.
-  Raise `stressedVolume` to 1050 mL and a broad optimum appears around PEEP
-  3–8, where output is higher than at zero. The optimal PEEP for a failing
-  right ventricle is not a property of the lung alone.
+  ventricle, a raised `pvrBase`, and — as shipped — over half of the collapse
+  reopenable (`recruitable=0.55`). Across a PEEP titration from 0 to 20 the
+  resistance coefficient falls 7.6 → 6.0 Wood units, but cardiac output falls
+  the whole way, 3.56 → 2.89 L/min: the preload cost outruns the afterload
+  benefit at every step. Filling the patient to `stressedVolume=1050` lifts the
+  whole curve (3.80 → 3.32) without changing its shape.
+
+  Set `recruitable=0` — the same collapsed lung, now consolidated rather than
+  closed — and the titration inverts. Resistance now *rises* with PEEP, 8.0 →
+  10.4, and output falls twice as fast, 3.38 → 2.02. Nothing else about the
+  patient changed. That is the comparison this preset exists for, and it is the
+  one a single-compartment lung could not show.
+
+  A PEEP that buys output does exist, but only in a lung that is both highly
+  recruitable and well filled: at `recruitable=0.9`, `pOpen=12` and
+  `stressedVolume=1400`, resistance falls 6.4 → 3.8 and output holds a broad
+  plateau out to PEEP 12–16 before declining. The plateau is shallow — the
+  differences along it are comparable to the respiratory swing, so it should be
+  read as "PEEP stops costing anything here", not as a peak to titrate to. The
+  optimal PEEP for a failing right ventricle is a property of neither the lung
+  nor the filling alone.
 - **Pulmonary embolism** is the deliberate mirror: `clung`, `ccw` and `frc` are
   all left at normal, and the entire abnormality is `pvrBase` with a right
   ventricle that cannot meet it. Because the lung is compliant, pleural
@@ -687,7 +743,10 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `SEPTAL.rvRef` / `lvRef` | 145 / 135 mL | volumes above which the septum shifts |
 | `SEPTAL.systolic` | 0.042 | systolic interdependence gain |
 | `PPL_FRC` | −5 cmH₂O | pleural pressure at the relaxation volume |
-| `PVR_NADIR_VOLUME` | 2.2 L | lung volume at the J-curve nadir |
+| `NORMAL_FRC` | 2.2 L | resting volume of a fully open lung; collapse is measured against it |
+| `PL_EASY`, `SPREAD_EASY` | 0, 1.3 cmH₂O | opening threshold and spread for normal units |
+| `SPREAD_HARD` | 7 cmH₂O | spread of opening pressures for diseased units |
+| `HPV_GAIN` | 1.1 | resistance added per unit of closed lung |
 | `K_ALV`, `K_EXTRA` | 1.6, 2.4 | J-curve exponents |
 | `F_ALV`, `F_EXTRA` | 0.6, 0.4 | J-curve weights |
 
@@ -705,7 +764,8 @@ src/
     units.js              cmH2O / mmHg conversion — the only place it happens
     parameters.js         every user-facing knob; the panel builds itself from this
     scenarios.js          presets, each with the question it is meant to answer
-    respiratory.js        equation of motion, Campbell mechanics, the PVR J-curve
+    respiratory.js        equation of motion, Campbell mechanics, holds
+    lung.js               two populations of units, recruitment, the PVR J-curve
     circulation.js        the closed loop, ventricular elastance, derived curves
     simulator.js          integration, trace ring buffers, derived measurements
   ui/

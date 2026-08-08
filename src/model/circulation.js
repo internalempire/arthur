@@ -15,7 +15,7 @@
 // untouched — only lung volume can move that.
 
 import { cmH2OtoMmHg, clamp } from './units.js';
-import { pvrAt } from './respiratory.js';
+import { pvrAt } from './lung.js';
 
 // Unstressed volumes (mL) and compliances (mL/mmHg) that are not user-facing.
 export const VASC = {
