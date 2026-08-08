@@ -157,11 +157,37 @@ from the same constants the integrator uses:
   applies the single-beat elastance relation with the arterial elastance the
   right ventricle currently faces.
 
-Because both come from the live state, their intersection lands on the operating
-point the simulation actually reaches — which is a continuous check that the
-graphical analysis and the numerical model agree. The x-intercept of the cardiac
-function curve sits at pleural pressure, so a breath visibly slides the curve
-along the axis.
+Because both come from the live state, their intersection tracks the operating
+point the simulation actually reaches. The x-intercept of the cardiac function
+curve sits at pleural pressure, so a breath visibly slides the curve along the
+axis.
+
+Everything on this plot is averaged over exactly one cardiac cycle. The Guyton
+diagram is a steady-state construction — its axes are mean pressure and mean
+flow — and right atrial pressure swings around 3 mmHg every beat through its a,
+c and v waves, roughly a third of the width of the plot. A boxcar one cardiac
+cycle long nulls that ripple exactly while passing the respiratory cycle
+essentially untouched, which is the motion the diagram exists to show.
+
+**The marker is drawn at the crossing of the two curves, and the integrated
+model sits within a few percent of it rather than exactly on it.** Two reasons,
+both worth knowing:
+
+- Venous return is a nonlinear function of right atrial pressure near the
+  collapse knee, and the mean of a nonlinear function is not that function of
+  the mean. Far from the knee — the ARDS and intra-abdominal hypertension
+  presets — the model's cycle-mean flow sits on the venous return curve to
+  within 0.01 L/min. Close to it, at a normal right atrial pressure, they differ
+  by about 0.5 L/min.
+- The cardiac function curve is a single-beat elastance approximation, not
+  something the integrator computes.
+
+Measured across the presets, the marker's height runs 0% to 7% above the
+integrated cardiac output, and +14% in the septic shock preset — the one case
+that combines a low right atrial pressure near the knee with a high heart rate.
+Read the marker as the graphical analysis's answer and the cardiac output tile
+as the model's; where they disagree, the tile is the one that came from
+conservation of volume.
 
 ---
 

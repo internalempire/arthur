@@ -260,10 +260,14 @@ function closeBeat(c) {
 // the two curves lands on the operating point the simulation actually reaches.
 // ---------------------------------------------------------------------------
 
-/** Venous return as a function of right atrial pressure, in L/min. */
-export function venousReturnCurve(p, c, nPoints = 90) {
-  const pmsf = c.p.pmsf;
-  const pCrit = c.p.pCrit;
+/**
+ * Venous return as a function of right atrial pressure, in L/min.
+ * `mean` carries the cycle-averaged state, so the curve is not redrawn several
+ * times a second by the cardiac ripple riding on these pressures.
+ */
+export function venousReturnCurve(p, c, mean, nPoints = 90) {
+  const pmsf = mean?.pmsf ?? c.p.pmsf;
+  const pCrit = mean?.pCrit ?? c.p.pCrit; // follows lung volume, so it moves with the breath
   const pts = [];
   const lo = Math.min(pCrit - 6, -6);
   for (let i = 0; i < nPoints; i++) {
@@ -280,8 +284,12 @@ export function venousReturnCurve(p, c, nPoints = 90) {
  * EDPVR to an end-diastolic volume, then run through the single-beat
  * elastance relation with the arterial elastance the RV currently faces.
  */
-export function cardiacFunctionCurve(p, c, nPoints = 90) {
-  const pExt = c.p.ppl + c.p.pPeri;
+export function cardiacFunctionCurve(p, c, mean, nPoints = 90) {
+  // Both terms are cycle-averaged. Sliding this curve along the pressure axis
+  // with each breath is the phenomenon the diagram exists to show, and averaging
+  // over one cardiac cycle leaves the respiratory swing intact while removing
+  // the beat-to-beat ripple that would otherwise jitter the intercept.
+  const pExt = (mean?.ppl ?? c.p.ppl) + (mean?.pPeri ?? c.p.pPeri);
   const svRv = Math.max(4, c.svRv ?? c.sv);
   const ea = Math.max(0.02, (c.rvEsp - c.p.ppl) / svRv);
   const { edA, edB, v0d, v0s } = { ...CHAMBER.rv, v0s: CHAMBER.rv.v0s };

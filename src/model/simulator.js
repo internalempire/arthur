@@ -24,6 +24,39 @@ class Ring {
 
 const CHANNELS = ['paw', 'ppl', 'palv', 'art', 'cvp', 'pap', 'paop', 'flow', 'volume', 'co', 'insp'];
 
+// The Guyton diagram is a steady-state analysis: its axes are mean pressure and
+// mean flow. Cardiac pulsatility does not belong on it — right atrial pressure
+// swings several mmHg every beat through its a, c and v waves, which is a third
+// of the width of the plot — but the respiratory excursion is the whole point
+// and must survive. A boxcar exactly one cardiac cycle long is the right filter:
+// it nulls the cardiac fundamental completely while passing the much slower
+// respiratory cycle almost untouched.
+const CYCLE_HZ = 250;
+const CYCLE_SECONDS = 2; // enough for a full cycle down to 30 beats/min
+
+class CycleRing {
+  constructor() {
+    this.buf = new Float32Array(CYCLE_HZ * CYCLE_SECONDS);
+    this.i = 0;
+    this.filled = 0;
+  }
+
+  push(v) {
+    this.buf[this.i] = v;
+    this.i = (this.i + 1) % this.buf.length;
+    if (this.filled < this.buf.length) this.filled++;
+  }
+
+  /** Mean of the most recent `samples` values. */
+  mean(samples) {
+    const n = Math.min(samples, this.filled);
+    if (n < 1) return 0;
+    let sum = 0;
+    for (let k = 1; k <= n; k++) sum += this.buf[(this.i - k + this.buf.length) % this.buf.length];
+    return sum / n;
+  }
+}
+
 export class Simulator {
   constructor() {
     this.params = defaultParams();
@@ -52,6 +85,12 @@ export class Simulator {
     // Exponential moving averages over simulated time, so a mean pressure does
     // not depend on how the caller happens to chunk its calls to advance().
     this.ema = null;
+    // Cycle-averaged quantities for the Guyton diagram.
+    this.cycle = {
+      ra: new CycleRing(), flow: new CycleRing(), pmsf: new CycleRing(),
+      peri: new CycleRing(), ppl: new CycleRing(), pCrit: new CycleRing(),
+    };
+    this.cycleTick = 0;
     // Settle the model so the first frame the user sees is a steady state.
     this.advance(15, true);
   }
@@ -111,6 +150,15 @@ export class Simulator {
       this.ema.cvp += alpha * (c.p.ra - this.ema.cvp);
       this.ema.pap += alpha * (c.p.pa - this.ema.pap);
       this.ema.paop += alpha * (c.p.la - this.ema.paop);
+    }
+
+    if (this.cycleTick++ % Math.round(1 / (CYCLE_HZ * DT)) === 0) {
+      this.cycle.ra.push(c.p.ra);
+      this.cycle.flow.push((c.q.vr * 60) / 1000);
+      this.cycle.pmsf.push(c.p.pmsf);
+      this.cycle.peri.push(c.p.pPeri);
+      this.cycle.ppl.push(c.p.ppl);
+      this.cycle.pCrit.push(c.p.pCrit);
     }
 
     if (c.beatCount !== this.beatSeen) {
@@ -177,6 +225,21 @@ export class Simulator {
     const crs = respiratorySystemCompliance(p);
     const pvrComp = pvrComponents(p, r.lungVolume);
 
+    // One cardiac cycle's worth of samples: the cardiac ripple averages out, the
+    // respiratory swing survives.
+    const window = Math.round((60 / p.hr) * CYCLE_HZ);
+    const operatingPoint = {
+      pra: this.cycle.ra.mean(window),
+      flow: this.cycle.flow.mean(window),
+      pmsf: this.cycle.pmsf.mean(window),
+      pPeri: this.cycle.peri.mean(window),
+      // The curves have to be evaluated on the same clock as the point. Left
+      // instantaneous, they lead it by half a cardiac cycle, and the marker
+      // drifts off them during the fast part of a breath.
+      ppl: this.cycle.ppl.mean(window),
+      pCrit: this.cycle.pCrit.mean(window),
+    };
+
     return {
       co, sv: c.sv, hr: p.hr,
       map, sbp: last.sbp ?? c.p.sa, dbp: last.dbp ?? c.p.sa,
@@ -186,7 +249,7 @@ export class Simulator {
       lvEdv: c.lvEdv, lvEsv: c.lvEsv, lvEf: c.lvEdv > 0 ? (100 * c.sv) / c.lvEdv : 0,
       rvEdv: c.rvEdv, rvEsv: c.rvEsv,
       rvLvRatio: c.lvEdv > 0 ? c.rvEdv / c.lvEdv : 1,
-      pmsf: c.p.pmsf, pCrit: c.p.pCrit, pPeri: c.p.pPeri,
+      pmsf: c.p.pmsf, pCrit: c.p.pCrit, pPeri: c.p.pPeri, operatingPoint,
       gradientVr: c.p.pmsf - Math.max(c.p.ra, c.p.pCrit),
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
       lungVolume: r.lungVolume, pab: r.pab,
