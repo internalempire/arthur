@@ -15,6 +15,7 @@ import {
   venousReturnCurve, cardiacFunctionCurve, venousReturnFlow,
 } from '../src/model/circulation.js';
 import { pvrComponents, PVR_NADIR_VOLUME } from '../src/model/respiratory.js';
+import { readFileSync } from 'node:fs';
 import { SNAPSHOTS } from './snapshots.js';
 
 // ---------------------------------------------------------------- harness ---
@@ -277,6 +278,36 @@ for (const sc of SCENARIOS) {
     .filter(([k, v]) => Math.abs(got[k] - v) > Math.max(0.05, Math.abs(v) * 0.02))
     .map(([k, v]) => `${k} ${v} -> ${got[k].toFixed(2)}`);
   check(sc.id, drift.length === 0, drift.join(', '));
+}
+
+// ------------------------------------------------------- documentation drift --
+
+// The README quotes what each scenario settles at. Rather than generate that
+// table and lose the prose around it, check it: a number in the documentation
+// that the model no longer produces is a defect, and this is how it gets found.
+describe('The README scenario table matches the model');
+{
+  const readme = readFileSync(new URL('../README.md', import.meta.url), 'utf8');
+  const section = readme.split('### What each one settles at')[1] ?? '';
+  const rows = [...section.matchAll(/^\| ([^|]+?) \| ([\d.]+) \| (−?\d+) \| (−?[\d.]+) \|/gm)];
+  check('the table was found and parsed', rows.length === SCENARIOS.length,
+    `${rows.length} rows for ${SCENARIOS.length} scenarios`);
+
+  for (const row of rows) {
+    const [, name, co, map, cvp] = row;
+    const sc = SCENARIOS.find((x) => x.name === name.trim());
+    if (!sc) { check(`${name.trim()} is a real scenario`, false); continue; }
+    const s = new Simulator();
+    s.applyScenario(sc);
+    s.advance(30, true);
+    const m = s.metrics;
+    const documented = { co: Number(co), map: Number(map), cvp: Number(cvp.replace('−', '-')) };
+    const drift = [];
+    if (!near(m.co, documented.co, 0.06)) drift.push(`CO ${documented.co} vs ${m.co.toFixed(2)}`);
+    if (!near(m.map, documented.map, 1.5)) drift.push(`MAP ${documented.map} vs ${m.map.toFixed(0)}`);
+    if (!near(m.cvp, documented.cvp, 0.3)) drift.push(`CVP ${documented.cvp} vs ${m.cvp.toFixed(1)}`);
+    check(sc.name, drift.length === 0, drift.join(', '));
+  }
 }
 
 // ------------------------------------------------------------------ summary --

@@ -19,6 +19,12 @@ What follows is the part that does not belong in a reference: how the model was
 calibrated, what was checked against the sources, and where it stops being
 trustworthy.
 
+Since the August 2026 audit the numbers here are also guarded by
+`node tests/run.mjs`, which checks volume conservation, compartment positivity
+across a sweep of the whole control space, convergence, the direction of eleven
+established relationships, agreement between the integrator and the curves drawn
+from it, and the scenario table in the README.
+
 ---
 
 ## 1. Calibration

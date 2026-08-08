@@ -29,10 +29,11 @@ Mireles-Cabodevila & Alviar (*ATS Scholar* 2025;6:94–108).
 10. [Scenarios](#10-scenarios)
 11. [Fixed constants](#11-fixed-constants)
 12. [Project layout](#12-project-layout)
-13. [Scripting it](#13-scripting-it)
-14. [Accessibility and colour](#14-accessibility-and-colour)
-15. [Limitations](#15-limitations)
-16. [Sources](#16-sources)
+13. [Tests](#13-tests)
+14. [Scripting it](#14-scripting-it)
+15. [Accessibility and colour](#15-accessibility-and-colour)
+16. [Limitations](#16-limitations)
+17. [Sources](#17-sources)
 
 ---
 
@@ -362,14 +363,19 @@ The x-intercept sits at pleural plus pericardial pressure, so a breath visibly
 slides the curve along the axis — which is the mechanism by which ventilation
 changes cardiac output, drawn directly.
 
-**The marker is placed at the crossing of the two curves**, solved by bisection,
-so it is on both to machine precision. The integrated model sits within a few
-percent of that crossing rather than exactly on it, for two reasons worth
-knowing: venous return is a nonlinear function of right atrial pressure near the
-collapse knee and the mean of a nonlinear function is not that function of the
-mean; and the cardiac function curve is a single-beat approximation rather than
-something the integrator computes. Quantified in
-[docs/PHYSIOLOGY.md](docs/PHYSIOLOGY.md).
+**Two markers, because they are two different things.** A filled marker shows
+the simulated state — the cycle-mean right atrial pressure against the
+cycle-mean venous return, which is where the integrated model actually is. A
+hollow marker shows the analytic equilibrium, the crossing of the two curves
+found by bisection. They are close but not identical: the cardiac function curve
+is a single-beat approximation rather than something the integrator computes.
+Drawing only the crossing, as this panel once did, presents a derived
+equilibrium as if it were the patient.
+
+Both curves call the same exported functions the integrator uses, so a curve
+cannot drift away from the model. The simulated state sits on the drawn venous
+return curve to within 0.02–0.33 L/min across every preset, and a test asserts
+it.
 
 ---
 
@@ -429,12 +435,47 @@ fluid bolus or a diuresis — rather than silently rescaling the model.
 
 | Symbol | Meaning | Unit | Default | Range |
 |---|---|---|---|---|
-| `pvrBase` | PVR at the J-curve nadir | mmHg·s/mL | 0.07 | 0.03 – 0.60 |
+| `pvrBase` | Resistance coefficient at the J-curve nadir | mmHg·s/mL | 0.07 | 0.03 – 0.60 |
 | `hpv` | Hypoxic vasoconstriction gain | × | 1.0 | 0 – 3 |
 | `piston` | Pulmonary capacitance coupling | mL/L | 85 | 0 – 200 |
 
 To convert a resistance to clinical units: Wood units = mmHg·s/mL × 1000/60;
 dyn·s·cm⁻⁵ = mmHg·s/mL × 80000/60.
+
+### Two different pulmonary resistances
+
+`pvrBase` sets the coefficient the integrator divides by. That is **not** the
+number a catheter gives you, and the app shows both:
+
+- **Pulmonary resistance coefficient** — the model's own J-curve value.
+- **PVR, derived** — (mPAP − wedge) / CO, computed the way a clinician would.
+
+They agree at baseline (1.44 against 1.46 Wood units) and diverge by up to 46%
+in scenarios where the alveolar waterfall and zone conditions carry part of the
+load that the catheter formula folds into a single resistance. Reporting the
+coefficient alone under the name PVR, as an earlier version did, invites reading
+a model constant as a measurement.
+
+### What each readout is, and whether it can be read
+
+Every readout is marked as a **measurement** the model makes, a **derived index**
+computed from those, or an **internal coefficient**. Indices additionally carry
+their validity conditions and are withheld when those are not met:
+
+| Readout | Withheld when | Qualified when |
+|---|---|---|
+| Pulse pressure variation, SVV | spontaneous effort | VT below 8 mL/kg, fewer than 3.6 beats per breath, RV dilated, raised abdominal pressure |
+| Plateau and driving pressure | spontaneous effort | — |
+| PVR, derived | no forward flow | — |
+| Wedge | — | zone 3 fraction below 95% |
+
+Pulmonary hypertension follows ESC/ERS 2022: mean pulmonary artery pressure
+above 20 mmHg, classified pre-capillary when PVR exceeds 2 Wood units with a
+wedge of 15 mmHg or less, post-capillary above that.
+
+When the model is driven outside the range where its equations hold — a
+compartment being drained faster than it can supply — every clinical readout is
+suspended and the reason stated, rather than continuing to print numbers.
 
 ---
 
@@ -594,7 +635,41 @@ src/
 
 ---
 
-## 13. Scripting it
+## 13. Tests
+
+```bash
+node tests/run.mjs
+```
+
+72 checks, no framework and no dependencies:
+
+- **Volume conservation** across every scenario, to 0.01 mL.
+- **Compartment positivity** across every scenario and across a deterministic
+  250-configuration sweep of the whole control space, with a fixed generator so
+  a failure is reproducible.
+- **Convergence** under time-step refinement, measured on continuous quantities.
+  Cardiac output is deliberately not used: it is latched at a beat boundary, so
+  which sample lands on the boundary shifts with the step.
+- **Determinism** — identical parameters give identical results.
+- **Eleven physiological relations**, by direction rather than by value: PEEP
+  raises CVP and lowers output, spontaneous breathing lowers measured CVP while
+  raising transmural pressure and output, hypovolaemia raises pulse pressure
+  variation, a short expiratory time traps gas, a stiff chest wall raises the
+  pleural swing, RV failure dilates the RV, removing septal coupling lets the LV
+  fill.
+- **The J-curve's nadir found by search**, not asserted — the test would fail if
+  the curve were monotonic.
+- **Integrator/drawing agreement** — the simulated state lies on the drawn
+  venous return curve, and the curve and the equation return the same flow.
+- **Scenario snapshots**, regenerated deliberately with
+  `node tests/generate-snapshots.mjs` so a change in behaviour has to be
+  acknowledged rather than discovered.
+- **Documentation** — the scenario table in this file is checked against a fresh
+  run of the model.
+
+---
+
+## 14. Scripting it
 
 The page exposes a handle for driving the model from the console or an embedding
 page:
@@ -613,11 +688,17 @@ titration swept in a loop, repainting once at the end, runs at the full 300×.
 
 ---
 
-## 14. Accessibility and colour
+## 15. Accessibility and colour
 
 The categorical palette was validated for colour-vision deficiency, and no
 series is identified by hue alone: every trace and curve carries a direct label,
-and every status readout carries a word as well as a colour. Respiratory and
+and every status readout carries a word as well as a colour. Strokes and text
+use separate tokens — a colour that reads well as a 2 px line is often too light
+as 10 px type — with the text tokens computed to clear the WCAG AA ratio of
+4.5:1 against the surface they are drawn on, in both themes. Every canvas
+carries a live one-sentence summary for assistive technology and an openable
+table of its values. The space bar toggles the transport only when no control
+has focus, so native keyboard behaviour is never intercepted. Respiratory and
 haemodynamic pressures are kept on separate strips rather than sharing one plot
 with two y-axes, because cmH₂O and mmHg are different scales and a dual axis
 would invite reading one against the other. Light and dark themes are separately
@@ -625,7 +706,7 @@ specified rather than inverted; the theme button cycles auto → light → dark.
 
 ---
 
-## 15. Limitations
+## 16. Limitations
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 The full list, with the measurements behind it, is in
@@ -652,7 +733,7 @@ The full list, with the measurements behind it, is in
 
 ---
 
-## 16. Sources
+## 17. Sources
 
 1. Kenny JE. *An Approach to Mechanical Heart-Lung Interaction*, 1st ed.
    Toronto: Spectral Envelope, 2020. Chapters 1–4 supply the integration of the
