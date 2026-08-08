@@ -450,7 +450,9 @@ fluid bolus or a diuresis — rather than silently rescaling the model.
 
 | Symbol | Meaning | Unit | Default | Range |
 |---|---|---|---|---|
-| `hr` | Heart rate | /min | 75 | 40 – 170 |
+| `hr` | Heart rate, before reflex modulation | /min | 75 | 40 – 170 |
+| `baroreflex` | Baroreflex gain | × | 1.0 | 0 – 2 |
+| `baroSetPoint` | Pressure the reflex defends | mmHg | 90 | 55 – 110 |
 | `eesLv` | LV end-systolic elastance | mmHg/mL | 3.0 | 0.3 – 6.0 |
 | `eesRv` | RV end-systolic elastance | mmHg/mL | 0.58 | 0.08 – 1.6 |
 | `lvStiff` | LV diastolic stiffness (the `B` of the LV EDPVR) | 1/mL | 0.028 | 0.010 – 0.080 |
@@ -467,6 +469,35 @@ fluid bolus or a diuresis — rather than silently rescaling the model.
 
 To convert a resistance to clinical units: Wood units = mmHg·s/mL × 1000/60;
 dyn·s·cm⁻⁵ = mmHg·s/mL × 80000/60.
+
+### The baroreflex
+
+One sympathetic outflow with a 15 s time constant, driven by the error between
+mean arterial pressure and a set point, acting on heart rate, systemic
+resistance, venous compliance and contractility together. Real arcs have
+different latencies; this is the level at which the teaching points live.
+
+The response is asymmetric — a quarter gain when pressure is above the set point
+— because resting sympathetic tone is low and there is far more room to increase
+outflow than to withdraw it. Without that, a patient a few mmHg above the set
+point acquires an implausible bradycardia.
+
+What it changes is not subtle. Setting the gain to zero recovers the model as it
+was before, and the comparison is the lesson:
+
+| Septic shock preset | Reflex off | Reflex on |
+|---|---|---|
+| Mean arterial pressure | 58 mmHg | 80 mmHg |
+| Heart rate | 105 | 131 |
+| Cardiac output | 3.6 L/min | 4.2 L/min |
+| Pulse pressure variation | 17% | 17% |
+| Cardiac output after 500 mL | +71% | +46% |
+
+With the reflex on, the pressure looks nearly acceptable while the patient is
+just as volume-depleted. The rate says otherwise, the pulse pressure variation
+says otherwise, and the fluid still works. That is compensated shock, and a
+simulator without a reflex cannot show it — every patient simply becomes
+hypotensive in proportion to the insult.
 
 ### Body position
 
@@ -568,18 +599,18 @@ in Wood units.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.6 | 99 | −1.0 | 24/13 | 9 | 1.2 | 0.89 | 8% |
-| Healthy, passive volume control | 5.0 | 96 | 1.5 | 23/13 | 10 | 1.3 | 0.88 | 2% |
-| PEEP escalation | 4.2 | 85 | 4.3 | 27/18 | 9 | 2.1 | 0.94 | 6% |
-| Septic shock, fluid responsive | 3.7 | 59 | 2.0 | 17/11 | 4 | 1.5 | 0.90 | 15% |
-| Big pleural swings, no variation | 6.8 | 97 | 1.7 | 30/18 | 10 | 1.2 | 0.99 | 6% |
-| ARDS with right ventricular failure | 2.7 | 57 | 4.9 | 30/24 | 3 | 5.5 | 2.26 | 10% |
-| Acute pulmonary embolism | 4.1 | 97 | 5.5 | 39/33 | 4 | 7.3 | 2.01 | 10% |
-| Cardiogenic pulmonary oedema | 3.4 | 78 | 5.0 | 43/37 | 32 | 1.8 | 0.90 | 6% |
-| Weaning the failing left ventricle | 3.2 | 80 | 0.7 | 35/28 | 31 | 1.3 | 0.92 | 19% |
-| Stiff chest wall | 4.2 | 87 | 3.4 | 18/10 | 9 | 1.3 | 0.84 | 5% |
-| COPD with dynamic hyperinflation | 4.6 | 88 | 4.1 | 22/13 | 10 | 1.7 | 0.88 | 5% |
-| Intra-abdominal hypertension | 2.9 | 71 | 0.9 | 14/8 | 3 | 1.4 | 0.84 | 9% |
+| Healthy, breathing spontaneously | 5.4 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
+| Healthy, passive volume control | 4.9 | 93 | 1.5 | 22/13 | 10 | 1.3 | 0.89 | 2% |
+| PEEP escalation | 4.3 | 89 | 4.3 | 27/18 | 9 | 2.1 | 0.93 | 6% |
+| Septic shock, fluid responsive | 4.2 | 80 | 1.9 | 19/13 | 4 | 1.5 | 0.79 | 18% |
+| Big pleural swings, no variation | 6.8 | 94 | 1.7 | 27/17 | 10 | 1.2 | 0.94 | 4% |
+| ARDS with right ventricular failure | 3.4 | 81 | 4.7 | 34/28 | 3 | 5.5 | 2.03 | 8% |
+| Acute pulmonary embolism | 4.1 | 94 | 5.5 | 39/33 | 4 | 7.3 | 2.02 | 8% |
+| Cardiogenic pulmonary oedema | 3.5 | 86 | 4.9 | 44/38 | 34 | 1.8 | 0.88 | 6% |
+| Weaning the failing left ventricle | 3.6 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
+| Stiff chest wall | 4.3 | 90 | 3.4 | 18/10 | 9 | 1.3 | 0.82 | 4% |
+| COPD with dynamic hyperinflation | 4.6 | 89 | 4.1 | 23/13 | 10 | 1.7 | 0.89 | 6% |
+| Intra-abdominal hypertension | 3.4 | 86 | 1.0 | 15/8 | 4 | 1.4 | 0.79 | 8% |
 
 ### How the presets are built
 

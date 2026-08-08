@@ -1,5 +1,6 @@
 import { defaultParams } from './parameters.js';
 import { resolveParams } from './position.js';
+import { createBaroreflexState, stepBaroreflex, applyBaroreflex } from './baroreflex.js';
 import {
   createRespiratoryState, stepRespiratory, respiratorySystemCompliance, pvrComponents,
 } from './respiratory.js';
@@ -75,6 +76,7 @@ export class Simulator {
 
   reset() {
     this.resp = createRespiratoryState();
+    this.baro = createBaroreflexState();
     this.effective = resolveParams(this.params);
     this.circ = createCirculationState(this.effective);
     this.traces = {};
@@ -165,8 +167,14 @@ export class Simulator {
     // Body position modifies chest wall compliance, abdominal pressure and
     // resting lung volume. Resolved once here — the parameters cannot change
     // mid-advance — so every consumer sees one consistent set.
-    this.effective = resolveParams(this.params);
+    const positioned = resolveParams(this.params);
+    this.effective = { ...positioned };
     for (let s = 0; s < steps; s++) {
+      // The reflex senses a mean pressure and modifies what the integrator
+      // reads, so it is applied before the step rather than corrected after.
+      const outflow = stepBaroreflex(positioned, this.baro,
+        this.ema ? this.ema.map : positioned.baroSetPoint, dt);
+      applyBaroreflex(this.effective, positioned, outflow);
       stepRespiratory(this.effective, this.resp, dt);
       stepCirculation(this.effective, this.circ, this.resp, dt);
       this.time += dt;
@@ -379,6 +387,8 @@ export class Simulator {
 
     return {
       spontaneousEffort, beatsPerBreath, interpretability, phPresent, phClass,
+      baroOutflow: this.baro.outflow,
+      effectiveHr: p.hr, effectiveSvr: p.svr,
       co, sv: c.sv, hr: p.hr,
       map, sbp: last.sbp ?? c.p.sa, dbp: last.dbp ?? c.p.sa,
       cvp, cvpTransmural: cvp - ema.ppl - ema.peri,

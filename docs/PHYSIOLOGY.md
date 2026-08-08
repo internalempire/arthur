@@ -33,15 +33,20 @@ Baseline (70 kg adult, passive volume control, VT 450 mL, PEEP 5, RR 14):
 
 | | Model | Expected |
 |---|---|---|
-| Cardiac output | 5.0 L/min | 4.5–6.0 |
-| Arterial pressure | 120/82, mean 96 | — |
+| Cardiac output | 4.9 L/min | 4.5–6.0 |
+| Arterial pressure | 111/75, mean 93 | — |
+| Heart rate (after reflex) | 73 | — |
 | CVP | 1.5 mmHg | 0–6 |
-| Pulmonary artery | 22/12, mean 17 | 15–25 / 8–15 |
+| Pulmonary artery | 22/13, mean 17 | 15–25 / 8–15 |
 | Wedge | 10 mmHg | 6–12 |
-| Mean systemic filling pressure | 9 mmHg | 8–12 |
+| Mean systemic filling pressure | 8.8 mmHg | 8–12 |
 | PVR | 1.3 Wood units | 0.3–2.0 |
-| LV ejection fraction | 49% | 55–70 (see limitations) |
+| LV ejection fraction | 50% | 55–70 (see limitations) |
 | Plateau pressure | 9.5 cmH₂O | — |
+
+The baroreflex sits slightly withdrawn at rest, because the baseline pressure is
+a little above its set point — which is why heart rate reads 73 rather than the
+75 on the control.
 
 Behaviour was checked against the sources rather than only against resting
 numbers. The following all reproduce:
@@ -95,10 +100,10 @@ calibrated estimate of it.
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 
-- **No autonomic control.** No baroreflex, no chemoreflex. Heart rate, vascular
-  tone and contractility only change when you change them. Real patients defend
-  their blood pressure; this one does not, so falls in cardiac output are larger
-  and more sustained than you would see at the bedside.
+- **One reflex arc, no chemoreflex.** The arterial baroreflex is present as a
+  single sympathetic outflow with one time constant; the real arcs to heart rate,
+  resistance, venous tone and contractility have different latencies, and there
+  is no chemoreflex at all. Set the gain to zero to see the uncompensated model.
 - **No gas exchange.** There is no oxygen, CO₂, pH or shunt. Hypoxic pulmonary
   vasoconstriction is a coefficient on derecruited lung, not a consequence of an
   alveolar oxygen tension.

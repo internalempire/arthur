@@ -135,6 +135,15 @@ export const PARAMETERS = [
     min: 0.010, max: 0.080, step: 0.002, default: 0.028,
   },
   {
+    id: 'baroreflex', group: 'heart', label: 'Baroreflex gain', unit: '×',
+    min: 0, max: 2, step: 0.1, default: 1.0,
+    help: 'A single sympathetic outflow driving heart rate, resistance, venous tone and contractility together, with a 15 s time constant. Set to zero to see what every intervention costs a patient with no compensation — which is what this model used to assume.',
+  },
+  {
+    id: 'baroSetPoint', group: 'heart', label: 'Baroreflex set point', unit: 'mmHg',
+    min: 55, max: 110, step: 1, default: 90,
+  },
+  {
     id: 'pericardium', group: 'heart', label: 'Pericardial constraint', unit: '×',
     min: 0, max: 4, step: 0.1, default: 1.0,
     help: 'The four chambers share a fixed pericardial space, so filling one stiffens the others. Set to zero to abolish diastolic ventricular interdependence.',

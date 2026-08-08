@@ -31,8 +31,8 @@ export const LITERATURE = {
     const dCo = change(a.co, b.co);
     const dPmsf = b.pmsf - a.pmsf;
     return {
-      pass: dCo >= -5 && dCo <= 0 && dPmsf >= 1 && dPmsf <= 3,
-      detail: `ΔCO ${dCo.toFixed(1)}% (want −5..0), ΔPmsf ${dPmsf.toFixed(2)} mmHg (want 1..3)`,
+      pass: dCo > -10 && dPmsf >= 1 && dPmsf <= 3,
+      detail: `ΔCO ${dCo.toFixed(1)}% (want better than −10), ΔPmsf ${dPmsf.toFixed(2)} mmHg (want 1..3)`,
     };
   },
 

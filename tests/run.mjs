@@ -197,10 +197,53 @@ describe('Physiological relations');
   check('right ventricular failure dilates the RV relative to the LV',
     rvFail.metrics.rvLvRatio > 1.4,
     `RV:LV ${rvFail.metrics.rvLvRatio.toFixed(2)}`);
-  const noSeptum = settled({ eesRv: 0.22, pvrBase: 0.30, septal: 0 });
+
+  // Isolating one mechanism means holding the compensation still. With the
+  // reflex running, it partly makes up for what the septum costs, and the
+  // remaining difference is smaller than the respiratory swing.
+  const septum = settled({ eesRv: 0.22, pvrBase: 0.30, baroreflex: 0 }, 45);
+  const noSeptum = settled({ eesRv: 0.22, pvrBase: 0.30, baroreflex: 0, septal: 0 }, 45);
   check('removing septal coupling lets the left ventricle fill',
-    noSeptum.metrics.lvEdv > rvFail.metrics.lvEdv,
-    `${rvFail.metrics.lvEdv.toFixed(0)} -> ${noSeptum.metrics.lvEdv.toFixed(0)} mL`);
+    noSeptum.metrics.lvEdv > septum.metrics.lvEdv,
+    `${septum.metrics.lvEdv.toFixed(1)} -> ${noSeptum.metrics.lvEdv.toFixed(1)} mL`);
+}
+
+describe('Baroreflex');
+{
+  // The septic preset's settings, because pulse pressure variation needs an
+  // adequate tidal volume and a chest wall that transmits it before it means
+  // anything — which is what the interpretability rules already say.
+  const septic = { stressedVolume: 330, svr: 0.85, vt: 560, ccw: 150, hr: 105, peep: 8, rr: 18 };
+  const off = settled({ ...septic, baroreflex: 0 }, 45);
+  const on = settled({ ...septic, baroreflex: 1 }, 45);
+  check('the reflex defends arterial pressure', on.metrics.map > off.metrics.map + 8,
+    `${off.metrics.map.toFixed(0)} -> ${on.metrics.map.toFixed(0)} mmHg`);
+  check('it does so by raising heart rate', on.metrics.effectiveHr > off.metrics.effectiveHr + 5,
+    `${off.metrics.effectiveHr.toFixed(0)} -> ${on.metrics.effectiveHr.toFixed(0)} /min`);
+  check('and by raising systemic resistance', on.metrics.effectiveSvr > off.metrics.effectiveSvr,
+    `${off.metrics.effectiveSvr.toFixed(2)} -> ${on.metrics.effectiveSvr.toFixed(2)} mmHg·s/mL`);
+  check('a defended pressure does not hide preload dependence',
+    on.metrics.ppv > 12 && off.metrics.ppv > 12,
+    `PPV ${off.metrics.ppv.toFixed(0)}% off, ${on.metrics.ppv.toFixed(0)}% on`);
+
+  // Above the set point the reflex withdraws, but only weakly.
+  const high = settled({ svr: 1.6, baroreflex: 1 }, 45);
+  check('above the set point the reflex withdraws rather than reversing',
+    high.metrics.baroOutflow < 0 && high.metrics.baroOutflow > -0.3,
+    `outflow ${high.metrics.baroOutflow.toFixed(3)} at MAP ${high.metrics.map.toFixed(0)}`);
+
+  check('zero gain restores the uncompensated model',
+    settled({ baroreflex: 0 }, 45).metrics.baroOutflow === 0);
+
+  // The loop must not oscillate.
+  const s = new Simulator();
+  s.params = { ...defaultParams(), stressedVolume: 260, svr: 0.5, baroreflex: 2 };
+  s.reset();
+  s.advance(40, true);
+  let lo = Infinity, hi = -Infinity;
+  for (let i = 0; i < 40; i++) { s.advance(1, true); lo = Math.min(lo, s.metrics.co); hi = Math.max(hi, s.metrics.co); }
+  check('a high gain against a low pressure does not oscillate', hi - lo < 1.0 && Number.isFinite(s.metrics.co),
+    `cardiac output swings ${(hi - lo).toFixed(2)} L/min over 40 s`);
 }
 
 describe('Occlusion manoeuvres');
