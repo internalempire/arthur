@@ -128,6 +128,9 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   thing reaches double figures. And the other classical sources are still absent:
   irregular, variable-depth efforts and arrhythmia, neither of which this model
   has, since effort is a reproducible half-sine and the rhythm is metronomic.
+
+  The preload reserve is not fooled by it, because it reads the curves rather
+  than the waveform. That is the argument for having both on screen.
 - **Ejection fraction runs low** (≈50% at baseline). Ejection ends when cavity
   pressure falls below aortic pressure, and with a double-hill activation that
   happens a little early. Stroke volume, cardiac output and the loop shape are

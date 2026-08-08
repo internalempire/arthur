@@ -61,6 +61,18 @@ const TILES = [
       ? ['serious', 'suggests preload dependence'] : null),
   },
   {
+    id: 'preload', label: 'Preload reserve', unit: '%/mmHg', kind: 'coefficient',
+    get: (m) => (m.preload ? (m.preload.relative * 100).toFixed(1) : '—'),
+    sub: (m) => (m.preload
+      ? `${m.preload.steep ? 'steep limb' : 'plateau'} · ${(m.preload.slope).toFixed(2)} L/min per mmHg`
+      : 'no crossing'),
+    quality: (m) => m.interpretability.preload,
+    // Unlike variation, this survives spontaneous breathing and a small tidal
+    // volume, because it is read off the curves rather than off the waveform.
+    status: (m) => (m.preload && m.preload.steep
+      ? ['serious', 'filling would raise output'] : null),
+  },
+  {
     id: 'pap', label: 'Pulmonary artery', unit: 'mmHg', kind: 'measured',
     get: (m) => `${m.papSys.toFixed(0)}/${m.papDia.toFixed(0)}`,
     sub: (m) => `mean ${m.papMean.toFixed(0)} · wedge ${m.paop.toFixed(0)}`,

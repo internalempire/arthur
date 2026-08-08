@@ -1,5 +1,7 @@
 import { Panel, niceTicks } from '../plot.js';
-import { venousReturnCurve, cardiacFunctionCurve } from '../../model/circulation.js';
+import {
+  venousReturnCurve, cardiacFunctionCurve, curveIntersection, preloadLimbs,
+} from '../../model/circulation.js';
 import { cmH2OtoMmHg } from '../../model/units.js';
 
 // The Guyton diagram. Both curves share right atrial pressure as their abscissa,
@@ -7,43 +9,6 @@ import { cmH2OtoMmHg } from '../../model/units.js';
 // the cardiac function curve along that axis while leaving the venous return
 // curve where it is — which is the entire mechanism by which a breath changes
 // cardiac output.
-
-/** Linear interpolation into a flat [x0,y0,x1,y1,…] curve. */
-function valueAt(pts, x) {
-  for (let i = 2; i < pts.length; i += 2) {
-    const a = pts[i - 2], b = pts[i];
-    if ((a <= x && x <= b) || (b <= x && x <= a)) {
-      const t = (x - a) / ((b - a) || 1);
-      return pts[i - 1] + t * (pts[i + 1] - pts[i - 1]);
-    }
-  }
-  return NaN;
-}
-
-/**
- * Where the two curves cross — which is what the operating point of a Guyton
- * diagram *is*, and so where the marker has to sit.
- *
- * The alternative, plotting the model's own cycle-mean pressure and flow, leaves
- * the marker visibly off the curves. That gap is not a coding error: venous
- * return is a nonlinear function of right atrial pressure near the collapse
- * knee, and the mean of a nonlinear function is not that function of the mean.
- * Far from the knee the two agree to within 0.01 L/min; near it they differ by
- * about half a litre. The crossing is the honest thing to draw, and
- * docs/PHYSIOLOGY.md records how far the integrated model sits from it.
- */
-function intersection(vr, cf) {
-  const f = (x) => valueAt(vr, x) - valueAt(cf, x);
-  let lo = Math.max(vr[0], cf[0]);
-  let hi = Math.min(vr[vr.length - 2], cf[cf.length - 2]);
-  if (!(f(lo) > 0) || !(f(hi) < 0)) return null; // no crossing in view
-  for (let i = 0; i < 40; i++) {
-    const mid = (lo + hi) / 2;
-    if (f(mid) > 0) lo = mid; else hi = mid;
-  }
-  const x = (lo + hi) / 2;
-  return { x, y: valueAt(vr, x) };
-}
 
 const TRAIL_INTERVAL = 0.025; // s of simulated time between trail samples
 const TRAIL_POINTS = 480;     // about 12 s of physiology
@@ -79,7 +44,7 @@ export function createGuyton(canvas) {
     // evaluating it at the mean pressure. Showing only the crossing, as this
     // panel used to, presents a derived equilibrium as if it were the patient.
     const simulated = { x: op.pra, y: op.flow };
-    const equilibrium = intersection(vr.points, cf.points);
+    const equilibrium = curveIntersection(vr.points, cf.points);
 
     // Sampled on simulated time so the trail covers a fixed span of physiology
     // regardless of frame rate, and stops growing when the model is paused.
@@ -122,6 +87,14 @@ export function createGuyton(canvas) {
     panel.line(vr.points, { color: colors.venous, width: 2 });
     panel.line(cf.points, { color: colors.arterial, width: 2 });
 
+    // The stretch of the cardiac function curve where filling would actually buy
+    // output, drawn over it. Which side of that the marker sits on is the whole
+    // question, and this makes it a place on the picture rather than a claim.
+    const limbs = preloadLimbs(p, c, op);
+    if (limbs.steep.length >= 4) {
+      panel.line(limbs.steep, { color: colors.arterial, width: 5, alpha: 0.28 });
+    }
+
     panel.unclip();
 
     // Direct labels rather than a legend box.
@@ -140,6 +113,14 @@ export function createGuyton(canvas) {
     panel.label('Ppl', pplMmHg, yHi, {
       color: colors.inkMuted, dx: 4, dy: 12, halo: colors.surface,
     });
+    // Placed at the middle of the band rather than its foot, which sits on the
+    // axis next to the Pmsf label.
+    if (limbs.steep.length >= 6) {
+      const mid = (Math.floor(limbs.steep.length / 4) * 2);
+      panel.label('filling helps here', limbs.steep[mid], limbs.steep[mid + 1], {
+        color: colors.text.arterial, align: 'right', dx: -8, dy: 4, halo: colors.surface,
+      });
+    }
 
     // Points measured by occlusion, and the line through them. This is how a
     // venous return curve is built at the bedside — and the line will not lie on

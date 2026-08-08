@@ -495,6 +495,58 @@ The bedside method has exactly this confound.
 
 ---
 
+### Preload reserve
+
+The two curves already carry the answer to "would filling help", so it is read
+off them rather than asserted:
+
+```
+sensitivity = d(CO*)/d(Pmsf)      from re-intersecting at Pmsf ± 0.5 mmHg
+reserve     = sensitivity / CO*    fraction of output per mmHg of filling
+steep limb  = reserve ≥ 0.10
+```
+
+Adding volume translates the venous return curve to the right and leaves cardiac
+function where it is, so the question is how far the crossing climbs when it
+does. On the steep limb it climbs; on the plateau it slides sideways along a flat
+cardiac function curve and output barely moves. Both curves matter — a stiff
+venous system moves the crossing further for the same volume, and a flat cardiac
+function curve stops that counting for anything.
+
+Every crossing lies on the cardiac function curve by construction, so sweeping
+filling pressure traces a segment of that curve rather than a new one. The panel
+therefore thickens the stretch where the reserve is above threshold instead of
+drawing a second line, which makes "on the steep part of the Starling curve" a
+place on the picture rather than a claim in a tile.
+
+**It is deliberately expressed per mmHg of filling pressure, not per millilitre
+of fluid.** Converting needs an assumption about how much of a bolus stays in the
+capacitance vessels — which is precisely what a fluid challenge is testing, so
+building it in would beg the question.
+
+**The threshold is calibrated against this model, not taken from a paper.** The
+clinical convention is that 500 mL raising cardiac output by 15% means fluid
+responsive, so the reserve that corresponds to that was measured rather than
+assumed. Across 60 randomised configurations varying stressed volume, systemic
+resistance, heart rate, right ventricular contractility, venous compliance, PEEP,
+resistance to venous return and abdominal pressure, a threshold of 0.10
+classifies about 90% of them the same way the model's own response to 500 mL
+does, and the test asserts that.
+
+The cases it gets wrong fall into two groups, both instructive. A patient can
+have a steep local slope and gain little, because 500 mL walks them past the knee
+and the gain saturates — the reserve is a derivative and a bolus is not
+infinitesimal. And a patient with low venous compliance gains more than their
+slope suggests, because the same bolus buys more filling pressure. That second
+one is the assumption left out on purpose.
+
+**Why it earns its place next to pulse pressure variation.** It is read off the
+curves rather than off the arterial waveform, so it survives the conditions that
+withhold the dynamic indices: spontaneous breathing, a tidal volume below
+8 mL/kg, an irregular rhythm. It is also not fooled by the one false positive
+this model does produce — at 1400 mL of stressed volume, variation is raised by
+the lung squeezing blood forward while the reserve correctly reads the plateau.
+
 ## 10. Parameters
 
 Every user-facing knob, defined in `src/model/parameters.js`. The control panel
@@ -796,6 +848,8 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `PL_EASY`, `SPREAD_EASY` | 0, 1.3 cmH₂O | opening threshold and spread for normal units |
 | `SPREAD_HARD` | 7 cmH₂O | spread of opening pressures for diseased units |
 | `HPV_GAIN` | 1.1 | resistance added per unit of closed lung |
+| `PRELOAD_STEEP` | 0.10 /mmHg | reserve above which filling buys output; calibrated against the model's own response to 500 mL, not published |
+| `TIDAL_CHALLENGE.threshold` | 3.5 points | Myatra 2017; published, not calibrated |
 | `K_ALV`, `K_EXTRA` | 1.6, 2.4 | J-curve exponents |
 | `F_ALV`, `F_EXTRA` | 0.6, 0.4 | J-curve weights |
 

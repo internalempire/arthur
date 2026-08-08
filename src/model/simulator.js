@@ -10,6 +10,7 @@ import {
 import { pvrComponents, lungRegions } from './lung.js';
 import {
   createCirculationState, stepCirculation, VASC, venousReturnBackPressure,
+  preloadSensitivity,
 } from './circulation.js';
 import { cmH2OtoMmHg, RESISTANCE_TO_DYN, RESISTANCE_TO_WOOD } from './units.js';
 
@@ -406,6 +407,15 @@ export class Simulator {
 
     // Conditions under which the dynamic indices stop meaning what their names
     // say. Levels: 'ok', 'caution', 'unavailable'.
+    // Where the patient sits on their own filling curve. Unlike variation this
+    // needs no particular breath, no passive patient and no regular rhythm — it
+    // is read off the two curves rather than off the arterial waveform, so it
+    // stays available exactly where the dynamic indices are withheld.
+    const preload = preloadSensitivity(p, c, operatingPoint);
+    const preloadReasons = [];
+    if (!preload) preloadReasons.push('the curves do not cross in this state');
+    else if (!Number.isFinite(preload.relative)) preloadReasons.push('no finite operating point');
+
     const ppvReasons = [];
     if (spontaneousEffort) ppvReasons.push('spontaneous effort — the index assumes a passive patient');
     // A completed challenge answers the tidal volume objection, which is the
@@ -439,6 +449,10 @@ export class Simulator {
         : (pvrDerived !== null && pvrDerived > 2 ? 'pre-capillary' : 'unclassified'));
 
     const interpretability = {
+      preload: {
+        level: preloadReasons.length ? 'unavailable' : 'ok',
+        reasons: preloadReasons,
+      },
       ppv: { level: ppvLevel, reasons: ppvReasons },
       plateau: { level: plateauLevel, reasons: plateauLevel === 'unavailable' ? ['no passive plateau during spontaneous effort'] : [] },
       wedge: {
@@ -450,6 +464,7 @@ export class Simulator {
     };
 
     return {
+      preload,
       spontaneousEffort, beatsPerBreath, interpretability, phPresent, phClass,
       tidalChallenge: this.challenge
         ? { running: true, phase: this.challenge.phase,
