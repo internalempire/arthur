@@ -1,0 +1,88 @@
+// Presets. Each one is a partial override of the defaults plus the question it
+// is meant to make answerable — the note is the reason the preset exists.
+
+export const SCENARIOS = [
+  {
+    id: 'healthy-spont',
+    name: 'Healthy, breathing spontaneously',
+    note: 'Watch the central venous pressure fall during inspiration while cardiac output rises. The measured pressure drops; the transmural pressure — the one the atrium feels — goes up.',
+    params: { mode: 'spont', pmus: 8, peep: 0, rr: 14 },
+  },
+  {
+    id: 'healthy-vcv',
+    name: 'Healthy, passive volume control',
+    note: 'The same lungs, the opposite pressure sign. Right atrial pressure now rises with each breath and cardiac output falls, because pleural pressure lifts the heart but not the venous reservoir.',
+    params: { mode: 'vcv', pmus: 0, vt: 450, peep: 5, rr: 14 },
+  },
+  {
+    id: 'peep-escalation',
+    name: 'PEEP escalation',
+    note: 'Raise PEEP and follow two things at once: the cardiac function curve sliding right on the Guyton diagram, and the operating point climbing the J-curve. Mean systemic filling pressure rises too — the abdomen defends the gradient.',
+    params: { mode: 'vcv', pmus: 0, vt: 450, peep: 14, rr: 14 },
+  },
+  {
+    id: 'septic-responder',
+    name: 'Septic shock, fluid responsive',
+    note: 'Low stressed volume, vasodilated, tachycardic. Pulse pressure variation is large because the ventricle is on the steep part of its Starling curve. Raise stressed volume and watch the variation collapse as cardiac output climbs.',
+    params: {
+      mode: 'vcv', pmus: 0, vt: 560, peep: 8, rr: 18, ccw: 150,
+      stressedVolume: 330, svr: 0.85, hr: 105,
+    },
+  },
+  {
+    id: 'swing-no-variation',
+    name: 'Big pleural swings, no variation',
+    note: 'The same patient after resuscitation, now making vigorous efforts against a stiff chest wall. Pleural pressure swings by more than 20 cmH₂O and pulse pressure variation still sits near 4%: a swing in pleural pressure is necessary for variation, but it is the flat part of the Starling curve that decides whether any of it reaches the stroke volume.',
+    params: {
+      mode: 'spont', pmus: 22, peep: 6, rr: 24, ccw: 100,
+      stressedVolume: 950, svr: 0.75, hr: 100,
+    },
+  },
+  {
+    id: 'ards-rv',
+    name: 'ARDS with right ventricular failure',
+    note: 'A collapsed, stiff lung and a failing right ventricle. The RV dilates, the septum bows left and the left ventricle cannot fill. Try adding volume — then try taking PEEP away — and see which one the model rewards.',
+    params: {
+      mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
+      frc: 1.35, clung: 34, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6,
+    },
+  },
+  {
+    id: 'lv-failure',
+    name: 'Cardiogenic pulmonary oedema',
+    note: 'A dilated, hypervolaemic left ventricle. Positive pressure now helps: it lowers left ventricular transmural pressure and unloads ejection. Compare how much cardiac output this heart loses to PEEP against how much a normal heart loses.',
+    params: {
+      mode: 'vcv', pmus: 0, vt: 450, peep: 10, rr: 18,
+      eesLv: 1.2, lvStiff: 0.034, stressedVolume: 1050, svr: 1.25, hr: 95,
+    },
+  },
+  {
+    id: 'weaning',
+    name: 'Weaning the failing left ventricle',
+    note: 'The same failing ventricle, now breathing on its own. Negative pleural pressure raises left ventricular afterload and venous return at the same time — the physiology behind weaning-induced pulmonary oedema.',
+    params: {
+      mode: 'spont', pmus: 10, peep: 0, rr: 26,
+      eesLv: 1.2, lvStiff: 0.034, stressedVolume: 1050, svr: 1.25, hr: 110,
+    },
+  },
+  {
+    id: 'obesity',
+    name: 'Stiff chest wall',
+    note: 'Obesity or a tense abdomen. A larger share of every breath goes into pleural pressure, so the haemodynamic cost of the same tidal volume goes up — and so does pulse pressure variation, whether or not the patient is dry.',
+    params: { mode: 'vcv', pmus: 0, vt: 500, peep: 8, rr: 16, ccw: 75, pab0: 12 },
+  },
+  {
+    id: 'copd',
+    name: 'COPD with dynamic hyperinflation',
+    note: 'High airway resistance and too little expiratory time. Gas trapping raises end-expiratory lung volume, generating intrinsic PEEP that the ventilator never displayed — and pushing the lung up the right limb of the J-curve.',
+    params: { mode: 'vcv', pmus: 0, vt: 500, peep: 5, rr: 26, ti: 0.9, raw: 24, clung: 240, frc: 3.0 },
+  },
+  {
+    id: 'iah',
+    name: 'Intra-abdominal hypertension',
+    note: 'Raised abdominal pressure does two opposite things: it raises mean systemic filling pressure, and it raises the pressure at which the vena cava closes. Which one wins depends on how full the patient is.',
+    params: { mode: 'vcv', pmus: 0, vt: 450, peep: 8, rr: 16, pab0: 22, abdCoupling: 6 },
+  },
+];
+
+export const SCENARIO_BY_ID = new Map(SCENARIOS.map((s) => [s.id, s]));

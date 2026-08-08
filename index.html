@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Heart–Lung Interaction — real-time simulator</title>
+  <meta name="description" content="A real-time cardiopulmonary simulator for teaching heart-lung interaction: Guyton and Campbell diagrams, pressure-volume loops and the pulmonary vascular J-curve, coupled through one closed-loop model.">
+  <link rel="stylesheet" href="styles/app.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='13'>🫁</text></svg>">
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Heart–Lung Interaction</h1>
+        <p>Real-time cardiopulmonary simulator</p>
+      </div>
+
+      <div class="topbar-controls">
+        <label class="field">
+          <span>Scenario</span>
+          <select id="scenario"></select>
+        </label>
+        <label class="field">
+          <span>Speed</span>
+          <select id="speed">
+            <option value="1">1×</option>
+            <option value="0.5">½×</option>
+            <option value="0.25">¼×</option>
+          </select>
+        </label>
+        <button id="playpause" class="btn btn-primary" type="button">Pause</button>
+        <button id="reset" class="btn" type="button">Reset</button>
+        <button id="theme" class="btn btn-icon" type="button" aria-label="Switch colour theme" title="Switch colour theme">◐</button>
+        <button id="sidebar-toggle" class="btn btn-icon" type="button" aria-label="Show parameters" aria-expanded="false">≡</button>
+      </div>
+    </header>
+
+    <p class="scenario-note" id="scenario-note"></p>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-inner" id="controls"></div>
+      </aside>
+
+      <main class="stage">
+        <div class="tiles" id="stats"></div>
+
+        <section class="panel panel-waves" aria-label="Time-aligned waveforms">
+          <div id="waveforms"></div>
+        </section>
+
+        <div class="grid">
+          <section class="panel" aria-label="Guyton diagram"><canvas id="guyton"></canvas></section>
+          <section class="panel" aria-label="Campbell diagram"><canvas id="campbell"></canvas></section>
+          <section class="panel" aria-label="Ventricular pressure-volume loops"><div id="pvloops"></div></section>
+          <section class="panel" aria-label="Pulmonary vascular resistance against lung volume"><canvas id="pvr"></canvas></section>
+          <section class="panel panel-thorax" aria-label="Thoracic schematic"><canvas id="thorax"></canvas></section>
+        </div>
+
+        <footer class="colophon">
+          <p>
+            A closed-loop lumped-parameter model. Every compartment is referenced to the pressure that surrounds it,
+            so the interactions shown are emergent rather than scripted.
+            Built from Kenny, <em>An Approach to Mechanical Heart-Lung Interaction</em> (2020);
+            Mahmood &amp; Pinsky, <em>Ann Transl Med</em> 2018;6:349;
+            Yuriditsky, Mireles-Cabodevila &amp; Alviar, <em>ATS Scholar</em> 2025;6:94–108.
+          </p>
+          <p><strong>For teaching only.</strong> This is a simplification of human physiology and must not be used to guide the care of a patient.</p>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
