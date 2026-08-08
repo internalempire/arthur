@@ -6,11 +6,11 @@ export const SNAPSHOTS = {
   'peep-escalation': { co: 4.23, map: 85.3, cvp: 4.35, papMean: 20.7, paop: 9.13, pvr: 2.13 },
   'septic-responder': { co: 3.70, map: 58.6, cvp: 1.97, papMean: 13.1, paop: 3.59, pvr: 1.50 },
   'swing-no-variation': { co: 6.81, map: 96.6, cvp: 1.71, papMean: 20.7, paop: 9.68, pvr: 1.24 },
-  'ards-rv': { co: 3.16, map: 64.8, cvp: 4.22, papMean: 23.6, paop: 3.31, pvr: 4.14 },
+  'ards-rv': { co: 2.68, map: 57.2, cvp: 4.93, papMean: 26.5, paop: 2.77, pvr: 5.53 },
   'pulmonary-embolism': { co: 4.14, map: 97.0, cvp: 5.49, papMean: 35.3, paop: 3.59, pvr: 7.33 },
   'lv-failure': { co: 3.39, map: 77.5, cvp: 4.96, papMean: 38.2, paop: 32.32, pvr: 1.78 },
   'weaning': { co: 3.22, map: 80.2, cvp: 0.70, papMean: 35.6, paop: 31.28, pvr: 1.28 },
   'obesity': { co: 4.23, map: 86.6, cvp: 3.35, papMean: 14.6, paop: 8.57, pvr: 1.25 },
-  'copd': { co: 4.13, map: 81.3, cvp: 4.45, papMean: 24.9, paop: 8.21, pvr: 4.15 },
+  'copd': { co: 4.58, map: 88.4, cvp: 4.07, papMean: 17.6, paop: 9.67, pvr: 1.71 },
   'iah': { co: 2.90, map: 70.6, cvp: 0.88, papMean: 11.0, paop: 3.29, pvr: 1.45 },
 };

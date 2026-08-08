@@ -235,21 +235,27 @@ the reference frame rather than being applied as a term.
 PVR is the sum of two exponential terms in lung volume:
 
 ```
-x               = (V_lung − 2.2 L) / 2.2 L
-R_alveolar      = 0.6 · PVR₀ · exp( 1.6·x)
-R_extraalveolar = 0.4 · PVR₀ · exp(−2.4·x) · (1 + hpv·1.4·max(0, −x))
+strain          = (V_lung − FRC_patient) / FRC_patient
+openness        = (V_lung − 2.2 L) / 2.2 L
+R_alveolar      = 0.6 · PVR₀ · exp( 1.6·strain)
+R_extraalveolar = 0.4 · PVR₀ · exp(−2.4·openness) · (1 + hpv·1.4·max(0, −openness))
 PVR             = R_alveolar + R_extraalveolar
 ```
 
 Intra-alveolar vessels are compressed by inflation; extra-alveolar vessels are
-tethered open by it. Their sum is J-shaped with its nadir at x = 0, so both
-atelectasis and overdistension load the right ventricle.
+tethered open by it. Their sum is J-shaped with its nadir where the two
+references coincide, so both atelectasis and overdistension load the right
+ventricle.
 
-**The reference volume is a normal FRC (2.2 L), not the patient's own relaxation
-volume.** A collapsed ARDS lung therefore sits on the left limb, where
-recruitment lowers PVR. Without this, taking PEEP away could only ever lower
-PVR, and the clinical point of the J-curve would be lost. The hypoxic
-vasoconstriction term acts only on derecruited lung (x < 0).
+**The two limbs are referenced to two different volumes, and that is the point.**
+Distension of the alveolar vessels is a strain: it depends on how far the units
+that are already open have been stretched past the lung's *own* resting volume.
+A collapsed ARDS lung inflated from 1.35 to 1.76 L is not "20% below normal" as
+far as its open units are concerned — they are a third past their resting
+length. How much lung is open at all, and how much of it is hypoxic, is the
+different question, and that one is relative to a normal FRC. Referencing both
+limbs to a normal FRC — as this once did — flatters recruitment and penalises
+chronic hyperinflation as though it were acute strain.
 
 ### Vascular waterfall and West zones
 
@@ -521,12 +527,12 @@ in Wood units.
 | PEEP escalation | 4.2 | 85 | 4.3 | 27/18 | 9 | 2.1 | 0.94 | 6% |
 | Septic shock, fluid responsive | 3.7 | 59 | 2.0 | 17/11 | 4 | 1.5 | 0.90 | 15% |
 | Big pleural swings, no variation | 6.8 | 97 | 1.7 | 30/18 | 10 | 1.2 | 0.99 | 6% |
-| ARDS with right ventricular failure | 3.2 | 65 | 4.2 | 27/20 | 3 | 4.1 | 1.92 | 6% |
+| ARDS with right ventricular failure | 2.7 | 57 | 4.9 | 30/24 | 3 | 5.5 | 2.26 | 10% |
 | Acute pulmonary embolism | 4.1 | 97 | 5.5 | 39/33 | 4 | 7.3 | 2.01 | 10% |
 | Cardiogenic pulmonary oedema | 3.4 | 78 | 5.0 | 43/37 | 32 | 1.8 | 0.90 | 6% |
 | Weaning the failing left ventricle | 3.2 | 80 | 0.7 | 35/28 | 31 | 1.3 | 0.92 | 19% |
 | Stiff chest wall | 4.2 | 87 | 3.4 | 18/10 | 9 | 1.3 | 0.84 | 5% |
-| COPD with dynamic hyperinflation | 4.1 | 81 | 4.4 | 29/19 | 8 | 4.2 | 1.09 | 5% |
+| COPD with dynamic hyperinflation | 4.6 | 88 | 4.1 | 22/13 | 10 | 1.7 | 0.88 | 5% |
 | Intra-abdominal hypertension | 2.9 | 71 | 0.9 | 14/8 | 3 | 1.4 | 0.84 | 9% |
 
 ### How the presets are built

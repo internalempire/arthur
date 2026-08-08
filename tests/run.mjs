@@ -17,6 +17,7 @@ import {
 import { pvrComponents, PVR_NADIR_VOLUME } from '../src/model/respiratory.js';
 import { readFileSync } from 'node:fs';
 import { SNAPSHOTS } from './snapshots.js';
+import { LITERATURE } from './literature.mjs';
 
 // ---------------------------------------------------------------- harness ---
 
@@ -278,6 +279,32 @@ for (const sc of SCENARIOS) {
     .filter(([k, v]) => Math.abs(got[k] - v) > Math.max(0.05, Math.abs(v) * 0.02))
     .map(([k, v]) => `${k} ${v} -> ${got[k].toFixed(2)}`);
   check(sc.id, drift.length === 0, drift.join(', '));
+}
+
+// ---------------------------------------------------------------- literature --
+
+// docs/LITERATURE_RANGES.md records, per published finding, whether the model
+// currently agrees. Both directions are enforced: a row that claims agreement
+// and stops agreeing fails, and so does a row that claims it does not agree and
+// then starts. The second half is what keeps the document from going stale.
+describe('Published findings, and whether the document says so honestly');
+{
+  const doc = readFileSync(new URL('../docs/LITERATURE_RANGES.md', import.meta.url), 'utf8');
+  const rows = [...doc.matchAll(/^\| `([\w-]+)` \| .+? \| (agrees|not yet) \|/gm)]
+    .map(([, id, status]) => ({ id, status }));
+
+  check('every row in the document has a check', rows.length === Object.keys(LITERATURE).length,
+    `${rows.length} rows, ${Object.keys(LITERATURE).length} checks`);
+
+  for (const { id, status } of rows) {
+    const fn = LITERATURE[id];
+    if (!fn) { check(id, false, 'no check implemented'); continue; }
+    const { pass, detail } = fn();
+    const documented = status === 'agrees';
+    check(`${id} — documented as "${status}"`, pass === documented,
+      pass ? `the model now agrees; mark the row "agrees" — ${detail}`
+        : `the model does not agree — ${detail}`);
+  }
 }
 
 // ------------------------------------------------------- documentation drift --

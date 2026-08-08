@@ -200,14 +200,34 @@ const F_EXTRA = 0.4;
 // pulmonary vascular resistance instead of lowering it.
 export const PVR_NADIR_VOLUME = 2.2; // L
 
+/**
+ * The two limbs are referenced to two different volumes, and that distinction is
+ * the whole point.
+ *
+ * Distension of the alveolar vessels is a *strain*: it depends on how far the
+ * units that are already open have been stretched beyond the lung's own resting
+ * volume. A collapsed ARDS lung inflated from 1.35 to 1.76 L is not at "20%
+ * below normal" as far as its open units are concerned — they are being pulled
+ * a third past their resting length.
+ *
+ * How much lung is open at all, and how much of it is hypoxic, is a different
+ * question, and that one is relative to a normal functional residual capacity.
+ *
+ * Referencing both limbs to a normal FRC — as this did originally — gives a
+ * recruitable lung a 28% fall in resistance when PEEP is raised. Cappio Borlino
+ * et al. (AJRCCM 2024;210(7)) measured no change: recruitment offsets the
+ * distension penalty rather than beating it. Separating the references is what
+ * lets the two effects cancel.
+ */
 export function pvrComponents(p, lungVolume) {
-  const x = (lungVolume - PVR_NADIR_VOLUME) / PVR_NADIR_VOLUME;
-  const alveolar = p.pvrBase * F_ALV * Math.exp(K_ALV * x);
-  // Below FRC the extra-alveolar term is amplified by hypoxic vasoconstriction
-  // acting on derecruited units.
-  const hypoxic = 1 + p.hpv * 1.4 * Math.max(0, -x);
-  const extraAlveolar = p.pvrBase * F_EXTRA * Math.exp(-K_EXTRA * x) * hypoxic;
-  return { alveolar, extraAlveolar, total: alveolar + extraAlveolar, x };
+  const strain = (lungVolume - p.frc) / p.frc;
+  const openness = (lungVolume - PVR_NADIR_VOLUME) / PVR_NADIR_VOLUME;
+  const alveolar = p.pvrBase * F_ALV * Math.exp(K_ALV * strain);
+  // Below a normal FRC the extra-alveolar term is amplified by hypoxic
+  // vasoconstriction acting on derecruited units.
+  const hypoxic = 1 + p.hpv * 1.4 * Math.max(0, -openness);
+  const extraAlveolar = p.pvrBase * F_EXTRA * Math.exp(-K_EXTRA * openness) * hypoxic;
+  return { alveolar, extraAlveolar, total: alveolar + extraAlveolar, x: openness, strain };
 }
 
 export function pvrAt(p, lungVolume) {
