@@ -377,6 +377,98 @@ describe('The two-compartment lung');
     })());
 }
 
+describe('Variation at the filled end of the range');
+{
+  // Averaged over a minute: variation is computed from the beats in one
+  // respiratory cycle, so at four or five beats per breath a single reading
+  // moves by more than a point depending on which beats land where.
+  const meanPpv = (over, seconds = 60) => {
+    const s = settled({ mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150, ...over }, 45);
+    let sum = 0, n = 0;
+    for (let i = 0; i < seconds / 0.05; i++) { s.advance(0.05, true); sum += s.variation().ppv; n++; }
+    return sum / n;
+  };
+
+  const trough = meanPpv({ stressedVolume: 900 });
+  const filled = meanPpv({ stressedVolume: 1400 });
+  check('variation rises again once the patient is full',
+    filled > trough + 1, `${trough.toFixed(1)}% at 900 mL vs ${filled.toFixed(1)}% at 1400 mL`);
+
+  // And it is the lung doing it, not the pericardium or the septum.
+  const noPiston = meanPpv({ stressedVolume: 1400, piston: 0 });
+  check('and it is the lung squeezing blood forward that does it',
+    noPiston < filled - 1.5, `${filled.toFixed(1)}% falls to ${noPiston.toFixed(1)}% with the piston off`);
+  check('the pericardium is not responsible',
+    Math.abs(meanPpv({ stressedVolume: 1400, pericardium: 0 }) - filled) < 0.6);
+
+  // The mechanism needs open capillaries, which is why it only shows up here.
+  check('it appears only where zone III is everywhere',
+    settled({ mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150, stressedVolume: 1400 }, 45).metrics.zone3 > 0.9
+      && settled({ mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150, stressedVolume: 500 }, 45).metrics.zone3 < 0.3);
+}
+
+describe('The tidal volume challenge');
+{
+  const protective = { mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150 };
+  const challenge = (over) => {
+    const s = settled({ ...protective, ...over }, 45);
+    const blockers = s.startTidalChallenge();
+    if (blockers.length) return { blockers };
+    s.advance(63, true);
+    return { result: s.challengeResult, sim: s };
+  };
+
+  const dry = challenge({ stressedVolume: 300 });
+  const wet = challenge({ stressedVolume: 1100 });
+  check('the manoeuvre completes and reports both windows',
+    dry.result && dry.result.ppvBefore > 0 && dry.result.ppvAfter > 0,
+    `${dry.result?.ppvBefore.toFixed(1)}% -> ${dry.result?.ppvAfter.toFixed(1)}%`);
+  check('raising the tidal volume raises variation',
+    dry.result.ppvAfter > dry.result.ppvBefore,
+    `${dry.result.ppvBefore.toFixed(1)} -> ${dry.result.ppvAfter.toFixed(1)}%`);
+  check('and it raises it more in the preload-dependent patient',
+    dry.result.dPpv > wet.result.dPpv + 1,
+    `ΔPPV ${dry.result.dPpv.toFixed(1)} dry vs ${wet.result.dPpv.toFixed(1)} wet`);
+
+  // The manoeuvre must put the ventilator back.
+  check('the tidal volume is restored afterwards',
+    Math.abs(dry.sim.effective.vt - 420) < 1e-9,
+    `${dry.sim.effective.vt.toFixed(0)} mL`);
+  check('and the slider was never touched', dry.sim.params.vt === 420);
+
+  // Conditions on the manoeuvre, not on the reading.
+  check('a spontaneously breathing patient cannot be challenged',
+    settled({ mode: 'spont', pmus: 8 }, 20).startTidalChallenge().length > 0);
+  check('nor can one already at 8 mL/kg',
+    settled({ ...protective, vt: 560 }, 20).startTidalChallenge().length > 0);
+  check('a passive patient in volume control can',
+    settled(protective, 20).startTidalChallenge().length === 0);
+
+  // The verdict is withheld rather than reported false — the model's delta does
+  // not span the published threshold, and saying "not dependent" for a patient
+  // who gains 40% from a bolus would be a false negative dressed as a result.
+  // The manoeuvre exists to answer the tidal volume objection, so once it has,
+  // the objection should stop being raised alongside the answer. A few breaths
+  // first: the latched tidal volume is still the raised one until the patient
+  // has taken a breath at the restored setting, and until then the caution
+  // correctly does not fire at all.
+  dry.sim.advance(12, true);
+  const reasons = dry.sim.metrics.interpretability.ppv.reasons.join(' | ');
+  check('a completed challenge supersedes the tidal volume caution',
+    reasons.includes('the challenge answered it'), reasons || '(none)');
+
+  // And stops applying if the ventilator has been changed since.
+  dry.sim.params.vt = 500;
+  dry.sim.advance(5, true);
+  check('and stops applying if the ventilator has been changed since',
+    dry.sim.metrics.tidalChallenge.result === null && dry.sim.metrics.tidalChallenge.stale,
+    dry.sim.metrics.interpretability.ppv.reasons.join(' | '));
+
+  check('a delta below the published threshold is withheld, not called negative',
+    dry.result.verdict === 'withheld' && dry.result.withheldReason !== null,
+    `ΔPPV ${dry.result.dPpv.toFixed(1)} against a threshold of ${dry.result.threshold}`);
+}
+
 describe('Body position');
 {
   const ARDS = { frc: 1.35, clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12, recruitable: 0.55 };

@@ -109,15 +109,25 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 - **No gas exchange.** There is no oxygen, CO₂, pH or shunt. Hypoxic pulmonary
   vasoconstriction is a coefficient on derecruited lung, not a consequence of an
   alveolar oxygen tension.
-- **Pulse pressure variation is underdamped in the false-positive direction.**
-  The model reproduces the *true* positive well — high variation in the fluid
-  responder, low in the non-responder. It does **not** reproduce the classic
-  false positives. A well-filled patient making 20 cmH₂O pleural swings still
-  shows about 4% variation, because the preload pathway is the only route to
-  variation here and that ventricle is on the flat part of its Starling curve.
-  Real false positives come largely from irregular, variable-depth efforts and
-  from arrhythmia, neither of which this model has: effort is a perfectly
-  reproducible half-sine and the rhythm is metronomic.
+- **Pulse pressure variation reproduces one false positive, weakly, and misses
+  the rest.** The true positive is reproduced well — high variation in the fluid
+  responder, low in the non-responder. This entry previously said the model
+  produced no false positives at all; that was written before the well-filled end
+  of the range was examined, and it is wrong.
+
+  There is one, and it has a mechanism. Above about 900 mL of stressed volume the
+  West zone III fraction reaches 96–100%, and with the capillaries open along
+  their whole length the lung can squeeze blood forward into the left atrium with
+  each breath — the `piston` term. Variation then rises again, from 1.7% at 900 mL
+  to 3.6% at 1400 mL, in patients who gain nothing from a bolus. Setting `piston`
+  to zero collapses it to 1.1%, which is how the mechanism was identified. This is
+  the direct-filling component of the classical Δup, and it appears exactly where
+  it should: only when the patient is full enough for zone III to be everywhere.
+
+  It is a weak false positive — 3.6% would not mislead anyone, where the real
+  thing reaches double figures. And the other classical sources are still absent:
+  irregular, variable-depth efforts and arrhythmia, neither of which this model
+  has, since effort is a reproducible half-sine and the rhythm is metronomic.
 - **Ejection fraction runs low** (≈50% at baseline). Ejection ends when cavity
   pressure falls below aortic pressure, and with a double-hill activation that
   happens a little early. Stroke volume, cardiac output and the loop shape are
@@ -125,9 +135,14 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 - **Two pulmonary compartments give almost no transit delay.** In a real chest
   the fall in right ventricular output reaches the left ventricle two or three
   beats later, which separates the Δup and Δdown components of pulse pressure
-  variation. Here they largely overlap and partly cancel.
+  variation. Here they largely overlap and partly cancel. This is a question
+  about the volumes and compliances of the two vascular compartments in series,
+  and is unrelated to the lung being split into two populations of units.
 - **The pulmonary circulation is lumped.** One PVR and one zone-III fraction for
-  the whole lung. Regional heterogeneity — the thing that actually makes ARDS
+  the whole lung. The lung units are now split into two populations by opening
+  pressure, which is what carries recruitability, but the vasculature that
+  serves them is still a single resistance. Regional heterogeneity — the thing
+  that actually makes ARDS
   ARDS — is absent.
 - **Forward Euler.** Stable across the shipped ranges, and flows are now limited
   so no compartment can be drained past a 1 mL floor; a 250-configuration sweep

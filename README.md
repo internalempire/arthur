@@ -228,7 +228,56 @@ the reference frame rather than being applied as a term.
 
 ---
 
-## 5. The pulmonary circulation
+## 5. Manoeuvres
+
+Three things can be done *to* the patient rather than set on them. All of them
+change what the ventilator delivers without moving the sliders, because a
+manoeuvre is not a new setting.
+
+### Occlusion holds
+
+End-expiratory and end-inspiratory holds freeze the airway, so alveolar pressure
+equilibrates with the airway and the circulation settles at a fixed lung volume.
+Each hold contributes one measured point to the Guyton diagram; several at
+different airway pressures draw a venous return curve the way the bedside draws
+one.
+
+### The tidal volume challenge
+
+```
+window 1   thirty seconds at the patient's own tidal volume
+window 2   thirty seconds at 8 mL/kg
+ΔPPV       mean variation in window 2 − mean in window 1
+```
+
+Variation needs a breath big enough to load and unload the heart, and protective
+ventilation does not provide one — which is why the model withholds the index
+below 8 mL/kg. Myatra et al. (*Crit Care Med* 2017;45:415–21) turned that into a
+manoeuvre: raise the volume, read the *change*, put the ventilator back. A rise
+above 3.5 percentage points identifies a preload-dependent patient, the reasoning
+being that a slope is still readable from a small perturbation even where the
+absolute value is not.
+
+Both windows are averaged over their settled portion. That is not fussiness:
+variation is computed from the beats in one respiratory cycle, so at four or five
+beats per breath a single reading moves by more than a point depending on which
+beats land where in the cycle. Comparing an instantaneous baseline against an
+averaged result puts that noise straight into the delta.
+
+**Where it holds and where it does not.** The ordering is right — ΔPPV falls
+3.4 → 0.1 points as stressed volume goes 300 → 1100 mL, in the same order as
+those patients' actual response to a bolus. The threshold is crossed in the
+septic responder preset (4.5 points), which is the patient the trial studied.
+A patient merely dry at a resting heart rate sits at 3.4–3.6, straddling the
+line; at a heart rate of 130 the same manoeuvre gives 5.2. The threshold is left
+at the published value rather than lowered to what the model reaches, because a
+model that cannot fall short of a number cannot be shown to be wrong about it.
+
+The manoeuvre refuses rather than misreports. A spontaneously breathing patient
+has no set tidal volume to raise, and one already at 8 mL/kg has nothing to raise
+it from; in both cases the button declines and says why.
+
+## 6. The pulmonary circulation
 
 ### The lung as two populations of units
 
@@ -324,7 +373,7 @@ positive-pressure ventilation.
 
 ---
 
-## 6. Ventricular interdependence
+## 7. Ventricular interdependence
 
 Three mechanisms, deliberately separated.
 
@@ -360,7 +409,7 @@ the control exists for.
 
 ---
 
-## 7. Integration and derived measurements
+## 8. Integration and derived measurements
 
 | Quantity | Method |
 |---|---|
@@ -387,7 +436,7 @@ the motion the diagram exists to show.
 
 ---
 
-## 8. The derived curves
+## 9. The derived curves
 
 The Guyton diagram is not drawn from a lookup table. Both curves are computed
 from the same constants the integrator uses, so they move with the live state.
@@ -446,7 +495,7 @@ The bedside method has exactly this confound.
 
 ---
 
-## 9. Parameters
+## 10. Parameters
 
 Every user-facing knob, defined in `src/model/parameters.js`. The control panel
 builds itself from this list, so adding an entry there is enough to make it
@@ -606,7 +655,7 @@ suspended and the reason stated, rather than continuing to print numbers.
 
 ---
 
-## 10. Scenarios
+## 11. Scenarios
 
 `src/model/scenarios.js`. A scenario is a **partial override of the defaults**,
 applied to the defaults and not to whatever the previous scenario left behind —
@@ -708,7 +757,7 @@ smallest set that makes that question answerable.
 
 ---
 
-## 11. Fixed constants
+## 12. Fixed constants
 
 Not user-facing, but part of the model. In `src/model/circulation.js` and
 `src/model/respiratory.js`.
@@ -752,7 +801,7 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 
 ---
 
-## 12. Project layout
+## 13. Project layout
 
 ```
 index.html
@@ -778,7 +827,7 @@ src/
 
 ---
 
-## 13. Tests
+## 14. Tests
 
 ```bash
 node tests/run.mjs
@@ -812,7 +861,7 @@ node tests/run.mjs
 
 ---
 
-## 14. Scripting it
+## 15. Scripting it
 
 The page exposes a handle for driving the model from the console or an embedding
 page:
@@ -831,7 +880,7 @@ titration swept in a loop, repainting once at the end, runs at the full 300×.
 
 ---
 
-## 15. Accessibility and colour
+## 16. Accessibility and colour
 
 The categorical palette was validated for colour-vision deficiency, and no
 series is identified by hue alone: every trace and curve carries a direct label,
@@ -849,7 +898,7 @@ specified rather than inverted; the theme button cycles auto → light → dark.
 
 ---
 
-## 16. Limitations
+## 17. Limitations
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 The full list, with the measurements behind it, is in
@@ -861,13 +910,22 @@ The full list, with the measurements behind it, is in
 - **No gas exchange.** No oxygen, CO₂, pH or shunt. Hypoxic vasoconstriction is
   a coefficient on derecruited lung, not a consequence of an alveolar oxygen
   tension.
-- **Pulse pressure variation reproduces the true positive but not the classic
-  false positives**, which come largely from irregular effort and arrhythmia —
-  neither of which this model has.
-- **One pulmonary compartment**, so almost no transit delay between the
-  ventricles, and at very high PVR the pulmonary artery diastolic pressure runs
-  higher than it should because the compartment's time constant exceeds the
-  cardiac cycle.
+- **Pulse pressure variation reproduces the true positive, and one false
+  positive weakly.** Above about 900 mL of stressed volume the zone III fraction
+  reaches 96–100% and the lung starts squeezing blood forward into the left
+  atrium with each breath, so variation rises again — 1.7% at 900 mL to 3.6% at
+  1400 mL — in patients who gain nothing from a bolus. That is the classical
+  direct-filling component, and it appears where it should. It is weak: the real
+  thing reaches double figures. The other classical sources, irregular effort and
+  arrhythmia, are genuinely absent.
+- **The tidal volume challenge is marginal in the patient it should be clearest
+  in.** It orders patients correctly and crosses the published threshold in the
+  tachycardic septic responder, but a patient merely dry at a resting heart rate
+  sits at 3.4–3.6 points against a threshold of 3.5.
+- **Almost no transit delay between the ventricles**, and at very high PVR the
+  pulmonary artery diastolic pressure runs higher than it should because the
+  vascular compartment's time constant exceeds the cardiac cycle. This is about
+  the pulmonary vessels, not the lung units, which are now two populations.
 - **Ejection fraction runs low** by roughly 5–10 points; stroke volume, cardiac
   output and loop shape are right, the ratio is pessimistic.
 - **Forward Euler**, with flows limited so no compartment can be drained past a
@@ -884,7 +942,7 @@ The full list, with the measurements behind it, is in
 
 ---
 
-## 17. Sources
+## 18. Sources
 
 1. Kenny JE. *An Approach to Mechanical Heart-Lung Interaction*, 1st ed.
    Toronto: Spectral Envelope, 2020. Chapters 1–4 supply the integration of the

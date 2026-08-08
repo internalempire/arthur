@@ -7,6 +7,7 @@
 
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams } from '../src/model/parameters.js';
+import { SCENARIO_BY_ID } from '../src/model/scenarios.js';
 import { pvrComponents, PVR_NADIR_VOLUME } from '../src/model/lung.js';
 import { venousReturnFlow } from '../src/model/circulation.js';
 
@@ -81,6 +82,47 @@ export const LITERATURE = {
     return {
       pass: monotone && steps[0] > 0 && steps[steps.length - 1] < 0,
       detail: `ΔPVR ${steps.map((d) => d.toFixed(0) + '%').join(' → ')} across recruitability 0 → 1`,
+    };
+  },
+
+  // Two rows, because the manoeuvre gets one thing right and one thing wrong,
+  // and a single row would hide whichever half it did not test.
+  'tidal-challenge-ordering': () => {
+    const protective = { mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150 };
+    const at = (stressedVolume) => {
+      const s = new Simulator();
+      s.params = { ...defaultParams(), ...protective, stressedVolume };
+      s.reset();
+      s.advance(45, true);
+      s.startTidalChallenge();
+      s.advance(63, true);
+      return s.challengeResult.dPpv;
+    };
+    const steps = [300, 500, 700, 1100].map(at);
+    const falling = steps.every((d, i) => i === 0 || d < steps[i - 1]);
+    return {
+      pass: falling,
+      detail: `ΔPPV ${steps.map((d) => d.toFixed(1)).join(' → ')} points across stressed volume 300 → 1100 mL`,
+    };
+  },
+
+  // The trial's patients were septic and postoperative ICU patients on
+  // protective ventilation who turned out to be fluid responsive — tachycardic
+  // and vasodilated, not merely dry at a resting heart rate. The app already
+  // ships a preset for that patient, so this row uses it rather than a stressed
+  // volume picked by hand, which is the number it would be tempting to choose.
+  'tidal-challenge-threshold': () => {
+    const s = new Simulator();
+    s.applyScenario(SCENARIO_BY_ID.get('septic-responder'));
+    s.params.vt = 6 * 70; // protective, where the plain index is not readable
+    s.reset();
+    s.advance(45, true);
+    s.startTidalChallenge();
+    s.advance(63, true);
+    const r = s.challengeResult;
+    return {
+      pass: r.dPpv > 3.5 && r.verdict === 'dependent',
+      detail: `ΔPPV ${r.dPpv.toFixed(1)} points, ${r.ppvBefore.toFixed(1)} → ${r.ppvAfter.toFixed(1)}% (want > 3.5)`,
     };
   },
 

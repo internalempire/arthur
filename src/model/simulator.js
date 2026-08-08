@@ -1,6 +1,9 @@
-import { defaultParams } from './parameters.js';
+import { defaultParams, REFERENCE_WEIGHT_KG } from './parameters.js';
 import { resolveParams } from './position.js';
 import { createBaroreflexState, stepBaroreflex, applyBaroreflex } from './baroreflex.js';
+import {
+  createTidalChallenge, stepTidalChallenge, challengeBlockers, challengeTidalVolume,
+} from './challenge.js';
 import {
   createRespiratoryState, stepRespiratory, respiratorySystemCompliance,
 } from './respiratory.js';
@@ -16,10 +19,6 @@ export const TRACE_SECONDS = 12;
 const TRACE_LEN = SAMPLE_HZ * TRACE_SECONDS;
 const MEAN_TIME_CONSTANT = 3; // s, for the mean-pressure moving averages
 const COMPARTMENTS = ['vSa', 'vSv', 'vRa', 'vRv', 'vPa', 'vPv', 'vLa', 'vLv'];
-// The compartment volumes, compliances and resistances are calibrated for an
-// adult of about this weight. It is stated because the validity condition for
-// pulse pressure variation is expressed per kilogram.
-const REFERENCE_WEIGHT_KG = 70;
 
 class Ring {
   constructor(n) { this.buf = new Float32Array(n); this.n = n; this.i = 0; this.filled = 0; }
@@ -107,6 +106,8 @@ export class Simulator {
     this.cycleTick = 0;
     // Occlusion manoeuvres, and the (pressure, flow) pairs they measure.
     this.hold = null;
+    this.challenge = null;
+    this.challengeResult = null;
     this.measuredPoints = [];
     // Settle the model so the first frame the user sees is a steady state.
     this.advance(15, true);
@@ -158,6 +159,24 @@ export class Simulator {
     this.hold = null;
   }
 
+  /**
+   * Read the variation at the patient's own tidal volume for half a minute, then
+   * at 8 mL/kg for half a minute, and report the change. Returns the reasons it
+   * cannot be done, empty if it started.
+   */
+  startTidalChallenge() {
+    if (this.challenge) return ['a challenge is already running'];
+    const blockers = challengeBlockers(this.params);
+    if (blockers.length) return blockers;
+    this.challenge = createTidalChallenge(this.params);
+    this.challengeResult = null;
+    return [];
+  }
+
+  cancelTidalChallenge() { this.challenge = null; }
+
+  clearChallengeResult() { this.challengeResult = null; }
+
   clearMeasuredPoints() { this.measuredPoints = []; }
 
   /** Advance simulated time by `seconds`, optionally without recording traces. */
@@ -176,6 +195,10 @@ export class Simulator {
       const outflow = stepBaroreflex(positioned, this.baro,
         this.ema ? this.ema.map : positioned.baroSetPoint, dt);
       applyBaroreflex(this.effective, positioned, outflow);
+      // The challenge changes what the ventilator delivers, not what the slider
+      // says — the same separation as body position, and for the same reason:
+      // the manoeuvre is something done *to* the patient, not a new setting.
+      this.effective.vt = challengeTidalVolume(this.challenge, positioned.vt);
       stepRespiratory(this.effective, this.resp, dt);
       stepCirculation(this.effective, this.circ, this.resp, dt);
       this.time += dt;
@@ -188,6 +211,7 @@ export class Simulator {
   accumulate() {
     const c = this.circ;
     this.trackHold();
+    this.trackChallenge();
     this.sysRun = Math.max(this.sysRun, c.p.sa);
     this.diaRun = Math.min(this.diaRun, c.p.sa);
     this.papSysRun = Math.max(this.papSysRun, c.p.pa);
@@ -241,6 +265,47 @@ export class Simulator {
    * intrathoracic pressure, and averaging the transient would put the point
    * somewhere the patient never was.
    */
+  /**
+   * Pulse pressure and stroke volume variation over the last respiratory cycle.
+   *
+   * Extracted so the tidal volume challenge measures the same number the panel
+   * shows. Metrics are only recomputed at the end of an advance, so a manoeuvre
+   * reading `this.metrics` would sample a value frozen at the start of the
+   * window — which is invisible at a frame at a time and wrong at thirty
+   * seconds at a time.
+   */
+  variation() {
+    const hist = this.beatHistory;
+    const period = 60 / this.params.rr;
+    const recent = hist.filter((b) => b.t > this.time - period * 1.05);
+    const pool = recent.length >= 2 ? recent : hist.slice(-4);
+    if (pool.length < 2) return { ppv: 0, svv: 0 };
+    const pps = pool.map((b) => b.pp);
+    const svs = pool.map((b) => b.sv);
+    const ppMax = Math.max(...pps), ppMin = Math.min(...pps);
+    const svMax = Math.max(...svs), svMin = Math.min(...svs);
+    return {
+      ppv: ppMax + ppMin > 0 ? (200 * (ppMax - ppMin)) / (ppMax + ppMin) : 0,
+      svv: svMax + svMin > 0 ? (200 * (svMax - svMin)) / (svMax + svMin) : 0,
+    };
+  }
+
+  trackChallenge() {
+    if (!this.challenge) return;
+    // Variation is read from the running metrics rather than recomputed, so the
+    // manoeuvre measures exactly the number the panel shows.
+    const { ppv, svv } = this.variation();
+    const done = stepTidalChallenge(this.challenge, ppv, svv, this.dt);
+    if (done) {
+      this.challengeResult = done;
+      this.challenge = null;
+      // Put the ventilator back here rather than waiting for the next step to
+      // do it: the manoeuvre ends inside the step that finished it, and leaving
+      // the raised volume in `effective` would outlive the advance.
+      this.effective.vt = done.baselineVt;
+    }
+  }
+
   trackHold() {
     const h = this.hold;
     if (!h) return;
@@ -293,22 +358,8 @@ export class Simulator {
 
   computeMetrics() {
     const p = this.effective ?? this.params, c = this.circ, r = this.resp;
-    const hist = this.beatHistory;
-    const period = 60 / p.rr;
-    const recent = hist.filter((b) => b.t > this.time - period * 1.05);
-    const pool = recent.length >= 2 ? recent : hist.slice(-4);
-
-    let ppv = 0, svv = 0;
-    if (pool.length >= 2) {
-      const pps = pool.map((b) => b.pp);
-      const svs = pool.map((b) => b.sv);
-      const ppMax = Math.max(...pps), ppMin = Math.min(...pps);
-      const svMax = Math.max(...svs), svMin = Math.min(...svs);
-      ppv = ppMax + ppMin > 0 ? (200 * (ppMax - ppMin)) / (ppMax + ppMin) : 0;
-      svv = svMax + svMin > 0 ? (200 * (svMax - svMin)) / (svMax + svMin) : 0;
-    }
-
-    const last = hist[hist.length - 1] ?? {};
+    const { ppv, svv } = this.variation();
+    const last = this.beatHistory[this.beatHistory.length - 1] ?? {};
     const ema = this.ema ?? {
       map: c.p.sa, cvp: c.p.ra, pap: c.p.pa, paop: c.p.la,
       ppl: c.p.ppl, peri: c.p.pPeri, pmsf: c.p.pmsf, pCrit: c.p.pCrit, flow: 0,
@@ -357,7 +408,18 @@ export class Simulator {
     // say. Levels: 'ok', 'caution', 'unavailable'.
     const ppvReasons = [];
     if (spontaneousEffort) ppvReasons.push('spontaneous effort — the index assumes a passive patient');
-    if (r.lastVt < 8 * REFERENCE_WEIGHT_KG) ppvReasons.push(`tidal volume below 8 mL/kg (${REFERENCE_WEIGHT_KG} kg assumed)`);
+    // A completed challenge answers the tidal volume objection, which is the
+    // whole reason the manoeuvre exists — so it supersedes the caution rather
+    // than sitting next to it. It stops applying if the ventilator has been
+    // changed since, because the result then describes a different patient.
+    const challengeAnswers = this.challengeResult
+      && this.challengeResult.baselineVt === p.vt
+      && p.mode === 'vcv' && p.pmus === 0;
+    if (r.lastVt < 8 * REFERENCE_WEIGHT_KG && !this.challenge) {
+      ppvReasons.push(challengeAnswers
+        ? `tidal volume below 8 mL/kg, but the challenge answered it: ${this.challengeResult.dPpv >= 0 ? '+' : ''}${this.challengeResult.dPpv.toFixed(1)} points`
+        : `tidal volume below 8 mL/kg (${REFERENCE_WEIGHT_KG} kg assumed)`);
+    }
     if (beatsPerBreath < 3.6) ppvReasons.push('fewer than 3.6 beats per breath');
     if (c.lvEdv > 0 && c.rvEdv / c.lvEdv > 1.2) ppvReasons.push('right ventricular dilatation — variation may reflect afterload, not preload');
     if (p.pab0 > 12) ppvReasons.push('raised intra-abdominal pressure');
@@ -389,6 +451,11 @@ export class Simulator {
 
     return {
       spontaneousEffort, beatsPerBreath, interpretability, phPresent, phClass,
+      tidalChallenge: this.challenge
+        ? { running: true, phase: this.challenge.phase,
+            progress: this.challenge.elapsed / this.challenge.seconds }
+        : { running: false, result: challengeAnswers ? this.challengeResult : null,
+            stale: !!this.challengeResult && !challengeAnswers },
       baroOutflow: this.baro.outflow,
       effectiveHr: p.hr, effectiveSvr: p.svr,
       co, sv: c.sv, hr: p.hr,

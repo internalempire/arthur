@@ -104,9 +104,30 @@ for (const [id, kind] of [['hold-exp', 'expiratory'], ['hold-insp', 'inspiratory
   });
 }
 
+// The tidal volume challenge. It refuses rather than misreports: a patient who
+// is breathing, or already at 8 mL/kg, has no manoeuvre to perform.
+el('tidal-challenge').addEventListener('click', (e) => {
+  const blockers = sim.startTidalChallenge();
+  const btn = e.currentTarget;
+  if (blockers.length) {
+    btn.title = blockers[0];
+    btn.classList.add('btn-refused');
+    setTimeout(() => btn.classList.remove('btn-refused'), 1400);
+  } else {
+    btn.classList.add('btn-busy');
+    // Two windows of thirty seconds, at whatever speed the user is running.
+    const check = setInterval(() => {
+      if (!sim.challenge) { btn.classList.remove('btn-busy'); clearInterval(check); }
+    }, 250);
+  }
+  dirty = true;
+});
+
 el('reset').addEventListener('click', () => {
   const current = scenarioSelect.value;
   sim.clearMeasuredPoints();
+  sim.cancelTidalChallenge();
+  sim.clearChallengeResult();
   sim.reset();
   if (current) applyScenario(current); else controls.sync();
   clearTrails();
