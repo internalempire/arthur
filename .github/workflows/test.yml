@@ -1,0 +1,21 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # No dependencies to install: the model is plain ES modules and the test
+      # runner is Node's own. `npm ci` would fail for want of a lockfile.
+      - name: Syntax check every module
+        run: find src tests -name '*.js' -o -name '*.mjs' | xargs -n1 node --check
+      - name: Model and documentation tests
+        run: node tests/run.mjs
