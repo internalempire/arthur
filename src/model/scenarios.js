@@ -44,7 +44,7 @@ export const SCENARIOS = [
     note: 'A collapsed, stiff lung and a failing right ventricle, and a lung that is over half recruitable. The RV dilates, the septum bows left and the left ventricle cannot fill. Try adding volume, then taking PEEP away, then turning the patient prone. Then set the recruitable fraction to zero — the same collapsed lung, now consolidated rather than closed — and run the PEEP titration again. It goes the other way, and nothing else about the patient has changed.',
     params: {
       mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
-      frc: 1.35, clung: 34, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6,
+      collapsed: 0.42, clung: 40, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6,
       recruitable: 0.55, pOpen: 20,
     },
   },
@@ -84,8 +84,8 @@ export const SCENARIOS = [
   {
     id: 'copd',
     name: 'COPD with dynamic hyperinflation',
-    note: 'High airway resistance and too little expiratory time. Gas trapping raises end-expiratory lung volume, generating intrinsic PEEP that the ventilator never displayed — and pushing the lung up the right limb of the J-curve.',
-    params: { mode: 'vcv', pmus: 0, vt: 500, peep: 5, rr: 26, ti: 0.9, raw: 24, clung: 240, frc: 3.0 },
+    note: 'High airway resistance and too little expiratory time. The lung is hyperinflated because it has lost its elastic recoil — a compliance of 300 rather than a resting volume set by hand — so it rests high before a single breath is delivered. Gas trapping then raises it further, generating intrinsic PEEP the ventilator never displayed and pushing the lung up the right limb of the J-curve.',
+    params: { mode: 'vcv', pmus: 0, vt: 500, peep: 5, rr: 26, ti: 0.9, raw: 24, clung: 300 },
   },
   {
     id: 'iah',

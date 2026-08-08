@@ -26,7 +26,7 @@ const change = (before, after) => (after / before - 1) * 100;
 // the model could not express until the lung was split into two populations of
 // units. Holding the resting volume equal is the point: it is what makes the
 // comparison about recruitability rather than about size.
-const ARDS = { clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, frc: 1.35 };
+const ARDS = { clung: 40, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, collapsed: 0.42 };
 
 export const LITERATURE = {
   'peep-euvolaemia': () => {
@@ -174,7 +174,7 @@ export const LITERATURE = {
 
   'ph-classification': () => {
     const post = settle({ eesLv: 1.2, lvStiff: 0.034, stressedVolume: 1050, svr: 1.25, hr: 95, peep: 10 });
-    const pre = settle({ ...ARDS, frc: 1.35, peep: 12, pvrBase: 0.44, eesRv: 0.32 });
+    const pre = settle({ ...ARDS, peep: 12, pvrBase: 0.44, eesRv: 0.32 });
     return {
       pass: post.phClass === 'post-capillary' && pre.phClass === 'pre-capillary',
       detail: `failing LV → ${post.phClass} (wedge ${post.paop.toFixed(0)}), high resistance → ${pre.phClass} (wedge ${pre.paop.toFixed(0)})`,

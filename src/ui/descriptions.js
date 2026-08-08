@@ -19,7 +19,7 @@ const PANELS = [
       const m = sim.metrics;
       return `Airway pressure ${n(m.paw)} and pleural pressure ${n(m.ppl)} cmH₂O; `
         + `arterial ${n(m.sbp, 0)} over ${n(m.dbp, 0)}, pulmonary artery ${n(m.papSys, 0)} over ${n(m.papDia, 0)}, `
-        + `central venous ${n(m.cvp)} mmHg; lung volume ${n((m.lungVolume - sim.params.frc) * 1000, 0)} mL above FRC.`;
+        + `central venous ${n(m.cvp)} mmHg; lung volume ${n((m.lungVolume - sim.resp.relaxVolume) * 1000, 0)} mL above resting.`;
     },
     rows: (sim) => {
       const m = sim.metrics;
@@ -65,14 +65,15 @@ const PANELS = [
     title: 'Campbell diagram',
     summary: (sim) => {
       const m = sim.metrics, p = sim.params;
-      return `At ${n((m.lungVolume - p.frc) * 1000, 0)} mL above FRC, pleural pressure is ${n(m.ppl)} and `
+      return `At ${n((m.lungVolume - sim.resp.relaxVolume) * 1000, 0)} mL above resting volume, pleural pressure is ${n(m.ppl)} and `
         + `airway pressure ${n(m.paw)} cmH₂O. Chest wall compliance ${p.ccw} and lung compliance ${p.clung} `
         + `mL/cmH₂O give a respiratory system compliance of ${n(m.crs, 0)}.`;
     },
     rows: (sim) => {
       const m = sim.metrics, p = sim.params;
       return [
-        ['Volume above FRC', `${n((m.lungVolume - p.frc) * 1000, 0)} mL`],
+        ['Volume above resting', `${n((m.lungVolume - sim.resp.relaxVolume) * 1000, 0)} mL`],
+        ['Resting volume', `${n(sim.resp.relaxVolume, 2)} L`],
         ['Pleural pressure', `${n(m.ppl)} cmH₂O`],
         ['Airway pressure', `${n(m.paw)} cmH₂O`],
         ['Alveolar pressure', `${n(m.palv)} cmH₂O`],

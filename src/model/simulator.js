@@ -7,7 +7,7 @@ import {
 import {
   createRespiratoryState, stepRespiratory, respiratorySystemCompliance,
 } from './respiratory.js';
-import { pvrComponents, lungRegions } from './lung.js';
+import { pvrComponents, lungRegions, relaxationVolume } from './lung.js';
 import {
   createCirculationState, stepCirculation, VASC, venousReturnBackPressure,
   preloadSensitivity,
@@ -123,9 +123,15 @@ export class Simulator {
       this.circ.vSv += value - this.params.stressedVolume;
     }
     this.params[id] = value;
-    if (id === 'frc') {
-      // Keep end-expiratory volume physical when FRC moves.
-      this.resp.v = Math.max(0, this.resp.v);
+    if (id === 'collapsed' || id === 'clung' || id === 'recruitable' || id === 'pOpen') {
+      // These move the resting volume, which `resp.v` is measured from. The gas
+      // in the lung cannot jump, so hold the absolute volume and re-reference it
+      // rather than letting the offset carry the change.
+      const before = this.resp.relaxVolume || relaxationVolume(this.params);
+      const absolute = before + this.resp.v;
+      const after = relaxationVolume(this.params);
+      this.resp.v = Math.max(-after * 0.9, absolute - after);
+      this.resp.plSolved = null;
     }
   }
 
@@ -368,7 +374,7 @@ export class Simulator {
     const { map, cvp, pap: papMean, paop } = ema;
 
     const co = (c.sv * p.hr) / 1000;
-    const crs = respiratorySystemCompliance(p);
+    const crs = respiratorySystemCompliance(p, r.lungVolume);
     const pvrComp = pvrComponents(p, r.lungVolume);
     const regions = lungRegions(p, r.lungVolume);
 
@@ -489,6 +495,13 @@ export class Simulator {
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
       lungVolume: r.lungVolume, pab: r.pab,
       openFraction: regions.openFraction,
+      relaxVolume: r.relaxVolume,
+      // What a ventilator would compute, not what the tissue is: tidal volume
+      // over the pressure it took to deliver it.
+      crsMeasured: (() => {
+        const driving = r.lastPplat - p.peep - r.lastAutoPeep;
+        return driving > 0.2 ? r.lastVt / driving : null;
+      })(),
       closedFraction: regions.closedFraction,
       recruitedFraction: regions.recruited,
       lungStrain: regions.strain,

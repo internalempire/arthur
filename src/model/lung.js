@@ -25,24 +25,30 @@
 // the model says a deflated lung stretches its remaining open units: with half
 // the units shut, the gas that is left has nowhere else to go.
 //
-// What this deliberately does *not* do is change the mechanics. Recruited units
-// add compliance in a real lung, so the pressure–volume relationship here is
-// still linear where a real one stiffens at both ends. That is a separate change
-// with its own stability questions, and folding it in would make this one
-// impossible to audit.
+// Recruitment changes the mechanics too, and that is where most of its clinical
+// weight sits. Units that open accept gas, so the lung's compliance follows how
+// many of them are open, and the resting volume rises when pressure opens more.
+// The pressure–volume relationship is therefore sigmoid rather than linear, and
+// it is sigmoid because of the unit population rather than because a sigmoid was
+// fitted to it.
+//
+// The consequence for `clung` is worth stating plainly: it is the compliance of
+// this patient's lung *with all of it open*, not the compliance a ventilator
+// would measure. The measured value is the open fraction times that, which is
+// the baby lung as a readout — compliance tracks how much lung is being
+// ventilated rather than how stiff the tissue is.
 
 import { clamp } from './units.js';
 
-// Pleural pressure at the relaxation volume, duplicated from the respiratory
-// module rather than imported: that module needs the resistance model, so
-// importing back the other way would make a cycle out of two files that each
-// only need one constant from the other.
-const PPL_FRC = -5; // cmH2O
-
-// The resting volume of a fully open lung. Collapse is measured against this,
-// not against the patient's own relaxation volume — a patient whose FRC is
-// 1.35 L is not a small normal lung, they are a normal lung with a third of it
-// shut.
+// The resting volume of a normal, fully open lung, with normal compliance.
+// Collapse is measured against this rather than against the patient's own
+// resting volume — a patient sitting at 1.35 L is not a small normal lung, they
+// are a normal lung with a third of it shut.
+//
+// Note what is no longer a parameter: resting volume itself. It is an outcome of
+// how much lung is open and how compliant it is, which is what makes recruitment
+// able to raise it. A lung that has lost recoil rests high, a lung that has
+// collapsed rests low, and neither is set by hand.
 export const NORMAL_FRC = 2.2; // L
 export const PVR_NADIR_VOLUME = NORMAL_FRC;
 
@@ -58,19 +64,108 @@ const SPREAD_HARD = 7; // cmH2O
 
 const logistic = (x) => 1 / (1 + Math.exp(-x));
 
+// Transpulmonary pressure at the relaxation volume: the recoil that holds the
+// lung open against the chest wall, and the negative of pleural pressure there.
+export const RECOIL_AT_FRC = 5; // cmH2O
+
+/** How much of the lung is open at a given transpulmonary pressure. */
+export function openFractionAt(p, pl) {
+  const diseased = clamp(p.collapsed ?? 0, 0, 0.95);
+  const recruitable = clamp(p.recruitable ?? 0, 0, 1);
+  const normalOpen = (1 - diseased) * logistic((pl - PL_EASY) / SPREAD_EASY);
+  const recruited = diseased * recruitable * logistic((pl - (p.pOpen ?? 20)) / SPREAD_HARD);
+  return clamp(normalOpen + recruited, 0.05, 1);
+}
+
+// The open fraction of an undiseased lung at its resting recoil is a constant —
+// the diseased population is zero, so only the easy limb contributes. Written as
+// one rather than derived per call, because deriving it meant spreading the
+// parameter object tens of thousands of times a simulated second and cost more
+// than every other part of the lung model together.
+const OPEN_AT_REST = 1 / (1 + Math.exp(-(RECOIL_AT_FRC - PL_EASY) / SPREAD_EASY));
+
+// Volume of a fully open lung at zero transpulmonary pressure — the gas that
+// stays in it when nothing is distending it. Fixed, so that a lung which has
+// lost its elastic recoil rests at a *higher* volume: emphysema is a compliance
+// that is too high, not a resting volume that is set by hand. The value is
+// chosen so that a normal lung, with normal compliance, rests at NORMAL_FRC.
+const UNSTRESSED_VOLUME = NORMAL_FRC / OPEN_AT_REST - RECOIL_AT_FRC * 0.2; // L
+
+function perUnitVolume(p, pl) {
+  return Math.max(0, UNSTRESSED_VOLUME + (p.clung / 1000) * pl);
+}
+
 /**
- * Transpulmonary pressure at a given lung volume.
+ * Lung volume at a given transpulmonary pressure — the pressure–volume curve.
  *
- * Pl = Palv - Ppl, and both muscle pressure and the chest wall cancel out of
- * that difference, so it depends on lung volume and lung compliance alone:
- *
- *   Pl = (V - FRC) / Clung - PPL_FRC
- *
- * At the relaxation volume this leaves the recoil pressure that holds the lung
- * open against the chest wall, which is why it is not zero there.
+ * Two factors, and the shape comes from their product. How many units are open
+ * is a sigmoid in pressure; how much each open unit holds is linear in it. A
+ * normal lung sits on the flat top of the first factor, so its curve is nearly
+ * straight. A collapsed but recruitable lung sits on the rising part, so its
+ * curve has the lower inflection a bedside pressure–volume manoeuvre draws.
  */
-export function transpulmonaryAt(p, lungVolume) {
-  return ((lungVolume - p.frc) * 1000) / p.clung - PPL_FRC;
+export function lungVolumeAtPl(p, pl) {
+  return openFractionAt(p, pl) * perUnitVolume(p, pl);
+}
+
+/** The volume the lung settles at when its recoil balances the chest wall. */
+export function relaxationVolume(p) {
+  return lungVolumeAtPl(p, RECOIL_AT_FRC);
+}
+
+/**
+ * Transpulmonary pressure at a given lung volume: the inverse of the curve
+ * above, by bisection.
+ *
+ * There is no closed form once the open fraction is part of it, and inverting
+ * numerically is the honest alternative to linearising and calling it the same
+ * thing. The map is monotone — more pressure opens more units and fills the open
+ * ones further — so a bisection is safe.
+ */
+export function transpulmonaryAt(p, lungVolume, hint = null) {
+  const TOL = 1e-6; // L
+
+  // The integrator moves the lung by about a tenth of a millilitre per step, so
+  // last step's answer is a very good starting point and Newton lands in one or
+  // two iterations. Without this the bisection below runs four thousand times a
+  // simulated second and costs an order of magnitude more than the rest of the
+  // model put together.
+  if (hint !== null && Number.isFinite(hint)) {
+    let pl = hint;
+    for (let i = 0; i < 4; i++) {
+      const f = lungVolumeAtPl(p, pl) - lungVolume;
+      if (Math.abs(f) < TOL) return pl;
+      const h = 0.05;
+      const slope = (lungVolumeAtPl(p, pl + h) - lungVolumeAtPl(p, pl - h)) / (2 * h);
+      if (!(slope > 1e-9)) break; // flat: Newton has nothing to work with
+      pl -= f / slope;
+      if (!Number.isFinite(pl) || pl < -25 || pl > 80) break;
+    }
+  }
+
+  let lo = -25, hi = 80;
+  if (lungVolume <= lungVolumeAtPl(p, lo)) return lo;
+  if (lungVolume >= lungVolumeAtPl(p, hi)) return hi;
+  for (let i = 0; i < 34; i++) {
+    const mid = (lo + hi) / 2;
+    if (lungVolumeAtPl(p, mid) < lungVolume) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/**
+ * The compliance a ventilator would measure: the slope of the curve here, not
+ * the tissue property.
+ *
+ * In a lung with units still opening this exceeds the open fraction times
+ * `clung`, because part of the volume accepted by a pressure step goes into
+ * units that were shut before it. That is the same thing that makes a
+ * recruitable lung look more compliant at higher PEEP.
+ */
+export function lungComplianceAt(p, lungVolume, eps = 0.25) {
+  const pl = transpulmonaryAt(p, lungVolume);
+  const dv = lungVolumeAtPl(p, pl + eps) - lungVolumeAtPl(p, pl - eps);
+  return (dv / (2 * eps)) * 1000; // mL/cmH2O
 }
 
 /**
@@ -84,12 +179,10 @@ export function transpulmonaryAt(p, lungVolume) {
  * even as total volume rises. That is the mechanism the recruiter has and the
  * non-recruiter does not, and it is the whole reason for this file.
  */
-export function lungRegions(p, lungVolume) {
-  // The share of a normal lung that disease has shut at the patient's own
-  // resting volume.
-  const diseased = clamp((NORMAL_FRC - p.frc) / NORMAL_FRC, 0, 0.95);
+export function lungRegions(p, lungVolume, plKnown = null) {
+  const diseased = clamp(p.collapsed ?? 0, 0, 0.95);
   const recruitable = clamp(p.recruitable ?? 0, 0, 1);
-  const pl = transpulmonaryAt(p, lungVolume);
+  const pl = plKnown ?? transpulmonaryAt(p, lungVolume);
 
   const easy = logistic((pl - PL_EASY) / SPREAD_EASY);
   const hard = logistic((pl - (p.pOpen ?? 20)) / SPREAD_HARD);
@@ -106,17 +199,47 @@ export function lungRegions(p, lungVolume) {
   return { diseased, recruited, easy, hard, openFraction, closedFraction, strain, pl };
 }
 
-// Alveolar vessels are compressed by the units around them, so their resistance
-// rises with strain. Extra-alveolar vessels are held open by radial traction
-// from the same parenchyma, so theirs falls with it. Their sum is the J.
+// The two limbs are driven by two different quantities, and conflating them was
+// an error that stayed hidden while the mechanics were linear.
 //
-// The nadir sits where the two derivatives cancel, F_ALV * K_ALV = F_EXTRA *
-// K_EXTRA, which is a constraint on these four constants rather than a number to
-// be tuned separately.
+// Alveolar vessels are squeezed by the units around them, so their resistance
+// follows how distended those units are: volume per open unit, the strain.
+//
+// Extra-alveolar vessels are held open by radial traction from the surrounding
+// parenchyma, and traction is a *stress*, not a volume. It follows
+// transpulmonary pressure. In tissue that is stiff or oedematous the same
+// pressure holds the vessels open just as well while the lung holds much less
+// gas, so a strain-driven extra-alveolar term says such a lung is derecruited
+// when it is merely stiff — and then claims PEEP relieves that, in a lung with
+// nothing to recruit.
+//
+// While compliance was a constant the two were proportional and the mistake had
+// no consequences. Making recruitment change the mechanics broke that
+// proportionality and surfaced it, in a test that had been passing for the wrong
+// reason.
 const K_ALV = 1.6;
-const K_EXTRA = 2.4;
 const F_ALV = 0.6;
 const F_EXTRA = 0.4;
+
+// Traction saturates. It pulls extra-alveolar vessels open up to their full
+// calibre and then has nothing left to do, so beyond that point more inflation
+// can only compress the alveolar ones. Without a floor the extra-alveolar limb
+// falls by 86% between transpulmonary pressures of 8 and 18 and swamps
+// everything else — which is what a lung reaching those pressures does, so the
+// omission only showed up once one did.
+//
+// The floor is a judgement: a third of the resting value is how far this model
+// lets traction take it. K_EXTRA is not a judgement — it is fixed by requiring
+// the two limbs' derivatives to cancel at a normal lung's resting point, which
+// is where the J-curve is calibrated.
+const EXTRA_FLOOR = 0.35;
+const K_EXTRA = 1.713;
+
+// Traction relative to a normal lung's resting recoil, so the exponent is zero
+// where the J-curve is calibrated.
+const traction = (pl) => pl / RECOIL_AT_FRC - 1;
+const tractionRelief = (pl) =>
+  EXTRA_FLOOR + (1 - EXTRA_FLOOR) * Math.exp(-K_EXTRA * traction(pl));
 
 // How much resistance hypoxic vasoconstriction adds per unit of closed lung.
 const HPV_GAIN = 1.1;
@@ -136,7 +259,7 @@ export function pvrComponents(p, lungVolume) {
   const r = lungRegions(p, lungVolume);
   const hypoxic = 1 + p.hpv * HPV_GAIN * r.closedFraction;
   const perUnitAlveolar = p.pvrBase * F_ALV * Math.exp(K_ALV * r.strain);
-  const perUnitExtra = p.pvrBase * F_EXTRA * Math.exp(-K_EXTRA * r.strain);
+  const perUnitExtra = p.pvrBase * F_EXTRA * tractionRelief(r.pl);
   const alveolar = (perUnitAlveolar / r.openFraction) * hypoxic;
   const extraAlveolar = (perUnitExtra / r.openFraction) * hypoxic;
   return {

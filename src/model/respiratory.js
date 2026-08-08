@@ -1,16 +1,26 @@
-// Respiratory mechanics, built on the equation of motion and split into the two
-// series elements the Campbell diagram draws separately: the lung and the chest
-// wall. Volumes are litres above the relaxation volume (FRC); pressures cmH2O.
+// Respiratory mechanics, split into the two series elements the Campbell diagram
+// draws separately: the lung and the chest wall. Volumes are litres above the
+// relaxation volume; pressures cmH2O.
 //
-//   Palv = V / Crs - Pmus
-//   Ppl  = PPL_FRC + V / Ccw - Pmus
+//   Ppl  = PPL_FRC + V / Ccw - Pmus        chest wall, linear
+//   Pl   = transpulmonaryAt(V_absolute)    lung, sigmoid — see lung.js
+//   Palv = Ppl + Pl
 //   flow = (Pao - Palv) / Raw
 //
 // Pleural pressure therefore follows the chest wall compliance curve while
-// alveolar pressure follows the respiratory system curve — the distinction that
-// makes airway pressure a poor proxy for the pressure the heart actually feels.
+// alveolar pressure follows the sum of both — the distinction that makes airway
+// pressure a poor proxy for the pressure the heart actually feels.
+//
+// The lung element is no longer a constant compliance. Once recruitment is part
+// of the model the pressure–volume relationship has to be sigmoid, because units
+// that open accept gas, and the resting volume itself becomes an outcome rather
+// than a setting: `relaxationVolume(p)` is where the lung's recoil balances the
+// chest wall, and it rises when pressure opens more units. That is the point of
+// doing it this way, and it is why `frc` is now a description of how much lung
+// is shut rather than a volume the model is told to sit at.
 
 import { clamp } from './units.js';
+import { transpulmonaryAt, relaxationVolume, lungComplianceAt } from './lung.js';
 
 // Pleural pressure at the relaxation volume. Its negative is the
 // transpulmonary recoil at FRC, which is why alveolar pressure there is zero.
@@ -39,6 +49,8 @@ export function createRespiratoryState() {
     lastVt: 0,
     lastAutoPeep: 0,
     lastPplSwing: 0,
+    relaxVolume: 0,
+    plSolved: null,
     pplatCandidate: 0,
     pplMin: Infinity,
     pplMax: -Infinity,
@@ -47,8 +59,18 @@ export function createRespiratoryState() {
   };
 }
 
-export function respiratorySystemCompliance(p) {
-  return 1 / (1 / p.clung + 1 / p.ccw);
+/**
+ * The two elements in series, at the volume the patient is currently at.
+ *
+ * State-dependent now, because the lung element is. Passing the volume is not
+ * optional bookkeeping: at the same settings a recruitable lung is a different
+ * spring at PEEP 5 and at PEEP 15, and that difference is most of what a
+ * recruitment manoeuvre is for.
+ */
+export function respiratorySystemCompliance(p, lungVolume = null) {
+  const v = lungVolume ?? relaxationVolume(p);
+  const clungLocal = lungComplianceAt(p, v);
+  return 1 / (1 / clungLocal + 1 / p.ccw);
 }
 
 // How long the inspiratory muscles are active. Capped at half the respiratory
@@ -85,8 +107,21 @@ function airwayOpeningPressure(p, r, period) {
 
 export function stepRespiratory(p, r, dt) {
   const period = 60 / p.rr;
-  const crs = respiratorySystemCompliance(p) / 1000; // L/cmH2O
   const ccw = p.ccw / 1000;
+  // The volume the lung would sit at with the airway open and no effort. An
+  // outcome of the pressure–volume curve, so it moves when recruitability or
+  // opening pressure does.
+  const vRelax = relaxationVolume(p);
+  // Alveolar pressure at a given volume above that: the chest wall's linear
+  // element plus the lung's sigmoid one. One function, used for the flow
+  // calculation and for the pressures reported afterwards, so they cannot drift
+  // apart.
+  // The solve is warm-started from the last answer and the result kept, so the
+  // hot loop costs a couple of evaluations rather than a full bisection.
+  const alveolar = (v, pmus) => {
+    r.plSolved = transpulmonaryAt(p, vRelax + v, r.plSolved);
+    return (PPL_FRC + v / ccw - pmus) + r.plSolved;
+  };
 
   r.tCycle += dt;
   r.tPhase += dt;
@@ -99,14 +134,15 @@ export function stepRespiratory(p, r, dt) {
   // pressure. That steady state is the point of the manoeuvre.
   if (r.hold) {
     r.flow = 0;
-    const palvHeld = r.v / crs - r.pmus;
+    const palvHeld = alveolar(r.v, r.pmus);
     r.palv = palvHeld;
     r.ppl = PPL_FRC + r.v / ccw - r.pmus;
     // With no flow the airway reads alveolar pressure — that is what a hold is
     // for, and it is why a plateau is measured this way.
     r.paw = palvHeld;
     r.pl = palvHeld - r.ppl;
-    r.lungVolume = p.frc + r.v;
+    r.lungVolume = vRelax + r.v;
+    r.relaxVolume = vRelax;
     r.pab = p.pab0 + p.abdCoupling * r.v;
     r.prevPhase = r.phase;
     return r;
@@ -156,7 +192,7 @@ export function stepRespiratory(p, r, dt) {
   }
 
   // --- flow ----------------------------------------------------------------
-  const palv = r.v / crs - r.pmus;
+  const palv = alveolar(r.v, r.pmus);
   const pao = airwayOpeningPressure(p, r, period);
 
   if (p.mode === 'vcv' && r.phase === 'insp') {
@@ -167,11 +203,15 @@ export function stepRespiratory(p, r, dt) {
     r.flow = (target - palv) / p.raw;
   }
 
-  r.v = Math.max(0, r.v + r.flow * dt);
+  // The floor is the emptiest the lung can get, not the relaxation volume:
+  // expiration below the resting point is what a Campbell diagram's lower half
+  // is about, and with a sigmoid lung the model no longer needs to be protected
+  // from it.
+  r.v = Math.max(-vRelax * 0.9, r.v + r.flow * dt);
   if (r.flow > 0) r.vtAccum += r.flow * dt;
 
   // --- derived pressures ---------------------------------------------------
-  const palvNew = r.v / crs - r.pmus;
+  const palvNew = alveolar(r.v, r.pmus);
   const ppl = PPL_FRC + r.v / ccw - r.pmus;
   const paw = p.mode === 'vcv' && r.phase === 'insp'
     ? palvNew + r.flow * p.raw
@@ -181,7 +221,8 @@ export function stepRespiratory(p, r, dt) {
   r.ppl = ppl;
   r.paw = paw;
   r.pl = palvNew - ppl; // transpulmonary pressure
-  r.lungVolume = p.frc + r.v; // absolute, L
+  r.lungVolume = vRelax + r.v; // absolute, L
+  r.relaxVolume = vRelax;
   r.pab = p.pab0 + p.abdCoupling * r.v;
 
   // --- per-breath bookkeeping ----------------------------------------------
@@ -189,8 +230,10 @@ export function stepRespiratory(p, r, dt) {
   r.pplMax = Math.max(r.pplMax, ppl);
   r.ppeakAccum = Math.max(r.ppeakAccum, paw);
   // Static recoil pressure at end-inspiration, i.e. the plateau the ventilator
-  // would show after an inspiratory hold.
-  if (r.phase === 'insp') r.pplatCandidate = r.v / crs;
+  // would show after an inspiratory hold. Read from the same relation as
+  // everything else rather than from a compliance that no longer exists as a
+  // single number.
+  if (r.phase === 'insp') r.pplatCandidate = alveolar(r.v, 0);
 
   // Everything reported per breath is latched exactly once, at the moment
   // inspiration ends — not on a time window that can fire twice.

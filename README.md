@@ -288,42 +288,90 @@ they can be reopened at all. Consolidated lung is collapsed and stays collapsed
 however hard it is pushed.
 
 ```
-diseased    = clamp((2.2 L − FRC_patient) / 2.2 L, 0, 0.95)
-Pl(V)       = (V − FRC_patient)/C_lung + 5           transpulmonary pressure
-easy(Pl)    = 1 / (1 + exp(−(Pl − 0) / 1.3))         normal units
-hard(Pl)    = 1 / (1 + exp(−(Pl − pOpen) / 7))       diseased units
-open        = (1 − diseased)·easy(Pl) + diseased·recruitable·hard(Pl)
-strain      = V / (2.2 L · open) − 1
+open(Pl)  = (1 - collapsed)*sigma((Pl - 0)/1.3) + collapsed*recruitable*sigma((Pl - pOpen)/7)
+perUnit   = max(0, V0 + C_lung*Pl)          V0 = 1.247 L, fixed
+V(Pl)     = open(Pl) * perUnit(Pl)          the pressure-volume curve
+V_rest    = V(5)                            recoil balancing the chest wall
+strain    = V / (2.2 L * open) - 1          volume per *open* unit
 ```
 
-Units are treated as either open at full size or shut — the sponge idealisation.
+Units are treated as either open at full size or shut - the sponge idealisation.
 `strain` is therefore volume per **open** unit, and it is the quantity a
 single-compartment lung cannot produce. With a third of the lung open, a litre of
 gas strains each unit half again as much as it would with two thirds open: the
-baby lung, written as arithmetic. When PEEP opens units, the gas it adds is
-shared among more of them, so strain per unit can *fall* while total volume
-rises.
+baby lung, written as arithmetic.
 
-Transpulmonary pressure is derived rather than assumed: Palv − Ppl cancels both
-the muscle pressure and the chest wall, leaving lung volume and lung compliance
-alone. The test suite checks that the value drawn on the curve equals the one the
-integrator produced.
+### Recruitment changes the mechanics, not only the resistance
+
+The curve above is a product of two factors, and the shape comes from that
+product: how many units are open is a sigmoid in pressure, how much each open one
+holds is linear in it. Three things follow, none of which a linear lung can do.
+
+**The pressure-volume curve has a lower inflection.** A recruitable lung is
+stiffest where its baby lung is being stretched alone and gets *less* stiff as
+pressure opens more of it - local slope 38 to 51 mL/cmH2O between transpulmonary
+pressures of 8 and 22. A consolidated one only stiffens, 25 to 23. A normal lung
+sits on the flat top of the recruitment sigmoid, so its curve is nearly straight,
+which is why this looked like a line for as long as it did.
+
+**Measured compliance tracks aerated lung size, not tissue stiffness.** What a
+ventilator computes is the open fraction times the tissue value, which is the
+baby lung as something that gets printed on a screen. `clung` is therefore the
+compliance of the lung *with all of it open*, not what you would measure. The
+ARDS preset carries `clung=40` and reads 36 mL/cmH2O at the bedside.
+
+**Resting volume is an outcome, so it can move.** It is where the lung's recoil
+balances the chest wall, `V(5)`, and it rises when pressure opens more units -
+which is why proning now adds volume instead of only opening units, and why `frc`
+is gone as a parameter. A lung that has lost its elastic recoil rests high
+without being told to: the COPD preset is `clung=300` and nothing else, and it
+sits at 2.69 L before a breath is delivered.
+
+There is no closed form for the inverse once the open fraction is in it, so
+transpulmonary pressure is found numerically. In the integrator the solve is
+warm-started from the previous step - the lung moves about a tenth of a
+millilitre per step - and agrees with a fresh bisection to 2 parts in 10^9.
+
+**What is still missing: hysteresis.** Units here open and close at the same
+pressure, so inflation and deflation follow one curve. Real lungs do not, which
+is why a recruitment manoeuvre followed by a decremental PEEP trial finds a lower
+optimum than an incremental one. That needs the opening and closing thresholds to
+differ, and it is the next honest thing to add.
 
 ### The J-curve
 
 ```
-R_alveolar      = 0.6 · PVR₀ · exp( 1.6·strain) / open · hypoxic
-R_extraalveolar = 0.4 · PVR₀ · exp(−2.4·strain) / open · hypoxic
-hypoxic         = 1 + hpv · 1.1 · (1 − open)
+traction        = Pl / 5 - 1
+relief          = 0.35 + 0.65 * exp(-1.713 * traction)
+R_alveolar      = 0.6 * PVR0 * exp(1.6*strain) / open * hypoxic
+R_extraalveolar = 0.4 * PVR0 * relief          / open * hypoxic
+hypoxic         = 1 + hpv * 1.1 * (1 - open)
 PVR             = R_alveolar + R_extraalveolar
 ```
 
-Intra-alveolar vessels are compressed by the units around them, so their
-resistance rises with strain. Extra-alveolar vessels are held open by radial
-traction from the same parenchyma, so theirs falls with it. Their sum is the J.
-The nadir sits where the two derivatives cancel, `F_ALV·K_ALV = F_EXTRA·K_EXTRA`
-— a constraint on the four constants rather than a fifth number to tune. For a
-normal lung it lands at 2.3 L.
+**The two limbs are driven by two different quantities**, and conflating them was
+an error that stayed hidden while the mechanics were linear. Alveolar vessels are
+squeezed by the units around them, so their resistance follows how distended
+those units are - the strain. Extra-alveolar vessels are held open by radial
+traction, and traction is a *stress*, not a volume: it follows transpulmonary
+pressure. In stiff or oedematous tissue the same pressure holds those vessels
+open just as well while the lung holds much less gas, so a strain-driven
+extra-alveolar limb calls such a lung derecruited when it is merely stiff - and
+then claims PEEP relieves that, in a lung with nothing to recruit.
+
+While compliance was a constant the two quantities were proportional and the
+mistake had no consequences. Making recruitment change the mechanics broke that
+proportionality and surfaced it, in a test that had been passing for the wrong
+reason.
+
+**Traction saturates.** It pulls extra-alveolar vessels open to their full
+calibre and then has nothing left to do, so beyond that only alveolar compression
+remains. Without the floor the extra-alveolar limb falls by 86% between
+transpulmonary pressures of 8 and 18 and swamps everything else - which is what a
+lung reaching those pressures does, so the omission only appeared once one did.
+The floor of 0.35 is a judgement; the exponent is not, being fixed by requiring
+the two limbs' derivatives to cancel at a normal lung's resting point. The nadir
+lands at 2.32 L.
 
 Two separate things push the left limb up, and separating them is what the two
 populations buy. Vessels in units that remain open are narrowed by low strain.
@@ -573,10 +621,10 @@ appear in the UI and in every scenario.
 | Symbol | Meaning | Unit | Default | Range |
 |---|---|---|---|---|
 | `position` | Body position | — | `supine` | `supine` / `prone` |
-| `clung` | Lung compliance | mL/cmH₂O | 200 | 15 – 260 |
+| `clung` | Lung compliance with all of it open | mL/cmH₂O | 200 | 20 – 420 |
 | `ccw` | Chest wall compliance | mL/cmH₂O | 200 | 40 – 300 |
 | `raw` | Airway resistance | cmH₂O/L/s | 5 | 1 – 40 |
-| `frc` | Functional residual capacity | L | 2.2 | 0.8 – 4.0 |
+| `collapsed` | Fraction of the lung shut at rest | — | 0 | 0 – 0.8 |
 | `pab0` | Baseline abdominal pressure | cmH₂O | 4 | 0 – 30 |
 | `abdCoupling` | Diaphragm–abdomen coupling | cmH₂O/L | 4 | 0 – 12 |
 
@@ -732,12 +780,12 @@ and septal gains in particular are for.
 | PEEP escalation (`peep-escalation`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=14`, `rr=14` |
 | Septic shock, fluid responsive (`septic-responder`) | `mode=vcv`, `pmus=0`, `vt=560`, `peep=8`, `rr=18`, `ccw=150`, `stressedVolume=330`, `svr=0.85`, `hr=105` |
 | Big pleural swings, no variation (`swing-no-variation`) | `mode=spont`, `pmus=22`, `peep=6`, `rr=24`, `ccw=100`, `stressedVolume=950`, `svr=0.75`, `hr=100` |
-| ARDS with right ventricular failure (`ards-rv`) | `mode=vcv`, `pmus=0`, `vt=350`, `peep=12`, `rr=24`, `frc=1.35`, `clung=34`, `eesRv=0.28`, `pvrBase=0.17`, `hpv=1.6`, `recruitable=0.55`, `pOpen=20` |
+| ARDS with right ventricular failure (`ards-rv`) | `mode=vcv`, `pmus=0`, `vt=350`, `peep=12`, `rr=24`, `collapsed=0.42`, `clung=40`, `eesRv=0.28`, `pvrBase=0.17`, `hpv=1.6`, `recruitable=0.55`, `pOpen=20` |
 | Acute pulmonary embolism (`pulmonary-embolism`) | `mode=spont`, `pmus=6`, `peep=0`, `rr=24`, `pvrBase=0.44`, `eesRv=0.32`, `stressedVolume=1050`, `svr=1.25`, `hr=118` |
 | Cardiogenic pulmonary oedema (`lv-failure`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=10`, `rr=18`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=95` |
 | Weaning the failing left ventricle (`weaning`) | `mode=spont`, `pmus=10`, `peep=0`, `rr=26`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=110` |
 | Stiff chest wall (`obesity`) | `mode=vcv`, `pmus=0`, `vt=500`, `peep=8`, `rr=16`, `ccw=75`, `pab0=12` |
-| COPD with dynamic hyperinflation (`copd`) | `mode=vcv`, `pmus=0`, `vt=500`, `peep=5`, `rr=26`, `ti=0.9`, `raw=24`, `clung=240`, `frc=3.0` |
+| COPD with dynamic hyperinflation (`copd`) | `mode=vcv`, `pmus=0`, `vt=500`, `peep=5`, `rr=26`, `ti=0.9`, `raw=24`, `clung=300` |
 | Intra-abdominal hypertension (`iah`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=8`, `rr=16`, `pab0=22`, `abdCoupling=6` |
 
 ### What each one settles at
@@ -747,18 +795,18 @@ in Wood units.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.40 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
-| Healthy, passive volume control | 4.93 | 93 | 1.5 | 22/13 | 10 | 1.3 | 0.89 | 2% |
-| PEEP escalation | 4.32 | 89 | 4.3 | 27/18 | 9 | 2.1 | 0.93 | 6% |
-| Septic shock, fluid responsive | 4.18 | 80 | 1.9 | 19/13 | 4 | 1.5 | 0.79 | 18% |
-| Big pleural swings, no variation | 6.80 | 94 | 1.7 | 27/17 | 10 | 1.2 | 0.94 | 4% |
-| ARDS with right ventricular failure | 3.18 | 79 | 4.9 | 34/28 | 3 | 5.5 | 2.03 | 8% |
-| Acute pulmonary embolism | 3.98 | 93 | 5.8 | 39/33 | 4 | 7.3 | 2.02 | 8% |
-| Cardiogenic pulmonary oedema | 3.48 | 86 | 4.9 | 44/38 | 34 | 1.8 | 0.88 | 6% |
-| Weaning the failing left ventricle | 3.62 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
-| Stiff chest wall | 4.27 | 90 | 3.4 | 18/10 | 9 | 1.3 | 0.82 | 4% |
-| COPD with dynamic hyperinflation | 4.17 | 88 | 4.4 | 23/13 | 10 | 1.7 | 0.89 | 6% |
-| Intra-abdominal hypertension | 3.42 | 86 | 1.0 | 15/8 | 4 | 1.4 | 0.79 | 8% |
+| Healthy, breathing spontaneously | 5.39 | 96 | −0.8 | 23/10 | 9 | 1.2 | 0.92 | 8% |
+| Healthy, passive volume control | 4.91 | 93 | 1.6 | 22/13 | 10 | 1.3 | 0.89 | 2% |
+| PEEP escalation | 4.34 | 89 | 4.4 | 27/18 | 9 | 2.1 | 0.93 | 6% |
+| Septic shock, fluid responsive | 4.21 | 80 | 2.0 | 19/13 | 4 | 1.5 | 0.79 | 18% |
+| Big pleural swings, no variation | 6.76 | 94 | 1.9 | 27/17 | 10 | 1.2 | 0.94 | 4% |
+| ARDS with right ventricular failure | 3.60 | 83 | 4.0 | 34/28 | 3 | 5.5 | 2.03 | 8% |
+| Acute pulmonary embolism | 3.96 | 92 | 5.8 | 39/33 | 4 | 7.3 | 2.02 | 8% |
+| Cardiogenic pulmonary oedema | 3.47 | 86 | 5.0 | 44/38 | 34 | 1.8 | 0.88 | 6% |
+| Weaning the failing left ventricle | 3.61 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
+| Stiff chest wall | 4.26 | 90 | 3.5 | 18/10 | 9 | 1.3 | 0.82 | 4% |
+| COPD with dynamic hyperinflation | 4.15 | 88 | 4.9 | 23/13 | 10 | 1.7 | 0.89 | 6% |
+| Intra-abdominal hypertension | 3.40 | 86 | 1.1 | 15/8 | 4 | 1.4 | 0.79 | 8% |
 
 ### How the presets are built
 
@@ -777,7 +825,7 @@ smallest set that makes that question answerable.
   and pulse pressure variation stays near 6%, because a swing is necessary for
   variation but the flat part of the Starling curve decides whether any of it
   reaches the stroke volume.
-- **ARDS** is a small, stiff, collapsed lung (`frc`, `clung`) with a weak right
+- **ARDS** is a small, stiff, collapsed lung (`collapsed`, `clung`) with a weak right
   ventricle, a raised `pvrBase`, and — as shipped — over half of the collapse
   reopenable (`recruitable=0.55`). Across a PEEP titration from 0 to 20 the
   resistance coefficient falls 7.6 → 6.0 Wood units, but cardiac output falls
@@ -799,7 +847,7 @@ smallest set that makes that question answerable.
   read as "PEEP stops costing anything here", not as a peak to titrate to. The
   optimal PEEP for a failing right ventricle is a property of neither the lung
   nor the filling alone.
-- **Pulmonary embolism** is the deliberate mirror: `clung`, `ccw` and `frc` are
+- **Pulmonary embolism** is the deliberate mirror: `clung`, `ccw` and `collapsed` are
   all left at normal, and the entire abnormality is `pvrBase` with a right
   ventricle that cannot meet it. Because the lung is compliant, pleural
   transmission is full — so switching this preset to `vcv` at PEEP 5 costs 11%
@@ -851,6 +899,9 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `PL_EASY`, `SPREAD_EASY` | 0, 1.3 cmH₂O | opening threshold and spread for normal units |
 | `SPREAD_HARD` | 7 cmH₂O | spread of opening pressures for diseased units |
 | `HPV_GAIN` | 1.1 | resistance added per unit of closed lung |
+| `UNSTRESSED_VOLUME` | 1.247 L | gas a fully open lung holds at zero transpulmonary pressure |
+| `RECOIL_AT_FRC` | 5 cmH₂O | recoil balancing the chest wall; defines the resting volume |
+| `EXTRA_FLOOR` | 0.35 | how far traction can take the extra-alveolar limb before it saturates |
 | `PRELOAD_STEEP` | 0.10 /mmHg | reserve above which filling buys output; calibrated against the model's own response to 500 mL, not published |
 | `TIDAL_CHALLENGE.threshold` | 3.5 points | Myatra 2017; published, not calibrated |
 | `K_ALV`, `K_EXTRA` | 1.6, 2.4 | J-curve exponents |

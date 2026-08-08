@@ -104,6 +104,14 @@ const TILES = [
       : m.rvLvRatio > 1.1 ? ['warning', 'RV larger than LV'] : null),
   },
   {
+    id: 'crs', label: 'Respiratory system compliance', unit: 'mL/cmH₂O', kind: 'derived',
+    get: (m) => (m.crsMeasured === null ? '—' : m.crsMeasured.toFixed(0)),
+    // The number a ventilator prints tracks how much lung is being ventilated,
+    // not how stiff the tissue is. Showing the open fraction beside it is the
+    // whole point of separating the two.
+    sub: (m) => `${(m.openFraction * 100).toFixed(0)}% of the lung open · resting volume ${m.relaxVolume.toFixed(2)} L`,
+  },
+  {
     id: 'pplat', label: 'Plateau pressure', unit: 'cmH₂O', kind: 'measured',
     get: (m) => m.pplat.toFixed(1),
     sub: (m) => `driving ${m.drivingPressure.toFixed(1)}`,

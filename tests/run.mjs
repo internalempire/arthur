@@ -15,7 +15,10 @@ import {
   venousReturnCurve, cardiacFunctionCurve, venousReturnFlow,
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
 } from '../src/model/circulation.js';
-import { pvrComponents, lungRegions, transpulmonaryAt, PVR_NADIR_VOLUME } from '../src/model/lung.js';
+import {
+  pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
+  lungVolumeAtPl, lungComplianceAt, PVR_NADIR_VOLUME,
+} from '../src/model/lung.js';
 import { readFileSync } from 'node:fs';
 import { SNAPSHOTS } from './snapshots.js';
 import { LITERATURE } from './literature.mjs';
@@ -183,7 +186,7 @@ describe('Physiological relations');
     `${dry.metrics.co.toFixed(2)} -> ${wet.metrics.co.toFixed(2)} L/min`);
 
   const roomy = settled({ raw: 5, rr: 12, ti: 1.2 });
-  const trapped = settled({ raw: 24, rr: 26, ti: 0.9, clung: 240, frc: 3.0 });
+  const trapped = settled({ raw: 24, rr: 26, ti: 0.9, clung: 300 });
   check('a short expiratory time generates intrinsic PEEP',
     trapped.metrics.autoPeep > 2 && roomy.metrics.autoPeep < 0.5,
     `${roomy.metrics.autoPeep.toFixed(2)} vs ${trapped.metrics.autoPeep.toFixed(2)} cmH2O`);
@@ -307,16 +310,26 @@ describe('The two-compartment lung');
     lungRegions(p, 2.2).openFraction > 0.97 && Math.abs(lungRegions(p, 2.2).strain) < 0.03,
     `open ${lungRegions(p, 2.2).openFraction.toFixed(3)}, strain ${lungRegions(p, 2.2).strain.toFixed(3)}`);
 
-  // The arithmetic of the baby lung: the same tidal volume, delivered to each
-  // lung from its own resting volume, strains the collapsed one more because
-  // there are fewer units to share it.
-  const ards = { ...p, frc: 1.35, clung: 34, recruitable: 0 };
-  const small = lungRegions(ards, ards.frc + 0.4);
-  const whole = lungRegions(p, p.frc + 0.4);
-  check('the same tidal volume strains a collapsed lung more than a whole one',
-    small.strain > whole.strain + 0.05,
-    `strain ${whole.strain.toFixed(2)} whole vs ${small.strain.toFixed(2)} collapsed, `
-    + `on ${whole.openFraction.toFixed(2)} vs ${small.openFraction.toFixed(2)} of the lung`);
+  // The arithmetic of the baby lung. The claim is about the strain a tidal
+  // volume *adds*, not the level it reaches: the two lungs start from different
+  // resting strains, because stiff tissue holds less gas at the same pressure,
+  // and comparing the levels measures that instead.
+  const ards = { ...p, collapsed: 0.42, clung: 40, recruitable: 0 };
+  const gained = (q) => {
+    const rest = relaxationVolume(q);
+    return lungRegions(q, rest + 0.4).strain - lungRegions(q, rest).strain;
+  };
+  check('the same tidal volume adds more strain to a collapsed lung',
+    gained(ards) > gained(p) * 1.5,
+    `${gained(p).toFixed(3)} whole vs ${gained(ards).toFixed(3)} collapsed, `
+    + `on ${openFractionAt(p, 5).toFixed(2)} vs ${openFractionAt(ards, 5).toFixed(2)} of the lung`);
+  // Close to the reciprocal of the open fraction, not equal to it: the open
+  // fraction itself moves a little over those 400 mL, so the ratio is an average
+  // over the interval rather than the value at its start.
+  check('and the ratio tracks the reciprocal of the open fraction',
+    near(gained(ards) / gained(p), openFractionAt(p, 5) / openFractionAt(ards, 5), 0.15),
+    `${(gained(ards) / gained(p)).toFixed(2)} against `
+    + `${(openFractionAt(p, 5) / openFractionAt(ards, 5)).toFixed(2)} at the resting point`);
 
   // The mechanism the single-compartment model could not express.
   const closed = lungRegions({ ...ards, recruitable: 0 }, 1.8);
@@ -356,13 +369,18 @@ describe('The two-compartment lung');
       `mean ${(sum / n).toFixed(2)}, range ${lo.toFixed(2)}–${hi.toFixed(2)} Wood units`);
   }
 
-  // Hyperinflation must cost something. The previous model referenced strain to
-  // the patient's own resting volume, so a chronically hyperinflated lung had
-  // zero strain by definition and this was free.
-  const emphysema = { ...p, frc: 3.0, clung: 240 };
-  check('a chronically hyperinflated lung sits on the right limb of the curve',
-    pvrComponents(emphysema, 3.0).total > pvrComponents(p, 2.2).total * 1.2,
-    `${(pvrComponents(emphysema, 3.0).total / pvrComponents(p, 2.2).total).toFixed(2)}× the normal nadir`);
+  // Hyperinflation must cost something, and it must not need to be asked for.
+  // A lung that has lost its elastic recoil rests high by itself, which is the
+  // reason resting volume stopped being a parameter.
+  const emphysema = { ...p, clung: 300 };
+  check('a lung with lost recoil rests hyperinflated without being told to',
+    relaxationVolume(emphysema) > 2.6,
+    `${relaxationVolume(emphysema).toFixed(2)} L against ${relaxationVolume(p).toFixed(2)} normal`);
+  check('and it therefore sits on the right limb of the curve',
+    pvrComponents(emphysema, relaxationVolume(emphysema)).total
+      > pvrComponents(p, relaxationVolume(p)).total * 1.2,
+    `${(pvrComponents(emphysema, relaxationVolume(emphysema)).total
+        / pvrComponents(p, relaxationVolume(p)).total).toFixed(2)}× the normal nadir`);
 
   // The claim the ARDS preset is built around, and the one that has drifted out
   // of the documentation twice. Asserted by direction rather than by value so it
@@ -370,8 +388,13 @@ describe('The two-compartment lung');
   {
     const preset = SCENARIOS.find((x) => x.id === 'ards-rv').params;
     const at = (peep, over) => settled({ ...preset, peep, ...over }, 45).metrics;
-    const recrLow = at(0, {}), recrHigh = at(20, {});
-    const consLow = at(0, { recruitable: 0 }), consHigh = at(20, { recruitable: 0 });
+
+    // Measured from PEEP 4 rather than 0, because below that even a consolidated
+    // lung is reopening its *normal* units — those close at very low volume and
+    // need almost no pressure back. That gives it a shallow optimum of its own
+    // around PEEP 8, which is real and worth not asserting away.
+    const consLow = at(4, { recruitable: 0 }), consHigh = at(20, { recruitable: 0 });
+    const recrLow = at(4, {}), recrHigh = at(20, {});
     check('PEEP lowers resistance in the recruitable ARDS lung',
       recrHigh.pvrCoefficientWood < recrLow.pvrCoefficientWood,
       `${recrLow.pvrCoefficientWood.toFixed(1)} -> ${recrHigh.pvrCoefficientWood.toFixed(1)} Wood units`);
@@ -381,6 +404,13 @@ describe('The two-compartment lung');
     check('so PEEP costs the consolidated lung more output',
       consLow.co - consHigh.co > recrLow.co - recrHigh.co,
       `${(recrLow.co - recrHigh.co).toFixed(2)} vs ${(consLow.co - consHigh.co).toFixed(2)} L/min lost`);
+
+    // Even with nothing recruitable there is a best PEEP, and it is not zero.
+    const sweep = [0, 4, 8, 12, 16, 20].map((peep) => at(peep, { recruitable: 0 }).pvrCoefficientWood);
+    const best = sweep.indexOf(Math.min(...sweep));
+    check('a consolidated lung still has a resistance optimum, and it is not at zero PEEP',
+      best > 0 && best < sweep.length - 1,
+      sweep.map((v, i) => `${[0, 4, 8, 12, 16, 20][i]}:${v.toFixed(2)}`).join('  '));
   }
 
   check('open fraction is bounded and monotone in volume',
@@ -580,17 +610,94 @@ describe('The tidal volume challenge');
     `ΔPPV ${dry.result.dPpv.toFixed(1)} against a threshold of ${dry.result.threshold}`);
 }
 
+describe('Recruitment changes the mechanics');
+{
+  const p = defaultParams();
+  const recruitable = { ...p, collapsed: 0.42, clung: 40, recruitable: 0.7, pOpen: 18 };
+  const consolidated = { ...recruitable, recruitable: 0 };
+
+  // The pressure–volume curve has to be a curve, and the signature is a slope
+  // that *recovers*: stiffest where the baby lung is being stretched alone, less
+  // stiff once pressure has opened more of it.
+  //
+  // Both ends are inside the clinical range on purpose. Below a transpulmonary
+  // pressure of about 6 every lung in this model is still reopening its normal
+  // units, so a window that reaches down there measures that transition instead
+  // of the one being asked about.
+  const slopeAt = (q, pl) => (lungVolumeAtPl(q, pl + 2) - lungVolumeAtPl(q, pl - 2)) / 4;
+  const curvature = (q) => slopeAt(q, 22) / slopeAt(q, 8);
+  check('a normal lung is nearly linear over the clinical range',
+    near(curvature(p), 1, 0.15),
+    `slope ${(slopeAt(p, 8) * 1000).toFixed(0)} -> ${(slopeAt(p, 22) * 1000).toFixed(0)} mL/cmH₂O`);
+  check('a recruitable lung gets less stiff as pressure opens it',
+    curvature(recruitable) > 1.2,
+    `slope ${(slopeAt(recruitable, 8) * 1000).toFixed(0)} -> ${(slopeAt(recruitable, 22) * 1000).toFixed(0)} mL/cmH₂O`);
+  check('a consolidated one only gets stiffer',
+    curvature(consolidated) < 1,
+    `slope ${(slopeAt(consolidated, 8) * 1000).toFixed(0)} -> ${(slopeAt(consolidated, 22) * 1000).toFixed(0)} mL/cmH₂O`);
+
+  // The two headline consequences the linear version could not produce.
+  const restLow = relaxationVolume(recruitable);
+  check('pressure raises the resting volume of a recruitable lung',
+    lungVolumeAtPl(recruitable, 20) - lungVolumeAtPl(recruitable, 20 - 1e-9) >= 0
+      && lungVolumeAtPl(recruitable, 18) / lungVolumeAtPl(consolidated, 18) > 1.15,
+    `at Pl 18: ${lungVolumeAtPl(consolidated, 18).toFixed(2)} consolidated vs `
+    + `${lungVolumeAtPl(recruitable, 18).toFixed(2)} recruitable L`);
+
+  const cLow = lungComplianceAt(recruitable, lungVolumeAtPl(recruitable, 8));
+  const cHigh = lungComplianceAt(recruitable, lungVolumeAtPl(recruitable, 18));
+  const kLow = lungComplianceAt(consolidated, lungVolumeAtPl(consolidated, 8));
+  const kHigh = lungComplianceAt(consolidated, lungVolumeAtPl(consolidated, 18));
+  check('and raises its measured compliance, while the consolidated one is flat',
+    cHigh > cLow * 1.2 && Math.abs(kHigh / kLow - 1) < 0.15,
+    `recruitable ${cLow.toFixed(0)} -> ${cHigh.toFixed(0)}, `
+    + `consolidated ${kLow.toFixed(0)} -> ${kHigh.toFixed(0)} mL/cmH₂O`);
+
+  // Measured compliance is the open fraction times the tissue value, which is
+  // the baby lung as something a ventilator prints.
+  const openHere = openFractionAt(consolidated, transpulmonaryAt(consolidated, lungVolumeAtPl(consolidated, 12)));
+  check('measured compliance tracks how much lung is open, not how stiff it is',
+    near(lungComplianceAt(consolidated, lungVolumeAtPl(consolidated, 12)) / consolidated.clung, openHere, 0.08),
+    `${(lungComplianceAt(consolidated, lungVolumeAtPl(consolidated, 12)) / consolidated.clung).toFixed(2)} `
+    + `against an open fraction of ${openHere.toFixed(2)}`);
+
+  // Resting volume is an outcome now, so the whole model has to agree on it.
+  {
+    const s = settled({ collapsed: 0.42, clung: 40, recruitable: 0.7, pOpen: 18, peep: 0, mode: 'vcv', vt: 300 }, 40);
+    check('the integrator settles at the resting volume the curve predicts',
+      near(s.resp.relaxVolume, relaxationVolume(s.params), 1e-9),
+      `${s.resp.relaxVolume.toFixed(4)} vs ${relaxationVolume(s.params).toFixed(4)} L`);
+  }
+
+  // PEEP now buys a recruitable patient volume that a consolidated one does not
+  // get, which is the bedside version of all of the above.
+  const eelv = (over) => {
+    const sim = settled({ mode: 'vcv', pmus: 0, vt: 350, rr: 20, collapsed: 0.42, clung: 40, ...over }, 45);
+    let lo = Infinity;
+    for (let i = 0; i < (60 / sim.params.rr) / 0.01; i++) { sim.advance(0.01, true); lo = Math.min(lo, sim.resp.lungVolume); }
+    return lo;
+  };
+  const rGain = eelv({ recruitable: 0.7, pOpen: 18, peep: 16 }) - eelv({ recruitable: 0.7, pOpen: 18, peep: 4 });
+  const cGain = eelv({ recruitable: 0, peep: 16 }) - eelv({ recruitable: 0, peep: 4 });
+  check('PEEP 4 to 16 gains a recruitable lung more volume than a consolidated one',
+    rGain > cGain * 1.25,
+    `${(rGain * 1000).toFixed(0)} mL vs ${(cGain * 1000).toFixed(0)} mL`);
+}
+
 describe('Body position');
 {
-  const ARDS = { frc: 1.35, clung: 34, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12, recruitable: 0.55 };
+  const ARDS = { collapsed: 0.42, clung: 40, vt: 350, rr: 24, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6, peep: 12, recruitable: 0.55 };
   const ardsSupine = settled(ARDS);
   const ardsProne = settled({ ...ARDS, position: 'prone' });
   check('proning a recruitable lung opens some of it',
     ardsProne.metrics.openFraction > ardsSupine.metrics.openFraction + 0.02,
     `open ${ardsSupine.metrics.openFraction.toFixed(2)} -> ${ardsProne.metrics.openFraction.toFixed(2)}`);
-  check('and it does so without adding lung volume, which the model does not claim',
-    Math.abs(ardsProne.metrics.lungVolume - ardsSupine.metrics.lungVolume) < 0.1,
-    `${ardsSupine.metrics.lungVolume.toFixed(2)} -> ${ardsProne.metrics.lungVolume.toFixed(2)} L`);
+  // This used to assert the opposite. Recruitment changed nothing mechanical
+  // then, so proning could open units without the lung holding more gas — which
+  // was the model's largest remaining inconsistency rather than a finding.
+  check('and the units it opens now hold gas, so resting volume rises',
+    ardsProne.resp.relaxVolume > ardsSupine.resp.relaxVolume,
+    `${ardsSupine.resp.relaxVolume.toFixed(3)} -> ${ardsProne.resp.relaxVolume.toFixed(3)} L at rest`);
   check('proning a recruitable lung lowers pulmonary vascular resistance',
     ardsProne.metrics.pvrCoefficientWood < ardsSupine.metrics.pvrCoefficientWood * 0.95,
     `${ardsSupine.metrics.pvrCoefficientWood.toFixed(2)} -> ${ardsProne.metrics.pvrCoefficientWood.toFixed(2)} Wood units`);

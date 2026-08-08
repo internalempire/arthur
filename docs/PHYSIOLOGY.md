@@ -145,6 +145,11 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   variation. Here they largely overlap and partly cancel. This is a question
   about the volumes and compliances of the two vascular compartments in series,
   and is unrelated to the lung being split into two populations of units.
+- **No hysteresis.** Units open and close at the same pressure, so inflation and
+  deflation follow one pressure–volume curve. Real lungs do not, which is why a
+  recruitment manoeuvre followed by a decremental PEEP trial finds a lower
+  optimum than an incremental one — a manoeuvre this model therefore cannot
+  show. It needs the opening and closing thresholds to differ.
 - **The pulmonary circulation is lumped.** One PVR and one zone-III fraction for
   the whole lung. The lung units are now split into two populations by opening
   pressure, which is what carries recruitability, but the vasculature that

@@ -76,9 +76,9 @@ export const PARAMETERS = [
     help: 'Proning stiffens the chest wall, raises abdominal pressure and recruits dorsal lung — three changes that pull in opposite directions haemodynamically. The controls keep showing the supine mechanics; turning someone over does not change how stiff their lung is.',
   },
   {
-    id: 'clung', group: 'mechanics', label: 'Lung compliance', unit: 'mL/cmH₂O',
-    min: 15, max: 260, step: 5, default: 200,
-    help: 'Stiff lungs (ARDS) blunt transmission of airway pressure to the pleural space, so the same PEEP costs less venous return.',
+    id: 'clung', group: 'mechanics', label: 'Lung compliance, fully open', unit: 'mL/cmH₂O',
+    min: 20, max: 420, step: 5, default: 200,
+    help: 'The compliance of this lung with all of it open, not the value a ventilator would measure — that is this times the open fraction, which is the baby lung as a readout. High values are lost elastic recoil, so an emphysematous lung rests hyperinflated without being told to.',
   },
   {
     id: 'ccw', group: 'mechanics', label: 'Chest wall compliance', unit: 'mL/cmH₂O',
@@ -90,8 +90,9 @@ export const PARAMETERS = [
     min: 1, max: 40, step: 0.5, default: 5,
   },
   {
-    id: 'frc', group: 'mechanics', label: 'FRC', unit: 'L',
-    min: 0.8, max: 4.0, step: 0.05, default: 2.2,
+    id: 'collapsed', group: 'mechanics', label: 'Collapsed lung', unit: 'fraction',
+    min: 0, max: 0.8, step: 0.05, default: 0,
+    help: 'How much of the lung is shut at rest. Resting volume is no longer something you set — it follows from how much lung is open and how compliant it is, which is what lets recruitment raise it. A lung that has lost its recoil rests high; a collapsed one rests low.',
   },
   {
     id: 'pab0', group: 'mechanics', label: 'Baseline abdominal pressure', unit: 'cmH₂O',

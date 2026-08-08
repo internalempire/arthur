@@ -87,6 +87,42 @@ compartments in series, and transit delay is a question about their volumes and
 compliances — parallel lung regions have nothing to do with it. Transit delay
 remains open and is unrelated to this work.
 
+## What making recruitment mechanical changed
+
+Recruitment used to alter resistance and gas exchange but not mechanics, so a
+recruited lung gained no compliance and no resting volume. Closing that gap moved
+three things, and one of them was an error rather than an omission.
+
+**Resting volume stopped being a parameter.** It is now where the lung's recoil
+balances the chest wall, so it rises when pressure opens units — which is what
+lets proning add volume rather than only opening units. `frc` is gone; what
+carries the disease is `collapsed`, the share of the lung that is shut, and
+`clung` now means the compliance of the lung with all of it open. A lung that has
+lost its elastic recoil rests hyperinflated without being told to, which is how
+the COPD preset works now.
+
+**The extra-alveolar limb was being driven by the wrong quantity.** It followed
+strain — volume per open unit — where radial traction is a stress and follows
+transpulmonary pressure. While compliance was constant the two were proportional
+and it made no difference. Once the mechanics became nonlinear it did: stiff
+tissue at a normal distending pressure holds much less gas, and a strain-driven
+limb called such a lung derecruited when it was merely stiff, then credited PEEP
+with relieving that in a lung with nothing to recruit. The recruitability rows
+below failed, which is how it was found — a test that had been passing for the
+wrong reason.
+
+**Traction needed a floor.** It opens extra-alveolar vessels to their full
+calibre and then stops. Without saturation the limb fell 86% between
+transpulmonary pressures of 8 and 18 and swamped everything else. The floor of
+0.35 is a judgement; the exponent that goes with it is fixed by the nadir
+condition rather than chosen.
+
+One claim that had been in this file was retired at the same time: that PEEP
+raises pulmonary vascular resistance in a consolidated lung across the whole
+range. It does not below about PEEP 4, because even a consolidated lung is still
+reopening its *normal* units down there, and it therefore has a shallow
+resistance optimum of its own near PEEP 8. The row now measures from 4.
+
 ## A note on how these rows were written
 
 Two of the rows were narrowed after drafting, and it is worth saying why.

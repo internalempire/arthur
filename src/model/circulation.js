@@ -171,7 +171,9 @@ export function stepCirculation(p, c, resp, dt) {
   const ppl = cmH2OtoMmHg(resp.ppl);
   const palv = cmH2OtoMmHg(resp.palv);
   const pab = cmH2OtoMmHg(resp.pab);
-  const vAboveFrc = resp.lungVolume - p.frc;
+  // Volume above the lung's *resting* volume, which is now an outcome of the
+  // pressure-volume curve rather than the `frc` parameter — recruitment moves it.
+  const vAboveFrc = resp.lungVolume - resp.relaxVolume;
 
   // --- pericardium: the four chambers share one space ----------------------
   const vHeart = c.vRa + c.vRv + c.vLa + c.vLv;

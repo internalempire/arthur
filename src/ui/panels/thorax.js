@@ -35,7 +35,7 @@ export function createThorax(canvas) {
     const cy = h * 0.44;
 
     // ---- thorax -----------------------------------------------------------
-    const inflation = clamp((r.lungVolume - p.frc) / 1.6, -0.2, 1.1);
+    const inflation = clamp((r.lungVolume - r.relaxVolume) / 1.6, -0.2, 1.1);
     const halfW = (108 + inflation * 12) * scale;
     const halfH = (86 + inflation * 16) * scale;
     const diaphragmY = cy + halfH;
