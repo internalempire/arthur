@@ -18,9 +18,9 @@ work, not excuses.
 | id | Manoeuvre and expected result | Status | Source |
 |---|---|---|---|
 | `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
-| `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
+| `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | not yet | Fougères et al., *Crit Care Med* 2010;38:802–7 |
 | `pvr-recruitability-low` | In a poorly recruitable lung, PEEP 4 → 14 raises pulmonary vascular resistance. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | In a highly recruitable lung — the same collapsed lung, differing only in how much of it can be reopened — the same PEEP change leaves pulmonary vascular resistance essentially unchanged: within ±10%. Recruitment offsets the distension penalty rather than beating it. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | In a highly recruitable lung — the same collapsed lung, differing only in how much of it can be reopened — the same PEEP change leaves pulmonary vascular resistance essentially unchanged: within ±10%. Recruitment offsets the distension penalty rather than beating it. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-dissociation` | Sweeping recruitability from 0 to 1 with everything else held identical moves the response monotonically from a rise to a fall, crossing zero once. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
@@ -71,12 +71,12 @@ the opposite direction: the previous version referenced distension to the
 patient's own resting volume, so a chronically hyperinflated lung had zero strain
 by definition and hyperinflation was free. The COPD preset's resistance was 1.7
 Wood units where the preset's own note claimed the lung was being pushed up the
-right limb of the curve. It is now 3.75 over a breath, and the note is true.
+right limb of the curve. It is now 2.97 over a breath, and the note is true.
 
 A caution about reading that number, which caught me out. Pulmonary vascular
 resistance here is instantaneous, and it follows lung volume, so in a patient
-with a large tidal excursion it swings within the breath — 3.16 to 4.49 Wood
-units in this preset, a swing of 1.33. A single reading is a reading at a phase,
+with a large tidal excursion it swings within the breath — 2.55 to 3.52 Wood
+units in this preset, a swing of 0.97. A single reading is a reading at a phase,
 not a property of the patient, and I quoted one as though it were the latter. The
 figures in this file are cycle means where the swing is material.
 
@@ -122,6 +122,33 @@ raises pulmonary vascular resistance in a consolidated lung across the whole
 range. It does not below about PEEP 4, because even a consolidated lung is still
 reopening its *normal* units down there, and it therefore has a shallow
 resistance optimum of its own near PEEP 8. The row now measures from 4.
+
+## Two rows that giving the tissue a ceiling pushed just outside
+
+The lung's pressure–volume relation used to be a straight line above the
+recruitment sigmoid, so airway pressure rose linearly however hard a lung was
+inflated and the stress index could not exceed 1 whatever was done to the
+patient. Tissue runs out of extensibility; the relation now saturates.
+
+That is right on its own terms, and it moved two rows from inside their bands to
+just outside them:
+
+| row | before | after | wanted |
+|---|---|---|---|
+| `pvr-recruitability-high` | −9% | −11% | within ±10% |
+| `peep-volume-status` | 1.6× | 1.47× | at least 1.5× |
+
+The mechanism is the same in both. A lung that stiffens as it fills takes less
+volume for each additional cmH₂O of PEEP, so it transmits less to the pleural
+space, so the haemodynamic cost of PEEP is smaller — and the *difference* in that
+cost between a full patient and an empty one is smaller with it.
+
+Both would come back inside with a small change to a single constant. That is
+exactly why they are marked `not yet` instead: a model that can be nudged back
+onto a row whenever it drifts off one is not being tested by the row. What is
+recorded here is that a defensible change to the mechanics cost two percent on
+one row and two points on another, and that neither was paid for by moving a
+number to avoid saying so.
 
 ## A note on how these rows were written
 

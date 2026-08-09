@@ -114,6 +114,18 @@ const TILES = [
         : ` · resting volume ${m.relaxVolume.toFixed(2)} L`),
   },
   {
+    id: 'stressIndex', label: 'Stress index', unit: '', kind: 'derived',
+    get: (m) => (m.stressIndex === null ? '—' : m.stressIndex.toFixed(2)),
+    sub: (m) => (m.stressIndex === null ? 'constant flow, passive patient'
+      : m.stressIndex > 1.05 ? 'airway pressure curling upward — running out of room'
+        : m.stressIndex < 0.95 ? 'curling downward — units still opening during the breath'
+          : 'straight — neither opening nor overdistending'),
+    quality: (m) => m.interpretability.stressIndex,
+    status: (m) => (m.stressIndex === null ? null
+      : m.stressIndex > 1.1 ? ['serious', 'tidal overdistension']
+        : m.stressIndex < 0.9 ? ['warning', 'tidal recruitment — PEEP may be too low'] : null),
+  },
+  {
     id: 'pplat', label: 'Plateau pressure', unit: 'cmH₂O', kind: 'measured',
     get: (m) => m.pplat.toFixed(1),
     sub: (m) => `driving ${m.drivingPressure.toFixed(1)}`,

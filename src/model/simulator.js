@@ -422,6 +422,14 @@ export class Simulator {
     if (!preload) preloadReasons.push('the curves do not cross in this state');
     else if (!Number.isFinite(preload.relative)) preloadReasons.push('no finite operating point');
 
+    // The stress index reads the shape of a constant-flow inflation, so it needs
+    // one: a passive patient in volume control. Anything else and the curve it
+    // would be fitting is not the curve it is named after.
+    const siReasons = [];
+    if (p.mode !== 'vcv') siReasons.push('needs volume control — the shape is only meaningful at constant flow');
+    if (p.pmus > 0) siReasons.push('needs a passive patient — effort bends the airway pressure curve on its own');
+    if (r.lastStressIndex === null) siReasons.push('waiting for a complete breath');
+
     const ppvReasons = [];
     if (spontaneousEffort) ppvReasons.push('spontaneous effort — the index assumes a passive patient');
     // A completed challenge answers the tidal volume objection, which is the
@@ -455,6 +463,10 @@ export class Simulator {
         : (pvrDerived !== null && pvrDerived > 2 ? 'pre-capillary' : 'unclassified'));
 
     const interpretability = {
+      stressIndex: {
+        level: siReasons.length ? 'unavailable' : 'ok',
+        reasons: siReasons,
+      },
       preload: {
         level: preloadReasons.length ? 'unavailable' : 'ok',
         reasons: preloadReasons,
@@ -523,6 +535,7 @@ export class Simulator {
       drivingPressure: r.lastPplat - (p.peep + r.lastAutoPeep),
       pplSwing: r.lastPplSwing,
       vtDelivered: r.lastVt,
+      stressIndex: siReasons.length ? null : r.lastStressIndex,
       crs, expTimeConstant: (crs / 1000) * p.raw,
       pvr: c.p.pvr,
       // The J-curve coefficient the model integrates with. Not the same number a

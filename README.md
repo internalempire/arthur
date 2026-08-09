@@ -298,11 +298,20 @@ however hard it is pushed.
 
 ```
 open(Pl)  = (1 - collapsed)*sigma((Pl - 0)/1.3) + collapsed*recruitable*sigma((Pl - pOpen)/7)
-perUnit   = max(0, V0 + C_lung*Pl)          V0 = 1.247 L, fixed
-V(Pl)     = open(Pl) * perUnit(Pl)          the pressure-volume curve
-V_rest    = V(5)                            recoil balancing the chest wall
-strain    = V / (2.2 L * open) - 1          volume per *open* unit
+room      = CAPACITY - V0
+perUnit   = V0 + room*(1 - exp(-C_lung*Pl/room))     saturating above Pl = 0
+          = max(0, V0 + C_lung*Pl)                   linear below it
+V(Pl)     = open(Pl) * perUnit(Pl)                   the pressure-volume curve
+V_rest    = V(5)                                     recoil balancing the chest wall
+strain    = V / (2.2 L * open) - 1                   volume per *open* unit
 ```
+
+`V0` and `CAPACITY` are not chosen, they are solved, from two textbook volumes: a
+normal fully open lung rests at 2.2 L when its recoil is 5 cmH₂O, and reaches
+total lung capacity, 6 L, at 35 cmH₂O. Both are asserted by the test suite to six
+and three decimals. `CAPACITY` comes out near 10 L, which is not a volume any
+lung reaches — it is the scale of the exponential, and the physical claims are
+the two anchors.
 
 Units are treated as either open at full size or shut - the sponge idealisation.
 `strain` is therefore volume per **open** unit, and it is the quantity a
@@ -340,6 +349,41 @@ There is no closed form for the inverse once the open fraction is in it, so
 transpulmonary pressure is found numerically. In the integrator the solve is
 warm-started from the previous step - the lung moves about a tenth of a
 millilitre per step - and agrees with a fresh bisection to 2 parts in 10^9.
+
+### The stress index
+
+```
+fit  Paw = a*t^b + c   over the constant-flow part of the breath;  report b
+```
+
+Above 1 the airway pressure curls upward: the lung is running out of room, and
+the breath is finishing on stiffer tissue than it started on. Below 1 it curls
+the other way, because units are still opening as the breath goes in and each one
+that opens takes pressure off the rest — tidal recruitment, and a sign the PEEP
+underneath is too low.
+
+This needs the tissue to have a ceiling, which is why it did not exist before.
+With a linear pressure–volume relation the airway pressure rose in a straight
+line however hard a lung was inflated, and the index could not exceed 1 whatever
+was done to the patient — measured at 0.92 with a tidal volume of 1200 mL on a
+normal lung, where it should have been well above 1.
+
+| | stress index |
+|---|---|
+| Normal lung, 450 mL | 1.03 |
+| Normal lung, 1400 mL | 1.07 |
+| Stiff collapsed lung, 900 mL at PEEP 20 | 1.19 |
+| Recruitable lung at PEEP 2 | **0.89** |
+| The same lung at PEEP 14 | **1.05** |
+
+That last pair is the point: the same patient reads below 1 when the PEEP under
+the breath is too low to hold the lung open, and above 1 once it is not.
+
+It reads the shape of a constant-flow inflation, so it is withheld outside one —
+in pressure control, or with any inspiratory effort, the curve it would be
+fitting is not the curve it is named after. The fit is a hundred candidate
+exponents against forty samples, once per breath: a few thousand operations
+against the four thousand integration steps the same second already costs.
 
 ### Hysteresis, optionally
 
@@ -441,7 +485,7 @@ change fixed an error in the other direction: distension used to be referenced t
 the patient's own resting volume, so a chronically hyperinflated lung had zero
 strain by definition and hyperinflation was free. Note that this resistance is
 instantaneous and follows lung volume, so in a patient with a large tidal
-excursion it swings within the breath — 3.16 to 4.49 Wood units in the COPD
+excursion it swings within the breath — 2.55 to 3.52 Wood units in the COPD
 preset. Quote the cycle mean, not a sample.
 
 **What it deliberately does not do.** Recruited units add compliance in a real
@@ -848,18 +892,18 @@ in Wood units.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.39 | 96 | −0.8 | 23/10 | 9 | 1.2 | 0.92 | 8% |
-| Healthy, passive volume control | 4.91 | 93 | 1.6 | 22/13 | 10 | 1.3 | 0.89 | 2% |
-| PEEP escalation | 4.34 | 89 | 4.4 | 27/18 | 9 | 2.1 | 0.93 | 6% |
-| Septic shock, fluid responsive | 4.21 | 80 | 2.0 | 19/13 | 4 | 1.5 | 0.79 | 18% |
-| Big pleural swings, no variation | 6.76 | 94 | 1.9 | 27/17 | 10 | 1.2 | 0.94 | 4% |
-| ARDS with right ventricular failure | 3.60 | 83 | 4.0 | 34/28 | 3 | 5.5 | 2.03 | 8% |
-| Acute pulmonary embolism | 3.96 | 92 | 5.8 | 39/33 | 4 | 7.3 | 2.02 | 8% |
-| Cardiogenic pulmonary oedema | 3.47 | 86 | 5.0 | 44/38 | 34 | 1.8 | 0.88 | 6% |
-| Weaning the failing left ventricle | 3.61 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
-| Stiff chest wall | 4.26 | 90 | 3.5 | 18/10 | 9 | 1.3 | 0.82 | 4% |
-| COPD with dynamic hyperinflation | 4.15 | 88 | 4.9 | 23/13 | 10 | 1.7 | 0.89 | 6% |
-| Intra-abdominal hypertension | 3.40 | 86 | 1.1 | 15/8 | 4 | 1.4 | 0.79 | 8% |
+| Healthy, breathing spontaneously | 5.39 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
+| Healthy, passive volume control | 4.91 | 93 | 1.5 | 22/13 | 10 | 1.3 | 0.89 | 2% |
+| PEEP escalation | 4.29 | 89 | 3.9 | 27/18 | 9 | 2.1 | 0.93 | 6% |
+| Septic shock, fluid responsive | 4.13 | 81 | 1.8 | 19/13 | 4 | 1.5 | 0.79 | 18% |
+| Big pleural swings, no variation | 6.87 | 94 | 1.5 | 27/17 | 10 | 1.2 | 0.94 | 4% |
+| ARDS with right ventricular failure | 3.62 | 83 | 4.1 | 34/28 | 3 | 5.5 | 2.03 | 8% |
+| Acute pulmonary embolism | 3.97 | 93 | 5.8 | 39/33 | 4 | 7.3 | 2.02 | 8% |
+| Cardiogenic pulmonary oedema | 3.51 | 86 | 4.7 | 44/38 | 34 | 1.8 | 0.88 | 6% |
+| Weaning the failing left ventricle | 3.60 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
+| Stiff chest wall | 4.28 | 90 | 3.3 | 18/10 | 9 | 1.3 | 0.82 | 4% |
+| COPD with dynamic hyperinflation | 4.45 | 88 | 4.2 | 23/13 | 10 | 1.7 | 0.89 | 6% |
+| Intra-abdominal hypertension | 3.44 | 86 | 0.8 | 15/8 | 4 | 1.4 | 0.79 | 8% |
 
 ### How the presets are built
 
@@ -955,6 +999,8 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `UNSTRESSED_VOLUME` | 1.247 L | gas a fully open lung holds at zero transpulmonary pressure |
 | `RECOIL_AT_FRC` | 5 cmH₂O | recoil balancing the chest wall; defines the resting volume |
 | `EXTRA_FLOOR` | 0.35 | how far traction can take the extra-alveolar limb before it saturates |
+| `TOTAL_LUNG_CAPACITY` | 6.0 L | reached at `TLC_PRESSURE`; with the resting volume, pins the tissue curve |
+| `TLC_PRESSURE` | 35 cmH₂O | transpulmonary pressure at total lung capacity |
 | `PRELOAD_STEEP` | 0.10 /mmHg | reserve above which filling buys output; calibrated against the model's own response to 500 mL, not published |
 | `TIDAL_CHALLENGE.threshold` | 3.5 points | Myatra 2017; published, not calibrated |
 | `K_ALV`, `K_EXTRA` | 1.6, 2.4 | J-curve exponents |

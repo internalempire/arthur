@@ -54,6 +54,9 @@ export function createRespiratoryState() {
     lastPplSwing: 0,
     relaxVolume: 0,
     plSolved: null,
+    siSamples: [],
+    siClock: 0,
+    lastStressIndex: null,
     // Null until the first step decides which branch this lung starts on.
     openFraction: null,
     pplatCandidate: 0,
@@ -108,6 +111,51 @@ function airwayOpeningPressure(p, r, period) {
     default:
       return p.peep;
   }
+}
+
+/**
+ * The stress index: fit Paw = a*t^b + c over the constant-flow part of a breath
+ * and report b.
+ *
+ * Above 1 the airway pressure curls upward and the lung is running out of room —
+ * tidal overdistension. Below 1 it curls the other way, because units are still
+ * opening as the breath goes in and each one that opens takes pressure off the
+ * rest — tidal recruitment, and a sign the PEEP underneath is too low. It only
+ * means anything during constant flow in a passive patient, which is why it is
+ * withheld rather than estimated otherwise.
+ *
+ * `b` is found by a grid search with a least-squares fit of a and c at each
+ * candidate. Forty samples and a hundred candidates, once per breath, is a few
+ * thousand operations — beneath noticing next to the four thousand integration
+ * steps the same second costs.
+ */
+function fitStressIndex(samples) {
+  if (samples.length < 12) return null;
+  // The first tenth is dropped, as the bedside method does: flow is still
+  // building there and the pressure step at its onset is resistive, not elastic.
+  const from = Math.floor(samples.length * 0.1);
+  const t = [], y = [];
+  for (let i = from; i < samples.length; i += 2) { t.push(samples[i]); y.push(samples[i + 1]); }
+  if (t.length < 6) return null;
+
+  let bestB = 1, bestErr = Infinity;
+  for (let k = 0; k <= 100; k++) {
+    const b = 0.4 + (k * 1.8) / 100;
+    let sx = 0, sy = 0, sxx = 0, sxy = 0;
+    const n = t.length;
+    for (let i = 0; i < n; i++) {
+      const x = t[i] ** b;
+      sx += x; sy += y[i]; sxx += x * x; sxy += x * y[i];
+    }
+    const det = n * sxx - sx * sx;
+    if (Math.abs(det) < 1e-12) continue;
+    const a = (n * sxy - sx * sy) / det;
+    const c = (sy - a * sx) / n;
+    let err = 0;
+    for (let i = 0; i < n; i++) { const e = a * (t[i] ** b) + c - y[i]; err += e * e; }
+    if (err < bestErr) { bestErr = err; bestB = b; }
+  }
+  return bestB;
 }
 
 export function stepRespiratory(p, r, dt) {
@@ -228,6 +276,19 @@ export function stepRespiratory(p, r, dt) {
   r.v = Math.max(-vRelax * 0.9, r.v + r.flow * dt);
   if (r.flow > 0) r.vtAccum += r.flow * dt;
 
+  // Airway pressure through the constant-flow part of the breath, for the stress
+  // index. Sampled sparsely — the shape is what matters, not the resolution —
+  // and only where the index means something.
+  const flowIsSet = p.mode === 'vcv' && r.phase === 'insp' && p.pmus === 0;
+  if (flowIsSet) {
+    r.siClock += dt;
+    if (r.siClock >= 0.03) {
+      r.siClock = 0;
+      r.siSamples.push(r.tPhase, r.paw ?? 0);
+      if (r.siSamples.length > 200) r.siSamples.splice(0, 2);
+    }
+  }
+
   // --- derived pressures ---------------------------------------------------
   const palvNew = alveolar(r.v, r.pmus);
   const ppl = PPL_FRC + r.v / ccw - r.pmus;
@@ -262,6 +323,9 @@ export function stepRespiratory(p, r, dt) {
   if (r.prevPhase === 'exp' && r.phase === 'insp') r.breathCount++;
 
   if (r.prevPhase === 'insp' && r.phase === 'exp') {
+    r.lastStressIndex = fitStressIndex(r.siSamples);
+    r.siSamples = [];
+    r.siClock = 0;
     r.lastPplat = r.pplatCandidate ?? 0;
     r.lastPpeak = r.ppeakAccum;
     r.lastPplSwing = r.pplMax - r.pplMin;

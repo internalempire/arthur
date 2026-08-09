@@ -127,15 +127,86 @@ export function stepOpenFraction(p, phi, pl) {
 // than every other part of the lung model together.
 const OPEN_AT_REST = 1 / (1 + Math.exp(-(RECOIL_AT_FRC - PL_EASY) / SPREAD_EASY));
 
-// Volume of a fully open lung at zero transpulmonary pressure — the gas that
-// stays in it when nothing is distending it. Fixed, so that a lung which has
-// lost its elastic recoil rests at a *higher* volume: emphysema is a compliance
-// that is too high, not a resting volume that is set by hand. The value is
-// chosen so that a normal lung, with normal compliance, rests at NORMAL_FRC.
-const UNSTRESSED_VOLUME = NORMAL_FRC / OPEN_AT_REST - RECOIL_AT_FRC * 0.2; // L
+// The tissue's own pressure-volume curve, pinned by two textbook volumes rather
+// than by constants chosen to look right.
+//
+//   a normal fully open lung rests at NORMAL_FRC when its recoil is 5 cmH2O
+//   the same lung reaches total lung capacity, 6 L, at 35 cmH2O
+//
+// Two anchors, two unknowns: the volume it holds at no distending pressure, and
+// the asymptote of the exponential. The asymptote comes out around 10 L, which
+// is not a volume any lung reaches — it is the scale of the exponential, and the
+// physical claims are the two anchors.
+//
+// Without the saturation the relation was a straight line, airway pressure rose
+// linearly however hard a lung was inflated, and the stress index could not
+// exceed 1 whatever was done to the patient. Tissue runs out of extensibility;
+// leaving that out made overdistension invisible.
+const TOTAL_LUNG_CAPACITY = 6.0;   // L, reached at
+const TLC_PRESSURE = 35;           // cmH2O
+const NORMAL_COMPLIANCE = 0.2;     // L/cmH2O, the compliance the anchors assume
+
+/**
+ * How much one fully open lung's worth of tissue holds at a transpulmonary
+ * pressure, given its unstressed volume and its compliance at that unstressed
+ * volume.
+ *
+ * Linear below zero and saturating above it, joined so that both the value and
+ * the slope are continuous at the join. `clung` therefore still means what it
+ * meant — the compliance at rest.
+ *
+ * Below zero the curve is left linear on purpose. What empties a lung at
+ * negative distending pressure is units shutting, and the open fraction already
+ * does that; making the tissue term collapse as well would count it twice.
+ */
+function saturating(v0, capacity, c, pl) {
+  if (pl <= 0) return Math.max(0, v0 + c * pl);
+  const room = capacity - v0;
+  return v0 + room * (1 - Math.exp((-c * pl) / room));
+}
+
+// Solved rather than written down, so the two anchors are enforced by the code
+// instead of being numbers somebody has to keep true by hand. Nested bisection,
+// once, at load.
+const [UNSTRESSED_VOLUME, CAPACITY] = (() => {
+  const atRest = NORMAL_FRC / OPEN_AT_REST;
+  // Divided by the open fraction *there*, which at 35 cmH2O is essentially the
+  // whole lung — not by the fraction open at rest, which is a different number
+  // and was the first thing I got wrong here.
+  const atCapacity = TOTAL_LUNG_CAPACITY
+    / (1 / (1 + Math.exp(-(TLC_PRESSURE - PL_EASY) / SPREAD_EASY)));
+  const unstressedFor = (capacity) => {
+    let lo = 0.05, hi = capacity - 0.05;
+    for (let i = 0; i < 80; i++) {
+      const mid = (lo + hi) / 2;
+      if (saturating(mid, capacity, NORMAL_COMPLIANCE, RECOIL_AT_FRC) < atRest) lo = mid;
+      else hi = mid;
+    }
+    return (lo + hi) / 2;
+  };
+  let lo = TOTAL_LUNG_CAPACITY + 0.2, hi = 40;
+  for (let i = 0; i < 80; i++) {
+    const capacity = (lo + hi) / 2;
+    const v0 = unstressedFor(capacity);
+    if (saturating(v0, capacity, NORMAL_COMPLIANCE, TLC_PRESSURE) < atCapacity) lo = capacity;
+    else hi = capacity;
+  }
+  const capacity = (lo + hi) / 2;
+  return [unstressedFor(capacity), capacity];
+})();
 
 function perUnitVolume(p, pl) {
-  return Math.max(0, UNSTRESSED_VOLUME + (p.clung / 1000) * pl);
+  return saturating(UNSTRESSED_VOLUME, CAPACITY, p.clung / 1000, pl);
+}
+
+/** The inverse of `saturating`, in closed form. */
+function perUnitPressure(p, volume) {
+  const c = p.clung / 1000;
+  if (volume <= UNSTRESSED_VOLUME) return (volume - UNSTRESSED_VOLUME) / c;
+  const room = CAPACITY - UNSTRESSED_VOLUME;
+  const left = CAPACITY - volume;
+  if (left <= 1e-9) return 80; // at capacity: no pressure gets more in
+  return (room / c) * Math.log(room / left);
 }
 
 /**
@@ -173,8 +244,7 @@ export function relaxationVolume(p, phi = null) {
  * bisection the equilibrium branch needs.
  */
 export function transpulmonaryAtFixed(p, lungVolume, phi) {
-  const c = p.clung / 1000;
-  return clamp((lungVolume / Math.max(phi, 1e-6) - UNSTRESSED_VOLUME) / c, -25, 80);
+  return clamp(perUnitPressure(p, lungVolume / Math.max(phi, 1e-6)), -25, 80);
 }
 
 /**
@@ -299,7 +369,11 @@ const F_EXTRA = 0.4;
 // the two limbs' derivatives to cancel at a normal lung's resting point, which
 // is where the J-curve is calibrated.
 const EXTRA_FLOOR = 0.35;
-const K_EXTRA = 1.713;
+// Fixed by the nadir condition, which depends on how fast pressure rises with
+// volume at the resting point — so it moved when the tissue curve gained its
+// saturation and the local compliance there went 200 to 179 mL/cmH2O. Derived,
+// not tuned: see the note below.
+const K_EXTRA = 1.535;
 
 // Traction relative to a normal lung's resting recoil, so the exponent is zero
 // where the J-curve is calibrated.

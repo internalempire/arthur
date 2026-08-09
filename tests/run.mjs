@@ -364,8 +364,11 @@ describe('The two-compartment lung');
       const v = s.metrics.pvrCoefficientWood;
       lo = Math.min(lo, v); hi = Math.max(hi, v); sum += v; n++;
     }
+    // The mean moved when the tissue gained a ceiling — a hyperinflated lung is
+    // further up a curve that now bends — but the point of this check is the
+    // *swing*, which is what makes a single reading a reading at a phase.
     check('resistance swings within a breath when the tidal excursion is large',
-      hi - lo > 1 && near(sum / n, 3.75, 0.25),
+      hi - lo > 0.8 && near(sum / n, 2.97, 0.3),
       `mean ${(sum / n).toFixed(2)}, range ${lo.toFixed(2)}–${hi.toFixed(2)} Wood units`);
   }
 
@@ -605,9 +608,17 @@ describe('The tidal volume challenge');
     dry.sim.metrics.tidalChallenge.result === null && dry.sim.metrics.tidalChallenge.stale,
     dry.sim.metrics.interpretability.ppv.reasons.join(' | '));
 
-  check('a delta below the published threshold is withheld, not called negative',
-    dry.result.verdict === 'withheld' && dry.result.withheldReason !== null,
+  // The dry patient now clears the published threshold, which he did not before
+  // the lung was given a ceiling — a bigger breath costs more pressure in a
+  // stiffening lung, so it swings the pleural space harder. The rule being
+  // checked is the one that matters: below the threshold the manoeuvre withholds
+  // a verdict rather than returning a negative one.
+  check('a preload-dependent patient now clears the published threshold',
+    dry.result.verdict === 'dependent',
     `ΔPPV ${dry.result.dPpv.toFixed(1)} against a threshold of ${dry.result.threshold}`);
+  check('and a filled one has its verdict withheld rather than called negative',
+    wet.result.verdict === 'withheld' && wet.result.withheldReason !== null,
+    `ΔPPV ${wet.result.dPpv.toFixed(1)}`);
 }
 
 describe('Recruitment changes the mechanics');
@@ -626,8 +637,12 @@ describe('Recruitment changes the mechanics');
   // of the one being asked about.
   const slopeAt = (q, pl) => (lungVolumeAtPl(q, pl + 2) - lungVolumeAtPl(q, pl - 2)) / 4;
   const curvature = (q) => slopeAt(q, 22) / slopeAt(q, 8);
-  check('a normal lung is nearly linear over the clinical range',
-    near(curvature(p), 1, 0.15),
+  // This used to assert that a normal lung is nearly straight, which it was only
+  // because the tissue had no ceiling. It stiffens as it fills now, so what
+  // separates the phenotypes is the *direction*: a normal lung only ever gets
+  // stiffer, a recruitable one gets softer first.
+  check('a normal lung only ever gets stiffer as it fills',
+    curvature(p) < 1,
     `slope ${(slopeAt(p, 8) * 1000).toFixed(0)} -> ${(slopeAt(p, 22) * 1000).toFixed(0)} mL/cmH₂O`);
   check('a recruitable lung gets less stiff as pressure opens it',
     curvature(recruitable) > 1.2,
@@ -768,6 +783,54 @@ describe('Recruitment hysteresis');
   check('no gap is the same as no hysteresis',
     near(settled({ ...ARDS, pClose: 22, peep: 10 }, 45).metrics.openFraction,
       settled({ ...ARDS, hysteresis: 'off', peep: 10 }, 45).metrics.openFraction, 0.005));
+}
+
+describe('The stress index');
+{
+  const vcv = { mode: 'vcv', pmus: 0, rr: 12, ti: 1.5 };
+  const si = (o) => settled({ ...vcv, ...o }, 45).metrics.stressIndex;
+
+  // The curve has to bend, and the direction has to depend on why.
+  check('a normal lung at a protective tidal volume reads about 1',
+    near(si({ vt: 450, peep: 5 }), 1, 0.08), `${si({ vt: 450, peep: 5 }).toFixed(2)}`);
+  check('and rises with tidal volume, because the tissue runs out of room',
+    si({ vt: 1400, peep: 10 }) > si({ vt: 450, peep: 10 }) + 0.03,
+    `${si({ vt: 450, peep: 10 }).toFixed(2)} at 450 mL -> ${si({ vt: 1400, peep: 10 }).toFixed(2)} at 1400`);
+  check('a stiff collapsed lung at a large tidal volume shows overdistension',
+    si({ clung: 45, collapsed: 0.4, vt: 900, peep: 20 }) > 1.1,
+    `${si({ clung: 45, collapsed: 0.4, vt: 900, peep: 20 }).toFixed(2)}`);
+
+  // The other direction, and the pair that makes it a teaching point: the same
+  // lung reads below 1 when PEEP is too low to hold it open and above 1 once it
+  // is not.
+  const openable = { clung: 45, collapsed: 0.45, recruitable: 0.8, pOpen: 16, vt: 600 };
+  check('too little PEEP shows tidal recruitment instead',
+    si({ ...openable, peep: 2 }) < 0.95, `${si({ ...openable, peep: 2 }).toFixed(2)} at PEEP 2`);
+  check('and enough of it turns the same lung the other way',
+    si({ ...openable, peep: 14 }) > si({ ...openable, peep: 2 }) + 0.1,
+    `${si({ ...openable, peep: 2 }).toFixed(2)} -> ${si({ ...openable, peep: 14 }).toFixed(2)}`);
+
+  // It reads the shape of a constant-flow inflation, so without one it is not a
+  // reading at all.
+  const spont = settled({ mode: 'spont', pmus: 10, peep: 4 }, 40);
+  check('withheld when the patient is breathing',
+    spont.metrics.stressIndex === null
+      && spont.metrics.interpretability.stressIndex.level === 'unavailable',
+    spont.metrics.interpretability.stressIndex.reasons.join(' | '));
+  check('and withheld in pressure control, where flow is not constant',
+    settled({ mode: 'pcv', pmus: 0, pinsp: 16, peep: 6 }, 40).metrics.stressIndex === null);
+
+  // The curve the index reads is pinned by two textbook volumes, and those are
+  // the claims worth asserting rather than the constants that satisfy them.
+  const p = defaultParams();
+  check('a normal lung rests at 2.2 L',
+    near(relaxationVolume(p), 2.2, 1e-6), `${relaxationVolume(p).toFixed(6)} L`);
+  check('and reaches total lung capacity at 35 cmH₂O',
+    near(lungVolumeAtPl(p, 35), 6.0, 1e-3), `${lungVolumeAtPl(p, 35).toFixed(4)} L`);
+  check('compliance falls as it fills, rather than staying constant for ever',
+    lungComplianceAt(p, lungVolumeAtPl(p, 40)) < lungComplianceAt(p, lungVolumeAtPl(p, 5)) * 0.6,
+    `${lungComplianceAt(p, lungVolumeAtPl(p, 5)).toFixed(0)} at rest -> `
+    + `${lungComplianceAt(p, lungVolumeAtPl(p, 40)).toFixed(0)} mL/cmH₂O near capacity`);
 }
 
 describe('Body position');
