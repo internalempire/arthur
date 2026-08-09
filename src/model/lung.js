@@ -331,51 +331,57 @@ export function lungRegions(p, lungVolume, plKnown = null, phiKnown = null) {
   return { diseased, recruited, easy, hard, openFraction, closedFraction, strain, pl };
 }
 
-// The two limbs are driven by two different quantities, and conflating them was
-// an error that stayed hidden while the mechanics were linear.
+// Both limbs are driven by volume, and they share the term that makes them rise.
 //
-// Alveolar vessels are squeezed by the units around them, so their resistance
-// follows how distended those units are: volume per open unit, the strain.
+// This replaces a version in which the alveolar limb followed strain and the
+// extra-alveolar one followed transpulmonary pressure. That split was argued from
+// first principles — radial traction is a stress, so it should follow a pressure —
+// and three measurements disagree with it:
 //
-// Extra-alveolar vessels are held open by radial traction from the surrounding
-// parenchyma, and traction is a *stress*, not a volume. It follows
-// transpulmonary pressure. In tissue that is stiff or oedematous the same
-// pressure holds the vessels open just as well while the lung holds much less
-// gas, so a strain-driven extra-alveolar term says such a lung is derecruited
-// when it is merely stiff — and then claims PEEP relieves that, in a lung with
-// nothing to recruit.
+//   Thomas, Griffo & Roos 1961, excised dog lung, negative-pressure inflation at
+//   constant vascular pressures: resistance plotted against transpulmonary
+//   pressure shows wide hysteresis between inflation and deflation; plotted
+//   against volume it does not. Their conclusion is that resistance is
+//   "volume-dependent rather than pressure-dependent".
 //
-// While compliance was a constant the two were proportional and the mistake had
-// no consequences. Making recruitment change the mechanics broke that
-// proportionality and surfaced it, in a test that had been passing for the wrong
-// reason.
-const K_ALV = 1.6;
+//   Hakim, Michel & Chang 1982, arterial and venous occlusion: the volume-related
+//   changes are identical under positive- and negative-pressure inflation while
+//   the pressure-related ones are not, and inflation produces "a volume-dependent
+//   increase in the resistance of both alveolar and extra-alveolar vessels".
+//
+//   The Petak group 2008, isolated perfused rat lung: hysteresis against
+//   transpulmonary pressure is abolished when the same data are plotted against
+//   volume.
+//
+// So `stretch` is a single exponential in strain applied to *both* compartments,
+// which is Hakim's sentence written as arithmetic: inflation narrows every
+// vessel. What separates them is that the extra-alveolar compartment also gets
+// unfurled by the surrounding parenchyma as the lung leaves collapse, and that
+// term falls with strain toward a floor. Their sum is the J, and the
+// extra-alveolar limb is itself U-shaped — falling, then overtaken by stretch —
+// which is what Hakim's arterial and venous segments do.
+//
+// The three constants are fitted to four published figures, listed in
+// docs/LITERATURE_RANGES.md and each an executable row: where the nadir sits, the
+// ratio at maximal inflation, the ratio at low volume, and the change across the
+// transpulmonary pressures this simulator actually runs in. Four constraints on
+// three constants, so the fit can fail — and the previous constants failed three
+// of the four by factors of up to five.
+const K_ALV = 0.515;      // stretch: how steeply inflation narrows every vessel
+const K_EXTRA = 3.35;     // unfurling: how quickly leaving collapse opens the
+                          // extra-alveolar vessels
+const EXTRA_FLOOR = 0.17; // what is left of that once they are fully unfurled
 const F_ALV = 0.6;
 const F_EXTRA = 0.4;
 
-// Traction saturates. It pulls extra-alveolar vessels open up to their full
-// calibre and then has nothing left to do, so beyond that point more inflation
-// can only compress the alveolar ones. Without a floor the extra-alveolar limb
-// falls by 86% between transpulmonary pressures of 8 and 18 and swamps
-// everything else — which is what a lung reaching those pressures does, so the
-// omission only showed up once one did.
-//
-// The floor is a judgement: a third of the resting value is how far this model
-// lets traction take it. K_EXTRA is not a judgement — it is fixed by requiring
-// the two limbs' derivatives to cancel at a normal lung's resting point, which
-// is where the J-curve is calibrated.
-const EXTRA_FLOOR = 0.35;
-// Fixed by the nadir condition, which depends on how fast pressure rises with
-// volume at the resting point — so it moved when the tissue curve gained its
-// saturation and the local compliance there went 200 to 179 mL/cmH2O. Derived,
-// not tuned: see the note below.
-const K_EXTRA = 1.535;
+// F_ALV is a modelling choice and cannot be made anything else. The published
+// partitions do not measure the same boundary and do not agree: capillaries 34%
+// by bolus, alveolar-wall capillaries 45% by micropuncture, the middle
+// distensible segment under 16% by occlusion — and that segment swings from 7%
+// to 53% with haematocrit alone. No measurement settles this one.
 
-// Traction relative to a normal lung's resting recoil, so the exponent is zero
-// where the J-curve is calibrated.
-const traction = (pl) => pl / RECOIL_AT_FRC - 1;
-const tractionRelief = (pl) =>
-  EXTRA_FLOOR + (1 - EXTRA_FLOOR) * Math.exp(-K_EXTRA * traction(pl));
+const unfurled = (strain) =>
+  EXTRA_FLOOR + (1 - EXTRA_FLOOR) * Math.exp(-K_EXTRA * strain);
 
 // How much resistance hypoxic vasoconstriction adds per unit of closed lung.
 const HPV_GAIN = 1.1;
@@ -394,8 +400,9 @@ const HPV_GAIN = 1.1;
 export function pvrComponents(p, lungVolume, plKnown = null, phiKnown = null) {
   const r = lungRegions(p, lungVolume, plKnown, phiKnown);
   const hypoxic = 1 + p.hpv * HPV_GAIN * r.closedFraction;
-  const perUnitAlveolar = p.pvrBase * F_ALV * Math.exp(K_ALV * r.strain);
-  const perUnitExtra = p.pvrBase * F_EXTRA * tractionRelief(r.pl);
+  const stretch = Math.exp(K_ALV * r.strain);
+  const perUnitAlveolar = p.pvrBase * F_ALV * stretch;
+  const perUnitExtra = p.pvrBase * F_EXTRA * unfurled(r.strain) * stretch;
   const alveolar = (perUnitAlveolar / r.openFraction) * hypoxic;
   const extraAlveolar = (perUnitExtra / r.openFraction) * hypoxic;
   return {

@@ -69,8 +69,8 @@ numbers. The following all reproduce:
   L/min.
 - COPD with a short expiratory time: 6.4 cmH₂O of intrinsic PEEP appears with no
   change in the set PEEP, and the hyperinflated lung sits on the right limb of
-  the J-curve at 2.97 Wood units averaged over a breath. That resistance swings
-  from 2.55 to 3.52 within the breath, because it is instantaneous and follows
+  the J-curve at 1.27 Wood units averaged over a breath. That resistance swings
+  from 1.22 to 1.34 within the breath, because it is instantaneous and follows
   lung volume; in presets with a smaller tidal excursion the swing is 0.3 or
   less.
 - Intra-abdominal hypertension raises Pmsf to 19 mmHg while *lowering* cardiac

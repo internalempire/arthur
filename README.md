@@ -436,37 +436,51 @@ resolves that, so the length of a manoeuvre does not matter, only its pressure.
 ### The J-curve
 
 ```
-traction        = Pl / 5 - 1
-relief          = 0.35 + 0.65 * exp(-1.713 * traction)
-R_alveolar      = 0.6 * PVR0 * exp(1.6*strain) / open * hypoxic
-R_extraalveolar = 0.4 * PVR0 * relief          / open * hypoxic
+stretch         = exp(0.515 * strain)                     both compartments
+unfurled        = 0.17 + 0.83 * exp(-3.35 * strain)       extra-alveolar only
+R_alveolar      = 0.6 * PVR0 * stretch            / open * hypoxic
+R_extraalveolar = 0.4 * PVR0 * unfurled * stretch / open * hypoxic
 hypoxic         = 1 + hpv * 1.1 * (1 - open)
 PVR             = R_alveolar + R_extraalveolar
 ```
 
-**The two limbs are driven by two different quantities**, and conflating them was
-an error that stayed hidden while the mechanics were linear. Alveolar vessels are
-squeezed by the units around them, so their resistance follows how distended
-those units are - the strain. Extra-alveolar vessels are held open by radial
-traction, and traction is a *stress*, not a volume: it follows transpulmonary
-pressure. In stiff or oedematous tissue the same pressure holds those vessels
-open just as well while the lung holds much less gas, so a strain-driven
-extra-alveolar limb calls such a lung derecruited when it is merely stiff - and
-then claims PEEP relieves that, in a lung with nothing to recruit.
+**Both limbs follow volume, and they share the term that makes them rise.** An
+earlier version drove the alveolar limb by strain and the extra-alveolar one by
+transpulmonary pressure, reasoning that radial traction is a stress rather than a
+volume. Three measurements say otherwise, and they are the ones this curve is now
+fitted to:
 
-While compliance was a constant the two quantities were proportional and the
-mistake had no consequences. Making recruitment change the mechanics broke that
-proportionality and surfaced it, in a test that had been passing for the wrong
-reason.
+- Thomas, Griffo & Roos 1961: resistance plotted against transpulmonary pressure
+  shows wide hysteresis between inflation and deflation, and plotted against
+  volume it does not. Their conclusion is that resistance is *"volume-dependent
+  rather than pressure-dependent"*.
+- Hakim, Michel & Chang 1982: the volume-related changes are identical under
+  positive- and negative-pressure inflation while the pressure-related ones are
+  not, and inflation produces *"a volume-dependent increase in the resistance of
+  both alveolar and extra-alveolar vessels"*.
+- The Peták group 2008: hysteresis against transpulmonary pressure is abolished
+  when the same data are plotted against volume.
 
-**Traction saturates.** It pulls extra-alveolar vessels open to their full
-calibre and then has nothing left to do, so beyond that only alveolar compression
-remains. Without the floor the extra-alveolar limb falls by 86% between
-transpulmonary pressures of 8 and 18 and swamps everything else - which is what a
-lung reaching those pressures does, so the omission only appeared once one did.
-The floor of 0.35 is a judgement; the exponent is not, being fixed by requiring
-the two limbs' derivatives to cancel at a normal lung's resting point. The nadir
-lands at 2.32 L.
+So `stretch` is one exponential in strain applied to **both** compartments, which
+is Hakim's sentence as arithmetic: inflation narrows every vessel. What separates
+them is that the extra-alveolar compartment is also unfurled by the parenchyma as
+the lung leaves collapse, a term that falls with strain toward a floor. Their sum
+is the J, and the extra-alveolar limb is itself U-shaped — falling, then overtaken
+by stretch — which is what Hakim's arterial and venous segments do: 9.2 → 7.8 →
+9.9 mmHg across transpulmonary pressures of 0 to 20.
+
+The three constants are fitted to four published figures, each an executable row
+in `docs/LITERATURE_RANGES.md`: where the nadir sits, the ratio at maximal
+inflation, the ratio at low volume, and the change across the transpulmonary
+pressures this simulator runs in. Four constraints on three constants, so the fit
+could have failed. The constants it replaced missed three of the four by factors
+of up to five — the right limb was 8.9× the nadir at maximal inflation against a
+measured 1.8–2.1×, and +193% across the clinical range against a measured +15% to
+−3%.
+
+The nadir now lands at 2.87 L, which is 48% of maximal volume — Thomas measured
+45–60% in 55 lungs. That is above FRC, not at it, which is where the textbook
+figure puts it.
 
 Two separate things push the left limb up, and separating them is what the two
 populations buy. Vessels in units that remain open are narrowed by low strain.
@@ -485,7 +499,7 @@ change fixed an error in the other direction: distension used to be referenced t
 the patient's own resting volume, so a chronically hyperinflated lung had zero
 strain by definition and hyperinflation was free. Note that this resistance is
 instantaneous and follows lung volume, so in a patient with a large tidal
-excursion it swings within the breath — 2.55 to 3.52 Wood units in the COPD
+excursion it swings within the breath — 1.22 to 1.34 Wood units in the COPD
 preset. Quote the cycle mean, not a sample.
 
 **What it deliberately does not do.** Recruited units add compliance in a real
@@ -892,18 +906,18 @@ in Wood units.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.39 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
-| Healthy, passive volume control | 4.91 | 93 | 1.5 | 22/13 | 10 | 1.3 | 0.89 | 2% |
-| PEEP escalation | 4.30 | 89 | 3.9 | 27/18 | 9 | 2.1 | 0.93 | 6% |
-| Septic shock, fluid responsive | 4.13 | 81 | 1.8 | 19/13 | 4 | 1.5 | 0.79 | 18% |
-| Big pleural swings, no variation | 6.86 | 94 | 1.5 | 27/17 | 10 | 1.2 | 0.94 | 4% |
-| ARDS with right ventricular failure | 3.57 | 83 | 3.9 | 34/28 | 3 | 5.5 | 2.03 | 8% |
-| Acute pulmonary embolism | 3.97 | 92 | 5.8 | 39/33 | 4 | 7.3 | 2.02 | 8% |
-| Cardiogenic pulmonary oedema | 3.51 | 86 | 4.7 | 44/38 | 34 | 1.8 | 0.88 | 6% |
-| Weaning the failing left ventricle | 3.60 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
-| Stiff chest wall | 4.28 | 90 | 3.3 | 18/10 | 9 | 1.3 | 0.82 | 4% |
-| COPD with dynamic hyperinflation | 4.33 | 89 | 4.5 | 23/13 | 10 | 1.7 | 0.89 | 6% |
-| Intra-abdominal hypertension | 3.44 | 86 | 0.8 | 15/8 | 4 | 1.4 | 0.79 | 8% |
+| Healthy, breathing spontaneously | 5.43 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
+| Healthy, passive volume control | 5.05 | 94 | 1.4 | 22/13 | 10 | 1.3 | 0.89 | 2% |
+| PEEP escalation | 4.47 | 90 | 3.7 | 27/18 | 9 | 2.1 | 0.93 | 6% |
+| Septic shock, fluid responsive | 4.33 | 81 | 1.7 | 19/13 | 4 | 1.5 | 0.79 | 18% |
+| Big pleural swings, no variation | 6.96 | 94 | 1.3 | 27/17 | 10 | 1.2 | 0.94 | 4% |
+| ARDS with right ventricular failure | 3.14 | 78 | 5.2 | 34/28 | 3 | 5.5 | 2.03 | 8% |
+| Acute pulmonary embolism | 4.16 | 94 | 5.4 | 39/33 | 4 | 7.3 | 2.02 | 8% |
+| Cardiogenic pulmonary oedema | 3.52 | 87 | 4.6 | 44/38 | 34 | 1.8 | 0.88 | 6% |
+| Weaning the failing left ventricle | 3.66 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
+| Stiff chest wall | 4.27 | 90 | 3.3 | 18/10 | 9 | 1.3 | 0.82 | 4% |
+| COPD with dynamic hyperinflation | 4.54 | 90 | 4.2 | 23/13 | 10 | 1.7 | 0.89 | 6% |
+| Intra-abdominal hypertension | 3.42 | 86 | 0.8 | 15/8 | 4 | 1.4 | 0.79 | 8% |
 
 ### How the presets are built
 

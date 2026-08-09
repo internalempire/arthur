@@ -18,20 +18,20 @@ work, not excuses.
 | id | Manoeuvre and expected result | Status | Source |
 |---|---|---|---|
 | `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
-| `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | not yet | Fougères et al., *Crit Care Med* 2010;38:802–7 |
-| `pvr-recruitability-low` | In a poorly recruitable lung (R/I < 0.5), PEEP 4 → 14 raises pulmonary vascular resistance by at least 25%. The trial's medians give 160 → 243 dyn·s·cm⁻⁵, +52%, P < 0.01. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | In a highly recruitable lung (R/I ≥ 0.5), the same PEEP change leaves resistance essentially unchanged: between −10% and +20%, the measured +5% with a band of ±15 either side of it. The trial's medians give 224 → 235 dyn·s·cm⁻⁵, +5%, P = 0.55. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
+| `pvr-recruitability-low` | In a poorly recruitable lung (R/I < 0.5), PEEP 4 → 14 raises pulmonary vascular resistance by at least 25%. The trial's medians give 160 → 243 dyn·s·cm⁻⁵, +52%, P < 0.01. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | In a highly recruitable lung (R/I ≥ 0.5), the same PEEP change leaves resistance essentially unchanged: between −10% and +20%, the measured +5% with a band of ±15 either side of it. The trial's medians give 224 → 235 dyn·s·cm⁻⁵, +5%, P = 0.55. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-dissociation` | Sweeping recruitability from 0 to 1 with everything else held identical moves the response monotonically from a rise to a fall, crossing zero once. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
-| `pvr-nadir-position` | Resistance is minimal at 45–60% of maximal lung volume. | not yet | Thomas, Griffo & Roos, *J Appl Physiol* 1961;16:451–6, Discussion (n = 55 lungs) |
-| `pvr-at-maximal-inflation` | At maximal inflation resistance is 1.6–2.4× its minimum. | not yet | Thomas et al. 1961, Fig. 6 (both experiments give 1.8–2.1×) |
+| `pvr-nadir-position` | Resistance is minimal at 45–60% of maximal lung volume. | agrees | Thomas, Griffo & Roos, *J Appl Physiol* 1961;16:451–6, Discussion (n = 55 lungs) |
+| `pvr-at-maximal-inflation` | At maximal inflation resistance is 1.6–2.4× its minimum. | agrees | Thomas et al. 1961, Fig. 6 (both experiments give 1.8–2.1×) |
 | `pvr-at-low-volume` | At 30% of maximal volume it is only 1.05–1.4× the minimum — the deflation limb is far flatter than the inflation limb. | agrees | Thomas et al. 1961, Fig. 6 (~1.2× in both) |
-| `pvr-clinical-range` | Across transpulmonary pressures of 2.5 to 22 cmH₂O — the range this simulator runs in — resistance changes by between −20% and +40%. | not yet | Peták group, *J Appl Physiol* 2008, doi:10.1152/japplphysiol.00831.2007 — **reported, not read here**: +15 ± 1% with positive-pressure inflation, −3 ± 0.3% with negative, hysteresis against Ptp abolished when plotted against volume |
-| `pvr-extraalveolar-shape` | The extra-alveolar limb is itself U-shaped: it falls, then turns back up, ending at least 1.1× its minimum at maximal inflation. | not yet | Hakim, Michel & Chang, *J Appl Physiol* 1982;53:1110–5, Fig. 3 (arterial + venous segments: 9.2 → 7.8 → 9.9 mmHg over Ptp 0 → 20) |
-| `tidal-challenge-ordering` | Raising the tidal volume from 6 to 8 mL/kg raises pulse pressure variation more in a preload-dependent patient than in a filled one, so the change orders patients by their response to fluid. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
+| `pvr-clinical-range` | Across transpulmonary pressures of 2.5 to 22 cmH₂O — the range this simulator runs in — resistance changes by between −20% and +40%. | agrees | Peták group, *J Appl Physiol* 2008, doi:10.1152/japplphysiol.00831.2007 — **reported, not read here**: +15 ± 1% with positive-pressure inflation, −3 ± 0.3% with negative, hysteresis against Ptp abolished when plotted against volume |
+| `pvr-extraalveolar-shape` | The extra-alveolar limb is itself U-shaped: it falls, then turns back up, ending at least 1.1× its minimum at maximal inflation. | agrees | Hakim, Michel & Chang, *J Appl Physiol* 1982;53:1110–5, Fig. 3 (arterial + venous segments: 9.2 → 7.8 → 9.9 mmHg over Ptp 0 → 20) |
+| `tidal-challenge-ordering` | Raising the tidal volume from 6 to 8 mL/kg raises pulse pressure variation more in a preload-dependent patient than in a filled one, so the change orders patients by their response to fluid. | not yet | Myatra et al., *Crit Care Med* 2017;45:415–21 |
 | `tidal-challenge-threshold` | In the septic fluid-responsive preset ventilated at 6 mL/kg, that change exceeds 3.5 percentage points and the manoeuvre calls the patient preload dependent. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
-| `ppv-responder` | A passive patient at 8 mL/kg who is preload dependent shows pulse pressure variation of at least 13%, and the index reports itself interpretable. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
+| `ppv-responder` | Every passive patient at 8 mL/kg whom the model calls preload dependent — a bolus buying at least 15% of cardiac output — shows pulse pressure variation of at least 13%, and the index reports itself interpretable. | not yet | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
 | `ppv-suspended-spontaneous` | The same patient breathing spontaneously has the index withheld rather than reported. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
 | `ph-classification` | A hypervolaemic failing left ventricle with a wedge above 15 mmHg and a mean pulmonary artery pressure above 20 is classified post-capillary; a lung with a high vascular resistance and a low wedge is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
@@ -300,6 +300,51 @@ structural rather than a retune:
 Neither is attempted here. Four rows now state what was measured, three of them
 fail, and that is a better position than one row stating a bound I made up and
 passing.
+
+## What changed when the limbs were rebuilt
+
+Both limbs now follow volume, and they share the exponential that makes them
+rise. The old split — alveolar by strain, extra-alveolar by transpulmonary
+pressure — was argued from first principles and contradicted by three
+measurements, so it is gone. The three constants were fitted to four published
+figures, which is one more constraint than there are constants, so the fit could
+have failed.
+
+Seven rows moved from `not yet` to `agrees`, including every one anchored to
+Thomas, Hakim and Peták, and both recruitability rows.
+
+**One of those needed a correction to the row rather than to the model.** The
+recruitability rows compared the model's own J-curve coefficient against a number
+Cappio Borlino measured with a pulmonary artery catheter. Those are different
+quantities, and in this model they move in opposite directions: raising PEEP from
+4 to 14 in a poorly recruitable lung *lowers* the coefficient by 13% while
+*raising* the catheter-derived (mPAP − wedge)/CO by 28%, because cardiac output
+falls faster than resistance does. Compared like against like, the low recruiter
+gives +28% against a published +52% and the high recruiter +2% against +5%, and
+the dissociation runs +39% to −6% across the recruitability range.
+
+That was a category error of exactly the kind this project spends most of its
+interpretability machinery avoiding everywhere else, and it had been sitting in
+the rows since they were written.
+
+**Two rows went the other way, and they share a cause.** `ppv-responder` and
+`tidal-challenge-ordering` now fail because pulse pressure variation is too low
+for the degree of preload dependence the model itself reports:
+
+| stressed volume | 300 | 400 | 500 | 700 |
+|---|---|---|---|---|
+| gain from 500 mL | +37% | +32% | +28% | +19% |
+| variation | 11.9% | 9.5% | 6.2% | 2.8% |
+
+Every one of those is preload dependent by the 15% rule, and only the driest
+comes near the 13% threshold that is supposed to identify them. The old
+`ppv-responder` row asserted a single stressed volume and passed at 13.0%; after
+the change it read 12.9% and looked like a rounding accident. It was not — the
+arbitrary choice of patient had been hiding a false-negative problem across the
+whole range. The row now tests the relationship instead, and fails properly.
+
+This is the mirror of the false-positive limitation already recorded, and it is
+new: the model under-reads variation in patients who would respond to fluid.
 
 ## A note on how these rows were written
 

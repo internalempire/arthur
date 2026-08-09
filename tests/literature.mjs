@@ -65,17 +65,24 @@ export const LITERATURE = {
   // medians, which is not the median of the ratios, and the model should not be
   // held to a precision the arithmetic does not carry. The point of the row is
   // that resistance rises substantially, and 25% is well inside that.
+  // Compared on the *derived* value, not the model's own coefficient. Cappio
+  // Borlino measured (mPAP − wedge) / CO through a pulmonary artery catheter, and
+  // that is a different quantity: in this model the coefficient falls with PEEP
+  // while the catheter number rises, because cardiac output falls faster than
+  // resistance does. Holding a catheter measurement against an internal
+  // coefficient was a category error, and it is the one this project spends most
+  // of its interpretability machinery avoiding everywhere else.
   'pvr-recruitability-low': () => {
     const a = settle({ ...ARDS, recruitable: 0.05, peep: 4 });
     const b = settle({ ...ARDS, recruitable: 0.05, peep: 14 });
-    const d = change(a.pvrCoefficientWood, b.pvrCoefficientWood);
+    const d = change(a.pvrDerivedWood, b.pvrDerivedWood);
     return { pass: d >= 25, detail: `ΔPVR ${d.toFixed(0)}% (want ≥ +25%; the trial's medians give +52%)` };
   },
 
   'pvr-recruitability-high': () => {
     const a = settle({ ...ARDS, recruitable: 0.55, peep: 4 });
     const b = settle({ ...ARDS, recruitable: 0.55, peep: 14 });
-    const d = change(a.pvrCoefficientWood, b.pvrCoefficientWood);
+    const d = change(a.pvrDerivedWood, b.pvrDerivedWood);
     // Centred on the measured +5%, not on zero. A band around zero admits -14%,
     // which is not "the same as +5%" — it is the opposite direction by nineteen
     // points, and would let the model pass on a technicality.
@@ -93,7 +100,7 @@ export const LITERATURE = {
     const at = (recruitable) => {
       const a = settle({ ...ARDS, recruitable, peep: 4 });
       const b = settle({ ...ARDS, recruitable, peep: 14 });
-      return change(a.pvrCoefficientWood, b.pvrCoefficientWood);
+      return change(a.pvrDerivedWood, b.pvrDerivedWood);
     };
     const steps = [0, 0.25, 0.5, 0.75, 1].map(at);
     const monotone = steps.every((d, i) => i === 0 || d < steps[i - 1]);
@@ -244,11 +251,26 @@ export const LITERATURE = {
     };
   },
 
+  // Restated as the relationship rather than one patient. It used to assert a
+  // single stressed volume and passed at 13.0%; when the mechanics changed it
+  // read 12.9% and failed, which looked like rounding. It is not. Checking the
+  // whole range showed the model calls patients preload dependent — by the 15%
+  // bolus rule — while their variation sits well under the threshold that is
+  // supposed to identify them.
   'ppv-responder': () => {
-    const m = settle({ stressedVolume: 330, vt: 560, ccw: 150, svr: 0.85, hr: 105 });
+    const patients = [300, 400, 500].map((stressedVolume) => {
+      const base = { stressedVolume, vt: 560, ccw: 150, svr: 0.85, hr: 105 };
+      const before = settle(base);
+      const after = settle({ ...base, stressedVolume: stressedVolume + 500 });
+      return { ppv: before.ppv, gain: change(before.co, after.co),
+        level: before.interpretability.ppv.level };
+    });
+    const dependent = patients.filter((x) => x.gain >= 15);
+    const flagged = dependent.filter((x) => x.ppv >= 13 && x.level === 'ok');
     return {
-      pass: m.ppv >= 13 && m.interpretability.ppv.level === 'ok',
-      detail: `PPV ${m.ppv.toFixed(0)}%, interpretability ${m.interpretability.ppv.level}`,
+      pass: dependent.length > 0 && flagged.length === dependent.length,
+      detail: `${flagged.length} of ${dependent.length} preload-dependent patients reach 13%: `
+        + patients.map((x) => `${x.ppv.toFixed(1)}% at +${x.gain.toFixed(0)}%`).join(', '),
     };
   },
 
