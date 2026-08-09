@@ -53,18 +53,32 @@ export const LITERATURE = {
     };
   },
 
+  // Both bands come from the trial's own medians now, not from a judgement about
+  // what "essentially unchanged" ought to mean. The PEEP levels are the trial's
+  // too: 4 [2-5] to 14 [12-15] cmH2O.
+  //
+  // Weakened deliberately from +52% to +25%: the published figure is a ratio of
+  // medians, which is not the median of the ratios, and the model should not be
+  // held to a precision the arithmetic does not carry. The point of the row is
+  // that resistance rises substantially, and 25% is well inside that.
   'pvr-recruitability-low': () => {
     const a = settle({ ...ARDS, recruitable: 0.05, peep: 4 });
     const b = settle({ ...ARDS, recruitable: 0.05, peep: 14 });
     const d = change(a.pvrCoefficientWood, b.pvrCoefficientWood);
-    return { pass: d > 0, detail: `ΔPVR ${d.toFixed(0)}% (want a rise)` };
+    return { pass: d >= 25, detail: `ΔPVR ${d.toFixed(0)}% (want ≥ +25%; the trial's medians give +52%)` };
   },
 
   'pvr-recruitability-high': () => {
     const a = settle({ ...ARDS, recruitable: 0.55, peep: 4 });
     const b = settle({ ...ARDS, recruitable: 0.55, peep: 14 });
     const d = change(a.pvrCoefficientWood, b.pvrCoefficientWood);
-    return { pass: Math.abs(d) <= 10, detail: `ΔPVR ${d.toFixed(0)}% (want within ±10%)` };
+    // Centred on the measured +5%, not on zero. A band around zero admits -14%,
+    // which is not "the same as +5%" — it is the opposite direction by nineteen
+    // points, and would let the model pass on a technicality.
+    return {
+      pass: d >= -10 && d <= 20,
+      detail: `ΔPVR ${d.toFixed(0)}% (want −10% to +20%, i.e. the trial's +5% ± 15; P=0.55)`,
+    };
   },
 
   // The row above needs a phenotype chosen for it, so on its own it could be

@@ -19,8 +19,8 @@ work, not excuses.
 |---|---|---|---|
 | `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | not yet | Fougères et al., *Crit Care Med* 2010;38:802–7 |
-| `pvr-recruitability-low` | In a poorly recruitable lung, PEEP 4 → 14 raises pulmonary vascular resistance. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | In a highly recruitable lung — the same collapsed lung, differing only in how much of it can be reopened — the same PEEP change leaves pulmonary vascular resistance essentially unchanged: within ±10%. Recruitment offsets the distension penalty rather than beating it. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-low` | In a poorly recruitable lung (R/I < 0.5), PEEP 4 → 14 raises pulmonary vascular resistance by at least 25%. The trial's medians give 160 → 243 dyn·s·cm⁻⁵, +52%, P < 0.01. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | In a highly recruitable lung (R/I ≥ 0.5), the same PEEP change leaves resistance essentially unchanged: between −10% and +20%, the measured +5% with a band of ±15 either side of it. The trial's medians give 224 → 235 dyn·s·cm⁻⁵, +5%, P = 0.55. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-dissociation` | Sweeping recruitability from 0 to 1 with everything else held identical moves the response monotonically from a rise to a fall, crossing zero once. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
@@ -156,6 +156,84 @@ onto a row whenever it drifts off one is not being tested by the row. What is
 recorded here is that a defensible change to the mechanics cost two percent on
 one row and two points on another, and that neither was paid for by moving a
 number to avoid saying so.
+
+## What the published numbers turned out to be
+
+The two recruitability rows were written from a description of Cappio Borlino et
+al. rather than from its figures, so they asked for a *direction* and a band I
+invented — "a rise", and "within ±10%". Nicola obtained the trial's abstract.
+The real numbers, at the trial's own PEEP levels of 4 [2–5] → 14 [12–15] cmH₂O:
+
+| | low recruiters (R/I < 0.5, n=10) | high recruiters (R/I ≥ 0.5, n=13) |
+|---|---|---|
+| PVR | 160 [120–297] → 243 [166–380] | 224 [185–289] → 235 [168–300] dyn·s·cm⁻⁵ |
+| Change | **+52%**, P < 0.01 | **+5%**, P = 0.55 |
+
+And the model, across the whole range of its recruitability parameter:
+
+| recruitable | 0 | 0.25 | 0.5 | 0.75 | 1 |
+|---|---|---|---|---|---|
+| ΔPVR | 0% | −7% | −13% | −18% | −23% |
+
+**It never rises at all.** The dissociation is there — the two ends differ by 23
+points — but the whole response sits about fifty percentage points below where
+the trial puts it. That is not a calibration question, and no single constant
+closes a gap that size.
+
+The uncomfortable part is that this was true before as well. The model gave +6%
+for the consolidated lung when the row was passing, against a published +52%, and
+the row passed because it only asked for a rise. A row weak enough to be
+satisfied by the sign let a model that is wrong by an order of magnitude in the
+effect size look calibrated for weeks. That is precisely the failure this file
+exists to prevent, and I built it into the row myself by writing down what I
+remembered of a finding instead of what it measured.
+
+Both rows are now stated against the trial's numbers. They fail, and they fail
+much harder than they did when they were failing before.
+
+One detail worth recording, because it nearly went the other way. A band of ±15%
+around *zero* would have admitted the model's −14% and marked the row as
+agreeing. But the trial measured +5%, and −14% is not the same as +5% — it is
+the opposite direction by nineteen points. The band is centred on the
+measurement instead, which is where a band belongs.
+
+## Leads on the model's structure, not yet acted on
+
+These came back from the same search and are recorded because they bear on
+choices the model has already made. **None has been read in the original** —
+they are abstracts relayed by a language model, which is the provenance that got
+these rows into trouble in the first place, so they are leads and not evidence.
+
+- **The J-curve figure usually attributed to Simmons et al. 1961 may be a
+  redrawing rather than data.** One source warns it is "a highly gentrified and
+  speculative interpretation", and redirects to **Thomas, Griffo & Roos, *J Appl
+  Physiol* 1961;16:451–6**, whose abstract reportedly states resistance is
+  "lowest at approximately half maximal lung volume". This model's
+  `pvr-j-shape` row cites Simmons.
+
+- **The extra-alveolar limb may turn up rather than plateau.** Hakim, Michel &
+  Chang, *J Appl Physiol* 1982;53:1110–5: under negative-pressure inflation the
+  total pressure drop first falls, as extra-alveolar resistance falls, and then
+  rises again through "a volume-dependent increase in the resistance of all
+  vessels". `EXTRA_FLOOR` asymptotes instead, so the functional form may be
+  wrong at high volume. Permutt and Howell 1961 are reported as monotonic, so
+  the sources disagree.
+
+- **The alveolar / extra-alveolar split cannot be anchored.** Published
+  partitions measure a different boundary and disagree with each other: the
+  capillary fraction of total resistance is reported at 34% (Brody, bolus), 45%
+  (Bhattacharya & Staub, micropuncture) and under 16% (Hakim, occlusion). `F_ALV`
+  is 0.60. There is no number here to move it to.
+
+- **Resistance may be volume-dependent rather than pressure-dependent.** Thomas
+  1961 is reported as concluding exactly that for negative-pressure inflation,
+  and a Michel/Hakim surface-tension paper as finding different resistance at
+  equal transpulmonary pressure but different volume. The extra-alveolar limb
+  here is driven by pressure, which that would count against.
+
+- **Two confounders the model has no term for**: the resistance–volume curve
+  shifts downward at high blood flow, and it shows hysteresis between the
+  inflation and deflation limbs.
 
 ## A note on how these rows were written
 
