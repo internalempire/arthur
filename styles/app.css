@@ -623,11 +623,39 @@ input[type="range"]:disabled { cursor: not-allowed; }
   min-height: 1.15em;
 }
 
-/* Rows sized alike, so one tall tile cannot make its neighbours jump when the
-   text inside it changes. */
+/* Rows of a fixed height, not a shared one.
+   `1fr` made every row as tall as the tallest tile anywhere, which is stable
+   only while that tile is. It is not: a caution appearing on the wedge grows
+   every row on the page, and it stays grown for as long as the caution does.
+   A height that does not depend on the content cannot do that.
+   The cost is empty space on the simple tiles, which is the trade being made
+   deliberately — a readout you are trying to read should not move. */
 .tiles {
-  grid-auto-rows: 1fr;
+  --tile-height: 172px;
+  grid-auto-rows: var(--tile-height);
   align-items: stretch;
+}
+
+.tile {
+  --tile-height: 172px;
+  overflow: hidden;
+}
+
+/* Whatever a caution needs beyond the room reserved for it scrolls rather than
+   pushing the layout around. Nothing is lost, and the page still does not move. */
+.tile-quality {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (max-width: 1100px) {
+  .tiles { --tile-height: 190px; }
+  .tile { --tile-height: 190px; }
+}
+
+@media (max-width: 640px) {
+  .tiles { --tile-height: 210px; }
+  .tile { --tile-height: 210px; }
 }
 
 .btn-busy {

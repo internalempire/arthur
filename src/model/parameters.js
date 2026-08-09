@@ -167,17 +167,17 @@ export const PARAMETERS = [
     min: 0.03, max: 0.60, step: 0.01, default: 0.07,
   },
   {
-    id: 'recruitable', group: 'pulmonary', label: 'Recruitable fraction', unit: '×',
+    id: 'recruitable', group: 'mechanics', label: 'Recruitable fraction', unit: '×',
     min: 0, max: 1, step: 0.05, default: 0.4,
     help: 'Of the lung that is collapsed at rest, how much can be reopened at all. Consolidated lung is collapsed and stays collapsed however hard it is pushed, and that is the difference between a patient in whom PEEP lowers pulmonary vascular resistance and one in whom it only raises it. Has no effect on a lung that is not collapsed to begin with.',
   },
   {
-    id: 'pOpen', group: 'pulmonary', label: 'Opening pressure', unit: 'cmH₂O',
+    id: 'pOpen', group: 'mechanics', label: 'Opening pressure', unit: 'cmH₂O',
     min: 5, max: 40, step: 1, default: 20,
     help: 'The transpulmonary pressure at which half the recruitable lung is open. Units open along a distribution rather than at a threshold, which is why recruitment is a ramp.',
   },
   {
-    id: 'hysteresis', group: 'pulmonary', label: 'Recruitment hysteresis',
+    id: 'hysteresis', group: 'mechanics', label: 'Recruitment hysteresis',
     type: 'choice',
     options: [
       { value: 'off', label: 'Off' },
@@ -187,7 +187,7 @@ export const PARAMETERS = [
     help: 'Off, units open and close at the same pressure, so how much lung is open follows the pressure of the moment and nothing you do to it lasts. On, they close at a lower pressure than they opened at, so how much is open becomes a state with a history — which is what makes a recruitment manoeuvre buy anything, and what makes a decremental PEEP trial land somewhere different from an incremental one.',
   },
   {
-    id: 'pClose', group: 'pulmonary', label: 'Closing pressure', unit: 'cmH₂O',
+    id: 'pClose', group: 'mechanics', label: 'Closing pressure', unit: 'cmH₂O',
     min: 2, max: 40, step: 1, default: 12,
     requires: { id: 'hysteresis', value: 'on' },
     help: 'The transpulmonary pressure at which units that are open start to shut again. Only has an effect with hysteresis on, and only below the opening pressure — the gap between the two is the width of the hysteresis, and setting it equal to the opening pressure is the same as switching hysteresis off.',

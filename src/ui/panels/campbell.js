@@ -17,6 +17,8 @@ export function createCampbell(canvas) {
   const pplLoop = [];
   const pawLoop = [];
   const palvLoop = [];
+  const prev = { ppl: [], paw: [], palv: [] };
+  let breathSeen = -1;
   let lastSample = -1;
 
   function render(sim, colors) {
@@ -29,6 +31,17 @@ export function createCampbell(canvas) {
     // rate and does not accumulate while paused.
     if (sim.time - lastSample >= LOOP_INTERVAL) {
       lastSample = sim.time;
+      // One breath at a time, and only the one before it kept.
+      //
+      // A rolling buffer spanning several breaths draws them all on top of each
+      // other, which is fine while they coincide and unreadable the moment a
+      // parameter changes and they stop coinciding. Keeping the previous breath
+      // and fading it shows the change instead of tangling with it.
+      if (r.breathCount !== breathSeen) {
+        breathSeen = r.breathCount;
+        prev.ppl = pplLoop.slice(); prev.paw = pawLoop.slice(); prev.palv = palvLoop.slice();
+        pplLoop.length = 0; pawLoop.length = 0; palvLoop.length = 0;
+      }
       pplLoop.push(r.ppl, vMl);
       pawLoop.push(r.paw, vMl);
       palvLoop.push(r.palv, vMl);
@@ -39,9 +52,11 @@ export function createCampbell(canvas) {
 
     const vMax = Math.max(900, vMl * 1.25, p.vt * 1.6 + p.peep * respiratorySystemCompliance(p, r.lungVolume));
     let pLo = -12, pHi = 30;
-    for (let i = 0; i < pplLoop.length; i += 2) {
-      pLo = Math.min(pLo, pplLoop[i] - 2);
-      pHi = Math.max(pHi, pawLoop[i] + 2);
+    for (const [pl, pw] of [[pplLoop, pawLoop], [prev.ppl, prev.paw]]) {
+      for (let i = 0; i < pl.length; i += 2) {
+        pLo = Math.min(pLo, pl[i] - 2);
+        pHi = Math.max(pHi, pw[i] + 2);
+      }
     }
     panel.setDomain(pLo, pHi, -50, vMax);
 
@@ -102,6 +117,11 @@ export function createCampbell(canvas) {
     }
     const lungCurve = drawn[0].curve;
 
+    // The breath before this one, underneath and faded.
+    panel.line(prev.ppl, { color: colors.pleural, width: 1.4, alpha: 0.22 });
+    panel.line(prev.palv, { color: colors.flow, width: 1.3, alpha: 0.2 });
+    panel.line(prev.paw, { color: colors.airway, width: 1.4, alpha: 0.22 });
+
     panel.line(pplLoop, { color: colors.pleural, width: 2 });
     // Alveolar pressure, between the other two. The airway loop is square in
     // volume control and that is arithmetic rather than a fault: expiration is
@@ -147,7 +167,9 @@ export function createCampbell(canvas) {
   }
 
   function clearTrail() {
-    pplLoop.length = 0; pawLoop.length = 0; palvLoop.length = 0; lastSample = -1;
+    pplLoop.length = 0; pawLoop.length = 0; palvLoop.length = 0;
+    prev.ppl.length = 0; prev.paw.length = 0; prev.palv.length = 0;
+    breathSeen = -1; lastSample = -1;
   }
 
   return { render, clearTrail };
