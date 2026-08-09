@@ -27,6 +27,7 @@ work, not excuses.
 | `pvr-nadir-position` | Resistance is minimal at 45–60% of maximal lung volume. | not yet | Thomas, Griffo & Roos, *J Appl Physiol* 1961;16:451–6, Discussion (n = 55 lungs) |
 | `pvr-at-maximal-inflation` | At maximal inflation resistance is 1.6–2.4× its minimum. | not yet | Thomas et al. 1961, Fig. 6 (both experiments give 1.8–2.1×) |
 | `pvr-at-low-volume` | At 30% of maximal volume it is only 1.05–1.4× the minimum — the deflation limb is far flatter than the inflation limb. | agrees | Thomas et al. 1961, Fig. 6 (~1.2× in both) |
+| `pvr-clinical-range` | Across transpulmonary pressures of 2.5 to 22 cmH₂O — the range this simulator runs in — resistance changes by between −20% and +40%. | not yet | Peták group, *J Appl Physiol* 2008, doi:10.1152/japplphysiol.00831.2007 — **reported, not read here**: +15 ± 1% with positive-pressure inflation, −3 ± 0.3% with negative, hysteresis against Ptp abolished when plotted against volume |
 | `pvr-extraalveolar-shape` | The extra-alveolar limb is itself U-shaped: it falls, then turns back up, ending at least 1.1× its minimum at maximal inflation. | not yet | Hakim, Michel & Chang, *J Appl Physiol* 1982;53:1110–5, Fig. 3 (arterial + venous segments: 9.2 → 7.8 → 9.9 mmHg over Ptp 0 → 20) |
 | `tidal-challenge-ordering` | Raising the tidal volume from 6 to 8 mL/kg raises pulse pressure variation more in a preload-dependent patient than in a filled one, so the change orders patients by their response to fluid. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
 | `tidal-challenge-threshold` | In the septic fluid-responsive preset ventilated at 6 mL/kg, that change exceeds 3.5 percentage points and the manoeuvre calls the patient preload dependent. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
@@ -249,6 +250,40 @@ inflation produces *"a volume-dependent increase in the resistance of both
 alveolar and extra-alveolar vessels"* — and that the volume-related changes are
 identical under positive- and negative-pressure inflation while the
 pressure-related ones are not.
+
+**A third measurement, in the range that matters.** Nicola's search returned a
+figure from the Peták group's 2008 paper on isolated perfused rat lung: sweeping
+transpulmonary pressure from 2.5 to 22 cmH₂O changes resistance by **+15 ± 1%**
+under positive-pressure inflation and **−3 ± 0.3%** under negative, and the
+hysteresis seen against transpulmonary pressure disappears when the same data are
+plotted against volume. That last clause is the third independent statement of
+the volume-versus-pressure point.
+
+This is the tightest constraint of the three, because 2.5 to 22 cmH₂O is the
+range every ventilated patient in this simulator occupies, where Thomas's
+"maximal inflation" is beyond it. **The model gives +193% over that span.**
+
+Unlike Thomas and Hakim, whose figures were read here directly, this one is
+reported rather than read, and the row records that difference. It is the same
+provenance that put the recruitability rows wrong, so it is stated as a lead with
+a wide band rather than as a tight target.
+
+**On `F_ALV`: the answer is that there is no answer.** The published partitions
+of pulmonary vascular resistance do not agree, because they do not measure the
+same thing:
+
+| share of total resistance | value | method |
+|---|---|---|
+| capillaries | 34% | Brody 1968, low-viscosity bolus, dog lobe |
+| alveolar-wall capillaries | 45% | Bhattacharya & Staub 1980, servo-null micropuncture |
+| middle distensible segment | < 16% | Hakim 1982, arterial and venous occlusion |
+| middle segment, by haematocrit | 7% at Hct 18 → 53% at Hct 66 | Julien et al. 1985 |
+
+Sixteen to forty-five percent depending on method, and a sevenfold swing with
+haematocrit alone. None was measured at a stated FRC. The model's 0.60 is above
+all of them, but the more useful conclusion is that this constant cannot be
+anchored by measurement at all, and should be documented as a modelling choice
+rather than left looking like one that evidence is pending on.
 
 **What this means for the model, not yet done.** Two changes, and they are
 structural rather than a retune:

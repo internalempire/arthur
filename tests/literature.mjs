@@ -8,7 +8,7 @@
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams } from '../src/model/parameters.js';
 import { SCENARIO_BY_ID } from '../src/model/scenarios.js';
-import { pvrComponents } from '../src/model/lung.js';
+import { pvrComponents, lungVolumeAtPl } from '../src/model/lung.js';
 
 // Thomas's volume axis runs from the degassed lung, so 'maximal volume' is the
 // model's own capacity.
@@ -203,6 +203,25 @@ export const LITERATURE = {
     return {
       pass: ratio >= 1.05 && ratio <= 1.4,
       detail: `${ratio.toFixed(2)}× the minimum at 30% of maximal volume (want 1.05–1.4; Thomas Fig. 6 gives ~1.2)`,
+    };
+  },
+
+  // The tightest constraint of the three, because it is the only one measured
+  // over the range this simulator actually runs in: a transpulmonary pressure of
+  // 2.5 to 22 cmH2O covers every ventilated patient in it.
+  //
+  // Reported rather than read. Nicola's search returned this from the full text
+  // of the Petak group's paper, but the paper itself has not been opened here —
+  // unlike Thomas and Hakim, whose figures were read directly. Same finding,
+  // weaker provenance, and the row says so.
+  'pvr-clinical-range': () => {
+    const p = { ...defaultParams(), hpv: 0 };
+    const at = (pl) => pvrComponents(p, lungVolumeAtPl(p, pl)).total;
+    const d = (at(22) / at(2.5) - 1) * 100;
+    return {
+      pass: d >= -20 && d <= 40,
+      detail: `ΔPVR ${d.toFixed(0)}% over transpulmonary pressure 2.5 → 22 cmH₂O `
+        + `(want −20% to +40%; reported +15% with positive-pressure inflation, −3% with negative)`,
     };
   },
 
