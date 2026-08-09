@@ -1012,12 +1012,13 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `HPV_GAIN` | 1.1 | resistance added per unit of closed lung |
 | `UNSTRESSED_VOLUME` | 1.247 L | gas a fully open lung holds at zero transpulmonary pressure |
 | `RECOIL_AT_FRC` | 5 cmH₂O | recoil balancing the chest wall; defines the resting volume |
-| `EXTRA_FLOOR` | 0.35 | how far traction can take the extra-alveolar limb before it saturates |
 | `TOTAL_LUNG_CAPACITY` | 6.0 L | reached at `TLC_PRESSURE`; with the resting volume, pins the tissue curve |
 | `TLC_PRESSURE` | 35 cmH₂O | transpulmonary pressure at total lung capacity |
 | `PRELOAD_STEEP` | 0.10 /mmHg | reserve above which filling buys output; calibrated against the model's own response to 500 mL, not published |
 | `TIDAL_CHALLENGE.threshold` | 3.5 points | Myatra 2017; published, not calibrated |
-| `K_ALV`, `K_EXTRA` | 1.6, 2.4 | J-curve exponents |
+| `K_ALV` | 0.515 | stretch: how steeply inflation narrows every vessel |
+| `K_EXTRA` | 3.35 | unfurling: how quickly leaving collapse opens the extra-alveolar vessels |
+| `EXTRA_FLOOR` | 0.17 | what survives of that once they are fully unfurled |
 | `F_ALV`, `F_EXTRA` | 0.6, 0.4 | J-curve weights |
 
 ---
