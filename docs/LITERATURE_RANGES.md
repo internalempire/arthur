@@ -24,7 +24,10 @@ work, not excuses.
 | `pvr-recruitability-dissociation` | Sweeping recruitability from 0 to 1 with everything else held identical moves the response monotonically from a rise to a fall, crossing zero once. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
-| `pvr-j-shape` | Pulmonary vascular resistance is minimal near functional residual capacity and at least 50% higher at both 1.2 L and 3.8 L. | agrees | Simmons et al., *Circ Res* 1961;9:465–71 |
+| `pvr-nadir-position` | Resistance is minimal at 45–60% of maximal lung volume. | not yet | Thomas, Griffo & Roos, *J Appl Physiol* 1961;16:451–6, Discussion (n = 55 lungs) |
+| `pvr-at-maximal-inflation` | At maximal inflation resistance is 1.6–2.4× its minimum. | not yet | Thomas et al. 1961, Fig. 6 (both experiments give 1.8–2.1×) |
+| `pvr-at-low-volume` | At 30% of maximal volume it is only 1.05–1.4× the minimum — the deflation limb is far flatter than the inflation limb. | agrees | Thomas et al. 1961, Fig. 6 (~1.2× in both) |
+| `pvr-extraalveolar-shape` | The extra-alveolar limb is itself U-shaped: it falls, then turns back up, ending at least 1.1× its minimum at maximal inflation. | not yet | Hakim, Michel & Chang, *J Appl Physiol* 1982;53:1110–5, Fig. 3 (arterial + venous segments: 9.2 → 7.8 → 9.9 mmHg over Ptp 0 → 20) |
 | `tidal-challenge-ordering` | Raising the tidal volume from 6 to 8 mL/kg raises pulse pressure variation more in a preload-dependent patient than in a filled one, so the change orders patients by their response to fluid. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
 | `tidal-challenge-threshold` | In the septic fluid-responsive preset ventilated at 6 mL/kg, that change exceeds 3.5 percentage points and the manoeuvre calls the patient preload dependent. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
 | `ppv-responder` | A passive patient at 8 mL/kg who is preload dependent shows pulse pressure variation of at least 13%, and the index reports itself interpretable. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
@@ -197,43 +200,71 @@ agreeing. But the trial measured +5%, and −14% is not the same as +5% — it i
 the opposite direction by nineteen points. The band is centred on the
 measurement instead, which is where a band belongs.
 
-## Leads on the model's structure, not yet acted on
+## What the two papers actually say
 
-These came back from the same search and are recorded because they bear on
-choices the model has already made. **None has been read in the original** —
-they are abstracts relayed by a language model, which is the provenance that got
-these rows into trouble in the first place, so they are leads and not evidence.
+Nicola supplied Thomas et al. 1961 and Hakim et al. 1982. Both were read, and
+both contradict the model in ways the old rows could not see, because the old
+rows asserted bounds I had invented rather than values anyone had measured.
 
-- **The J-curve figure usually attributed to Simmons et al. 1961 may be a
-  redrawing rather than data.** One source warns it is "a highly gentrified and
-  speculative interpretation", and redirects to **Thomas, Griffo & Roos, *J Appl
-  Physiol* 1961;16:451–6**, whose abstract reportedly states resistance is
-  "lowest at approximately half maximal lung volume". This model's
-  `pvr-j-shape` row cites Simmons.
+**Thomas, Griffo & Roos** inflated excised dog lungs by lowering the pressure
+around them, holding the vascular pressures constant and measuring under static
+conditions — so no Starling resistance and essentially no hypoxic
+vasoconstriction, which makes it the cleanest available look at the mechanical
+effect alone. Reading Fig. 6 and the Discussion:
 
-- **The extra-alveolar limb may turn up rather than plateau.** Hakim, Michel &
-  Chang, *J Appl Physiol* 1982;53:1110–5: under negative-pressure inflation the
-  total pressure drop first falls, as extra-alveolar resistance falls, and then
-  rises again through "a volume-dependent increase in the resistance of all
-  vessels". `EXTRA_FLOOR` asymptotes instead, so the functional form may be
-  wrong at high volume. Permutt and Howell 1961 are reported as monotonic, so
-  the sources disagree.
+| | measured | this model |
+|---|---|---|
+| Nadir | 45–60% of maximal volume (n = 55) | **39%** |
+| At maximal inflation | 1.8–2.1× the minimum | **8.9×** |
+| At 30% of maximal volume | ~1.2× the minimum | 1.19× |
 
-- **The alveolar / extra-alveolar split cannot be anchored.** Published
-  partitions measure a different boundary and disagree with each other: the
-  capillary fraction of total resistance is reported at 34% (Brody, bolus), 45%
-  (Bhattacharya & Staub, micropuncture) and under 16% (Hakim, occlusion). `F_ALV`
-  is 0.60. There is no number here to move it to.
+The low-volume limb is right, and that is worth noting because it was never
+tested against a value before. The high-volume limb overstates overdistension by
+four to five times. `K_ALV` is what sets it.
 
-- **Resistance may be volume-dependent rather than pressure-dependent.** Thomas
-  1961 is reported as concluding exactly that for negative-pressure inflation,
-  and a Michel/Hakim surface-tension paper as finding different resistance at
-  equal transpulmonary pressure but different volume. The extra-alveolar limb
-  here is driven by pressure, which that would count against.
+Their conclusion is the second finding, and it bears on a choice made in this
+model rather than on a constant: *"pulmonary vascular resistance is
+volume-dependent rather than pressure-dependent when inflation is accomplished by
+lowering the pressure around the lung."* Resistance plotted against
+transpulmonary pressure showed wide hysteresis between inflation and deflation;
+plotted against volume it did not. This model drives the extra-alveolar limb by
+transpulmonary pressure.
 
-- **Two confounders the model has no term for**: the resistance–volume curve
-  shifts downward at high blood flow, and it shows hysteresis between the
-  inflation and deflation limbs.
+**Hakim, Michel & Chang** partitioned the pressure drop with arterial and venous
+occlusion. Their Fig. 3, negative-pressure inflation, n = 7, over transpulmonary
+pressures 0 to 20 mmHg:
+
+| segment | Ptp 0 | 5 | 10 | 15 | 20 |
+|---|---|---|---|---|---|
+| Total | 11.8 | **9.2** | 9.5 | 11.8 | 14.3 |
+| Venous | 5.5 | 4.6 | 4.6 | 5.5 | 5.9 |
+| Arterial | 3.7 | 3.2 | 3.1 | 3.6 | 4.0 |
+| Middle | 2.6 | **1.3** | 1.4 | 2.9 | 4.2 |
+
+Every segment is U-shaped, not only the total. The arterial and venous segments
+are the large indistensible extra-alveolar vessels, and together they run 9.2 →
+7.8 → 9.9: a fall of 15% and then a rise of 27%. This model's extra-alveolar limb
+falls by 65% to a floor and never returns. Their conclusion is explicit —
+inflation produces *"a volume-dependent increase in the resistance of both
+alveolar and extra-alveolar vessels"* — and that the volume-related changes are
+identical under positive- and negative-pressure inflation while the
+pressure-related ones are not.
+
+**What this means for the model, not yet done.** Two changes, and they are
+structural rather than a retune:
+
+1. `K_ALV` is roughly two and a half times too large. The arithmetic suggests
+   about 0.65 against the present 1.6, with `K_EXTRA` following from the nadir
+   condition as it always has.
+2. The extra-alveolar limb needs to turn up rather than approach a floor, and
+   both papers say the driving variable should be volume rather than
+   transpulmonary pressure. That is the opposite of a change made earlier in this
+   file's history, which was argued from first principles about radial traction
+   being a stress. The principle is sound and the measurement disagrees with it.
+
+Neither is attempted here. Four rows now state what was measured, three of them
+fail, and that is a better position than one row stating a bound I made up and
+passing.
 
 ## A note on how these rows were written
 

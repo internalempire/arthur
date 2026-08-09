@@ -8,7 +8,11 @@
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams } from '../src/model/parameters.js';
 import { SCENARIO_BY_ID } from '../src/model/scenarios.js';
-import { pvrComponents, PVR_NADIR_VOLUME } from '../src/model/lung.js';
+import { pvrComponents } from '../src/model/lung.js';
+
+// Thomas's volume axis runs from the degassed lung, so 'maximal volume' is the
+// model's own capacity.
+const LUNG_CAPACITY = 6.0; // L
 import { venousReturnFlow } from '../src/model/circulation.js';
 
 function settle(overrides, seconds = 30) {
@@ -158,15 +162,66 @@ export const LITERATURE = {
     };
   },
 
-  'pvr-j-shape': () => {
-    const p = defaultParams();
-    const at = (v) => pvrComponents(p, v).total;
-    const nadir = at(PVR_NADIR_VOLUME);
-    const low = at(1.2) / nadir;
-    const high = at(3.8) / nadir;
+  // Four rows off two papers Nicola supplied, replacing a single row that cited
+  // Simmons 1961 for a bound of my own invention. Thomas et al. inflated excised
+  // dog lungs by lowering the pressure around them, at constant vascular
+  // pressures, and measured under static conditions — so there is no Starling
+  // resistance and essentially no hypoxic vasoconstriction to confound the
+  // mechanical effect. Their volume axis runs from the degassed state, so
+  // "maximal volume" is the top of their own inflation, which is what the model
+  // is compared against.
+  'pvr-nadir-position': () => {
+    const p = { ...defaultParams(), hpv: 0 };
+    let best = { v: 0, r: Infinity };
+    for (let v = 0.4; v <= 5.95; v += 0.01) {
+      const r = pvrComponents(p, v).total;
+      if (r < best.r) best = { v, r };
+    }
+    const pct = (best.v / LUNG_CAPACITY) * 100;
     return {
-      pass: low >= 1.5 && high >= 1.5,
-      detail: `${low.toFixed(2)}× nadir at 1.2 L, ${high.toFixed(2)}× at 3.8 L (want ≥1.5 both)`,
+      pass: pct >= 45 && pct <= 60,
+      detail: `nadir at ${pct.toFixed(0)}% of maximal volume (want 45–60%)`,
+    };
+  },
+
+  'pvr-at-maximal-inflation': () => {
+    const p = { ...defaultParams(), hpv: 0 };
+    let nadir = Infinity;
+    for (let v = 0.4; v <= 5.95; v += 0.01) nadir = Math.min(nadir, pvrComponents(p, v).total);
+    const ratio = pvrComponents(p, LUNG_CAPACITY * 0.99).total / nadir;
+    return {
+      pass: ratio >= 1.6 && ratio <= 2.4,
+      detail: `${ratio.toFixed(1)}× the minimum at maximal inflation (want 1.6–2.4; Thomas Fig. 6 gives 1.8–2.1)`,
+    };
+  },
+
+  'pvr-at-low-volume': () => {
+    const p = { ...defaultParams(), hpv: 0 };
+    let nadir = Infinity;
+    for (let v = 0.4; v <= 5.95; v += 0.01) nadir = Math.min(nadir, pvrComponents(p, v).total);
+    const ratio = pvrComponents(p, LUNG_CAPACITY * 0.30).total / nadir;
+    return {
+      pass: ratio >= 1.05 && ratio <= 1.4,
+      detail: `${ratio.toFixed(2)}× the minimum at 30% of maximal volume (want 1.05–1.4; Thomas Fig. 6 gives ~1.2)`,
+    };
+  },
+
+  // Hakim et al. partitioned the pressure drop with arterial and venous
+  // occlusion. Their arterial and venous segments are the large indistensible
+  // extra-alveolar vessels, and both are U-shaped in transpulmonary pressure
+  // rather than falling: 9.2 mmHg combined at Ptp 0, 7.8 at the minimum, 9.9 at
+  // Ptp 20. The model's extra-alveolar limb falls to a floor and never returns.
+  'pvr-extraalveolar-shape': () => {
+    const p = { ...defaultParams(), hpv: 0 };
+    const extra = (v) => pvrComponents(p, v).extraAlveolar;
+    let lo = Infinity, loV = 0;
+    for (let v = 1.0; v <= 5.9; v += 0.01) { const e = extra(v); if (e < lo) { lo = e; loV = v; } }
+    const high = extra(LUNG_CAPACITY * 0.99);
+    const rise = high / lo;
+    return {
+      pass: rise >= 1.1,
+      detail: `extra-alveolar limb ${rise.toFixed(2)}× its minimum at maximal inflation `
+        + `(want ≥ 1.1, i.e. it turns back up; Hakim Fig. 3 gives 1.27). Minimum at ${loV.toFixed(2)} L`,
     };
   },
 
