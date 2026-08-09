@@ -177,6 +177,22 @@ export const PARAMETERS = [
     help: 'The transpulmonary pressure at which half the recruitable lung is open. Units open along a distribution rather than at a threshold, which is why recruitment is a ramp.',
   },
   {
+    id: 'hysteresis', group: 'pulmonary', label: 'Recruitment hysteresis',
+    type: 'choice',
+    options: [
+      { value: 'off', label: 'Off' },
+      { value: 'on', label: 'On' },
+    ],
+    default: 'off',
+    help: 'Off, units open and close at the same pressure, so how much lung is open follows the pressure of the moment and nothing you do to it lasts. On, they close at a lower pressure than they opened at, so how much is open becomes a state with a history — which is what makes a recruitment manoeuvre buy anything, and what makes a decremental PEEP trial land somewhere different from an incremental one.',
+  },
+  {
+    id: 'pClose', group: 'pulmonary', label: 'Closing pressure', unit: 'cmH₂O',
+    min: 2, max: 40, step: 1, default: 12,
+    requires: { id: 'hysteresis', value: 'on' },
+    help: 'The transpulmonary pressure at which units that are open start to shut again. Only has an effect with hysteresis on, and only below the opening pressure — the gap between the two is the width of the hysteresis, and setting it equal to the opening pressure is the same as switching hysteresis off.',
+  },
+  {
     id: 'hpv', group: 'pulmonary', label: 'Hypoxic vasoconstriction', unit: '×',
     min: 0, max: 3, step: 0.1, default: 1.0,
     help: 'Applied to derecruited lung below FRC. It is why lowering PEEP in RV failure can raise PVR rather than lower it.',

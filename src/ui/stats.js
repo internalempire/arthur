@@ -109,7 +109,9 @@ const TILES = [
     // The number a ventilator prints tracks how much lung is being ventilated,
     // not how stiff the tissue is. Showing the open fraction beside it is the
     // whole point of separating the two.
-    sub: (m) => `${(m.openFraction * 100).toFixed(0)}% of the lung open · resting volume ${m.relaxVolume.toFixed(2)} L`,
+    sub: (m) => `${(m.openFraction * 100).toFixed(0)}% of the lung open`
+      + (m.hysteresis ? ` · ${m.hysteresis.band} · pressure alone would give ${m.hysteresis.equilibrium}`
+        : ` · resting volume ${m.relaxVolume.toFixed(2)} L`),
   },
   {
     id: 'pplat', label: 'Plateau pressure', unit: 'cmH₂O', kind: 'measured',

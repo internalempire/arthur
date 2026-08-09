@@ -341,11 +341,53 @@ transpulmonary pressure is found numerically. In the integrator the solve is
 warm-started from the previous step - the lung moves about a tenth of a
 millilitre per step - and agrees with a fresh bisection to 2 parts in 10^9.
 
-**What is still missing: hysteresis.** Units here open and close at the same
-pressure, so inflation and deflation follow one curve. Real lungs do not, which
-is why a recruitment manoeuvre followed by a decremental PEEP trial finds a lower
-optimum than an incremental one. That needs the opening and closing thresholds to
-differ, and it is the next honest thing to add.
+### Hysteresis, optionally
+
+With `hysteresis` off, units open and close at the same pressure, how much lung
+is open is a function of the pressure of the moment, and nothing you do to the
+lung lasts. Switch it on and units close at `pClose`, below the `pOpen` they
+opened at, which makes the open fraction a **state with a history**:
+
+```
+band(Pl)  = { lo: open(Pl, 0), hi: open(Pl, pOpen - pClose) }
+phi       <- min(max(phi, lo), hi)        every step
+```
+
+A play operator. Below `lo` the pressure is prising units open and drags the
+state up; above `hi` it is letting them shut and drags it down; in between
+nothing moves, and that gap is the memory. Within a step the fraction is frozen,
+which makes the lung a straight line and the inverse a closed form rather than a
+solve.
+
+A lung that has never been inflated starts on the opening branch, so there is
+something for a manoeuvre to do.
+
+**What this buys.** Taking the ARDS preset to 35 cmH₂O for thirty seconds and
+back to PEEP 10, with `pClose=6`: the lung goes from 75% open to 79% and stays
+there, the resistance coefficient falls 3.21 to 2.90 Wood units, and the
+right-to-left end-diastolic ratio falls 1.66 to 1.62. The manoeuvre is not a
+button — raise PEEP, wait, lower it — because with hysteresis the model does not
+need one.
+
+**And what it does not.** Run the same manoeuvre with `pClose=14` and it buys
+exactly nothing: 71.6% open before and after. End-expiratory transpulmonary
+pressure is 13.0, below the closing pressure, so everything recruited shuts again
+on the first expiration. That is the clinical point about recruitment manoeuvres
+stated as arithmetic — the manoeuvre opens the lung, the PEEP after it is what
+keeps it open, and without the second the first is a transient.
+
+**Incremental and decremental PEEP trials stop being the same experiment.** Walk
+up from 4 and down from 35 through the same rungs and the descending limb sits 3
+to 4 points more open at every one, with a resistance about 0.3 Wood units lower
+and a higher cardiac output. Same patient, same PEEP, different lung.
+
+Setting `pClose` equal to `pOpen` is the same as switching the flag off, and the
+test suite asserts that rather than the documentation claiming it.
+
+**Still missing:** the operator is instantaneous, so a unit opens within the step
+that reaches its threshold. Real recruitment has a time course over seconds to
+minutes, which is why manoeuvres are held rather than touched. Nothing here
+resolves that, so the length of a manoeuvre does not matter, only its pressure.
 
 ### The J-curve
 
@@ -670,6 +712,8 @@ fluid bolus or a diuresis — rather than silently rescaling the model.
 | `hpv` | Hypoxic vasoconstriction gain | × | 1.0 | 0 – 3 |
 | `recruitable` | Fraction of the collapsed lung that can be reopened | × | 0.4 | 0 – 1 |
 | `pOpen` | Transpulmonary pressure at which half the recruitable lung is open | cmH₂O | 20 | 5 – 40 |
+| `hysteresis` | Whether units close at a lower pressure than they opened at | off/on | off | — |
+| `pClose` | Pressure at which open units start to shut, with hysteresis on | cmH₂O | 12 | 2 – 40 |
 | `piston` | Pulmonary capacitance coupling | mL/L | 85 | 0 – 200 |
 
 To convert a resistance to clinical units: Wood units = mmHg·s/mL × 1000/60;

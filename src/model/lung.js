@@ -68,13 +68,56 @@ const logistic = (x) => 1 / (1 + Math.exp(-x));
 // lung open against the chest wall, and the negative of pleural pressure there.
 export const RECOIL_AT_FRC = 5; // cmH2O
 
-/** How much of the lung is open at a given transpulmonary pressure. */
-export function openFractionAt(p, pl) {
+/**
+ * How much of the lung is open at a given transpulmonary pressure.
+ *
+ * `shift` moves both thresholds down, which is what makes the closing branch the
+ * closing branch: a unit that needed 20 cmH2O to open will not close again until
+ * pressure falls well below that.
+ */
+export function openFractionAt(p, pl, shift = 0) {
   const diseased = clamp(p.collapsed ?? 0, 0, 0.95);
   const recruitable = clamp(p.recruitable ?? 0, 0, 1);
-  const normalOpen = (1 - diseased) * logistic((pl - PL_EASY) / SPREAD_EASY);
-  const recruited = diseased * recruitable * logistic((pl - (p.pOpen ?? 20)) / SPREAD_HARD);
+  const normalOpen = (1 - diseased) * logistic((pl - (PL_EASY - shift)) / SPREAD_EASY);
+  const recruited = diseased * recruitable
+    * logistic((pl - ((p.pOpen ?? 20) - shift)) / SPREAD_HARD);
   return clamp(normalOpen + recruited, 0.05, 1);
+}
+
+/** How far below the opening pressure units hang on before they shut again. */
+export function hysteresisGap(p) {
+  if (p.hysteresis !== 'on') return 0;
+  return Math.max(0, (p.pOpen ?? 20) - (p.pClose ?? 12));
+}
+
+/**
+ * The band of open fractions this pressure is consistent with.
+ *
+ * Below `lo` the lung is being pushed open; above `hi` it is being let shut.
+ * Between them nothing moves, and that gap is the hysteresis: the same
+ * transpulmonary pressure leaves a lung that has just been inflated more open
+ * than one that has just been deflated to it.
+ */
+export function openBand(p, pl) {
+  const gap = hysteresisGap(p);
+  return {
+    lo: openFractionAt(p, pl, 0),      // opens only what this pressure can open
+    hi: openFractionAt(p, pl, gap),    // keeps open everything already open
+  };
+}
+
+/**
+ * Advance the open fraction one step, given where the lung currently is.
+ *
+ * A play operator: the state is dragged along by whichever edge of the band it
+ * has run into, and sits still in between. Instantaneous rather than rate-based,
+ * because in this model an alveolus opens within a breath and nothing here
+ * resolves the milliseconds it takes.
+ */
+export function stepOpenFraction(p, phi, pl) {
+  const { lo, hi } = openBand(p, pl);
+  if (!(phi > 0)) return lo;
+  return Math.min(Math.max(phi, lo), hi);
 }
 
 // The open fraction of an undiseased lung at its resting recoil is a constant —
@@ -104,13 +147,34 @@ function perUnitVolume(p, pl) {
  * straight. A collapsed but recruitable lung sits on the rising part, so its
  * curve has the lower inflection a bedside pressure–volume manoeuvre draws.
  */
-export function lungVolumeAtPl(p, pl) {
-  return openFractionAt(p, pl) * perUnitVolume(p, pl);
+export function lungVolumeAtPl(p, pl, phi = null) {
+  return (phi ?? openFractionAt(p, pl)) * perUnitVolume(p, pl);
 }
 
-/** The volume the lung settles at when its recoil balances the chest wall. */
-export function relaxationVolume(p) {
-  return lungVolumeAtPl(p, RECOIL_AT_FRC);
+/**
+ * The volume the lung settles at when its recoil balances the chest wall.
+ *
+ * With hysteresis on this is no longer a property of the parameters alone — the
+ * same lung rests at two different volumes depending on whether it was last
+ * inflated or last emptied — so the caller passes the open fraction it is
+ * actually at. Omitting it gives the equilibrium branch, which is what the
+ * non-hysteresis model has always used.
+ */
+export function relaxationVolume(p, phi = null) {
+  return lungVolumeAtPl(p, RECOIL_AT_FRC, phi);
+}
+
+/**
+ * Transpulmonary pressure at a volume, with the open fraction held fixed.
+ *
+ * Closed form, because with the fraction frozen the curve is a straight line:
+ * V = phi * (V0 + C*Pl). Within a step the fraction *is* frozen — it is a state
+ * that the step then updates — so this is both exact and cheaper than the
+ * bisection the equilibrium branch needs.
+ */
+export function transpulmonaryAtFixed(p, lungVolume, phi) {
+  const c = p.clung / 1000;
+  return clamp((lungVolume / Math.max(phi, 1e-6) - UNSTRESSED_VOLUME) / c, -25, 80);
 }
 
 /**
@@ -179,7 +243,7 @@ export function lungComplianceAt(p, lungVolume, eps = 0.25) {
  * even as total volume rises. That is the mechanism the recruiter has and the
  * non-recruiter does not, and it is the whole reason for this file.
  */
-export function lungRegions(p, lungVolume, plKnown = null) {
+export function lungRegions(p, lungVolume, plKnown = null, phiKnown = null) {
   const diseased = clamp(p.collapsed ?? 0, 0, 0.95);
   const recruitable = clamp(p.recruitable ?? 0, 0, 1);
   const pl = plKnown ?? transpulmonaryAt(p, lungVolume);
@@ -189,7 +253,9 @@ export function lungRegions(p, lungVolume, plKnown = null) {
 
   const normalOpen = (1 - diseased) * easy;
   const recruited = diseased * recruitable * hard;
-  const openFraction = clamp(normalOpen + recruited, 0.05, 1);
+  // With hysteresis running, how much is open is a state rather than a function
+  // of the present pressure, and the resistance has to be read off the state.
+  const openFraction = phiKnown ?? clamp(normalOpen + recruited, 0.05, 1);
   const closedFraction = 1 - openFraction;
 
   // Volume per open unit, referenced to what those units would hold at a normal
@@ -255,8 +321,8 @@ const HPV_GAIN = 1.1;
  * Closed units are not simply removed: they are still perfused, badly, and
  * hypoxic vasoconstriction is what makes that expensive.
  */
-export function pvrComponents(p, lungVolume) {
-  const r = lungRegions(p, lungVolume);
+export function pvrComponents(p, lungVolume, plKnown = null, phiKnown = null) {
+  const r = lungRegions(p, lungVolume, plKnown, phiKnown);
   const hypoxic = 1 + p.hpv * HPV_GAIN * r.closedFraction;
   const perUnitAlveolar = p.pvrBase * F_ALV * Math.exp(K_ALV * r.strain);
   const perUnitExtra = p.pvrBase * F_EXTRA * tractionRelief(r.pl);
@@ -276,6 +342,6 @@ export function pvrComponents(p, lungVolume) {
   };
 }
 
-export function pvrAt(p, lungVolume) {
-  return clamp(pvrComponents(p, lungVolume).total, 0.005, 5);
+export function pvrAt(p, lungVolume, plKnown = null, phiKnown = null) {
+  return clamp(pvrComponents(p, lungVolume, plKnown, phiKnown).total, 0.005, 5);
 }

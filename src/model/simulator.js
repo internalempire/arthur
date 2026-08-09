@@ -7,7 +7,7 @@ import {
 import {
   createRespiratoryState, stepRespiratory, respiratorySystemCompliance,
 } from './respiratory.js';
-import { pvrComponents, lungRegions, relaxationVolume } from './lung.js';
+import { pvrComponents, lungRegions, relaxationVolume, openBand } from './lung.js';
 import {
   createCirculationState, stepCirculation, VASC, venousReturnBackPressure,
   preloadSensitivity,
@@ -375,8 +375,8 @@ export class Simulator {
 
     const co = (c.sv * p.hr) / 1000;
     const crs = respiratorySystemCompliance(p, r.lungVolume);
-    const pvrComp = pvrComponents(p, r.lungVolume);
-    const regions = lungRegions(p, r.lungVolume);
+    const pvrComp = pvrComponents(p, r.lungVolume, r.plSolved, r.openFraction);
+    const regions = lungRegions(p, r.lungVolume, r.plSolved, r.openFraction);
 
     // Whether each derived index can be read as the clinical quantity it shares
     // a name with. A dynamic index outside its validity conditions is not a
@@ -495,6 +495,19 @@ export class Simulator {
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
       lungVolume: r.lungVolume, pab: r.pab,
       openFraction: regions.openFraction,
+      // With hysteresis on, how much is open is a state rather than a reading of
+      // the present pressure, so the tile has to say which and by how much they
+      // differ — the gap is what the lung remembers.
+      hysteresis: p.hysteresis === 'on' ? (() => {
+        const band = openBand(p, r.plSolved ?? r.pl);
+        const eq = lungRegions({ ...p, hysteresis: 'off' }, r.lungVolume, r.plSolved).openFraction;
+        return {
+          equilibrium: `${(eq * 100).toFixed(0)}%`,
+          band: regions.openFraction >= band.hi - 1e-6 ? 'letting units shut'
+            : regions.openFraction <= band.lo + 1e-6 ? 'pressure is opening units'
+              : 'holding what it has',
+        };
+      })() : null,
       relaxVolume: r.relaxVolume,
       // What a ventilator would compute, not what the tissue is: tidal volume
       // over the pressure it took to deliver it.

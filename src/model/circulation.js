@@ -236,7 +236,7 @@ export function stepCirculation(p, c, resp, dt) {
   const qVr = venousReturnFlow(pmsf, pRa, pCrit, rvrEff);
   const qSys = (pSa - pmsf) / p.svr;
 
-  const pvr = pvrAt(p, resp.lungVolume);
+  const pvr = pvrAt(p, resp.lungVolume, resp.plSolved, resp.openFraction);
   // Vascular waterfall: where alveolar pressure exceeds pulmonary venous
   // pressure, alveolar pressure — not left atrial pressure — is the downstream
   // pressure for flow.

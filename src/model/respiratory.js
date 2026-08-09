@@ -20,7 +20,10 @@
 // is shut rather than a volume the model is told to sit at.
 
 import { clamp } from './units.js';
-import { transpulmonaryAt, relaxationVolume, lungComplianceAt } from './lung.js';
+import {
+  transpulmonaryAt, transpulmonaryAtFixed, relaxationVolume, lungComplianceAt,
+  stepOpenFraction, openBand, RECOIL_AT_FRC,
+} from './lung.js';
 
 // Pleural pressure at the relaxation volume. Its negative is the
 // transpulmonary recoil at FRC, which is why alveolar pressure there is zero.
@@ -51,6 +54,8 @@ export function createRespiratoryState() {
     lastPplSwing: 0,
     relaxVolume: 0,
     plSolved: null,
+    // Null until the first step decides which branch this lung starts on.
+    openFraction: null,
     pplatCandidate: 0,
     pplMin: Infinity,
     pplMax: -Infinity,
@@ -108,18 +113,30 @@ function airwayOpeningPressure(p, r, period) {
 export function stepRespiratory(p, r, dt) {
   const period = 60 / p.rr;
   const ccw = p.ccw / 1000;
-  // The volume the lung would sit at with the airway open and no effort. An
-  // outcome of the pressure–volume curve, so it moves when recruitability or
-  // opening pressure does.
+  // The reference the chest wall is measured from: where this lung would rest if
+  // it were on its equilibrium branch. Deliberately not the volume the lung is
+  // actually resting at, which with hysteresis depends on what was done to it —
+  // the chest wall knows how much gas is in the chest, not how it got there.
   const vRelax = relaxationVolume(p);
-  // Alveolar pressure at a given volume above that: the chest wall's linear
-  // element plus the lung's sigmoid one. One function, used for the flow
+  const hysteretic = p.hysteresis === 'on';
+  if (hysteretic && !(r.openFraction > 0)) {
+    // A lung that has never been inflated sits on the opening branch.
+    r.openFraction = openBand(p, RECOIL_AT_FRC).lo;
+  }
+
+  // Alveolar pressure at a given volume above that reference: the chest wall's
+  // linear element plus the lung's sigmoid one. One function, used for the flow
   // calculation and for the pressures reported afterwards, so they cannot drift
   // apart.
-  // The solve is warm-started from the last answer and the result kept, so the
-  // hot loop costs a couple of evaluations rather than a full bisection.
+  //
+  // With hysteresis the open fraction is frozen for the step — it is a state the
+  // step then updates — which makes the lung a straight line within the step and
+  // the inverse a closed form. Without it, the fraction follows the pressure and
+  // the inverse is a solve, warm-started from the last answer.
   const alveolar = (v, pmus) => {
-    r.plSolved = transpulmonaryAt(p, vRelax + v, r.plSolved);
+    r.plSolved = hysteretic
+      ? transpulmonaryAtFixed(p, vRelax + v, r.openFraction)
+      : transpulmonaryAt(p, vRelax + v, r.plSolved);
     return (PPL_FRC + v / ccw - pmus) + r.plSolved;
   };
 
@@ -144,6 +161,7 @@ export function stepRespiratory(p, r, dt) {
     r.lungVolume = vRelax + r.v;
     r.relaxVolume = vRelax;
     r.pab = p.pab0 + p.abdCoupling * r.v;
+    if (hysteretic) r.openFraction = stepOpenFraction(p, r.openFraction, r.pl);
     r.prevPhase = r.phase;
     return r;
   }
@@ -224,6 +242,10 @@ export function stepRespiratory(p, r, dt) {
   r.lungVolume = vRelax + r.v; // absolute, L
   r.relaxVolume = vRelax;
   r.pab = p.pab0 + p.abdCoupling * r.v;
+  // The state the next step will read. Updated after the pressures rather than
+  // before them, so what is reported and what the flow was computed from are the
+  // same lung.
+  if (hysteretic) r.openFraction = stepOpenFraction(p, r.openFraction, r.pl);
 
   // --- per-breath bookkeeping ----------------------------------------------
   r.pplMin = Math.min(r.pplMin, ppl);

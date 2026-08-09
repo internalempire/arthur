@@ -69,6 +69,11 @@ export function createControls(container, sim, onChange) {
       const v = spec.type === 'choice' ? input.value : parseFloat(input.value);
       sim.setParam(spec.id, v);
       paint(spec, input, value);
+      // One control can decide whether another applies at all, so relevance is
+      // recomputed on every change rather than only when a scenario is loaded.
+      // Without this, turning hysteresis on left its closing pressure greyed out
+      // and unusable until the next reset.
+      refreshRelevance();
       onChange?.(spec.id, v);
     });
     row.appendChild(input);
@@ -94,16 +99,34 @@ export function createControls(container, sim, onChange) {
     }
   }
 
-  /** Reflect the simulator's parameters back into the inputs. */
-  function sync() {
+  /**
+   * Grey out the controls that would do nothing.
+   *
+   * A control can be irrelevant because of the ventilatory mode, or because
+   * another switch has turned it off — closing pressure with hysteresis off is
+   * the second kind: the slider would move and nothing would happen.
+   *
+   * Kept apart from `sync` because this runs on every change, and `sync` writes
+   * values back into the inputs, which is the wrong thing to do to a control
+   * somebody is in the middle of dragging.
+   */
+  function refreshRelevance() {
     const mode = sim.params.mode;
-    for (const { spec, row, input, value } of rows.values()) {
-      input.value = sim.params[spec.id];
-      paint(spec, input, value);
-      const relevant = !spec.appliesTo || spec.appliesTo.includes(mode);
+    for (const { spec, row, input } of rows.values()) {
+      const relevant = (!spec.appliesTo || spec.appliesTo.includes(mode))
+        && (!spec.requires || sim.params[spec.requires.id] === spec.requires.value);
       row.classList.toggle('inactive', !relevant);
       input.disabled = !relevant;
     }
+  }
+
+  /** Reflect the simulator's parameters back into the inputs. */
+  function sync() {
+    for (const { spec, input, value } of rows.values()) {
+      input.value = sim.params[spec.id];
+      paint(spec, input, value);
+    }
+    refreshRelevance();
   }
 
   sync();

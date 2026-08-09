@@ -17,7 +17,7 @@ import {
 } from '../src/model/circulation.js';
 import {
   pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
-  lungVolumeAtPl, lungComplianceAt, PVR_NADIR_VOLUME,
+  lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction, PVR_NADIR_VOLUME,
 } from '../src/model/lung.js';
 import { readFileSync } from 'node:fs';
 import { SNAPSHOTS } from './snapshots.js';
@@ -682,6 +682,92 @@ describe('Recruitment changes the mechanics');
   check('PEEP 4 to 16 gains a recruitable lung more volume than a consolidated one',
     rGain > cGain * 1.25,
     `${(rGain * 1000).toFixed(0)} mL vs ${(cGain * 1000).toFixed(0)} mL`);
+}
+
+describe('Recruitment hysteresis');
+{
+  const ARDS = {
+    ...SCENARIOS.find((x) => x.id === 'ards-rv').params,
+    hysteresis: 'on', pOpen: 22, recruitable: 0.7,
+  };
+  // Settle, then a recruitment manoeuvre, then back to where it started.
+  const manoeuvre = (over) => {
+    const s = settled({ ...ARDS, ...over }, 45);
+    const before = { open: s.metrics.openFraction, pvr: s.metrics.pvrCoefficientWood,
+      rvlv: s.metrics.rvLvRatio, pl: s.resp.pl };
+    const peep = s.params.peep;
+    s.setParam('peep', 35);
+    s.advance(30, true);
+    s.setParam('peep', peep);
+    s.advance(45, true);
+    return { before, after: { open: s.metrics.openFraction, pvr: s.metrics.pvrCoefficientWood,
+      rvlv: s.metrics.rvLvRatio }, sim: s };
+  };
+
+  check('off, the flag changes nothing at all',
+    settled({ ...ARDS, hysteresis: 'off', peep: 10 }, 45).metrics.openFraction
+      === settled({ ...ARDS, hysteresis: 'off', peep: 10, pClose: 3 }, 45).metrics.openFraction);
+
+  // The point of the whole thing: a manoeuvre that leaves something behind.
+  const held = manoeuvre({ pClose: 6, peep: 10 });
+  check('a recruitment manoeuvre leaves the lung more open than it found it',
+    held.after.open > held.before.open + 0.02,
+    `${(held.before.open * 100).toFixed(1)}% -> ${(held.after.open * 100).toFixed(1)}% at the same PEEP`);
+  check('and the right ventricle feels it',
+    held.after.pvr < held.before.pvr * 0.95 && held.after.rvlv < held.before.rvlv,
+    `PVR ${held.before.pvr.toFixed(2)} -> ${held.after.pvr.toFixed(2)} Wood units, `
+    + `RV:LV ${held.before.rvlv.toFixed(2)} -> ${held.after.rvlv.toFixed(2)}`);
+
+  // And the condition under which it does not, which is the clinical point.
+  const lost = manoeuvre({ pClose: 14, peep: 10 });
+  check('a manoeuvre buys nothing if the PEEP after it is below the closing pressure',
+    Math.abs(lost.after.open - lost.before.open) < 0.005,
+    `end-expiratory transpulmonary pressure ${lost.before.pl.toFixed(1)} against a closing pressure of 14; `
+    + `${(lost.before.open * 100).toFixed(1)}% -> ${(lost.after.open * 100).toFixed(1)}%`);
+
+  // Incremental and decremental limbs are the same lung at the same pressures.
+  {
+    const up = settled({ ...ARDS, pClose: 6, peep: 4 }, 40);
+    const down = settled({ ...ARDS, pClose: 6, peep: 4 }, 20);
+    down.setParam('peep', 35); down.advance(30, true);
+    // The decremental limb has to be walked *down*, which is the whole point of
+    // it. Stepping both series upward compares one limb with itself.
+    const rungs = [8, 12, 16];
+    const upAt = new Map(), downAt = new Map();
+    for (const peep of rungs) {
+      up.setParam('peep', peep); up.advance(35, true);
+      upAt.set(peep, [up.metrics.openFraction, up.metrics.pvrCoefficientWood]);
+    }
+    for (const peep of [...rungs].reverse()) {
+      down.setParam('peep', peep); down.advance(35, true);
+      downAt.set(peep, [down.metrics.openFraction, down.metrics.pvrCoefficientWood]);
+    }
+    const limbs = rungs.map((peep) => [peep, upAt.get(peep)[0], downAt.get(peep)[0],
+      upAt.get(peep)[1], downAt.get(peep)[1]]);
+    check('the decremental limb sits above the incremental one at every PEEP',
+      limbs.every(([, u, d]) => d > u + 0.01),
+      limbs.map(([peep, u, d]) => `${peep}: ${(u * 100).toFixed(1)} vs ${(d * 100).toFixed(1)}%`).join('  '));
+    check('and its resistance is lower there',
+      limbs.every(([, , , ru, rd]) => rd < ru),
+      limbs.map(([peep, , , ru, rd]) => `${peep}: ${ru.toFixed(2)} vs ${rd.toFixed(2)}`).join('  '));
+  }
+
+  // The state has to stay inside the band it is defined by, always.
+  {
+    const s = settled({ ...ARDS, pClose: 6, peep: 8 }, 30);
+    let worst = 0;
+    for (let i = 0; i < 400; i++) {
+      s.advance(0.05, true);
+      const { lo, hi } = openBand(s.params, s.resp.plSolved);
+      worst = Math.max(worst, lo - s.resp.openFraction, s.resp.openFraction - hi);
+    }
+    check('the open fraction never leaves its band', worst < 1e-9, `worst excursion ${worst.toExponential(1)}`);
+  }
+
+  // Setting the two pressures equal is the same as turning the flag off.
+  check('no gap is the same as no hysteresis',
+    near(settled({ ...ARDS, pClose: 22, peep: 10 }, 45).metrics.openFraction,
+      settled({ ...ARDS, hysteresis: 'off', peep: 10 }, 45).metrics.openFraction, 0.005));
 }
 
 describe('Body position');

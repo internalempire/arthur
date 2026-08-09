@@ -145,11 +145,14 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   variation. Here they largely overlap and partly cancel. This is a question
   about the volumes and compliances of the two vascular compartments in series,
   and is unrelated to the lung being split into two populations of units.
-- **No hysteresis.** Units open and close at the same pressure, so inflation and
-  deflation follow one pressure–volume curve. Real lungs do not, which is why a
-  recruitment manoeuvre followed by a decremental PEEP trial finds a lower
-  optimum than an incremental one — a manoeuvre this model therefore cannot
-  show. It needs the opening and closing thresholds to differ.
+- **Hysteresis is optional and instantaneous.** With the flag off, units open and
+  close at the same pressure and nothing done to the lung lasts. With it on they
+  close at `pClose`, so a recruitment manoeuvre leaves something behind and a
+  decremental PEEP trial lands somewhere different from an incremental one. What
+  is still missing is the time course: a unit opens within the step that reaches
+  its threshold, so how long a manoeuvre is held makes no difference, only how
+  high it goes. Real recruitment takes seconds to minutes, which is why
+  manoeuvres are held rather than touched.
 - **The pulmonary circulation is lumped.** One PVR and one zone-III fraction for
   the whole lung. The lung units are now split into two populations by opening
   pressure, which is what carries recruitability, but the vasculature that
