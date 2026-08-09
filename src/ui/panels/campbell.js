@@ -1,6 +1,8 @@
 import { Panel, niceTicks } from '../plot.js';
 import { PPL_FRC, respiratorySystemCompliance } from '../../model/respiratory.js';
-import { lungVolumeAtPl, relaxationVolume } from '../../model/lung.js';
+import {
+  lungVolumeAtPl, relaxationVolume, openBand, stepOpenFraction,
+} from '../../model/lung.js';
 
 // The Campbell diagram. Pleural pressure follows the chest wall compliance
 // curve; airway pressure follows the respiratory system curve. The horizontal
@@ -14,6 +16,7 @@ export function createCampbell(canvas) {
   const panel = new Panel(canvas, { padding: [22, 58, 34, 48] });
   const pplLoop = [];
   const pawLoop = [];
+  const palvLoop = [];
   let lastSample = -1;
 
   function render(sim, colors) {
@@ -28,7 +31,10 @@ export function createCampbell(canvas) {
       lastSample = sim.time;
       pplLoop.push(r.ppl, vMl);
       pawLoop.push(r.paw, vMl);
-      if (pplLoop.length > LOOP_POINTS * 2) { pplLoop.splice(0, 2); pawLoop.splice(0, 2); }
+      palvLoop.push(r.palv, vMl);
+      if (pplLoop.length > LOOP_POINTS * 2) {
+        pplLoop.splice(0, 2); pawLoop.splice(0, 2); palvLoop.splice(0, 2);
+      }
     }
 
     const vMax = Math.max(900, vMl * 1.25, p.vt * 1.6 + p.peep * respiratorySystemCompliance(p, r.lungVolume));
@@ -65,27 +71,57 @@ export function createCampbell(canvas) {
     // has the lower inflection that a bedside manoeuvre draws; in a normal one it
     // is nearly straight, which is why this looked like a line for so long.
     const vRelax = relaxationVolume(p);
-    const lungCurve = [], rsCurve = [];
-    for (let i = 0; i <= 40; i++) {
-      const pl = -2 + (i * 44) / 40;
-      const vMlHere = (lungVolumeAtPl(p, pl) - vRelax) * 1000;
-      if (vMlHere < -60 || vMlHere > vMax * 1.1) continue;
-      // Drawn back from the alveolus toward the pleural space, as before.
-      lungCurve.push(-pl, vMlHere);
-      // The respiratory system is the two in series at each volume: the lung's
-      // own pressure plus what the chest wall needs at that volume.
-      rsCurve.push(pl + PPL_FRC + vMlHere / p.ccw, vMlHere);
+    // The lung's own pressure-volume relation, swept. With hysteresis on it has
+    // two branches — the lung opens along one and empties along the other — and
+    // the area between them is what a slow inflation to high pressure draws at
+    // the bedside, lower inflection and all. Without it the two coincide and one
+    // line is the whole story.
+    const branches = p.hysteresis === 'on'
+      ? [{ phi: 'up', dash: [2, 4] }, { phi: 'down', dash: [5, 3] }]
+      : [{ phi: null, dash: [2, 4] }];
+    const rsCurve = [];
+    const drawn = [];
+    for (const branch of branches) {
+      const curve = [];
+      let phi = branch.phi === 'down' ? openBand(p, 45).lo : null;
+      for (let i = 0; i <= 60; i++) {
+        const pl = branch.phi === 'down' ? 45 - (i * 47) / 60 : -2 + (i * 47) / 60;
+        if (branch.phi) phi = stepOpenFraction(p, phi ?? openBand(p, pl).lo, pl);
+        const vMlHere = (lungVolumeAtPl(p, pl, branch.phi ? phi : null) - vRelax) * 1000;
+        if (vMlHere < -60 || vMlHere > vMax * 1.1) continue;
+        curve.push(-pl, vMlHere); // back from the alveolus toward the pleural space
+        if (branch === branches[0]) {
+          rsCurve.push(pl + PPL_FRC + vMlHere / p.ccw, vMlHere);
+        }
+      }
+      drawn.push({ curve, dash: branch.dash });
     }
     panel.line(rsCurve, { color: colors.airway, width: 1.5, dash: [4, 4], alpha: 0.75 });
-    panel.line(lungCurve, { color: colors.inkMuted, width: 1.5, dash: [2, 4], alpha: 0.7 });
+    for (const d of drawn) {
+      panel.line(d.curve, { color: colors.inkMuted, width: 1.5, dash: d.dash, alpha: 0.7 });
+    }
+    const lungCurve = drawn[0].curve;
 
     panel.line(pplLoop, { color: colors.pleural, width: 2 });
+    // Alveolar pressure, between the other two. The airway loop is square in
+    // volume control and that is arithmetic rather than a fault: expiration is
+    // passive against a constant PEEP, so airway pressure does not move at all
+    // while the volume falls, and the limb has to be vertical. Alveolar pressure
+    // is the one that traces a loop, and the gap between the two curves is the
+    // pressure spent on resistance — which is what a Campbell diagram is read
+    // for.
+    panel.line(palvLoop, { color: colors.flow, width: 1.8, alpha: 0.9 });
     panel.line(pawLoop, { color: colors.airway, width: 2 });
 
     panel.unclip();
 
     panel.label('Ppl', r.ppl, vMl, { color: colors.text.pleural, dx: -6, align: 'right', halo: colors.surface });
     panel.label('Paw', r.paw, vMl, { color: colors.text.airway, dx: 6, halo: colors.surface });
+    if (Math.abs(r.paw - r.palv) > 0.4) {
+      panel.label('Palv', r.palv, vMl, {
+        color: colors.text.flow, dx: -6, align: 'right', halo: colors.surface,
+      });
+    }
     // The three relaxation lines converge near the top of the plot, so each
     // label is anchored at a different height on its own line.
     panel.label('Ccw', PPL_FRC + (vMax * 0.92) / p.ccw, vMax * 0.92, {
@@ -110,7 +146,9 @@ export function createCampbell(canvas) {
     panel.title('Campbell diagram', colors, 'chest wall vs respiratory system');
   }
 
-  function clearTrail() { pplLoop.length = 0; pawLoop.length = 0; lastSample = -1; }
+  function clearTrail() {
+    pplLoop.length = 0; pawLoop.length = 0; palvLoop.length = 0; lastSample = -1;
+  }
 
   return { render, clearTrail };
 }
