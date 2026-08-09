@@ -43,14 +43,23 @@ No build step and no dependencies. Serve the directory over HTTP — ES modules
 will not load from `file://`:
 
 ```bash
-python3 -m http.server 8422
+npm run serve
 ```
 
 Then open <http://localhost:8422>. Any static server works.
 
-While editing, note that browsers cache ES modules aggressively and a plain
-reload can leave you looking at the previous version of a module. Hard-reload,
-or serve with `Cache-Control: no-store`.
+**While editing, use the other one:**
+
+```bash
+npm run serve:dev
+```
+
+That is `node tools/serve.mjs`, on port 8499, and the only thing it does
+differently is send `Cache-Control: no-store`. Browsers cache ES modules hard
+enough that a plain reload can serve you the previous version of a module while
+you are staring at the new source. That is not a hypothetical: a real bug in this
+repository survived several rounds of "that change did nothing" before it was
+found, and it was found by serving with no-store.
 
 ---
 
@@ -914,6 +923,7 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 ```
 index.html
 styles/app.css
+tools/serve.mjs           static server that refuses to be cached, for editing
 docs/PHYSIOLOGY.md        calibration, verification against the sources, limitations
 src/
   main.js                 transport, scenario wiring, animation loop
