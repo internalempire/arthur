@@ -93,13 +93,19 @@ el('speed').addEventListener('change', (e) => { speed = parseFloat(e.target.valu
 // Occlusion manoeuvres. Each contributes a measured point to the Guyton
 // diagram; several at different airway pressures draw a venous return curve the
 // way it is done at the bedside.
+//
+// Every manoeuvre button is a toggle. Clicking one that is already running
+// cancels it, which is not a nicety: a hold advances on *simulated* time, so
+// with the model paused it never finishes, and the first version had no way out
+// of that except Reset. The busy styling is driven from the model's own state
+// below rather than from a timer, for the same reason — a timer and a manoeuvre
+// measured in different clocks will disagree the moment the speed control is
+// touched.
 for (const [id, kind] of [['hold-exp', 'expiratory'], ['hold-insp', 'inspiratory']]) {
-  el(id).addEventListener('click', (e) => {
-    const started = sim.startHold(kind, 12);
-    if (started) {
-      e.currentTarget.classList.add('btn-busy');
-      setTimeout(() => e.currentTarget.classList.remove('btn-busy'), 1200);
-    }
+  el(id).addEventListener('click', () => {
+    if (sim.hold || sim.resp.holdPending) sim.cancelHold();
+    else sim.startHold(kind, 12);
+    syncManoeuvreButtons();
     dirty = true;
   });
 }
@@ -107,25 +113,50 @@ for (const [id, kind] of [['hold-exp', 'expiratory'], ['hold-insp', 'inspiratory
 // The tidal volume challenge. It refuses rather than misreports: a patient who
 // is breathing, or already at 8 mL/kg, has no manoeuvre to perform.
 el('tidal-challenge').addEventListener('click', (e) => {
-  const blockers = sim.startTidalChallenge();
   const btn = e.currentTarget;
-  if (blockers.length) {
-    btn.title = blockers[0];
-    btn.classList.add('btn-refused');
-    setTimeout(() => btn.classList.remove('btn-refused'), 1400);
+  if (sim.challenge) {
+    sim.cancelTidalChallenge();
   } else {
-    btn.classList.add('btn-busy');
-    // Two windows of thirty seconds, at whatever speed the user is running.
-    const check = setInterval(() => {
-      if (!sim.challenge) { btn.classList.remove('btn-busy'); clearInterval(check); }
-    }, 250);
+    const blockers = sim.startTidalChallenge();
+    if (blockers.length) {
+      btn.title = blockers[0];
+      btn.classList.add('btn-refused');
+      setTimeout(() => btn.classList.remove('btn-refused'), 1400);
+    }
   }
+  syncManoeuvreButtons();
   dirty = true;
 });
+
+/**
+ * Show which manoeuvres are running, from the model rather than from a timeout.
+ *
+ * A hold is armed by the click and engages at the right point in the breath, so
+ * the button has to show "running" while it is still only pending — otherwise it
+ * looks like the click was lost.
+ */
+function syncManoeuvreButtons() {
+  const holding = !!(sim.hold || sim.resp.holdPending);
+  const kind = sim.hold?.kind ?? sim.resp.holdPending;
+  for (const [id, k] of [['hold-exp', 'expiratory'], ['hold-insp', 'inspiratory']]) {
+    const btn = el(id);
+    const mine = holding && kind === k;
+    btn.classList.toggle('btn-busy', mine);
+    btn.title = mine
+      ? 'Manoeuvre running — click to cancel'
+      : (k === 'expiratory'
+        ? 'Occlude at end-expiration and plot the resulting pressure and flow'
+        : 'Occlude at end-inspiration and plot the resulting pressure and flow');
+  }
+  const tv = el('tidal-challenge');
+  tv.classList.toggle('btn-busy', !!sim.challenge);
+  if (sim.challenge) tv.title = 'Challenge running — click to cancel';
+}
 
 el('reset').addEventListener('click', () => {
   const current = scenarioSelect.value;
   sim.clearMeasuredPoints();
+  sim.cancelHold();
   sim.cancelTidalChallenge();
   sim.clearChallengeResult();
   sim.reset();
@@ -202,6 +233,7 @@ function frame(now) {
     if (statsClock > 0.12 || !running) {
       stats.render(sim.metrics);
       descriptions.render(sim);
+      syncManoeuvreButtons();
       statsClock = 0;
     }
     if (!running) dirty = false;

@@ -10,12 +10,17 @@ export class Panel {
     this.w = 0;
     this.h = 0;
     this.domain = { x0: 0, x1: 1, y0: 0, y1: 1 };
+    this.reservedRight = 0;
     this.resize();
   }
 
   resize() {
     const rect = this.canvas.getBoundingClientRect();
     const dpr = window.devicePixelRatio || 1;
+    // How much of the top right belongs to the values disclosure. Measured here
+    // rather than per frame, since it only changes when the layout does.
+    const data = this.canvas.parentElement?.querySelector('.panel-data');
+    this.reservedRight = data ? Math.ceil(data.getBoundingClientRect().width) + 10 : 0;
     // Belt and braces against the layout feedback loop the CSS also guards
     // against: whatever happens, never allocate a backing store larger than a
     // screen's worth of pixels.
@@ -239,12 +244,32 @@ export class Panel {
       const titleWidth = ctx.measureText(text).width;
       ctx.font = '11px system-ui, -apple-system, "Segoe UI", sans-serif';
       const x = 4 + titleWidth + 8;
-      if (x + ctx.measureText(sub).width <= this.w - 4) {
+      // The values disclosure is a DOM element positioned over the top right of
+      // this canvas, so the canvas has less room than its own width suggests.
+      // Without reserving it the subtitle is drawn underneath and the two read
+      // as one run-on string.
+      const room = this.w - 4 - this.reservedRight - x;
+      // Omitted rather than clipped to a stub. A subtitle cut to "where ven…"
+      // reads as a rendering fault, and the same words are in the values
+      // disclosure a few pixels to its right anyway.
+      if (room >= ctx.measureText(sub).width * 0.6) {
         ctx.fillStyle = colors.inkMuted;
-        ctx.fillText(sub, x, 3);
+        ctx.fillText(this.fit(sub, room), x, 3);
       }
     }
     ctx.restore();
+  }
+
+  /** `text` shortened with an ellipsis until it fits `width`, in the current font. */
+  fit(text, width) {
+    const { ctx } = this;
+    if (ctx.measureText(text).width <= width) return text;
+    let lo = 0, hi = text.length;
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      if (ctx.measureText(text.slice(0, mid) + '\u2026').width <= width) lo = mid; else hi = mid - 1;
+    }
+    return lo > 0 ? text.slice(0, lo) + '\u2026' : '';
   }
 }
 

@@ -612,9 +612,27 @@ input[type="range"]:disabled { cursor: not-allowed; }
 
 /* A manoeuvre in progress: the button is briefly unavailable because the model
    is holding the airway. */
+/* A manoeuvre in progress. Still clickable, because clicking it again is how
+   you cancel one — a button that can be started but not stopped is a trap, and
+   was one. */
+/* The alert line is reserved whether or not there is an alert to put in it.
+   Without this, a flag appearing as a value crosses a threshold grows its tile,
+   grows the grid row, and shifts every panel on the page downward — which
+   happens mid-breath, repeatedly, while you are trying to read something. */
+.tile-flag {
+  min-height: 1.15em;
+}
+
+/* Rows sized alike, so one tall tile cannot make its neighbours jump when the
+   text inside it changes. */
+.tiles {
+  grid-auto-rows: 1fr;
+  align-items: stretch;
+}
+
 .btn-busy {
   opacity: 0.55;
-  pointer-events: none;
+  border-color: var(--text-warning);
 }
 
 /* A manoeuvre that cannot be performed on this patient. The button says so by
