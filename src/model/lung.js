@@ -133,80 +133,76 @@ const OPEN_AT_REST = 1 / (1 + Math.exp(-(RECOIL_AT_FRC - PL_EASY) / SPREAD_EASY)
 //   a normal fully open lung rests at NORMAL_FRC when its recoil is 5 cmH2O
 //   the same lung reaches total lung capacity, 6 L, at 35 cmH2O
 //
-// Two anchors, two unknowns: the volume it holds at no distending pressure, and
-// the asymptote of the exponential. The asymptote comes out around 10 L, which
-// is not a volume any lung reaches — it is the scale of the exponential, and the
-// physical claims are the two anchors.
+// Two anchors, two unknowns: the volume the tissue holds at no distending
+// pressure, and the pressure scale over which it stiffens.
 //
-// Without the saturation the relation was a straight line, airway pressure rose
-// linearly however hard a lung was inflated, and the stress index could not
-// exceed 1 whatever was done to the patient. Tissue runs out of extensibility;
-// leaving that out made overdistension invisible.
+// The scale is a pressure, and the same pressure for every lung. That is the
+// substance of it. Collagen engages at a strain, and a strain corresponds to a
+// pressure, so a stiff lung should run out of room at the *same pressures* as a
+// soft one — it just holds much less when it gets there. Writing the ceiling as
+// an absolute volume instead, as a first version did, made the scale
+// proportional to 1/compliance and put a stiff lung's stiffening at 195 cmH2O,
+// so the baby lung was the one place the model stayed straight. Which is exactly
+// where the question was asked.
+//
+// Capacity now follows from compliance: V0 + clung * P_SCALE. A normal lung
+// tends to 9.4 L, an ARDS lung at 45 mL/cmH2O to 3.1 L. Small stiff lungs are
+// small.
 const TOTAL_LUNG_CAPACITY = 6.0;   // L, reached at
 const TLC_PRESSURE = 35;           // cmH2O
 const NORMAL_COMPLIANCE = 0.2;     // L/cmH2O, the compliance the anchors assume
 
 /**
  * How much one fully open lung's worth of tissue holds at a transpulmonary
- * pressure, given its unstressed volume and its compliance at that unstressed
- * volume.
+ * pressure, given its compliance at rest.
  *
  * Linear below zero and saturating above it, joined so that both the value and
- * the slope are continuous at the join. `clung` therefore still means what it
- * meant — the compliance at rest.
+ * the slope are continuous at the join, so `clung` still means the compliance at
+ * rest.
  *
  * Below zero the curve is left linear on purpose. What empties a lung at
  * negative distending pressure is units shutting, and the open fraction already
  * does that; making the tissue term collapse as well would count it twice.
  */
-function saturating(v0, capacity, c, pl) {
+function saturating(v0, scale, c, pl) {
   if (pl <= 0) return Math.max(0, v0 + c * pl);
-  const room = capacity - v0;
-  return v0 + room * (1 - Math.exp((-c * pl) / room));
+  return v0 + c * scale * (1 - Math.exp(-pl / scale));
 }
 
 // Solved rather than written down, so the two anchors are enforced by the code
-// instead of being numbers somebody has to keep true by hand. Nested bisection,
-// once, at load.
-const [UNSTRESSED_VOLUME, CAPACITY] = (() => {
-  const atRest = NORMAL_FRC / OPEN_AT_REST;
-  // Divided by the open fraction *there*, which at 35 cmH2O is essentially the
-  // whole lung — not by the fraction open at rest, which is a different number
-  // and was the first thing I got wrong here.
-  const atCapacity = TOTAL_LUNG_CAPACITY
-    / (1 / (1 + Math.exp(-(TLC_PRESSURE - PL_EASY) / SPREAD_EASY)));
-  const unstressedFor = (capacity) => {
-    let lo = 0.05, hi = capacity - 0.05;
-    for (let i = 0; i < 80; i++) {
-      const mid = (lo + hi) / 2;
-      if (saturating(mid, capacity, NORMAL_COMPLIANCE, RECOIL_AT_FRC) < atRest) lo = mid;
-      else hi = mid;
+// instead of being numbers somebody has to keep true by hand.
+const [UNSTRESSED_VOLUME, PRESSURE_SCALE] = (() => {
+  const openAt = (pl) => 1 / (1 + Math.exp(-(pl - PL_EASY) / SPREAD_EASY));
+  const atRest = NORMAL_FRC / openAt(RECOIL_AT_FRC);
+  const atCapacity = TOTAL_LUNG_CAPACITY / openAt(TLC_PRESSURE);
+  // For any scale, the resting anchor fixes the unstressed volume outright.
+  const unstressedFor = (scale) =>
+    atRest - NORMAL_COMPLIANCE * scale * (1 - Math.exp(-RECOIL_AT_FRC / scale));
+  let lo = 1, hi = 400;
+  for (let i = 0; i < 200; i++) {
+    const scale = (lo + hi) / 2;
+    if (saturating(unstressedFor(scale), scale, NORMAL_COMPLIANCE, TLC_PRESSURE) < atCapacity) {
+      lo = scale;
+    } else {
+      hi = scale;
     }
-    return (lo + hi) / 2;
-  };
-  let lo = TOTAL_LUNG_CAPACITY + 0.2, hi = 40;
-  for (let i = 0; i < 80; i++) {
-    const capacity = (lo + hi) / 2;
-    const v0 = unstressedFor(capacity);
-    if (saturating(v0, capacity, NORMAL_COMPLIANCE, TLC_PRESSURE) < atCapacity) lo = capacity;
-    else hi = capacity;
   }
-  const capacity = (lo + hi) / 2;
-  return [unstressedFor(capacity), capacity];
+  const scale = (lo + hi) / 2;
+  return [unstressedFor(scale), scale];
 })();
 
 function perUnitVolume(p, pl) {
-  return saturating(UNSTRESSED_VOLUME, CAPACITY, p.clung / 1000, pl);
+  return saturating(UNSTRESSED_VOLUME, PRESSURE_SCALE, p.clung / 1000, pl);
 }
 
 /** The inverse of `saturating`, in closed form. */
 function perUnitPressure(p, volume) {
   const c = p.clung / 1000;
   if (volume <= UNSTRESSED_VOLUME) return (volume - UNSTRESSED_VOLUME) / c;
-  const room = CAPACITY - UNSTRESSED_VOLUME;
-  const left = CAPACITY - volume;
-  if (left <= 1e-9) return 80; // at capacity: no pressure gets more in
-  return (room / c) * Math.log(room / left);
+  const room = c * PRESSURE_SCALE;              // all the tissue has left
+  const left = UNSTRESSED_VOLUME + room - volume;
+  if (left <= 1e-6) return 80;                  // at capacity: no pressure gets more in
+  return PRESSURE_SCALE * Math.log(room / left);
 }
 
 /**

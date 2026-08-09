@@ -894,15 +894,15 @@ in Wood units.
 |---|---|---|---|---|---|---|---|---|
 | Healthy, breathing spontaneously | 5.39 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
 | Healthy, passive volume control | 4.91 | 93 | 1.5 | 22/13 | 10 | 1.3 | 0.89 | 2% |
-| PEEP escalation | 4.29 | 89 | 3.9 | 27/18 | 9 | 2.1 | 0.93 | 6% |
+| PEEP escalation | 4.30 | 89 | 3.9 | 27/18 | 9 | 2.1 | 0.93 | 6% |
 | Septic shock, fluid responsive | 4.13 | 81 | 1.8 | 19/13 | 4 | 1.5 | 0.79 | 18% |
-| Big pleural swings, no variation | 6.87 | 94 | 1.5 | 27/17 | 10 | 1.2 | 0.94 | 4% |
-| ARDS with right ventricular failure | 3.62 | 83 | 4.1 | 34/28 | 3 | 5.5 | 2.03 | 8% |
-| Acute pulmonary embolism | 3.97 | 93 | 5.8 | 39/33 | 4 | 7.3 | 2.02 | 8% |
+| Big pleural swings, no variation | 6.86 | 94 | 1.5 | 27/17 | 10 | 1.2 | 0.94 | 4% |
+| ARDS with right ventricular failure | 3.57 | 83 | 3.9 | 34/28 | 3 | 5.5 | 2.03 | 8% |
+| Acute pulmonary embolism | 3.97 | 92 | 5.8 | 39/33 | 4 | 7.3 | 2.02 | 8% |
 | Cardiogenic pulmonary oedema | 3.51 | 86 | 4.7 | 44/38 | 34 | 1.8 | 0.88 | 6% |
 | Weaning the failing left ventricle | 3.60 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
 | Stiff chest wall | 4.28 | 90 | 3.3 | 18/10 | 9 | 1.3 | 0.82 | 4% |
-| COPD with dynamic hyperinflation | 4.45 | 88 | 4.2 | 23/13 | 10 | 1.7 | 0.89 | 6% |
+| COPD with dynamic hyperinflation | 4.33 | 89 | 4.5 | 23/13 | 10 | 1.7 | 0.89 | 6% |
 | Intra-abdominal hypertension | 3.44 | 86 | 0.8 | 15/8 | 4 | 1.4 | 0.79 | 8% |
 
 ### How the presets are built

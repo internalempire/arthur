@@ -387,6 +387,10 @@ export class Simulator {
     // values in clinical units.
     const lvEf = c.lvEdv > 0 ? (100 * c.sv) / c.lvEdv : 0;
     const reasons = [];
+    if (r.atCapacity) {
+      reasons.push('the lung is at capacity — this tidal volume does not fit in it, '
+        + 'and the airway pressure shown is a clamp rather than a result');
+    }
     if (c.limitTicks > 0) reasons.push('a compartment was being drained faster than it could supply');
     const emptied = COMPARTMENTS.filter((k) => c[k] <= 1.5);
     if (emptied.length) reasons.push(`${emptied.join(', ')} at the volume floor`);

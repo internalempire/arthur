@@ -19,7 +19,7 @@ work, not excuses.
 |---|---|---|---|
 | `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | not yet | Fougères et al., *Crit Care Med* 2010;38:802–7 |
-| `pvr-recruitability-low` | In a poorly recruitable lung, PEEP 4 → 14 raises pulmonary vascular resistance. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-low` | In a poorly recruitable lung, PEEP 4 → 14 raises pulmonary vascular resistance. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-high` | In a highly recruitable lung — the same collapsed lung, differing only in how much of it can be reopened — the same PEEP change leaves pulmonary vascular resistance essentially unchanged: within ±10%. Recruitment offsets the distension penalty rather than beating it. | not yet | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-dissociation` | Sweeping recruitability from 0 to 1 with everything else held identical moves the response monotonically from a rise to a fall, crossing zero once. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
@@ -135,8 +135,15 @@ just outside them:
 
 | row | before | after | wanted |
 |---|---|---|---|
-| `pvr-recruitability-high` | −9% | −11% | within ±10% |
+| `pvr-recruitability-low` | +6% | −1% | a rise |
+| `pvr-recruitability-high` | −9% | −13% | within ±10% |
 | `peep-volume-status` | 1.6× | 1.47× | at least 1.5× |
+
+The first of those is the row the two-compartment lung was built for, so losing
+it is not a detail. The dissociation itself survives — across recruitability 0 to
+1 the response still runs 0% to −23%, monotone, so recruitable and consolidated
+lungs still behave differently — but the consolidated end no longer rises, it
+sits flat.
 
 The mechanism is the same in both. A lung that stiffens as it fills takes less
 volume for each additional cmH₂O of PEEP, so it transmits less to the pleural

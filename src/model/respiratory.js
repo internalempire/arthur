@@ -54,6 +54,8 @@ export function createRespiratoryState() {
     lastPplSwing: 0,
     relaxVolume: 0,
     plSolved: null,
+    atCapacity: false,
+    hitCapacity: false,
     siSamples: [],
     siClock: 0,
     lastStressIndex: null,
@@ -302,6 +304,14 @@ export function stepRespiratory(p, r, dt) {
   r.pl = palvNew - ppl; // transpulmonary pressure
   r.lungVolume = vRelax + r.v; // absolute, L
   r.relaxVolume = vRelax;
+  // The tissue has a ceiling now, so a tidal volume can be asked for that the
+  // lung cannot physically hold. The pressure is clamped to keep the integrator
+  // finite, which means the number on the screen would be fiction — so the state
+  // says so instead of quietly showing it.
+  // Latched for the breath: reaching the ceiling happens at end-inspiration and
+  // is gone a moment later, so a metric sampled at the end of an advance would
+  // miss it entirely and report a fabricated pressure as a result.
+  if (r.plSolved >= 79.5) r.hitCapacity = true;
   r.pab = p.pab0 + p.abdCoupling * r.v;
   // The state the next step will read. Updated after the pressures rather than
   // before them, so what is reported and what the flow was computed from are the
@@ -323,6 +333,8 @@ export function stepRespiratory(p, r, dt) {
   if (r.prevPhase === 'exp' && r.phase === 'insp') r.breathCount++;
 
   if (r.prevPhase === 'insp' && r.phase === 'exp') {
+    r.atCapacity = r.hitCapacity;
+    r.hitCapacity = false;
     r.lastStressIndex = fitStressIndex(r.siSamples);
     r.siSamples = [];
     r.siClock = 0;

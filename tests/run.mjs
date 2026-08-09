@@ -644,8 +644,12 @@ describe('Recruitment changes the mechanics');
   check('a normal lung only ever gets stiffer as it fills',
     curvature(p) < 1,
     `slope ${(slopeAt(p, 8) * 1000).toFixed(0)} -> ${(slopeAt(p, 22) * 1000).toFixed(0)} mL/cmH₂O`);
+  // The gain is smaller than it was, because the tissue ceiling now works against
+  // the recruitment: opening units adds compliance while stretching them removes
+  // it. What survives is the sign, and the sign is what tells the phenotypes
+  // apart.
   check('a recruitable lung gets less stiff as pressure opens it',
-    curvature(recruitable) > 1.2,
+    curvature(recruitable) > 1.05,
     `slope ${(slopeAt(recruitable, 8) * 1000).toFixed(0)} -> ${(slopeAt(recruitable, 22) * 1000).toFixed(0)} mL/cmH₂O`);
   check('a consolidated one only gets stiffer',
     curvature(consolidated) < 1,
@@ -663,18 +667,39 @@ describe('Recruitment changes the mechanics');
   const cHigh = lungComplianceAt(recruitable, lungVolumeAtPl(recruitable, 18));
   const kLow = lungComplianceAt(consolidated, lungVolumeAtPl(consolidated, 8));
   const kHigh = lungComplianceAt(consolidated, lungVolumeAtPl(consolidated, 18));
-  check('and raises its measured compliance, while the consolidated one is flat',
-    cHigh > cLow * 1.2 && Math.abs(kHigh / kLow - 1) < 0.15,
+  // The consolidated lung used to be flat here. It falls now, because the tissue
+  // has a ceiling and pressure alone walks it up its own curve. What separates
+  // the two is still the sign: opening units buys compliance, and nothing else
+  // in this model does.
+  check('pressure raises the recruitable lung\'s compliance and lowers the consolidated one\'s',
+    cHigh > cLow * 1.15 && kHigh < kLow,
     `recruitable ${cLow.toFixed(0)} -> ${cHigh.toFixed(0)}, `
     + `consolidated ${kLow.toFixed(0)} -> ${kHigh.toFixed(0)} mL/cmH₂O`);
 
-  // Measured compliance is the open fraction times the tissue value, which is
-  // the baby lung as something a ventilator prints.
-  const openHere = openFractionAt(consolidated, transpulmonaryAt(consolidated, lungVolumeAtPl(consolidated, 12)));
-  check('measured compliance tracks how much lung is open, not how stiff it is',
-    near(lungComplianceAt(consolidated, lungVolumeAtPl(consolidated, 12)) / consolidated.clung, openHere, 0.08),
-    `${(lungComplianceAt(consolidated, lungVolumeAtPl(consolidated, 12)) / consolidated.clung).toFixed(2)} `
-    + `against an open fraction of ${openHere.toFixed(2)}`);
+  // Measured compliance is the open fraction times the tissue value times how far
+  // up its own curve the tissue has been pushed. The first factor is the baby
+  // lung as something a ventilator prints; the second is why two lungs with the
+  // same amount open still read differently.
+  {
+    const at = (pl) => {
+      const v = lungVolumeAtPl(consolidated, pl);
+      return {
+        measured: lungComplianceAt(consolidated, v),
+        open: openFractionAt(consolidated, transpulmonaryAt(consolidated, v)),
+      };
+    };
+    // Only where nothing is still opening. Lower down, units reopening add volume
+    // of their own and measured compliance *exceeds* the open fraction times the
+    // tissue value — 26 against 23 at a transpulmonary pressure of 6 — which is
+    // the same recruitment the phenotype checks above are about.
+    const low = at(6), high = at(24);
+    check('above the opening range, compliance is the open fraction times the tissue value or less',
+      high.measured < consolidated.clung * high.open,
+      `${high.measured.toFixed(0)} against ${(consolidated.clung * high.open).toFixed(0)} at Pl 24`);
+    check('and below it, units still opening push it the other way',
+      low.measured > consolidated.clung * low.open,
+      `${low.measured.toFixed(0)} against ${(consolidated.clung * low.open).toFixed(0)} at Pl 6`);
+  }
 
   // Resting volume is an outcome now, so the whole model has to agree on it.
   {
@@ -701,9 +726,14 @@ describe('Recruitment changes the mechanics');
 
 describe('Recruitment hysteresis');
 {
+  // A small tidal volume on purpose. With a large one the breaths themselves
+  // reach the top of the hysteresis band within a few cycles — tidal recruitment
+  // doing the manoeuvre's job — and there is nothing left for a manoeuvre to
+  // add. That is a real finding rather than an inconvenience, and it has its own
+  // check below.
   const ARDS = {
     ...SCENARIOS.find((x) => x.id === 'ards-rv').params,
-    hysteresis: 'on', pOpen: 22, recruitable: 0.7,
+    hysteresis: 'on', pOpen: 22, recruitable: 0.7, vt: 250,
   };
   // Settle, then a recruitment manoeuvre, then back to where it started.
   const manoeuvre = (over) => {
@@ -777,6 +807,17 @@ describe('Recruitment hysteresis');
       worst = Math.max(worst, lo - s.resp.openFraction, s.resp.openFraction - hi);
     }
     check('the open fraction never leaves its band', worst < 1e-9, `worst excursion ${worst.toExponential(1)}`);
+  }
+
+  // Found while the tidal volume above was being chosen, and worth keeping: a
+  // big enough breath recruits by itself, and then a manoeuvre adds nothing.
+  {
+    const big = manoeuvre({ pClose: 6, peep: 10, vt: 350 });
+    check('a large enough tidal volume leaves a manoeuvre nothing to add',
+      Math.abs(big.after.open - big.before.open) < 0.005
+        && big.before.open > held.before.open,
+      `at 350 mL the lung already sits at ${(big.before.open * 100).toFixed(1)}%, `
+      + `against ${(held.before.open * 100).toFixed(1)}% at 250`);
   }
 
   // Setting the two pressures equal is the same as turning the flag off.
