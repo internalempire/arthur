@@ -136,34 +136,14 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   The preload reserve is not fooled by it, because it reads the curves rather
   than the waveform. That is the argument for having both on screen.
 
-- **Variation also under-reads, and this one is unexplained.** The model calls
-  patients preload dependent — a 500 mL bolus buying at least 15% of cardiac
-  output — while their pulse pressure variation sits below the 13% that is
-  supposed to identify them. At a stressed volume of 600 mL a bolus buys 21% and
-  variation reads 5.8%; a real patient gaining that much would show something
-  near the threshold. The disagreement is worst at moderate hypovolaemia and
-  closes at both ends.
-
-  It was traced rather than guessed at, and most of the obvious explanations were
-  eliminated. The absolute swing loses about a third between the right ventricle
-  and the left, and another sixth in the ventricular coupling, and both of those
-  losses are individually defensible. Pulmonary compliance is not the cause —
-  dividing it by ten changes the attenuation from 0.55 to 0.61. Neither is the
-  piston, the septum or the pericardium: at these volumes the latter two sit
-  below their thresholds and do nothing, which is correct.
-
-  **A pulmonary transport delay was built and then removed.** Two compliant
-  chambers in series smooth a flow oscillation rather than carrying it, so a
-  capillary bed of 90 mL was added as a volume-clocked queue — conserving volume
-  exactly, delaying by the bed's volume over cardiac output. Once its
-  discretisation noise was resolved away it changed the answer by under a
-  percentage point at every heart rate. The hypothesis was wrong, and carrying an
-  extra compartment and its quantisation sensitivity for no benefit would have
-  been worse than the gap it was meant to close.
-
-  What would settle it is a published relationship between baseline variation and
-  the size of the response to volume, rather than the two thresholds separately —
-  Michard's data relate them, and this model needs the relation, not the cut-offs.
+- **Variation scales with driving pressure, as it should.** An earlier note here
+  claimed the model under-read pulse pressure variation. It does not. Michard's
+  13% threshold and his regression were measured at a driving pressure near 30
+  cmH₂O — his Figure 1 shows the airway pressure trace — and at that ventilation
+  this model reproduces the regression, slope 0.87 against his 1.01. At a
+  protective 6 cmH₂O of driving pressure the variation is a fifth of that, which
+  is correct and is the reason the tidal volume challenge exists. The earlier
+  note applied his threshold outside his conditions.
 - **Ejection fraction runs low** (≈50% at baseline). Ejection ends when cavity
   pressure falls below aortic pressure, and with a double-hill activation that
   happens a little early. Stroke volume, cardiac output and the loop shape are

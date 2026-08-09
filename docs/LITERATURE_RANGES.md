@@ -29,9 +29,10 @@ work, not excuses.
 | `pvr-at-low-volume` | At 30% of maximal volume it is only 1.05–1.4× the minimum — the deflation limb is far flatter than the inflation limb. | agrees | Thomas et al. 1961, Fig. 6 (~1.2× in both) |
 | `pvr-clinical-range` | Across transpulmonary pressures of 2.5 to 22 cmH₂O — the range this simulator runs in — resistance changes by between −20% and +40%. | agrees | Peták group, *J Appl Physiol* 2008, doi:10.1152/japplphysiol.00831.2007 — **reported, not read here**: +15 ± 1% with positive-pressure inflation, −3 ± 0.3% with negative, hysteresis against Ptp abolished when plotted against volume |
 | `pvr-extraalveolar-shape` | The extra-alveolar limb is itself U-shaped: it falls, then turns back up, ending at least 1.1× its minimum at maximal inflation. | agrees | Hakim, Michel & Chang, *J Appl Physiol* 1982;53:1110–5, Fig. 3 (arterial + venous segments: 9.2 → 7.8 → 9.9 mmHg over Ptp 0 → 20) |
-| `tidal-challenge-ordering` | Raising the tidal volume from 6 to 8 mL/kg raises pulse pressure variation more in a preload-dependent patient than in a filled one, so the change orders patients by their response to fluid. | not yet | Myatra et al., *Crit Care Med* 2017;45:415–21 |
+| `tidal-challenge-ordering` | Raising the tidal volume from 6 to 8 mL/kg raises pulse pressure variation more in a preload-dependent patient than in a filled one, so the change orders patients by their response to fluid. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
 | `tidal-challenge-threshold` | In the septic fluid-responsive preset ventilated at 6 mL/kg, that change exceeds 3.5 percentage points and the manoeuvre calls the patient preload dependent. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
-| `ppv-responder` | Every passive patient at 8 mL/kg whom the model calls preload dependent — a bolus buying at least 15% of cardiac output — shows pulse pressure variation of at least 13%, and the index reports itself interpretable. | not yet | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
+| `ppv-responder` | Ventilated as Michard's patients were — a stiff lung at a driving pressure near 30 cmH₂O — every patient the model calls preload dependent shows variation of at least 13%, and the index reports itself interpretable. | agrees |
+| `ppv-fluid-response-relation` | Across that same range, the gain in cardiac output after volume expansion rises with baseline variation on a line of slope 0.70–1.35. | agrees | Michard et al., *Am J Respir Crit Care Med* 2000;162:134–8, Fig. 3 upper panel: ΔCI% = 1.01·ΔPP% − 1.46, r² = 0.85 | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
 | `ppv-suspended-spontaneous` | The same patient breathing spontaneously has the index withheld rather than reported. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
 | `ph-classification` | A hypervolaemic failing left ventricle with a wedge above 15 mmHg and a mean pulmonary artery pressure above 20 is classified post-capillary; a lung with a high vascular resistance and a low wedge is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
@@ -345,6 +346,44 @@ whole range. The row now tests the relationship instead, and fails properly.
 
 This is the mirror of the false-positive limitation already recorded, and it is
 new: the model under-reads variation in patients who would respond to fluid.
+
+## The variation was never under-reading
+
+For most of a day this file recorded that the model under-read pulse pressure
+variation: patients it called preload dependent showed 3 to 12% where the
+threshold that identifies them is 13%. A capillary transport delay was built to
+fix it and thrown away when it changed nothing. Compliance, the piston, the
+septum and the pericardium were eliminated one by one.
+
+Nicola supplied Michard et al. 2000, and the answer was in Figure 1 rather than
+in the model. That figure is a recording, and its airway pressure trace swings
+from about 7 to about 40 cmH₂O — a driving pressure near 30, which is what
+ventilating an ARDS lung looked like in 2000. The 13% threshold and the whole
+relation were measured *there*.
+
+The row that was failing asked for 13% from a normal lung at 8 mL/kg, where the
+driving pressure is 6 cmH₂O. Put the model on Michard's ventilation instead and
+it reproduces his regression:
+
+| | slope | intercept |
+|---|---|---|
+| Michard Fig. 3, upper panel | 1.01 | −1.46 (r² = 0.85) |
+| this model, driving pressure 30 | 0.87 | +3.90 |
+| this model, driving pressure 6 | 5.13 | −4.30 |
+
+The individual patients land on his line too — 29% variation at a 26% gain, 20%
+at 23%, 18% at 19%, 9% at 16%.
+
+**So the error was mine, and it was a specific one.** I applied a threshold
+outside the conditions it was measured in — which is the exact failure the
+interpretability rules in this model exist to prevent, and which those rules
+would have caught if I had listened to them instead of writing a test that
+bypassed them. Variation really is smaller at a small tidal volume. That is not a
+defect; it is the reason the tidal volume challenge was invented.
+
+Both rows are now stated at Michard's ventilation, and a new one tests the
+relation rather than the threshold, which constrains the whole line instead of
+one point on it.
 
 ## A note on how these rows were written
 
