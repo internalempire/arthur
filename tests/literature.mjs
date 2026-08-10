@@ -308,6 +308,25 @@ export const LITERATURE = {
     };
   },
 
+  // Cecconi, Collino & Pinsky state it as established: a patient ventilated with
+  // low tidal volumes can show a falsely low variation while being preload
+  // responsive. The model should therefore fail to flag a responder at 6 mL/kg
+  // whom it flags correctly at Michard's ventilation — the same patient, two
+  // ventilators, two answers.
+  'ppv-falsely-low-at-low-tidal-volume': () => {
+    const patient = { collapsed: 0.35, clung: 45, peep: 7, rr: 15, ti: 1.2,
+      mode: 'vcv', pmus: 0, stressedVolume: 350 };
+    const gentle = settle({ ...patient, vt: 420 });
+    const michard = settle({ ...patient, vt: 700 });
+    const after = settle({ ...patient, vt: 700, stressedVolume: 850 });
+    const responsive = change(michard.co, after.co) >= 15;
+    return {
+      pass: responsive && gentle.ppv < 13 && michard.ppv >= 13,
+      detail: `the same responder reads ${gentle.ppv.toFixed(0)}% at 6 mL/kg and `
+        + `${michard.ppv.toFixed(0)}% at 10 mL/kg`,
+    };
+  },
+
   'ppv-suspended-spontaneous': () => {
     const m = settle({ stressedVolume: 330, ccw: 150, svr: 0.85, hr: 105, mode: 'spont', pmus: 8 });
     return {

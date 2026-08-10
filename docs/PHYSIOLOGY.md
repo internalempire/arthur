@@ -110,6 +110,12 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   single sympathetic outflow with one time constant; the real arcs to heart rate,
   resistance, venous tone and contractility have different latencies, and there
   is no chemoreflex at all. Set the gain to zero to see the uncompensated model.
+- **The J-curve nadir is above FRC, and current reviews say otherwise.** Cecconi,
+  Collino & Pinsky (*Intensive Care Med* 2026) place the minimum of the
+  resistance–volume curve at functional residual capacity, as almost every source
+  does. Thomas, Griffo & Roos measured it at 45–60% of maximal lung volume in 55
+  excised lungs, above FRC, and this model follows the measurement — its nadir
+  sits at 2.87 L against an FRC of 2.2. Worth knowing before teaching from it.
 - **No gas exchange.** There is no oxygen, CO₂, pH or shunt. Hypoxic pulmonary
   vasoconstriction is a coefficient on derecruited lung, not a consequence of an
   alveolar oxygen tension.

@@ -33,6 +33,7 @@ work, not excuses.
 | `tidal-challenge-threshold` | In the septic fluid-responsive preset ventilated at 6 mL/kg, that change exceeds 3.5 percentage points and the manoeuvre calls the patient preload dependent. | agrees | Myatra et al., *Crit Care Med* 2017;45:415–21 |
 | `ppv-responder` | Ventilated as Michard's patients were — a stiff lung at a driving pressure near 30 cmH₂O — every patient the model calls preload dependent shows variation of at least 13%, and the index reports itself interpretable. | agrees |
 | `ppv-fluid-response-relation` | Across that same range, the gain in cardiac output after volume expansion rises with baseline variation on a line of slope 0.70–1.35. | agrees | Michard et al., *Am J Respir Crit Care Med* 2000;162:134–8, Fig. 3 upper panel: ΔCI% = 1.01·ΔPP% − 1.46, r² = 0.85 | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
+| `ppv-falsely-low-at-low-tidal-volume` | The same preload-responsive patient reads below 13% at 6 mL/kg and above it at 10 mL/kg. | agrees | Cecconi, Collino & Pinsky, *Intensive Care Med* 2026, doi:10.1007/s00134-026-08583-3 |
 | `ppv-suspended-spontaneous` | The same patient breathing spontaneously has the index withheld rather than reported. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
 | `ph-classification` | A hypervolaemic failing left ventricle with a wedge above 15 mmHg and a mean pulmonary artery pressure above 20 is classified post-capillary; a lung with a high vascular resistance and a low wedge is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
@@ -384,6 +385,54 @@ defect; it is the reason the tidal volume challenge was invented.
 Both rows are now stated at Michard's ventilation, and a new one tests the
 relation rather than the threshold, which constrains the whole line instead of
 one point on it.
+
+## Checked against Cecconi, Collino & Pinsky 2026
+
+A short review of heart–lung interaction in ARDS, read in full. Every mechanism
+it names is already in the model, and one of its statements is now a row.
+
+**What it asserts, and where the model stands.** Raised intrathoracic pressure
+unloading the left ventricle; the lung as a Starling resistor under West zone 2;
+the right ventricle as the integrator; pleural transmission varying with lung
+compliance and amplified by abdominal pressure; diaphragmatic descent raising
+abdominal pressure and partly defending venous return; variation reflecting right
+ventricular afterload rather than preload when the right ventricle is failing.
+All present, most already tested.
+
+Its caution that variation can be *falsely low* under low tidal volumes is the
+same thing that took a day to establish here from Michard's Figure 1, and it is
+now a row: the same responder reads below 13% at 6 mL/kg and above it at 10.
+
+**What it asks for that the model cannot do.** The review's central practical
+proposal is to use a PEEP step as a bedside test, reading oxygenation, compliance,
+dead space and haemodynamics together. Three of those four are available —
+compliance, cardiac output, right ventricular size and resistance all respond to
+a PEEP step here. Dead space and oxygenation are not, because there is no gas
+exchange, so the model can show half of that test and should not pretend
+otherwise. The same gap makes its argument about oxygen delivery — that better
+oxygenation can cost more cardiac output than it gains in content —
+unreproducible, though the cardiac output half of it is exactly what the model
+does show.
+
+**Where the model disagrees with it.** The legend to its Figure 1C places the
+minimum of the resistance–volume curve *at* functional residual capacity. Thomas,
+Griffo & Roos measured it at 45–60% of maximal lung volume in 55 lungs, which is
+above FRC, and this model follows the measurement: its nadir sits at 2.87 L
+against an FRC of 2.2. The review is restating the textbook position, which is
+what almost every source does. Anyone teaching from this simulator should know
+that it takes the primary measurement over the restatement, and why.
+
+**One thing the review prompted that is not settled.** Holding tidal volume and
+chest wall compliance fixed and varying only lung compliance, the pleural swing
+is unchanged at 2.8 cmH₂O — it must be, since it is tidal volume over chest wall
+compliance — yet the variation a preload-responsive patient shows runs from 6% to
+39% as lung compliance falls from 200 to 30 mL/cmH₂O. So in this model the
+variation is carried mostly by the alveolar route, through what airway pressure
+does to the pulmonary vessels, rather than by the pleural route through venous
+return. The conventional account emphasises the pleural route. Which of those is
+right is not something the review settles and not something the model can settle
+about itself; it is recorded here because it is a structural claim nobody has
+tested.
 
 ## A note on how these rows were written
 
