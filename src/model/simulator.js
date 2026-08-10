@@ -107,6 +107,10 @@ export class Simulator {
     this.cycleTick = 0;
     // Occlusion manoeuvres, and the (pressure, flow) pairs they measure.
     this.hold = null;
+    this.pvrBreath = -1;
+    this.pvrLo = Infinity;
+    this.pvrHi = -Infinity;
+    this.lastPvrSwing = 0;
     this.challenge = null;
     this.challengeResult = null;
     this.measuredPoints = [];
@@ -217,6 +221,20 @@ export class Simulator {
 
   accumulate() {
     const c = this.circ;
+    // How much right ventricular afterload moves within a breath. Latched per
+    // breath like the respiratory quantities, because it is the amplitude over a
+    // cycle that matters and a single sample is a sample at a phase.
+    if (this.resp.breathCount !== this.pvrBreath) {
+      this.pvrBreath = this.resp.breathCount;
+      this.lastPvrSwing = this.pvrHi > this.pvrLo
+        ? (this.pvrHi - this.pvrLo) / Math.max(1e-6, (this.pvrHi + this.pvrLo) / 2)
+        : 0;
+      this.pvrLo = Infinity;
+      this.pvrHi = -Infinity;
+    }
+    this.pvrLo = Math.min(this.pvrLo, c.p.pvr);
+    this.pvrHi = Math.max(this.pvrHi, c.p.pvr);
+
     this.trackHold();
     this.trackChallenge();
     this.sysRun = Math.max(this.sysRun, c.p.sa);
@@ -450,6 +468,25 @@ export class Simulator {
     }
     if (beatsPerBreath < 3.6) ppvReasons.push('fewer than 3.6 beats per breath');
     if (c.lvEdv > 0 && c.rvEdv / c.lvEdv > 1.2) ppvReasons.push('right ventricular dilatation — variation may reflect afterload, not preload');
+    // The same caution, caught by its cause rather than by a proxy. Cecconi,
+    // Collino & Pinsky put it plainly: where pulmonary vascular resistance is
+    // high, respiratory variation may reflect cyclic changes in right
+    // ventricular afterload rather than preload dependence. Dilatation is a late
+    // sign of that and this model reaches it long after the variation has been
+    // contaminated — at a lung compliance of 30 the right ventricle is still
+    // smaller than the left while variation reads 22%.
+    //
+    // The threshold is where this model's own relation between variation and
+    // fluid response crosses Michard's. Below a swing of about 15% the slope is
+    // steeper than his 1.01, meaning variation understates the response; above
+    // it the slope falls through 1 and keeps falling, meaning variation starts
+    // to overstate it. That is the point at which the number is reporting
+    // something other than preload, and it is anchored to a published slope
+    // rather than chosen to look right.
+    if (this.lastPvrSwing > 0.15) {
+      ppvReasons.push(`right ventricular afterload swings ${(this.lastPvrSwing * 100).toFixed(0)}% `
+        + 'within the breath — variation may be reporting that rather than preload');
+    }
     if (p.pab0 > 12) ppvReasons.push('raised intra-abdominal pressure');
     const ppvLevel = spontaneousEffort ? 'unavailable' : ppvReasons.length ? 'caution' : 'ok';
 
@@ -487,6 +524,7 @@ export class Simulator {
 
     return {
       preload,
+      pvrSwing: this.lastPvrSwing,
       spontaneousEffort, beatsPerBreath, interpretability, phPresent, phClass,
       tidalChallenge: this.challenge
         ? { running: true, phase: this.challenge.phase,

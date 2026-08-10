@@ -110,6 +110,16 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   single sympathetic outflow with one time constant; the real arcs to heart rate,
   resistance, venous tone and contractility have different latencies, and there
   is no chemoreflex at all. Set the gain to zero to see the uncompensated model.
+- **Variation can report right ventricular afterload rather than preload, and
+  now says so.** As lung compliance falls, airway pressure swings the pulmonary
+  vessels harder within each breath, and more of the pulse pressure variation is
+  the right ventricle ejecting against a cyclically varying afterload. At a lung
+  compliance of 30 mL/cmH₂O the pleural swing is unchanged at 2.8 cmH₂O and
+  venous return barely moves, but right ventricular stroke volume swings three
+  times as much and variation reads 22%. The guard used to be a rule on right
+  ventricular dilatation, which is a late sign — the right ventricle is still
+  smaller than the left there. The model now flags the cause directly, when
+  afterload swings by more than 15% of its mean within a breath.
 - **The J-curve nadir is above FRC, and current reviews say otherwise.** Cecconi,
   Collino & Pinsky (*Intensive Care Med* 2026) place the minimum of the
   resistance–volume curve at functional residual capacity, as almost every source

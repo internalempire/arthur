@@ -531,6 +531,32 @@ describe('Preload reserve on the Guyton construction');
       && smallVt.metrics.interpretability.ppv.reasons.length > 0);
 }
 
+describe('Variation contaminated by cyclic right ventricular afterload');
+{
+  // The stiffer the lung, the more airway pressure swings the pulmonary vessels
+  // within a breath, and the more of the variation is afterload rather than
+  // preload. The right ventricle is still smaller than the left throughout, so
+  // the dilatation rule that used to be the only guard never fires here.
+  const at = (clung) => settled({ mode: 'vcv', pmus: 0, vt: 560, clung,
+    peep: 7, rr: 15, ti: 1.2, stressedVolume: 450 }, 45).metrics;
+  const soft = at(200), stiff = at(30);
+
+  check('a stiff lung swings right ventricular afterload within the breath',
+    stiff.pvrSwing > soft.pvrSwing * 3,
+    `${(soft.pvrSwing * 100).toFixed(0)}% at a compliance of 200 vs `
+    + `${(stiff.pvrSwing * 100).toFixed(0)}% at 30`);
+  check('and the pleural swing is identical in both, so this is not venous return',
+    Math.abs(at(200).pplSwing - at(30).pplSwing) < 0.05,
+    `${soft.pplSwing.toFixed(2)} vs ${stiff.pplSwing.toFixed(2)} cmH₂O`);
+  check('the variation is flagged as possibly reporting afterload',
+    stiff.interpretability.ppv.reasons.some((r) => /afterload swings/.test(r)),
+    stiff.interpretability.ppv.reasons.join(' | ') || '(nothing flagged)');
+  check('and is not flagged when the lung is compliant',
+    !soft.interpretability.ppv.reasons.some((r) => /afterload swings/.test(r)));
+  check('the dilatation rule alone would have missed it',
+    stiff.rvLvRatio < 1.2, `RV:LV ${stiff.rvLvRatio.toFixed(2)}`);
+}
+
 describe('Variation at the filled end of the range');
 {
   // Averaged over a minute: variation is computed from the beats in one

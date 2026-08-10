@@ -422,17 +422,52 @@ against an FRC of 2.2. The review is restating the textbook position, which is
 what almost every source does. Anyone teaching from this simulator should know
 that it takes the primary measurement over the restatement, and why.
 
-**One thing the review prompted that is not settled.** Holding tidal volume and
-chest wall compliance fixed and varying only lung compliance, the pleural swing
-is unchanged at 2.8 cmH₂O — it must be, since it is tidal volume over chest wall
+**One thing the review prompted, first written up wrongly.** Holding tidal volume
+and chest wall compliance fixed and varying only lung compliance, the pleural
+swing is unchanged at 2.8 cmH₂O — it must be, being tidal volume over chest wall
 compliance — yet the variation a preload-responsive patient shows runs from 6% to
-39% as lung compliance falls from 200 to 30 mL/cmH₂O. So in this model the
-variation is carried mostly by the alveolar route, through what airway pressure
-does to the pulmonary vessels, rather than by the pleural route through venous
-return. The conventional account emphasises the pleural route. Which of those is
-right is not something the review settles and not something the model can settle
-about itself; it is recorded here because it is a structural claim nobody has
-tested.
+39% as lung compliance falls from 200 to 30 mL/cmH₂O.
+
+The first version of this note concluded that the variation must therefore travel
+by "the alveolar route" rather than the pleural one. That was reasoning by
+elimination from a quantity I had not measured, and it was wrong twice over:
+varying lung compliance moves the whole pulmonary operating point, not just
+alveolar pressure, so a constant pleural *swing* does not mean the pleural route
+is inert; and the conclusion was stated as something the literature had not
+described when the review names it explicitly.
+
+Measured rather than inferred, the chain is:
+
+| | compliance 200 | compliance 30 |
+|---|---|---|
+| pleural swing | 2.79 | 2.79 cmH₂O |
+| venous return swing | 1.45 | 1.64 L/min |
+| right ventricular filling swing | 7.1 | 11.7 mL |
+| right ventricular **stroke volume** swing | 7.9 | **27.0 mL** |
+| resistance swing within the breath | 0.04 | 0.34 Wood units |
+
+Venous return — what the pleural route delivers — barely moves. Filling moves
+moderately. Stroke volume triples, and the amplification between filling and
+stroke volume is not preload: it is the right ventricle ejecting against an
+afterload that is itself swinging with the breath.
+
+Which is the review's own caution: *"in patients with impaired right ventricular
+function or increased PVR, such variations may predominantly reflect cyclic
+changes in right ventricular afterload induced by intrathoracic pressure swings,
+rather than true preload dependency."* Not an undescribed assumption — a
+documented phenomenon the model reproduces.
+
+**And it was not being flagged.** The only guard was a rule on right ventricular
+dilatation, and at a lung compliance of 30 the right ventricle is still smaller
+than the left while variation reads 22%. Dilatation is a late sign. The model can
+measure the cause directly, so it now does: when afterload swings by more than
+15% of its mean within a breath, the variation says so.
+
+That threshold is where this model's own relation between variation and fluid
+response crosses Michard's slope of 1.01. Below it the slope is steeper than his,
+so variation understates the response; above it the slope falls through 1 and
+keeps going, so variation starts to overstate it. Anchored to a published slope
+rather than chosen.
 
 ## A note on how these rows were written
 
