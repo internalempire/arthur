@@ -276,7 +276,13 @@ export const LITERATURE = {
         level: before.interpretability.ppv.level };
     });
     const dependent = patients.filter((x) => x.gain >= 15);
-    const flagged = dependent.filter((x) => x.ppv >= 13 && x.level === 'ok');
+    // Available, not unqualified. The model now cautions that variation in a
+    // stiff lung may partly report cyclic right ventricular afterload — and
+    // Michard's patients were exactly that, ARDS lungs at a driving pressure
+    // near 30. The caution is right and the prediction still held in his hands
+    // at r² = 0.85, so the row asks that the number be readable and above the
+    // threshold, not that it come without a caveat.
+    const flagged = dependent.filter((x) => x.ppv >= 13 && x.level !== 'unavailable');
     return {
       pass: dependent.length > 0 && flagged.length === dependent.length,
       detail: `${flagged.length} of ${dependent.length} preload-dependent patients reach 13%: `

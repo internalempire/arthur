@@ -463,6 +463,14 @@ than the left while variation reads 22%. Dilatation is a late sign. The model ca
 measure the cause directly, so it now does: when afterload swings by more than
 15% of its mean within a breath, the variation says so.
 
+One consequence worth recording, because it looked like a failure and is not.
+The new caution fires on Michard's own patients — ARDS lungs at a driving
+pressure near 30 are precisely where afterload swings hardest — and that broke
+`ppv-responder`, which had required no caveat at all. The caution is correct and
+his prediction still held at r² = 0.85, so the row now asks that the number be
+readable and above the threshold rather than unqualified. A caution is
+information; only `unavailable` means the reading is not a reading.
+
 That threshold is where this model's own relation between variation and fluid
 response crosses Michard's slope of 1.01. Below it the slope is steeper than his,
 so variation understates the response; above it the slope falls through 1 and
