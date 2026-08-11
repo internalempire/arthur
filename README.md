@@ -264,7 +264,8 @@ they can be reopened at all. Consolidated lung is collapsed and stays collapsed
 however hard it is pushed.
 
 ```
-open(Pl)  = (1 - collapsed)*sigma((Pl - 0)/1.3) + collapsed*recruitable*sigma((Pl - pOpen)/7)
+f_openable = calibrate(R/I, collapsed, C_lung, C_cw, pOpen; PEEP 5 -> 15)
+open(Pl)  = (1 - collapsed)*sigma((Pl - 0)/1.3) + collapsed*f_openable*sigma((Pl - pOpen)/2)
 room      = CAPACITY - V0
 perUnit   = V0 + room*(1 - exp(-C_lung*Pl/room))     saturating above Pl = 0
           = max(0, V0 + C_lung*Pl)                   linear below it
@@ -272,6 +273,21 @@ V(Pl)     = open(Pl) * perUnit(Pl)                   the pressure-volume curve
 V_rest    = V(5)                                     recoil balancing the chest wall
 strain    = V / (2.2 L * open) - 1                   volume per *open* unit
 ```
+
+`f_openable` is deliberately internal. The user supplies the bedside
+recruitment-to-inflation ratio, and the model finds the smallest fraction of the
+collapsed compartment that reproduces it during a passive PEEP 5 → 15 cmH₂O
+reference manoeuvre:
+
+```
+V_recruited = ΔEELV - Crs_low * ΔPEEP
+R/I         = (V_recruited / ΔPEEP) / Crs_low
+```
+
+Collapse, tissue compliance and R/I therefore remain separate. A high requested
+R/I cannot create units that are not collapsed; if the finite collapsed
+compartment or the selected opening pressure cannot supply it, the model reports
+the lower achieved R/I and marks the readout for caution.
 
 `V0` and `CAPACITY` are not chosen, they are solved, from two textbook volumes: a
 normal fully open lung rests at 2.2 L when its recoil is 5 cmH₂O, and reaches
@@ -446,17 +462,19 @@ and drove the severe ARDS phenotype to roughly 10–16 WU.
 **Why this replaced a single compartment.** With one compartment, a recruiter and
 a non-recruiter were the same lung at different resting volumes, so raising PEEP
 gave them identical volume gain and identical transpulmonary pressure and there
-was nothing left to tell them apart. Recruitability is now explicit. In the
-human calibration phenotype, PEEP 4 → 14 gives 2.68 → 3.28 WU (+22%) at low
-recruitability and 2.45 → 2.62 WU (+7%) at higher recruitability. All four values
-lie inside the IQRs reported by Cappio Borlino et al.; the response is not fitted
-to the ratio of cohort medians.
+was nothing left to tell them apart. Recruitability is now explicit and uses the
+same numerical R/I definition as the study. In the human calibration phenotype,
+PEEP 4 → 14 gives 2.63 → 3.18 WU (+21%) at R/I 0.05 and 2.53 → 2.65 WU (+5%) at
+R/I 0.50. All four values lie inside the IQRs reported by Cappio Borlino et al.;
+the response is not fitted to the ratio of cohort medians.
 
-**Limits.** `recruitable` is still a fraction of collapsed units that may open,
-not the bedside R/I ratio. The threefold closed-path factor is an aggregate
-teaching coefficient, not a measured anatomical constant. Regional perfusion,
-vascular remodelling, thrombotic obstruction, hypercapnia and hypoxic tone
-outside derecruited units are not represented here.
+**Limits.** The model has no separately measured airway-opening pressure, so its
+R/I uses the applied 10 cmH₂O step rather than Chen's airway-opening correction.
+R/I is protocol-dependent, and a high value does not prove that high PEEP avoids
+overdistension. The opening-sigmoid width and threefold closed-path factor are
+aggregate teaching coefficients, not measured anatomical constants. Regional
+perfusion, vascular remodelling, thrombotic obstruction, hypercapnia and hypoxic
+tone outside derecruited units are not represented here.
 
 ### Vascular waterfall and West zones
 
@@ -726,8 +744,8 @@ changes the pressure–volume slope; it does not stand in for venoconstriction.
 |---|---|---|---|---|
 | `pvrBase` | Resistance coefficient of a fully open lung at its resting-volume nadir | mmHg·s/mL | 0.07 | 0.03 – 0.60 |
 | `hpv` | Hypoxic vasoconstriction gain | × | 1.0 | 0 – 3 |
-| `recruitable` | Fraction of the collapsed lung that can be reopened | × | 0.4 | 0 – 1 |
-| `pOpen` | Transpulmonary pressure at which half the recruitable lung is open | cmH₂O | 20 | 5 – 40 |
+| `riRatio` | R/I over the passive PEEP 5 → 15 reference manoeuvre | ratio | 0.5 | 0 – 2 |
+| `pOpen` | Transpulmonary pressure at which half the internally openable compartment is open | cmH₂O | 20 | 5 – 40 |
 | `hysteresis` | Whether units close at a lower pressure than they opened at | off/on | off | — |
 | `pClose` | Pressure at which open units start to shut, with hysteresis on | cmH₂O | 12 | 2 – 40 |
 | `piston` | Pulmonary capacitance coupling | mL/L | 85 | 0 – 200 |
@@ -856,7 +874,7 @@ and septal gains in particular are for.
 | PEEP escalation (`peep-escalation`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=14`, `rr=14` |
 | Septic shock, fluid responsive (`septic-responder`) | `mode=vcv`, `pmus=0`, `vt=560`, `peep=8`, `rr=18`, `ccw=150`, `stressedVolume=330`, `svr=0.85`, `hr=105` |
 | Big pleural swings, no variation (`swing-no-variation`) | `mode=spont`, `pmus=22`, `peep=6`, `rr=24`, `ccw=100`, `stressedVolume=950`, `svr=0.75`, `hr=100` |
-| ARDS with right ventricular failure (`ards-rv`) | `mode=vcv`, `pmus=0`, `vt=350`, `peep=12`, `rr=24`, `collapsed=0.42`, `clung=40`, `eesRv=0.28`, `pvrBase=0.17`, `hpv=1.6`, `recruitable=0.55`, `pOpen=20` |
+| ARDS with right ventricular failure (`ards-rv`) | `mode=vcv`, `pmus=0`, `vt=350`, `peep=12`, `rr=24`, `collapsed=0.42`, `clung=40`, `eesRv=0.28`, `pvrBase=0.17`, `hpv=1.6`, `riRatio=0.7`, `pOpen=18` |
 | Acute pulmonary embolism (`pulmonary-embolism`) | `mode=spont`, `pmus=6`, `peep=0`, `rr=24`, `pvrBase=0.44`, `eesRv=0.32`, `stressedVolume=1050`, `svr=1.25`, `hr=118` |
 | Cardiogenic pulmonary oedema (`lv-failure`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=10`, `rr=18`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=95` |
 | Weaning the failing left ventricle (`weaning`) | `mode=spont`, `pmus=10`, `peep=0`, `rr=26`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=110` |
@@ -877,7 +895,7 @@ catheter-derived value is separately labelled in the app.
 | PEEP escalation | 4.54 | 90 | 3.8 | 22/13 | 10 | 1.3 | 0.87 | 1% |
 | Septic shock, fluid responsive | 4.40 | 82 | 1.7 | 16/10 | 4 | 1.2 | 0.73 | 2% |
 | Big pleural swings, no variation | 6.72 | 92 | 1.1 | 24/15 | 9 | 1.2 | 0.89 | 7% |
-| ARDS with right ventricular failure | 3.96 | 85 | 3.7 | 27/19 | 4 | 4.1 | 1.66 | 1% |
+| ARDS with right ventricular failure | 3.99 | 85 | 3.7 | 28/20 | 4 | 4.3 | 1.65 | 1% |
 | Acute pulmonary embolism | 4.10 | 94 | 5.8 | 39/33 | 4 | 7.5 | 2.02 | 11% |
 | Cardiogenic pulmonary oedema | 3.53 | 87 | 5.0 | 44/38 | 35 | 1.2 | 0.86 | 6% |
 | Weaning the failing left ventricle | 3.28 | 87 | 1.1 | 36/31 | 33 | 1.2 | 0.88 | 21% |
@@ -903,22 +921,22 @@ smallest set that makes that question answerable.
   variation but the flat part of the Starling curve decides whether any of it
   reaches the stroke volume.
 - **ARDS** is a small, stiff, collapsed lung (`collapsed`, `clung`) with a weak right
-  ventricle, a raised `pvrBase`, and — as shipped — over half of the collapse
-  reopenable (`recruitable=0.55`). Across a PEEP titration from 0 to 20 the
-  resistance coefficient falls 4.42 → 3.89 Wood units, but derived PVR rises
-  4.44 → 5.55 WU and cardiac output falls 4.14 → 3.73 L/min: the preload and
+  ventricle, a raised `pvrBase`, and — as shipped — a high-recruiter phenotype
+  (`riRatio=0.7`). Across a PEEP titration from 0 to 20 the resistance
+  coefficient falls 4.57 → 3.66 Wood units, but derived PVR rises 4.67 → 5.28 WU
+  and cardiac output falls 4.10 → 3.82 L/min: the preload and
   waterfall costs outrun the coefficient benefit.
 
-  Set `recruitable=0` — the same collapsed lung, now consolidated rather than
+  Set `riRatio=0` — the same collapsed lung, now consolidated rather than
   closed — and the titration separates further. The coefficient rises 4.57 →
-  4.62 WU, derived PVR rises 4.93 → 7.85 WU, and output falls 3.97 → 3.24.
+  4.62 WU, derived PVR rises 4.92 → 7.08 WU, and output falls 4.03 → 3.60.
   Nothing else about the patient changed. That is the comparison this preset
   exists for, and it is the one a single-compartment lung could not show.
 
   A PEEP that buys output does exist, but only in a lung that is both highly
-  recruitable and well filled: at `recruitable=0.9`, `pOpen=12` and
-  `stressedVolume=1400`, derived PVR stays around 3.5 WU and output holds a broad
-  plateau from PEEP 4–12 before declining. The plateau is shallow — the
+  recruitable and well filled: at `riRatio=0.8`, `pOpen=16` and
+  `stressedVolume=1400`, derived PVR stays around 4.1–4.5 WU and output holds a
+  broad plateau from PEEP 4–16 before declining. The plateau is shallow — the
   differences along it are comparable to the respiratory swing, so it should be
   read as "PEEP stops costing anything here", not as a peak to titrate to. The
   optimal PEEP for a failing right ventricle is a property of neither the lung
@@ -1192,3 +1210,7 @@ The full list, with the measurements behind it, is in
 18. Fougères E, Teboul JL, Richard C, et al. Hemodynamic impact of a positive
     end-expiratory pressure setting in acute respiratory distress syndrome:
     importance of the volume status. *Crit Care Med* 2010;38:802–807.
+19. Chen L, Del Sorbo L, Grieco DL, et al. Potential for lung recruitment
+    estimated by the recruitment-to-inflation ratio in acute respiratory
+    distress syndrome. *Am J Respir Crit Care Med* 2020;201:178–187.
+    doi:10.1164/rccm.201902-0334OC.

@@ -21,18 +21,20 @@ function settle(overrides, seconds = 30) {
 
 const change = (before, after) => (after / before - 1) * 100;
 
-// The two phenotypes are the *same collapsed lung*. They differ only in how much
-// of the collapse can be reopened — which is what recruitability means, and what
-// the model could not express until the lung was split into two populations of
-// units. Holding the resting volume equal is the point: it is what makes the
-// comparison about recruitability rather than about size.
+// The two phenotypes are the *same collapsed lung*. They differ in measured R/I,
+// which the model translates into how much of that compartment can reopen.
+// Holding collapse and tissue compliance equal is the point: it makes the
+// comparison about recruitment relative to inflation rather than lung size.
 // This is a calibration phenotype for the Cappio Borlino cohort, not the app's
 // deliberately severe ARDS-with-RV-failure preset. The study did not enrol a
 // uniform failing-RV population, so importing that preset's EesRV and very high
 // baseline resistance would make the model validate its own extreme scenario
 // rather than the measured human values. A PVR0 of 0.09 gives the whole-lung
 // catheter-derived values inside all four reported IQRs.
-const HUMAN_ARDS = { clung: 40, vt: 350, rr: 24, pvrBase: 0.09, hpv: 1.6, collapsed: 0.42 };
+const HUMAN_ARDS = {
+  clung: 40, vt: 350, rr: 24, pvrBase: 0.09, hpv: 1.6,
+  collapsed: 0.42, pOpen: 18,
+};
 
 export const LITERATURE = {
   'peep-euvolaemia': () => {
@@ -70,8 +72,8 @@ export const LITERATURE = {
   // remains deliberately broader than a ratio of cohort medians, which is not
   // the median within-patient response.
   'pvr-recruitability-low': () => {
-    const a = settle({ ...HUMAN_ARDS, recruitable: 0.05, peep: 4 }, 45);
-    const b = settle({ ...HUMAN_ARDS, recruitable: 0.05, peep: 14 }, 45);
+    const a = settle({ ...HUMAN_ARDS, riRatio: 0.05, peep: 4 }, 45);
+    const b = settle({ ...HUMAN_ARDS, riRatio: 0.05, peep: 14 }, 45);
     const d = change(a.pvrDerivedWood, b.pvrDerivedWood);
     const absolute = a.pvrDerivedWood >= 1.50 && a.pvrDerivedWood <= 3.71
       && b.pvrDerivedWood >= 2.08 && b.pvrDerivedWood <= 4.75;
@@ -83,8 +85,8 @@ export const LITERATURE = {
   },
 
   'pvr-recruitability-high': () => {
-    const a = settle({ ...HUMAN_ARDS, recruitable: 0.55, peep: 4 }, 45);
-    const b = settle({ ...HUMAN_ARDS, recruitable: 0.55, peep: 14 }, 45);
+    const a = settle({ ...HUMAN_ARDS, riRatio: 0.5, peep: 4 }, 45);
+    const b = settle({ ...HUMAN_ARDS, riRatio: 0.5, peep: 14 }, 45);
     const d = change(a.pvrDerivedWood, b.pvrDerivedWood);
     const absolute = a.pvrDerivedWood >= 2.31 && a.pvrDerivedWood <= 3.61
       && b.pvrDerivedWood >= 2.10 && b.pvrDerivedWood <= 3.75;
@@ -96,21 +98,21 @@ export const LITERATURE = {
   },
 
   // The row above needs a phenotype chosen for it, so on its own it could be
-  // satisfied by picking one. Across the whole model control, increasing
-  // recruitability must progressively attenuate the PEEP-related rise. The old
-  // test additionally required a sign change, which the human study neither
-  // measured nor implies: the high-recruiter cohort median was still +5%.
+  // satisfied by picking one. Across the R/I control, increasing recruitment
+  // relative to inflation must progressively attenuate the PEEP-related rise.
+  // The human study does not require a sign change: the high-recruiter cohort
+  // median still rose by 5%.
   'pvr-recruitability-dissociation': () => {
-    const at = (recruitable) => {
-      const a = settle({ ...HUMAN_ARDS, recruitable, peep: 4 }, 45);
-      const b = settle({ ...HUMAN_ARDS, recruitable, peep: 14 }, 45);
+    const at = (riRatio) => {
+      const a = settle({ ...HUMAN_ARDS, riRatio, peep: 4 }, 45);
+      const b = settle({ ...HUMAN_ARDS, riRatio, peep: 14 }, 45);
       return change(a.pvrDerivedWood, b.pvrDerivedWood);
     };
-    const steps = [0, 0.25, 0.5, 0.75, 1].map(at);
+    const steps = [0, 0.2, 0.4, 0.6, 0.8].map(at);
     const monotone = steps.every((d, i) => i === 0 || d < steps[i - 1]);
     return {
       pass: monotone && steps[0] - steps[steps.length - 1] >= 15,
-      detail: `ΔPVR ${steps.map((d) => d.toFixed(0) + '%').join(' → ')} across recruitability 0 → 1`,
+      detail: `ΔPVR ${steps.map((d) => d.toFixed(0) + '%').join(' → ')} across R/I 0 → 0.8`,
     };
   },
 

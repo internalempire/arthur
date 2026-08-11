@@ -23,9 +23,9 @@ work, not excuses.
 |---|---|---|---|
 | `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on central filling: raising PEEP from 5 to 15 reduces output more in the underfilled model than in the euvolaemic model. This is a directional teaching constraint. Fougères et al. measured a 13±9% cardiac-index fall with higher PEEP and a 14±10% restoration with passive leg raising at high PEEP; they did **not** report the former model target of a ≥1.5× between-state ratio. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
-| `pvr-recruitability-low` | In a low-recruitability human ARDS phenotype, PEEP 4 → 14 keeps derived PVR inside the trial's two IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | In a high-recruitability phenotype, the same manoeuvre stays inside 2.31–3.61 → 2.10–3.75 WU and changes PVR by −10% to +20%; the trial's cohort medians changed +5%, P = 0.55. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-dissociation` | Sweeping the model's recruitability control from 0 to 1 progressively attenuates the PEEP-related PVR rise by at least 15 percentage points. No sign change is required: the measured high-recruiter median was still +5%. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-low` | At R/I 0.05 in the human ARDS calibration phenotype, PEEP 4 → 14 keeps derived PVR inside the low-recruiter trial IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | At R/I 0.50, the same manoeuvre stays inside the high-recruiter IQRs (2.31–3.61 → 2.10–3.75 WU) and changes PVR by −10% to +20%; the trial's cohort medians changed +5%, P = 0.55. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-dissociation` | Sweeping R/I from 0 to 0.8 progressively attenuates the PEEP-related PVR rise by at least 15 percentage points. No sign change is required: the measured high-recruiter median was still +5%. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `pvr-human-frc-nadir` | The fully open mechanical J-curve has its minimum within 0.15 L of the model's 2.2 L human FRC. | agrees | Cecconi, Collino & Pinsky, *Intensive Care Med* 2026, Fig. 1C (clinical synthesis: minimum near FRC) |
@@ -40,6 +40,27 @@ The earlier ≥1.5× `peep-volume-status` threshold was retired during phase 4 a
 the source was re-read. The human experiment supports the effect of central
 filling on the PEEP response, but not that numerical ratio. Retaining the ratio
 would make a local model calibration masquerade as an in-vivo measurement.
+
+## Current phase-5 R/I semantics
+
+`riRatio` is the model result of a defined passive PEEP 5 → 15 cmH₂O manoeuvre,
+not a renamed fraction of units. Following Chen et al., the model subtracts the
+volume predicted by low-PEEP respiratory-system compliance from the EELV change,
+divides that recruited volume by the pressure step, and normalises the resulting
+compliance to low-PEEP compliance. It numerically maps that target to an internal
+openable fraction while keeping `collapsed`, `clung` and `pOpen` independent.
+
+The mapping is bounded by available lung. If all of the collapsed compartment
+is already openable and the requested R/I is still not reached, the model reports
+the attained ratio and marks it with a caution. It does not increase collapse or
+permit an openable fraction above one. R/I 0.5 is the cohort split used in the
+source studies, not a validated treatment threshold.
+
+The simulator cannot apply the airway-opening-pressure correction because it has
+no separate airway-opening measurement; `pOpen` is a transpulmonary alveolar
+opening pressure and must not be substituted for it. Thus the executable R/I is
+an internally consistent teaching analogue of the standard manoeuvre, not a
+claim that every bedside technical condition is represented.
 
 ## Current phase-3 volume semantics
 
@@ -474,12 +495,11 @@ produced a model fitted to a paraphrase. The row now states the mechanism the
 source is actually about — the abdomen defending the gradient, worth 1–3 mmHg of
 mean systemic filling pressure — and bounds the output cost loosely.
 
-The `pvr-recruitability-high` row survives in its original form because that one
-*was* read: the trial reports resistance unchanged in high recruiters. It now
-passes, but on a phenotype this file chose — 55% of the collapsed lung
-recruitable at an opening pressure of 20 cmH₂O — rather than on one calibrated
-against the R/I ratio the trial actually measured. That is why the dissociation
-row exists alongside it.
+Historically, the `pvr-recruitability-high` row passed on a phenotype this file
+chose — 55% of the collapsed lung openable at an opening pressure of 20 cmH₂O —
+rather than on the R/I ratio the trial measured. Phase 5 retires that mismatch:
+the active row uses R/I 0.50 and the dissociation row sweeps the same measured
+control. This paragraph is retained to record why a sign-only row was not enough.
 
 If you have the Berger paper to hand, tightening this row against its actual
 figures would be a genuine improvement.

@@ -187,9 +187,57 @@ fit.
 The 45% waterfall share and threefold intrinsic resistance of the derecruited
 path are transparent aggregate coefficients. They avoid a false all-or-none
 whole-lung effect; they do not reproduce regional perfusion anatomy. The
-`recruitable` control also remains a fraction of collapsed units that can open,
-not the measured recruitment-to-inflation ratio. Replacing it with R/I requires
-a separate calibration and is not hidden inside this phase.
+`recruitable` control at the end of this phase was still a fraction of collapsed
+units, not measured R/I. That limitation is historical: the following phase
+replaces the control explicitly rather than hiding a reinterpretation here.
+
+## 2026-08-11 — Replace fractional recruitability with measured R/I
+
+### Decision
+
+- Replace the user-facing fraction of collapsed units with `riRatio`, defined by
+  a passive PEEP 5 → 15 cmH₂O reference manoeuvre.
+- Keep total collapse, fully-open tissue compliance and transpulmonary opening
+  pressure as independent inputs.
+- Translate R/I into an internal openable fraction numerically; never expose that
+  latent fraction as though it were the bedside index.
+- Cap the internal fraction at the available collapsed compartment. Report the
+  achieved R/I and a caution when the requested value is not attainable.
+- Retain 0.5 as a teaching split used in the published cohorts, not as an
+  outcome-validated prescription for high PEEP.
+
+### Why
+
+Chen et al. define recruited volume as the measured change in end-expiratory
+lung volume minus the inflation predicted from low-PEEP respiratory-system
+compliance. Recruited compliance divided by that low-PEEP compliance is R/I.
+The former `recruitable` parameter instead meant the maximum fraction of the
+collapsed compartment that might ever open. It was a useful internal state but
+not the measured quantity, and a rename would have been false.
+
+The difference was not cosmetic. In the reference ARDS phenotype, the former
+opening distribution produced R/I below 0.15 even when every collapsed unit was
+allowed to open. The diseased-unit sigmoid is now narrower (2 cmH₂O rather than
+7) and explicitly documented as a didactic shape coefficient. For each patient,
+the solver then finds the smallest openable fraction that reproduces the target
+R/I under the reference manoeuvre. The finite collapsed compartment and selected
+opening pressure remain hard constraints.
+
+### Human calibration result
+
+For the Cappio Borlino phenotype, PEEP 4 → 14 now gives 2.63 → 3.18 WU (+21%) at
+R/I 0.05 and 2.53 → 2.65 WU (+5%) at R/I 0.50. Across R/I 0 → 0.8, the derived
+PVR response changes monotonically from +26% to −3%. The four cohort-comparison
+values remain inside the reported IQRs.
+
+### Deliberate limits
+
+R/I is protocol-dependent and may combine recruitment, inflation and
+overdistension. The simulator has no separately measured airway-opening pressure,
+so its 10 cmH₂O effective step cannot reproduce Chen's correction when airway
+opening pressure exceeds low PEEP. A high R/I also does not prove that high PEEP
+is safe or optimal. These limitations are shown in the control help and readout;
+the app does not turn R/I into a PEEP recommendation.
 
 ## 2026-08-11 — Retire diagnostic PPV calibration and the tidal-volume challenge
 

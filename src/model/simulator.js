@@ -122,7 +122,7 @@ export class Simulator {
       this.circ.vSv += value - this.params.stressedVolume;
     }
     this.params[id] = value;
-    if (id === 'collapsed' || id === 'clung' || id === 'recruitable' || id === 'pOpen') {
+    if (id === 'collapsed' || id === 'clung' || id === 'riRatio' || id === 'pOpen') {
       // These move the resting volume, which `resp.v` is measured from. The gas
       // in the lung cannot jump, so hold the absolute volume and re-reference it
       // rather than letting the offset carry the change.
@@ -413,6 +413,21 @@ export class Simulator {
     if (p.pab0 > 12) ppvReasons.push('raised intra-abdominal pressure');
     const ppvLevel = spontaneousEffort ? 'unavailable' : ppvReasons.length ? 'caution' : 'ok';
 
+    // R/I is a property of a specified PEEP manoeuvre, not of a lung with no
+    // closed compartment. A requested value can also exceed what the selected
+    // collapse and opening pressure can physically supply; in that case report
+    // the achieved model manoeuvre and retain the target only as context.
+    const riReasons = [];
+    let riLevel = 'ok';
+    if ((p.collapsed ?? 0) < 0.005) {
+      riLevel = 'unavailable';
+      riReasons.push('no collapsed compartment is available to recruit');
+    } else if (p.riLimited) {
+      riLevel = 'caution';
+      riReasons.push(`target ${Number(p.riTarget).toFixed(2)} exceeds the model maximum `
+        + `${Number(p.riMaximum).toFixed(2)} for this collapsed compartment and opening pressure`);
+    }
+
     const plateauLevel = spontaneousEffort ? 'unavailable' : 'ok';
     const wedgeLevel = c.p.zone3 >= 0.95 ? 'ok' : 'caution';
     const pvrDerivedLevel = co > 0.05 ? 'ok' : 'unavailable';
@@ -436,6 +451,7 @@ export class Simulator {
         reasons: preloadReasons,
       },
       ppv: { level: ppvLevel, reasons: ppvReasons },
+      ri: { level: riLevel, reasons: riReasons },
       plateau: { level: plateauLevel, reasons: plateauLevel === 'unavailable' ? ['no passive plateau during spontaneous effort'] : [] },
       wedge: {
         level: wedgeLevel,
@@ -467,6 +483,16 @@ export class Simulator {
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
       lungVolume: r.lungVolume, pab: r.pab,
       openFraction: regions.openFraction,
+      // Result of the same static 5 -> 15 cmH2O calculation used to translate
+      // the user-entered R/I into the model's latent openable compartment.
+      // Keeping target and achieved separate prevents a physical saturation
+      // from masquerading as a successful calibration.
+      riRatio: p.riAchieved,
+      riTarget: p.riTarget,
+      riMaximum: p.riMaximum,
+      riLimited: p.riLimited,
+      riRecruitedVolume: p.riAssessment?.recruitedVolume ?? null,
+      riLowCompliance: p.riAssessment?.lowCompliance ?? null,
       // With hysteresis on, how much is open is a state rather than a reading of
       // the present pressure, so the tile has to say which and by how much they
       // differ — the gap is what the lung remembers.

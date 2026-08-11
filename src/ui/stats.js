@@ -97,6 +97,16 @@ const TILES = [
         : ` · resting volume ${m.relaxVolume.toFixed(2)} L`),
   },
   {
+    id: 'ri', label: 'Recruitment-to-inflation', unit: 'R/I', kind: 'derived',
+    get: (m) => Number(m.riRatio).toFixed(2),
+    sub: (m) => `PEEP 5→15 · target ${Number(m.riTarget).toFixed(2)}`
+      + (m.riRecruitedVolume === null ? '' : ` · recruited ${Math.max(0, m.riRecruitedVolume).toFixed(0)} mL`),
+    quality: (m) => m.interpretability.ri,
+    // No diagnostic colour threshold: 0.5 split the original cohort at its
+    // median. It is useful for phenotype comparison, not a validated command
+    // to raise PEEP in an individual patient.
+  },
+  {
     id: 'stressIndex', label: 'Stress index', unit: '', kind: 'derived',
     get: (m) => (m.stressIndex === null ? '—' : m.stressIndex.toFixed(2)),
     sub: (m) => (m.stressIndex === null ? 'constant flow, passive patient'

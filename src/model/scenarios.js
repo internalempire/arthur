@@ -41,11 +41,11 @@ export const SCENARIOS = [
   {
     id: 'ards-rv',
     name: 'ARDS with right ventricular failure',
-    note: 'A collapsed, stiff lung and a failing right ventricle, and a lung that is over half recruitable. The RV dilates, the septum bows left and the left ventricle cannot fill. Try adding volume, then taking PEEP away, then turning the patient prone. Then set the recruitable fraction to zero — the same collapsed lung, now consolidated rather than closed — and run the PEEP titration again. It goes the other way, and nothing else about the patient has changed.',
+    note: 'A collapsed, stiff lung and a failing right ventricle, with a high-recruiter R/I phenotype. The RV dilates, the septum bows left and the left ventricle cannot fill. Try adding volume, then taking PEEP away, then turning the patient prone. Then set R/I to zero — the same amount of collapsed lung, now consolidated rather than reopenable — and run the PEEP titration again. It goes the other way, and nothing else about the patient has changed.',
     params: {
       mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
       collapsed: 0.42, clung: 40, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6,
-      recruitable: 0.55, pOpen: 20,
+      riRatio: 0.7, pOpen: 18,
     },
   },
   {

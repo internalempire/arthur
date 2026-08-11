@@ -85,6 +85,9 @@ const PANELS = [
         ['Chest wall compliance', `${p.ccw} mL/cmH₂O`],
         ['Lung compliance', `${p.clung} mL/cmH₂O`],
         ['Respiratory system compliance', `${n(m.crs, 0)} mL/cmH₂O`],
+        ['Recruitment-to-inflation ratio', m.interpretability.ri.level === 'unavailable'
+          ? 'not applicable without collapsed lung'
+          : `${n(m.riRatio, 2)} over PEEP 5 to 15 cmH₂O (target ${n(m.riTarget, 2)})`],
         ['Expiratory time constant', `${n(m.expTimeConstant, 2)} s`],
         ['Plateau pressure', `${n(m.pplat)} cmH₂O`],
         ['Total PEEP', `${n(m.totalPeep)} cmH₂O (intrinsic ${n(m.autoPeep)})`],
@@ -140,6 +143,9 @@ const PANELS = [
         ['Open fraction', `${n(m.openFraction * 100, 0)}%`],
         ['Strain per open unit', `${n(m.lungStrain * 100, 0)}%`],
         ['Reopened by pressure', `${n(m.recruitedFraction * 100, 0)}% of the lung`],
+        ['R/I reference manoeuvre', m.interpretability.ri.level === 'unavailable'
+          ? 'not applicable without collapsed lung'
+          : `${n(m.riRatio, 2)}; ${n(Math.max(0, m.riRecruitedVolume), 0)} mL recruited`],
         ['Open-unit vascular bed', `${n(comp.openBed * RESISTANCE_TO_WOOD, 2)} Wood units`],
         // A logistic opening curve never reaches exactly 100%, so an otherwise
         // normal lung can retain a mathematically tiny closed branch with a

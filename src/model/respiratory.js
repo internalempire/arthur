@@ -22,7 +22,7 @@
 import { clamp } from './units.js';
 import {
   transpulmonaryAt, transpulmonaryAtFixed, relaxationVolume, lungComplianceAt,
-  stepOpenFraction, openBand, RECOIL_AT_FRC,
+  stepOpenFraction, openBand, hysteresisGap, RECOIL_AT_FRC,
 } from './lung.js';
 
 // Pleural pressure at the relaxation volume. Its negative is the
@@ -168,7 +168,12 @@ export function stepRespiratory(p, r, dt) {
   // actually resting at, which with hysteresis depends on what was done to it —
   // the chest wall knows how much gas is in the chest, not how it got there.
   const vRelax = relaxationVolume(p);
-  const hysteretic = p.hysteresis === 'on';
+  // With no opening/closing gap there is no memory to integrate. Solving the
+  // equilibrium curve directly is not just cheaper but necessary: treating an
+  // algebraic curve as a lagged state creates a spurious collapse feedback when
+  // the recruitment transition is steep. Thus pClose === pOpen is exactly the
+  // same model as hysteresis off, as the control promises.
+  const hysteretic = p.hysteresis === 'on' && hysteresisGap(p) > 1e-9;
   if (hysteretic && !(r.openFraction > 0)) {
     // A lung that has never been inflated sits on the opening branch.
     r.openFraction = openBand(p, RECOIL_AT_FRC).lo;

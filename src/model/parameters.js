@@ -167,14 +167,14 @@ export const PARAMETERS = [
     help: 'The resistance coefficient of a fully open lung at its resting volume. Collapse and hypoxic vasoconstriction then redistribute flow between open and derecruited vascular pathways.',
   },
   {
-    id: 'recruitable', group: 'mechanics', label: 'Recruitable fraction', unit: '×',
-    min: 0, max: 1, step: 0.05, default: 0.4,
-    help: 'Of the lung that is collapsed at rest, how much can be reopened at all. Consolidated lung is collapsed and stays collapsed however hard it is pushed, and that is the difference between a patient in whom PEEP lowers pulmonary vascular resistance and one in whom it only raises it. Has no effect on a lung that is not collapsed to begin with.',
+    id: 'riRatio', group: 'mechanics', label: 'Recruitment-to-inflation ratio', unit: 'R/I',
+    min: 0, max: 2, step: 0.05, default: 0.5,
+    help: 'Supine bedside R/I for a passive PEEP 5 to 15 cmH₂O manoeuvre: compliance of recruited volume divided by respiratory-system compliance at low PEEP. Values below 0.5 describe lower recruitment relative to inflation; 0.5 is a cohort-derived teaching threshold, not an outcome-proven treatment cutoff. Collapse remains a separate input: if too little lung is closed to realise the requested R/I, the model stops at the available lung and flags the shortfall. Proning may change the achieved readout by shifting opening pressures.',
   },
   {
     id: 'pOpen', group: 'mechanics', label: 'Opening pressure', unit: 'cmH₂O',
     min: 5, max: 40, step: 1, default: 20,
-    help: 'The transpulmonary pressure at which half the recruitable lung is open. Units open along a distribution rather than at a threshold, which is why recruitment is a ramp.',
+    help: 'The transpulmonary pressure at which half the internally openable diseased compartment is open. It shapes where recruitment occurs; it is not the airway-opening pressure used to correct a bedside R/I manoeuvre.',
   },
   {
     id: 'hysteresis', group: 'mechanics', label: 'Recruitment hysteresis',
