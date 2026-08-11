@@ -162,8 +162,9 @@ export const PARAMETERS = [
 
   // ------------------------------------------------------------------- pulmonary
   {
-    id: 'pvrBase', group: 'pulmonary', label: 'Baseline PVR at FRC', unit: 'mmHg·s/mL',
+    id: 'pvrBase', group: 'pulmonary', label: 'Open-lung PVR at FRC', unit: 'mmHg·s/mL',
     min: 0.03, max: 0.60, step: 0.01, default: 0.07,
+    help: 'The resistance coefficient of a fully open lung at its resting volume. Collapse and hypoxic vasoconstriction then redistribute flow between open and derecruited vascular pathways.',
   },
   {
     id: 'recruitable', group: 'mechanics', label: 'Recruitable fraction', unit: '×',
@@ -194,7 +195,7 @@ export const PARAMETERS = [
   {
     id: 'hpv', group: 'pulmonary', label: 'Hypoxic vasoconstriction', unit: '×',
     min: 0, max: 3, step: 0.1, default: 1.0,
-    help: 'Applied to derecruited lung below FRC. It is why lowering PEEP in RV failure can raise PVR rather than lower it.',
+    help: 'Raises resistance only in the vascular pathway of derecruited units. It can redirect flow toward open lung, but severe collapse still reduces the vascular bed available to the right ventricle.',
   },
   {
     id: 'piston', group: 'pulmonary', label: 'Pulmonary capacitance coupling', unit: 'mL/L',

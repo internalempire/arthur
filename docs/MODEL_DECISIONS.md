@@ -8,6 +8,66 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-08-11 — Re-centre pulmonary vascular calibration on human in-vivo data
+
+### Decision
+
+- Put the fully open mechanical J-curve minimum near the model's human FRC
+  (2.25 versus 2.2 L), rather than at 2.87 L / 48% of a fixed 6 L capacity.
+- Retain Thomas 1961, Hakim 1982 and the isolated-lung work as qualitative
+  support for volume dependence and opposing mechanical limbs, but retire their
+  exact animal nadir and maximal-inflation ratios as executable human targets.
+- Reference vascular strain to the volume this patient's fully open tissue
+  would hold at resting recoil. A small stiff ARDS lung can therefore be
+  distended despite a total volume below the normal 2.2 L FRC.
+- Represent open and derecruited vascular beds as conductances in parallel.
+  Hypoxic vasoconstriction raises only the derecruited pathway's resistance.
+- Apply the alveolar waterfall to 45% of the aggregate pulmonary bed rather than
+  placing the entire circulation behind `max(Ppv, Palv)`.
+- Calibrate absolute derived PVR and the PEEP response against Cappio Borlino et
+  al. 2024 using a human ARDS phenotype with normal RV contractility and
+  `pvrBase=0.09`; do not reuse the deliberately severe ARDS/RV-failure preset as
+  a study cohort.
+
+### Why
+
+The prior J-curve passed precise numerical tests taken from excised or isolated
+animal lungs while disagreeing with the clinically used human schematic, which
+places the minimum near FRC. More importantly, its ARDS values were far outside
+the available human in-vivo measurements. In the Cappio Borlino manoeuvre the
+model produced approximately 10–16 WU, versus cohort IQRs spanning roughly
+1.5–4.75 WU.
+
+Two structural inconsistencies caused most of the excess. The documentation said
+closed units remained perfused, but the equation divided by the open fraction,
+which removed their vascular pathway, then multiplied the whole lung by HPV. In
+the circulation, a mean-pressure crossing from `Ppv>Palv` to `Palv>Ppv` placed
+the whole pulmonary bed abruptly behind an alveolar waterfall. Both choices
+amplified a regional mechanism into a whole-lung penalty.
+
+### Human calibration result
+
+After 45 s of equilibration, PEEP 4 → 14 produces:
+
+| Phenotype | Model | Human cohort medians [IQR] |
+|---|---|---|
+| Low recruitability | 2.71 → 3.35 WU, +24% | 2.00 [1.50–3.71] → 3.04 [2.08–4.75] WU, +52% ratio of medians |
+| Higher recruitability | 2.45 → 2.64 WU, +8% | 2.80 [2.31–3.61] → 2.94 [2.10–3.75] WU, +5% ratio of medians |
+
+All four absolute model values are inside the published IQRs. The low-recruiter
+response is intentionally not forced to +52%: a ratio of cohort medians is not
+the median paired percentage change, and the simulator is not a patient-specific
+fit.
+
+### Deliberate limits
+
+The 45% waterfall share and threefold intrinsic resistance of the derecruited
+path are transparent aggregate coefficients. They avoid a false all-or-none
+whole-lung effect; they do not reproduce regional perfusion anatomy. The
+`recruitable` control also remains a fraction of collapsed units that can open,
+not the measured recruitment-to-inflation ratio. Replacing it with R/I requires
+a separate calibration and is not hidden inside this phase.
+
 ## 2026-08-11 — Retire diagnostic PPV calibration and the tidal-volume challenge
 
 ### Decision

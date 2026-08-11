@@ -50,7 +50,6 @@ import { clamp } from './units.js';
 // able to raise it. A lung that has lost recoil rests high, a lung that has
 // collapsed rests low, and neither is set by hand.
 export const NORMAL_FRC = 2.2; // L
-export const PVR_NADIR_VOLUME = NORMAL_FRC;
 
 // Normal units close as the lung empties and reopen almost as soon as there is
 // any distending pressure, so their threshold sits near zero transpulmonary
@@ -324,55 +323,34 @@ export function lungRegions(p, lungVolume, plKnown = null, phiKnown = null) {
   const openFraction = phiKnown ?? clamp(normalOpen + recruited, 0.05, 1);
   const closedFraction = 1 - openFraction;
 
-  // Volume per open unit, referenced to what those units would hold at a normal
-  // resting volume.
-  const strain = lungVolume / (NORMAL_FRC * openFraction) - 1;
+  // Volume per open unit, referenced to what this patient's fully open tissue
+  // would hold at resting recoil. This is the clinically relevant FRC for the
+  // mechanical J-curve: a stiff ARDS baby lung can be distended at a total
+  // volume far below 2.2 L. Using the healthy absolute FRC here made such a lung
+  // appear under-inflated even at high plateau pressure.
+  const vascularFrc = perUnitVolume(p, RECOIL_AT_FRC);
+  const strain = lungVolume / (vascularFrc * openFraction) - 1;
 
-  return { diseased, recruited, easy, hard, openFraction, closedFraction, strain, pl };
+  return { diseased, recruited, easy, hard, openFraction, closedFraction, strain, pl, vascularFrc };
 }
 
-// Both limbs are driven by volume, and they share the term that makes them rise.
+// Both mechanical limbs are driven by volume, and they share the term that makes
+// them rise with overdistension. Thomas 1961 and Hakim 1982 support this
+// qualitative mechanism, but both are animal preparations; their exact ratios
+// are no longer used as human calibration targets.
 //
-// This replaces a version in which the alveolar limb followed strain and the
-// extra-alveolar one followed transpulmonary pressure. That split was argued from
-// first principles — radial traction is a stress, so it should follow a pressure —
-// and three measurements disagree with it:
-//
-//   Thomas, Griffo & Roos 1961, excised dog lung, negative-pressure inflation at
-//   constant vascular pressures: resistance plotted against transpulmonary
-//   pressure shows wide hysteresis between inflation and deflation; plotted
-//   against volume it does not. Their conclusion is that resistance is
-//   "volume-dependent rather than pressure-dependent".
-//
-//   Hakim, Michel & Chang 1982, arterial and venous occlusion: the volume-related
-//   changes are identical under positive- and negative-pressure inflation while
-//   the pressure-related ones are not, and inflation produces "a volume-dependent
-//   increase in the resistance of both alveolar and extra-alveolar vessels".
-//
-//   The Petak group 2008, isolated perfused rat lung: hysteresis against
-//   transpulmonary pressure is abolished when the same data are plotted against
-//   volume.
-//
-// So `stretch` is a single exponential in strain applied to *both* compartments,
-// which is Hakim's sentence written as arithmetic: inflation narrows every
-// vessel. What separates them is that the extra-alveolar compartment also gets
-// unfurled by the surrounding parenchyma as the lung leaves collapse, and that
-// term falls with strain toward a floor. Their sum is the J, and the
-// extra-alveolar limb is itself U-shaped — falling, then overtaken by stretch —
-// which is what Hakim's arterial and venous segments do.
-//
-// The three constants are fitted to four published figures, listed in
-// docs/LITERATURE_RANGES.md and each an executable row: where the nadir sits, the
-// ratio at maximal inflation, the ratio at low volume, and the change across the
-// transpulmonary pressures this simulator actually runs in. Four constraints on
-// three constants, so the fit can fail — and the previous constants failed three
-// of the four by factors of up to five.
-const K_ALV = 0.515;      // stretch: how steeply inflation narrows every vessel
-const K_EXTRA = 3.35;     // unfurling: how quickly leaving collapse opens the
-                          // extra-alveolar vessels
-const EXTRA_FLOOR = 0.17; // what is left of that once they are fully unfurled
+// For the didactic human curve the fully open lung has its minimum at NORMAL_FRC.
+// Clinical reviews draw the J-curve this way, whereas the old 2.87 L minimum was
+// inherited from excised dog lungs. K_UNFURL is derived, not fitted: at zero
+// strain it makes the negative slope from parenchymal unfurling exactly cancel
+// the positive slope from vascular stretch. The right limb then rises gradually
+// over the volumes the simulator can plausibly reach instead of reproducing an
+// animal maximal-inflation experiment.
+const K_STRETCH = 0.515;
+const EXTRA_FLOOR = 0.17;
 const F_ALV = 0.6;
 const F_EXTRA = 0.4;
+const K_UNFURL = K_STRETCH / (F_EXTRA * (1 - EXTRA_FLOOR));
 
 // F_ALV is a modelling choice and cannot be made anything else. The published
 // partitions do not measure the same boundary and do not agree: capillaries 34%
@@ -381,38 +359,49 @@ const F_EXTRA = 0.4;
 // to 53% with haematocrit alone. No measurement settles this one.
 
 const unfurled = (strain) =>
-  EXTRA_FLOOR + (1 - EXTRA_FLOOR) * Math.exp(-K_EXTRA * strain);
+  EXTRA_FLOOR + (1 - EXTRA_FLOOR) * Math.exp(-K_UNFURL * strain);
 
-// How much resistance hypoxic vasoconstriction adds per unit of closed lung.
+// A derecruited unit is poorly perfused, not absent. Its intrinsic pathway is
+// narrower even with HPV disabled; HPV then raises only this pathway's
+// resistance. CLOSED_PATH_FACTOR is a deliberately coarse teaching coefficient,
+// constrained together with the ARDS phenotype by the human in-vivo PEEP trial
+// in tests/literature.mjs rather than presented as a measured anatomical ratio.
+const CLOSED_PATH_FACTOR = 3;
 const HPV_GAIN = 1.1;
 
 /**
- * Pulmonary vascular resistance, as the parallel sum of the open units.
+ * Pulmonary vascular resistance, as the equivalent of two parallel pathways.
  *
- * Two things set it. Each open unit's resistance follows the J above, driven by
- * the strain in that unit. And the units conduct in parallel, so halving how
- * many are open doubles the resistance — the 1/openFraction term, which is where
- * derecruitment does most of its damage.
- *
- * Closed units are not simply removed: they are still perfused, badly, and
- * hypoxic vasoconstriction is what makes that expensive.
+ * Open units follow the volume-dependent J above. Derecruited units retain a
+ * high-resistance pathway whose tone is increased by HPV. Each population's
+ * conductance is proportional to how much lung belongs to it, and the two
+ * conductances add. This matters physiologically and numerically: the previous
+ * formula said closed units were still perfused but divided only by the open
+ * fraction and applied HPV to the whole lung, which actually removed their
+ * pathway and over-amplified absolute PVR in ARDS.
  */
 export function pvrComponents(p, lungVolume, plKnown = null, phiKnown = null) {
   const r = lungRegions(p, lungVolume, plKnown, phiKnown);
-  const hypoxic = 1 + p.hpv * HPV_GAIN * r.closedFraction;
-  const stretch = Math.exp(K_ALV * r.strain);
+  const stretch = Math.exp(K_STRETCH * r.strain);
   const perUnitAlveolar = p.pvrBase * F_ALV * stretch;
   const perUnitExtra = p.pvrBase * F_EXTRA * unfurled(r.strain) * stretch;
-  const alveolar = (perUnitAlveolar / r.openFraction) * hypoxic;
-  const extraAlveolar = (perUnitExtra / r.openFraction) * hypoxic;
+  const openPath = perUnitAlveolar + perUnitExtra;
+  const closedPath = p.pvrBase * CLOSED_PATH_FACTOR * (1 + (p.hpv ?? 0) * HPV_GAIN);
+  const openConductance = r.openFraction / openPath;
+  const closedConductance = r.closedFraction / closedPath;
+  const totalConductance = openConductance + closedConductance;
   return {
-    alveolar,
-    extraAlveolar,
-    total: alveolar + extraAlveolar,
+    openPath,
+    closedPath,
+    openBed: openPath / r.openFraction,
+    closedBed: r.closedFraction > 0 ? closedPath / r.closedFraction : Infinity,
+    openFlowShare: openConductance / totalConductance,
+    total: 1 / totalConductance,
     openFraction: r.openFraction,
     closedFraction: r.closedFraction,
     recruited: r.recruited,
     strain: r.strain,
+    vascularFrc: r.vascularFrc,
     pl: r.pl,
     // Kept under its old name for the panels that label the axis with it.
     x: r.strain,

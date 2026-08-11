@@ -59,19 +59,17 @@ numbers. The following all reproduce:
 - Hypovolaemia: pulse pressure variation 15%, and a 500 mL bolus raises cardiac
   output from 4.7 to 6.3 L/min. At euvolaemia the same bolus gains about 12%
   and variation is 2%.
-- ARDS with right ventricular failure: RV:LV end-diastolic ratio 2.2, resistance
-  coefficient 6.6 Wood units against 9.2 derived from mean pulmonary artery
-  pressure, wedge and output. Across a PEEP titration from 0 to 20 the
-  coefficient falls 7.6 → 6.0 while cardiac output falls throughout,
-  3.56 → 2.89 L/min: the preload cost outruns the afterload benefit at every
-  step, and filling the patient lifts the curve without changing its shape.
-  Setting `recruitable` to zero inverts it — the same collapsed lung,
-  consolidated rather than closed, gives 8.0 → 10.4 Wood units and 3.38 → 2.02
-  L/min.
+- ARDS with right ventricular failure: at its shipped PEEP the RV:LV
+  end-diastolic ratio is 1.65, the resistance coefficient is 4.09 WU and the
+  catheter-derived value is about 4.98 WU. Across PEEP 0 → 20 the coefficient
+  falls 4.42 → 3.89 while derived PVR rises 4.44 → 5.55 WU and output falls
+  4.14 → 3.73 L/min. Setting `recruitable` to zero separates the response: the
+  coefficient rises 4.57 → 4.62, derived PVR 4.93 → 7.85 and output falls
+  3.97 → 3.24 L/min.
 - COPD with a short expiratory time: 6.4 cmH₂O of intrinsic PEEP appears with no
   change in the set PEEP, and the hyperinflated lung sits on the right limb of
-  the J-curve at 1.27 Wood units averaged over a breath. That resistance swings
-  from 1.22 to 1.34 within the breath, because it is instantaneous and follows
+  the J-curve at 1.25 Wood units averaged over a breath. That resistance swings
+  from 1.23 to 1.28 within the breath, because it is instantaneous and follows
   lung volume; in presets with a smaller tidal excursion the swing is 0.3 or
   less.
 - Intra-abdominal hypertension raises Pmsf to 19 mmHg while *lowering* cardiac
@@ -114,20 +112,11 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 - **Variation can report right ventricular afterload rather than preload.** As
   lung compliance falls, airway pressure swings the pulmonary
   vessels harder within each breath, and more of the pulse pressure variation is
-  the right ventricle ejecting against a cyclically varying afterload. At a lung
-  compliance of 30 mL/cmH₂O the pleural swing is unchanged at 2.8 cmH₂O and
-  venous return barely moves, but right ventricular stroke volume swings three
-  times as much and variation reads 22%. The model exposes that afterload swing
-  as a mechanistic output, but no longer assigns it a PPV cutoff: the former 15%
-  warning threshold was calibrated against the now-retired Michard
-  fluid-response relation. Right ventricular dilatation remains an applicability
-  caution, but is a late and incomplete proxy for the mechanism.
-- **The J-curve nadir is above FRC, and current reviews say otherwise.** Cecconi,
-  Collino & Pinsky (*Intensive Care Med* 2026) place the minimum of the
-  resistance–volume curve at functional residual capacity, as almost every source
-  does. Thomas, Griffo & Roos measured it at 45–60% of maximal lung volume in 55
-  excised lungs, above FRC, and this model follows the measurement — its nadir
-  sits at 2.87 L against an FRC of 2.2. Worth knowing before teaching from it.
+  the right ventricle ejecting against a cyclically varying afterload. The model
+  exposes that afterload swing as a mechanistic output, but the spatially lumped
+  PVR cannot support a quantitative ARDS cutoff or magnitude claim. Right
+  ventricular dilatation remains an applicability caution, but is a late and
+  incomplete proxy for the mechanism.
 - **No gas exchange.** There is no oxygen, CO₂, pH or shunt. Hypoxic pulmonary
   vasoconstriction is a coefficient on derecruited lung, not a consequence of an
   alveolar oxygen tension.
@@ -180,12 +169,13 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   its threshold, so how long a manoeuvre is held makes no difference, only how
   high it goes. Real recruitment takes seconds to minutes, which is why
   manoeuvres are held rather than touched.
-- **The pulmonary circulation is lumped.** One PVR and one zone-III fraction for
-  the whole lung. The lung units are now split into two populations by opening
-  pressure, which is what carries recruitability, but the vasculature that
-  serves them is still a single resistance. Regional heterogeneity — the thing
-  that actually makes ARDS
-  ARDS — is absent.
+- **The pulmonary circulation remains spatially lumped.** Open and derecruited
+  unit populations now have separate vascular conductances in parallel, and the
+  alveolar waterfall is limited to a fixed aggregate share. There are still no
+  dependent/non-dependent regions, gravitational pressure gradients, local West
+  zones or regional HPV. This corrects the previous all-or-none whole-lung
+  behaviour without claiming to reproduce the heterogeneity that makes ARDS
+  ARDS.
 - **Forward Euler.** Stable across the shipped ranges, and flows are now limited
   so no compartment can be drained past a 1 mL floor; a 250-configuration sweep
   of the whole control space finds no negative volume, no non-finite value and
@@ -199,8 +189,7 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   identifiability analysis — different parameter combinations can produce the
   same output. This is a mechanistic teaching model calibrated to reproduce
   qualitative relationships, not a patient-specific predictor.
-- **No valvular disease, no arrhythmia, no bronchospasm heterogeneity, no
-  recruitment hysteresis.**
+- **No valvular disease, no arrhythmia and no bronchospasm heterogeneity.**
 
 ## Sources
 
@@ -228,3 +217,15 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
    critically ill patients. *Chest* 1985;88:653–8.
 10. Teboul JL, Monnet X, Chemla D, Michard F. Arterial pulse pressure variation
     with mechanical ventilation. *Am J Respir Crit Care Med* 2019;199:22–31.
+11. Cappio Borlino S, et al. The effect of positive end-expiratory pressure on
+    pulmonary vascular resistance depends on lung recruitability in patients
+    with ARDS. *Am J Respir Crit Care Med* 2024;210:900–907.
+    doi:10.1164/rccm.202402-0383OC.
+12. Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical
+    bedside implications. *Intensive Care Med* 2026.
+    doi:10.1007/s00134-026-08583-3.
+13. Thomas LJ Jr, Griffo ZJ, Roos A. Effect of negative pressure inflation of
+    the lung on pulmonary vascular resistance. *J Appl Physiol* 1961;16:451–456.
+14. Hakim TS, Michel RP, Chang HK. Effect of lung inflation on pulmonary
+    vascular resistance by arterial and venous occlusion. *J Appl Physiol*
+    1982;53:1110–1115.

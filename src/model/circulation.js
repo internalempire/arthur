@@ -17,6 +17,17 @@
 import { cmH2OtoMmHg, clamp } from './units.js';
 import { pvrAt } from './lung.js';
 
+// Only the alveolar microvascular share is exposed directly to an alveolar
+// waterfall. The old circuit put the entire pulmonary resistance behind
+// max(Ppv, Palv), so a small crossing of those mean pressures switched the whole
+// lung from zone III to zone II and added several Wood units at high PEEP. Human
+// lungs contain alveolar and extra-alveolar segments in series and regions in
+// different West zones; 0.45 is the upper end of the 34–45% alveolar-capillary
+// partition reported by indicator-dilution and micropuncture studies. It is a
+// deliberately transparent aggregate, not a claim that every patient has this
+// exact fraction.
+const ALVEOLAR_WATERFALL_FRACTION = 0.45;
+
 // Unstressed volumes (mL) and compliances (mL/mmHg) that are not user-facing.
 export const VASC = {
   vuSa: 700, cSa: 1.35,
@@ -237,10 +248,12 @@ export function stepCirculation(p, c, resp, dt) {
   const qSys = (pSa - pmsf) / p.svr;
 
   const pvr = pvrAt(p, resp.lungVolume, resp.plSolved, resp.openFraction);
-  // Vascular waterfall: where alveolar pressure exceeds pulmonary venous
-  // pressure, alveolar pressure — not left atrial pressure — is the downstream
-  // pressure for flow.
-  const qPul = Math.max(0, (pPa - Math.max(pPv, palv)) / pvr);
+  // Vascular waterfall: alveolar pressure can replace pulmonary venous pressure
+  // as downstream pressure, but only for the alveolar microvascular share. The
+  // extra-alveolar share remains referenced to pulmonary venous pressure.
+  const pPulDownstream = pPv
+    + ALVEOLAR_WATERFALL_FRACTION * Math.max(0, palv - pPv);
+  const qPul = Math.max(0, (pPa - pPulDownstream) / pvr);
   const qPulVen = (pPv - pLa) / VASC.rPulVen;
 
   const qTv = valveFlow(pRa, pRv, VALVE.tricuspid);
