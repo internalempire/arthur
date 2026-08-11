@@ -1080,6 +1080,7 @@ docs/PHYSIOLOGY.md        calibration, verification against the sources, limitat
 docs/LITERATURE_RANGES.md published findings as executable rows, and where the model fails them
 docs/MODEL_DECISIONS.md   dated rationale for substantive modelling changes
 docs/POSTMORTEM-2026-08-09.md  the errors made while anchoring the J-curve, and how they were caught
+docs/HANDOVER-2026-08-11.md    current project state and the ordered roadmap for the next session
 src/
   main.js                 transport, scenario wiring, animation loop
   model/
