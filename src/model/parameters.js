@@ -141,9 +141,9 @@ export const PARAMETERS = [
     min: 0.010, max: 0.080, step: 0.002, default: 0.028,
   },
   {
-    id: 'baroreflex', group: 'heart', label: 'Baroreflex gain', unit: '×',
+    id: 'baroreflex', group: 'heart', label: 'Baroreflex sensitivity', unit: '×',
     min: 0, max: 2, step: 0.1, default: 1.0,
-    help: 'A single sympathetic outflow driving heart rate, resistance, venous tone and contractility together, with a 15 s time constant. Set to zero to see what every intervention costs a patient with no compensation — which is what this model used to assume.',
+    help: 'Sensitivity of one bounded, slow sympathetic compensator driving heart rate, resistance, venous tone and contractility together. It uses one 15 s time constant and is not a beat-to-beat human baroreflex model. Set to zero to show the same circulation without compensation.',
   },
   {
     id: 'baroSetPoint', group: 'heart', label: 'Baroreflex set point', unit: 'mmHg',

@@ -335,9 +335,8 @@ describe('Pulmonary transit');
 
 describe('Baroreflex');
 {
-  // The septic preset's settings, because pulse pressure variation needs an
-  // adequate tidal volume and a chest wall that transmits it before it means
-  // anything — which is what the interpretability rules already say.
+  // Use the septic preset's underfilled, vasodilated phenotype. The invariant
+  // below is mechanistic preload reserve, not a PPV cutoff.
   const septic = { stressedVolume: 330, svr: 0.85, vt: 560, ccw: 150, hr: 105, peep: 8, rr: 18 };
   const off = settled({ ...septic, baroreflex: 0 }, 45);
   const on = settled({ ...septic, baroreflex: 1 }, 45);
@@ -361,8 +360,30 @@ describe('Baroreflex');
     high.metrics.baroOutflow < 0 && high.metrics.baroOutflow > -0.3,
     `outflow ${high.metrics.baroOutflow.toFixed(3)} at MAP ${high.metrics.map.toFixed(0)}`);
 
-  check('zero gain restores the uncompensated model',
+  check('zero sensitivity restores the uncompensated model',
     settled({ baroreflex: 0 }, 45).metrics.baroOutflow === 0);
+
+  // Sensitivity changes where the aggregate reflex saturates, not the size of
+  // a biologically undefined super-response. This guardrail matters because a
+  // high selected baseline HR already represents part of the patient's
+  // phenotype and must not be multiplied by the compensation a second time.
+  const extreme = settled({
+    stressedVolume: 200, svr: 0.25, hr: 170, baroreflex: 2, baroSetPoint: 110,
+  }, 60);
+  check('high sensitivity cannot exceed full sympathetic outflow',
+    extreme.metrics.baroOutflow <= 1 && extreme.effective.venousToneVolume <= BARO.venousRecruitment,
+    `outflow ${extreme.metrics.baroOutflow.toFixed(3)}, venous recruitment ${extreme.effective.venousToneVolume.toFixed(0)} mL`);
+  check('an already high baseline rate is not multiplied into an extreme tachycardia',
+    extreme.metrics.effectiveHr <= 170 + BARO.heartRateReserve,
+    `effective HR ${extreme.metrics.effectiveHr.toFixed(0)} /min`);
+
+  const lowBase = { hr: 75, svr: 1.05, csv: 120, eesLv: 3, eesRv: 0.58 };
+  const highBase = { ...lowBase, hr: 105 };
+  const lowEffective = {}, highEffective = {};
+  applyBaroreflex(lowEffective, lowBase, 0.5);
+  applyBaroreflex(highEffective, highBase, 0.5);
+  check('chronotropic reserve is additive rather than proportional to baseline rate',
+    near(lowEffective.hr - lowBase.hr, highEffective.hr - highBase.hr, 1e-12));
 
   // The loop must not oscillate.
   const s = new Simulator();
@@ -371,7 +392,7 @@ describe('Baroreflex');
   s.advance(40, true);
   let lo = Infinity, hi = -Infinity;
   for (let i = 0; i < 40; i++) { s.advance(1, true); lo = Math.min(lo, s.metrics.co); hi = Math.max(hi, s.metrics.co); }
-  check('a high gain against a low pressure does not oscillate', hi - lo < 1.0 && Number.isFinite(s.metrics.co),
+  check('a high sensitivity against a low pressure does not oscillate', hi - lo < 1.0 && Number.isFinite(s.metrics.co),
     `cardiac output swings ${(hi - lo).toFixed(2)} L/min over 40 s`);
 }
 
