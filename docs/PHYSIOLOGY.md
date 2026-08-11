@@ -17,7 +17,8 @@ numbers the model no longer produced.
 
 What follows is the part that does not belong in a reference: how the model was
 calibrated, what was checked against the sources, and where it stops being
-trustworthy.
+trustworthy. Dated rationale for changes to those claims is kept in
+[MODEL_DECISIONS.md](MODEL_DECISIONS.md).
 
 Since the August 2026 audit the numbers here are also guarded by
 `node tests/run.mjs`, which checks volume conservation, compartment positivity
@@ -110,16 +111,17 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   single sympathetic outflow with one time constant; the real arcs to heart rate,
   resistance, venous tone and contractility have different latencies, and there
   is no chemoreflex at all. Set the gain to zero to see the uncompensated model.
-- **Variation can report right ventricular afterload rather than preload, and
-  now says so.** As lung compliance falls, airway pressure swings the pulmonary
+- **Variation can report right ventricular afterload rather than preload.** As
+  lung compliance falls, airway pressure swings the pulmonary
   vessels harder within each breath, and more of the pulse pressure variation is
   the right ventricle ejecting against a cyclically varying afterload. At a lung
   compliance of 30 mL/cmH₂O the pleural swing is unchanged at 2.8 cmH₂O and
   venous return barely moves, but right ventricular stroke volume swings three
-  times as much and variation reads 22%. The guard used to be a rule on right
-  ventricular dilatation, which is a late sign — the right ventricle is still
-  smaller than the left there. The model now flags the cause directly, when
-  afterload swings by more than 15% of its mean within a breath.
+  times as much and variation reads 22%. The model exposes that afterload swing
+  as a mechanistic output, but no longer assigns it a PPV cutoff: the former 15%
+  warning threshold was calibrated against the now-retired Michard
+  fluid-response relation. Right ventricular dilatation remains an applicability
+  caution, but is a late and incomplete proxy for the mechanism.
 - **The J-curve nadir is above FRC, and current reviews say otherwise.** Cecconi,
   Collino & Pinsky (*Intensive Care Med* 2026) place the minimum of the
   resistance–volume curve at functional residual capacity, as almost every source
@@ -152,14 +154,14 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   The preload reserve is not fooled by it, because it reads the curves rather
   than the waveform. That is the argument for having both on screen.
 
-- **Variation scales with driving pressure, as it should.** An earlier note here
-  claimed the model under-read pulse pressure variation. It does not. Michard's
-  13% threshold and his regression were measured at a driving pressure near 30
-  cmH₂O — his Figure 1 shows the airway pressure trace — and at that ventilation
-  this model reproduces the regression, slope 0.87 against his 1.01. At a
-  protective 6 cmH₂O of driving pressure the variation is a fifth of that, which
-  is correct and is the reason the tidal volume challenge exists. The earlier
-  note applied his threshold outside his conditions.
+- **Variation is not quantitatively validated as a fluid-response test.** It
+  scales with driving pressure and retains the expected qualitative dependence
+  on loading conditions, but no 13% cutoff or PPV–fluid-response regression is
+  applied. An earlier version reproduced the Michard 2000 relation under the
+  study's high-driving-pressure ventilation and promoted that agreement to a
+  model calibration. That use has been retired because it is not generalisable
+  enough for this didactic model. Low tidal volume remains an applicability
+  caution; it is not “corrected” by a tidal-volume challenge.
 - **Ejection fraction runs low** (≈50% at baseline). Ejection ends when cavity
   pressure falls below aortic pressure, and with a double-hill activation that
   happens a little early. Stroke volume, cardiac output and the loop shape are

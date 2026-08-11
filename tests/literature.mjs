@@ -7,7 +7,6 @@
 
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams } from '../src/model/parameters.js';
-import { SCENARIO_BY_ID } from '../src/model/scenarios.js';
 import { pvrComponents, lungVolumeAtPl } from '../src/model/lung.js';
 
 // Thomas's volume axis runs from the degassed lung, so 'maximal volume' is the
@@ -110,50 +109,6 @@ export const LITERATURE = {
     };
   },
 
-  // Two rows, because the manoeuvre gets one thing right and one thing wrong,
-  // and a single row would hide whichever half it did not test.
-  'tidal-challenge-ordering': () => {
-    const protective = { mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150 };
-    const at = (stressedVolume) => {
-      const s = new Simulator();
-      s.params = { ...defaultParams(), ...protective, stressedVolume };
-      s.reset();
-      s.advance(45, true);
-      s.startTidalChallenge();
-      s.advance(63, true);
-      return s.challengeResult.dPpv;
-    };
-    // Only over the range where there is something to order. Above about 900 mL
-    // the change is a few tenths of a point in either direction, which is the
-    // measurement's own noise rather than a reversal.
-    const steps = [300, 500, 700, 900].map(at);
-    const falling = steps.every((d, i) => i === 0 || d < steps[i - 1] + 0.15);
-    return {
-      pass: falling,
-      detail: `ΔPPV ${steps.map((d) => d.toFixed(1)).join(' → ')} points across stressed volume 300 → 1100 mL`,
-    };
-  },
-
-  // The trial's patients were septic and postoperative ICU patients on
-  // protective ventilation who turned out to be fluid responsive — tachycardic
-  // and vasodilated, not merely dry at a resting heart rate. The app already
-  // ships a preset for that patient, so this row uses it rather than a stressed
-  // volume picked by hand, which is the number it would be tempting to choose.
-  'tidal-challenge-threshold': () => {
-    const s = new Simulator();
-    s.applyScenario(SCENARIO_BY_ID.get('septic-responder'));
-    s.params.vt = 6 * 70; // protective, where the plain index is not readable
-    s.reset();
-    s.advance(45, true);
-    s.startTidalChallenge();
-    s.advance(63, true);
-    const r = s.challengeResult;
-    return {
-      pass: r.dPpv > 3.5 && r.verdict === 'dependent',
-      detail: `ΔPPV ${r.dPpv.toFixed(1)} points, ${r.ppvBefore.toFixed(1)} → ${r.ppvAfter.toFixed(1)}% (want > 3.5)`,
-    };
-  },
-
   'transmission-chest-wall': () => {
     const compliant = settle({ ccw: 250, clung: 200, peep: 12 });
     const stiff = settle({ ccw: 70, clung: 200, peep: 12 });
@@ -251,85 +206,6 @@ export const LITERATURE = {
       pass: rise >= 1.1,
       detail: `extra-alveolar limb ${rise.toFixed(2)}× its minimum at maximal inflation `
         + `(want ≥ 1.1, i.e. it turns back up; Hakim Fig. 3 gives 1.27). Minimum at ${loV.toFixed(2)} L`,
-    };
-  },
-
-  // Michard's own ventilation, which is the whole point of this row and the one
-  // below. His Figure 1 shows airway pressure swinging from about 7 to about 40
-  // cmH2O — a driving pressure near 30, which is what 2000-era ventilation of an
-  // ARDS lung looked like. Variation of 13% means something there and cannot be
-  // demanded of a patient ventilated at a sixth of that pressure.
-  //
-  // An earlier version of this row asked for it anyway, using a normal lung at
-  // 8 mL/kg where the driving pressure is 6 cmH2O, and concluded the model
-  // under-read variation by a factor of four. It does not. Applying a threshold
-  // outside the conditions it was measured in is the exact error the
-  // interpretability rules in this model exist to prevent, and it was sitting in
-  // a test.
-  'ppv-responder': () => {
-    const vent = { mode: 'vcv', pmus: 0, vt: 700, collapsed: 0.35, clung: 45,
-      peep: 7, rr: 15, ti: 1.2 };
-    const patients = [280, 350, 450].map((stressedVolume) => {
-      const before = settle({ ...vent, stressedVolume });
-      const after = settle({ ...vent, stressedVolume: stressedVolume + 500 });
-      return { ppv: before.ppv, gain: change(before.co, after.co),
-        level: before.interpretability.ppv.level };
-    });
-    const dependent = patients.filter((x) => x.gain >= 15);
-    // Available, not unqualified. The model now cautions that variation in a
-    // stiff lung may partly report cyclic right ventricular afterload — and
-    // Michard's patients were exactly that, ARDS lungs at a driving pressure
-    // near 30. The caution is right and the prediction still held in his hands
-    // at r² = 0.85, so the row asks that the number be readable and above the
-    // threshold, not that it come without a caveat.
-    const flagged = dependent.filter((x) => x.ppv >= 13 && x.level !== 'unavailable');
-    return {
-      pass: dependent.length > 0 && flagged.length === dependent.length,
-      detail: `${flagged.length} of ${dependent.length} preload-dependent patients reach 13%: `
-        + patients.map((x) => `${x.ppv.toFixed(0)}% at +${x.gain.toFixed(0)}%`).join(', '),
-    };
-  },
-
-  // The relation rather than the threshold, which is a far stronger test: it
-  // constrains the whole line, not one point on it.
-  'ppv-fluid-response-relation': () => {
-    const vent = { mode: 'vcv', pmus: 0, vt: 700, collapsed: 0.35, clung: 45,
-      peep: 7, rr: 15, ti: 1.2 };
-    // Settled for longer than the file's default: a stiff lung at this driving
-    // pressure takes a while to reach a steady output, and a slope fitted to
-    // seven points that have not is a slope fitted to the transient.
-    const pts = [280, 350, 450, 550, 700, 900, 1150].map((stressedVolume) => {
-      const before = settle({ ...vent, stressedVolume }, 45);
-      const after = settle({ ...vent, stressedVolume: Math.min(1800, stressedVolume + 500) }, 45);
-      return { x: before.ppv, y: change(before.co, after.co) };
-    });
-    const n = pts.length;
-    const sx = pts.reduce((t, q) => t + q.x, 0), sy = pts.reduce((t, q) => t + q.y, 0);
-    const sxx = pts.reduce((t, q) => t + q.x * q.x, 0);
-    const sxy = pts.reduce((t, q) => t + q.x * q.y, 0);
-    const slope = (n * sxy - sx * sy) / (n * sxx - sx * sx);
-    return {
-      pass: slope >= 0.7 && slope <= 1.35,
-      detail: `slope ${slope.toFixed(2)} (want 0.70–1.35; Michard Fig. 3 gives 1.01, r² 0.85)`,
-    };
-  },
-
-  // Cecconi, Collino & Pinsky state it as established: a patient ventilated with
-  // low tidal volumes can show a falsely low variation while being preload
-  // responsive. The model should therefore fail to flag a responder at 6 mL/kg
-  // whom it flags correctly at Michard's ventilation — the same patient, two
-  // ventilators, two answers.
-  'ppv-falsely-low-at-low-tidal-volume': () => {
-    const patient = { collapsed: 0.35, clung: 45, peep: 7, rr: 15, ti: 1.2,
-      mode: 'vcv', pmus: 0, stressedVolume: 350 };
-    const gentle = settle({ ...patient, vt: 420 });
-    const michard = settle({ ...patient, vt: 700 });
-    const after = settle({ ...patient, vt: 700, stressedVolume: 850 });
-    const responsive = change(michard.co, after.co) >= 15;
-    return {
-      pass: responsive && gentle.ppv < 13 && michard.ppv >= 13,
-      detail: `the same responder reads ${gentle.ppv.toFixed(0)}% at 6 mL/kg and `
-        + `${michard.ppv.toFixed(0)}% at 10 mL/kg`,
     };
   },
 

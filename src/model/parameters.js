@@ -1,7 +1,6 @@
 // The compartment volumes, compliances and resistances are calibrated for an
 // adult of about this weight. It is stated rather than buried because the
-// validity condition for pulse pressure variation is expressed per kilogram,
-// and so is the tidal volume challenge.
+// validity condition for pulse pressure variation is expressed per kilogram.
 export const REFERENCE_WEIGHT_KG = 70;
 
 // Every knob the user can turn, in one place. The UI builds itself from this

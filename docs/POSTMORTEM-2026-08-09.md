@@ -1,5 +1,11 @@
 # What went wrong, and how it was caught
 
+> **Historical record.** The PPV calibration, 13% decision threshold,
+> tidal-volume challenge and Michard-derived afterload warning described below
+> were retired on 2026-08-11. See [MODEL_DECISIONS.md](MODEL_DECISIONS.md) for the
+> current rationale. The account is preserved because it documents how the
+> earlier conclusions were reached, not because those features remain active.
+
 A retrospective on two days of work: the pressure–volume curve gaining a ceiling,
 the J-curve being anchored to primary measurements, recruitment hysteresis, the
 stress index, and a long hunt for a defect in pulse pressure variation that did
