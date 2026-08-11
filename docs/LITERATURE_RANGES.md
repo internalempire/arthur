@@ -21,7 +21,7 @@ work, not excuses.
 
 | id | Manoeuvre and expected result | Status | Source |
 |---|---|---|---|
-| `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
+| `peep-euvolaemic-pig` | Experimental anchor, not a human clinical range: in nine anaesthetised pigs at 7.7 mL/kg, PEEP 5 → 10 raised balloon-occlusion MSFP 12.9 → 14.0 mmHg (+1.1) and changed pulmonary arterial flow 2.75 → 2.56 L/min (−6.9%, `p=0.094`). At the equivalent reference-weight tidal volume, the model allows ΔPmsf +0.5 to +1.8 mmHg and ΔCO −15% to +5%; these are model tolerances around the reported means, not study confidence intervals. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–H806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on central filling: raising PEEP from 5 to 15 reduces output more in the underfilled model than in the euvolaemic model. This is a directional teaching constraint. Fougères et al. measured a 13±9% cardiac-index fall with higher PEEP and a 14±10% restoration with passive leg raising at high PEEP; they did **not** report the former model target of a ≥1.5× between-state ratio. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
 | `pvr-recruitability-low` | At R/I 0.05 in the human ARDS calibration phenotype, PEEP 4 → 14 keeps derived PVR inside the low-recruiter trial IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-high` | At R/I 0.50, the same manoeuvre stays inside the high-recruiter IQRs (2.31–3.61 → 2.10–3.75 WU) and changes PVR by −10% to +20%; the trial's cohort medians changed +5%, P = 0.55. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
@@ -487,22 +487,30 @@ explicit limitation that it is a late proxy for cyclic afterload.
 
 Two of the rows were narrowed after drafting, and it is worth saying why.
 
-The `peep-euvolaemia` row first read "costs between −5% and 0% of cardiac
-output". That figure came from a secondary characterisation of Berger 2016, not
-from reading the paper's numbers, and the model landed at −6.1% with a full
-baroreflex. Tuning reflex gains until an unverified number is met would have
-produced a model fitted to a paraphrase. The row now states the mechanism the
-source is actually about — the abdomen defending the gradient, worth 1–3 mmHg of
-mean systemic filling pressure — and bounds the output cost loosely.
+The former `peep-euvolaemia` row first read "costs between −5% and 0% of cardiac
+output", then retained a broad 1–3 mmHg Pmsf range while calling the preparation
+a patient. Reading the full paper resolves all three points. This was a study in
+nine anaesthetised pigs; PEEP 5 → 10 raised balloon-occlusion MSFP by 1.1 mmHg
+and changed pulmonary arterial flow by −6.9%, without statistical significance
+for the latter. The renamed executable row now surrounds those actual means and
+does not use them to tune the baroreflex.
+
+The hold experiment is a separate result. Across 37 paired measurements,
+inspiratory-hold extrapolation exceeded balloon-occlusion MSFP by 3.0 (SD 5.1)
+mmHg. The simulator reproduces the direction but not a porcine-sized bias: four
+inspiratory holds at 300, 500, 700 and 900 mL (about 8.3–15.3 cmH₂O)
+extrapolate to roughly 28 mmHg against an actual Pmsf around 8.8. Human
+hold-derived estimates are themselves often much higher than arrest or model-
+analogue values, so forcing this human
+teaching model to the pig mean would not be a defensible calibration. The app
+therefore calls the result an extrapolated intercept and documents the magnitude
+as uncalibrated.
 
 Historically, the `pvr-recruitability-high` row passed on a phenotype this file
 chose — 55% of the collapsed lung openable at an opening pressure of 20 cmH₂O —
 rather than on the R/I ratio the trial measured. Phase 5 retires that mismatch:
 the active row uses R/I 0.50 and the dissociation row sweeps the same measured
 control. This paragraph is retained to record why a sign-only row was not enough.
-
-If you have the Berger paper to hand, tightening this row against its actual
-figures would be a genuine improvement.
 
 ## What this file is not
 

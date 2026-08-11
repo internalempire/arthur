@@ -2,9 +2,10 @@
 //
 // Without one, every intervention in this model produces an unopposed fall in
 // cardiac output, and the simulator overstates what a breath costs a patient
-// who still has reflexes. Berger and colleagues measured essentially no change
-// in output when PEEP was raised from 5 to 10 in euvolaemic subjects; a model
-// with no compensation cannot reproduce that.
+// who still has reflexes. The gains below are a didactic aggregate calibration;
+// they are not fitted to Berger et al.'s PEEP experiment, which used
+// anaesthetised pigs, did not block reflexes and cannot identify a human
+// baroreflex gain from its composite steady-state response.
 //
 // This is one effector, not four separate arcs: a single sympathetic outflow
 // with a time constant, driving heart rate, systemic resistance, venous tone and

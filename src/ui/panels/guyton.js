@@ -122,10 +122,11 @@ export function createGuyton(canvas) {
       });
     }
 
-    // Points measured by occlusion, and the line through them. This is how a
-    // venous return curve is built at the bedside — and the line will not lie on
-    // the analytic curve, because each hold raises abdominal pressure and so
-    // shifts the very curve it is sampling. That gap is the lesson, not a fault.
+    // Points measured during occlusion, and the line through them. This is how
+    // a venous return curve can be estimated at the bedside, but its zero-flow
+    // intercept is extrapolated rather than directly measured. Each hold raises
+    // abdominal pressure and shifts the relation it is sampling; the label must
+    // therefore not present that intercept as the model's actual Pmsf.
     const measured = sim.measuredPoints;
     if (measured.length >= 2) {
       const n = measured.length;
@@ -144,7 +145,7 @@ export function createGuyton(canvas) {
             color: colors.inkSecondary, width: 1.6, dash: [6, 4], alpha: 0.9,
           });
           panel.unclip();
-          panel.label(`Pmsf ${xEnd.toFixed(1)} measured`, Math.min(xEnd, xHi), 0, {
+          panel.label(`intercept ${xEnd.toFixed(1)} extrapolated`, Math.min(xEnd, xHi), 0, {
             color: colors.inkSecondary, dx: -4, dy: -22, align: 'right', halo: colors.surface,
           });
         }
