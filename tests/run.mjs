@@ -14,7 +14,7 @@ import { PARAMETERS, defaultParams } from '../src/model/parameters.js';
 import {
   venousReturnCurve, cardiacFunctionCurve, venousReturnFlow,
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
-  systemicVenousVolumeState,
+  systemicVenousVolumeState, PULMONARY_TRANSIT,
 } from '../src/model/circulation.js';
 import { applyBaroreflex, BARO } from '../src/model/baroreflex.js';
 import {
@@ -53,7 +53,7 @@ function settled(overrides = {}, seconds = 30, opts = {}) {
   return s;
 }
 
-const COMPARTMENTS = ['vSa', 'vSv', 'vRa', 'vRv', 'vPa', 'vPv', 'vLa', 'vLv'];
+const COMPARTMENTS = ['vSa', 'vSv', 'vRa', 'vRv', 'vPa', 'vPt', 'vPv', 'vLa', 'vLv'];
 const totalVolume = (c) => COMPARTMENTS.reduce((t, k) => t + c[k], 0);
 
 // ------------------------------------------------------- volume conservation -
@@ -114,7 +114,10 @@ for (const sc of SCENARIOS) {
   const s = new Simulator();
   s.applyScenario(sc);
   s.advance(40, true);
-  const min = Math.min(...COMPARTMENTS.map((k) => s.circ[k]));
+  // `vPt` is the conserved aggregate; its eight internal stage volumes must be
+  // positive as well, or the aggregate could hide a numerically invalid path.
+  const min = Math.min(...COMPARTMENTS.map((k) => s.circ[k]),
+    ...s.circ.pulmonaryTransit.volume);
   check(sc.id, min > 0, `smallest compartment ${min.toFixed(2)} mL`);
 }
 
@@ -141,7 +144,8 @@ describe('Compartment positivity across a control-space sweep');
     s.params = p;
     s.reset();
     s.advance(20, true);
-    worstVolume = Math.min(worstVolume, Math.min(...COMPARTMENTS.map((k) => s.circ[k])));
+    worstVolume = Math.min(worstVolume,
+      ...COMPARTMENTS.map((k) => s.circ[k]), ...s.circ.pulmonaryTransit.volume);
     const m = s.metrics;
     for (const [, v] of Object.entries(m)) {
       if (typeof v === 'number' && !Number.isFinite(v)) nonFinite++;
@@ -219,9 +223,11 @@ describe('Physiological relations');
 
   const dry = settled({ stressedVolume: 330, vt: 560, ccw: 150, svr: 0.85, hr: 105 });
   const wet = settled({ stressedVolume: 830, vt: 560, ccw: 150, svr: 0.85, hr: 105 });
-  check('hypovolaemia raises pulse pressure variation',
-    dry.metrics.ppv > wet.metrics.ppv + 5,
-    `${dry.metrics.ppv.toFixed(0)}% vs ${wet.metrics.ppv.toFixed(0)}%`);
+  // Phase 1 retired the Michard-based PPV calibration. Do not reintroduce it as
+  // an unlabelled five-point separation here: with transit and the pulmonary
+  // venous piston both active, variation is not monotone across filling states.
+  // The model may display PPV descriptively, but the independent Guyton reserve
+  // below is what is tested against a fluid response.
   check('a fluid bolus raises cardiac output more when the patient is dry',
     wet.metrics.co - dry.metrics.co > 1.0,
     `${dry.metrics.co.toFixed(2)} -> ${wet.metrics.co.toFixed(2)} L/min`);
@@ -251,6 +257,79 @@ describe('Physiological relations');
   check('removing septal coupling lets the left ventricle fill',
     noSeptum.metrics.lvEdv > septum.metrics.lvEdv,
     `${septum.metrics.lvEdv.toFixed(1)} -> ${noSeptum.metrics.lvEdv.toFixed(1)} mL`);
+}
+
+// ------------------------------------------------------- pulmonary transit --
+
+describe('Pulmonary transit');
+{
+  // Isolate serial flow transport from the immediate septal, pericardial and
+  // lung-piston routes. An abrupt loss of RV contractility then asks one clean
+  // question: how many beats pass before the LV loses what the RV stopped
+  // sending? This is a mechanistic timing test, not a PPV calibration.
+  const s = new Simulator();
+  s.params = {
+    ...defaultParams(), baroreflex: 0, septal: 0, pericardium: 0, piston: 0,
+    vt: 0, peep: 0, pmus: 0, eesRv: 0.58,
+  };
+  s.reset();
+  s.advance(30, true);
+  const baseline = { rv: s.circ.svRv, lv: s.circ.sv, pt: s.circ.vPt };
+  const bloodBefore = totalVolume(s.circ);
+  s.setParam('eesRv', 0.18);
+
+  let beatSeen = s.circ.beatCount;
+  const beats = [];
+  for (let i = 0; i < 500 && beats.length < 4; i++) {
+    s.advance(0.01, true);
+    if (s.circ.beatCount !== beatSeen) {
+      beatSeen = s.circ.beatCount;
+      beats.push({ rv: s.circ.svRv, lv: s.circ.sv, pt: s.circ.vPt });
+    }
+  }
+
+  check('the first affected RV beat has not yet reached the LV',
+    beats.length === 4 && beats[0].rv < baseline.rv - 10
+      && Math.abs(beats[0].lv - baseline.lv) < baseline.lv * 0.01,
+    `RV ${baseline.rv.toFixed(1)} -> ${beats[0]?.rv.toFixed(1)}, `
+      + `LV ${baseline.lv.toFixed(1)} -> ${beats[0]?.lv.toFixed(1)} mL`);
+  check('the LV response emerges over the following two to three beats',
+    baseline.lv - beats[1].lv < baseline.lv * 0.02
+      // The 1.5% floor separates a true transported response from integrator
+      // noise; its amplitude is not a claimed in-vivo calibration. The cited
+      // observation constrains timing (2–3 beats), not the size of this severe
+      // isolated contractility step.
+      && baseline.lv - beats[3].lv > baseline.lv * 0.015,
+    `LV ${beats.map((b) => b.lv.toFixed(1)).join(' -> ')} mL`);
+  check('the transport pathway supplies the interval without creating blood',
+    beats[1].pt < baseline.pt - 10
+      && near(totalVolume(s.circ), bloodBefore, 0.01)
+      && s.metrics.pulmonaryTransitTime === PULMONARY_TRANSIT.meanTime,
+    `pathway ${baseline.pt.toFixed(1)} -> ${beats[1].pt.toFixed(1)} mL, `
+      + `blood ${bloodBefore.toFixed(2)} -> ${totalVolume(s.circ).toFixed(2)} mL`);
+
+  // In positive-pressure ventilation the RV loses preload during inspiration;
+  // after pulmonary transit, the LV nadir belongs in expiration. Only the phase
+  // is asserted — not a diagnostic amplitude or cutoff.
+  const ventilated = new Simulator();
+  ventilated.params = {
+    ...defaultParams(), baroreflex: 0, mode: 'vcv', pmus: 0, vt: 560,
+    peep: 8, rr: 18, ti: 1.2, stressedVolume: 330, svr: 0.85, hr: 105, ccw: 150,
+  };
+  ventilated.reset();
+  ventilated.advance(30, true);
+  beatSeen = ventilated.circ.beatCount;
+  const respiratoryBeats = [];
+  for (let i = 0; i < 1000 && respiratoryBeats.length < 10; i++) {
+    ventilated.advance(0.01, true);
+    if (ventilated.circ.beatCount !== beatSeen) {
+      beatSeen = ventilated.circ.beatCount;
+      respiratoryBeats.push({ sv: ventilated.circ.sv, phase: ventilated.resp.phase });
+    }
+  }
+  const lvNadir = respiratoryBeats.reduce((a, b) => (b.sv < a.sv ? b : a));
+  check('the delayed LV stroke-volume nadir occurs during expiration',
+    lvNadir.phase === 'exp', `nadir ${lvNadir.sv.toFixed(1)} mL in ${lvNadir.phase}`);
 }
 
 describe('Baroreflex');

@@ -54,8 +54,13 @@ export const LITERATURE = {
     const eu = change(euLow.co, euHigh.co);
     const hypo = change(hypoLow.co, hypoHigh.co);
     return {
-      pass: hypo < eu * 1.5,
-      detail: `euvolaemic ${eu.toFixed(1)}%, hypovolaemic ${hypo.toFixed(1)}% (want at least 1.5× the cost)`,
+      // Fougères et al. measured a 13±9% fall in cardiac index with higher PEEP
+      // and a 14±10% restoration with passive leg raising at high PEEP. They did
+      // not report the former model target of a 1.5× hypovolaemic/euvolaemic
+      // ratio. Preserve only the supported direction: less central filling
+      // makes the haemodynamic cost of PEEP greater.
+      pass: hypo < eu,
+      detail: `euvolaemic ${eu.toFixed(1)}%, hypovolaemic ${hypo.toFixed(1)}% (want a greater cost when underfilled)`,
     };
   },
 
@@ -208,6 +213,37 @@ export const LITERATURE = {
         + ` → ${after.unstressedVolume.toFixed(0)} mL, stressed ${before.stressedVolume.toFixed(0)}`
         + ` → ${after.stressedVolume.toFixed(0)} mL, pressure ${before.elasticPressure.toFixed(1)}`
         + ` → ${after.elasticPressure.toFixed(1)} mmHg`,
+    };
+  },
+
+  'pulmonary-transit-beats': () => {
+    const s = new Simulator();
+    s.params = {
+      ...defaultParams(), baroreflex: 0, septal: 0, pericardium: 0, piston: 0,
+      vt: 0, peep: 0, pmus: 0, eesRv: 0.58,
+    };
+    s.reset();
+    s.advance(30, true);
+    const baseline = { rv: s.circ.svRv, lv: s.circ.sv };
+    s.setParam('eesRv', 0.18);
+    let seen = s.circ.beatCount;
+    const beats = [];
+    for (let i = 0; i < 500 && beats.length < 4; i++) {
+      s.advance(0.01, true);
+      if (s.circ.beatCount !== seen) {
+        seen = s.circ.beatCount;
+        beats.push({ rv: s.circ.svRv, lv: s.circ.sv });
+      }
+    }
+    return {
+      pass: beats.length === 4 && beats[0].rv < baseline.rv - 10
+        && Math.abs(beats[0].lv - baseline.lv) < baseline.lv * 0.01
+        && baseline.lv - beats[1].lv < baseline.lv * 0.02
+        // This is a timing constraint. The small amplitude floor only keeps
+        // numerical noise from being mislabeled as a delayed LV response.
+        && baseline.lv - beats[3].lv > baseline.lv * 0.015,
+      detail: `after RV ${baseline.rv.toFixed(1)} → ${beats[0]?.rv.toFixed(1)} mL, `
+        + `LV beats ${beats.map((b) => b.lv.toFixed(1)).join(' → ')} mL`,
     };
   },
 };

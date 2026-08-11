@@ -7,7 +7,7 @@ import {
 import { pvrComponents, lungRegions, relaxationVolume, openBand } from './lung.js';
 import {
   createCirculationState, stepCirculation, venousReturnBackPressure,
-  preloadSensitivity, systemicVenousVolumeState,
+  preloadSensitivity, systemicVenousVolumeState, PULMONARY_TRANSIT,
 } from './circulation.js';
 import { cmH2OtoMmHg, RESISTANCE_TO_DYN, RESISTANCE_TO_WOOD } from './units.js';
 
@@ -16,7 +16,7 @@ const SAMPLE_HZ = 250;
 export const TRACE_SECONDS = 12;
 const TRACE_LEN = SAMPLE_HZ * TRACE_SECONDS;
 const MEAN_TIME_CONSTANT = 3; // s, for the mean-pressure moving averages
-const COMPARTMENTS = ['vSa', 'vSv', 'vRa', 'vRv', 'vPa', 'vPv', 'vLa', 'vLv'];
+const COMPARTMENTS = ['vSa', 'vSv', 'vRa', 'vRv', 'vPa', 'vPt', 'vPv', 'vLa', 'vLv'];
 
 class Ring {
   constructor(n) { this.buf = new Float32Array(n); this.n = n; this.i = 0; this.filled = 0; }
@@ -513,6 +513,9 @@ export class Simulator {
       pvrClosedBed: pvrComp.closedBed,
       pvrOpenFlowShare: pvrComp.openFlowShare,
       zone3: c.p.zone3,
+      pulmonaryTransitTime: PULMONARY_TRANSIT.meanTime,
+      pulmonaryTransitVolume: c.vPt,
+      pulmonaryTransitFlow: (c.q.pulTransit * 60) / 1000,
       minuteVentilation: (r.lastVt * p.rr) / 1000,
       bloodVolume: COMPARTMENTS.reduce((t, k) => t + c[k], 0),
       minCompartment: Math.min(...COMPARTMENTS.map((k) => c[k])),
