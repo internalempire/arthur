@@ -8,6 +8,70 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-08-11 — Treat Berger as an animal anchor, not a human calibration
+
+### Decision
+
+- Identify the PEEP 5 → 10 experiment explicitly as a study in nine
+  anaesthetised pigs ventilated at 7.7 mL/kg.
+- Tighten its executable check around the published paired means: MSFP measured
+  by right-atrial balloon occlusion rose 12.9 → 14.0 mmHg, while pulmonary
+  arterial flow changed 2.75 → 2.56 L/min (−6.9%, `p=0.094`). The tolerance
+  remains broader than those means because it is an order-of-magnitude anchor,
+  not a reconstructed confidence interval.
+- Do not use the study to calibrate the human baroreflex. Reflexes were not
+  blocked, and the composite steady-state response cannot identify a reflex
+  gain separately from mechanical and vascular compensation.
+- Keep inspiratory holds as a demonstration that pressure–flow extrapolation can
+  be biased, but call their zero-flow crossing an **extrapolated intercept**, not
+  a measured Pmsf.
+- Do not tune the magnitude of that bias to the porcine mean. Record the current
+  mismatch and keep it outside quantitative human validation.
+
+### Why
+
+The earlier row described a “euvolaemic patient”, allowed a 1–3 mmHg Pmsf rise
+and attributed the small output cost to the baroreflex. None of those
+interpretations follows from the experiment. The measured Pmsf rise was
+1.1 mmHg, the output change was small but not zero, and all observations came
+from healthy pigs under anaesthesia.
+
+The same paper found that inspiratory-hold extrapolation exceeded balloon-
+occlusion MSFP by 3.0 (SD 5.1) mmHg across 37 paired measurements. That is
+evidence for direction and uncertainty, not a portable human error term.
+Postoperative human studies using the hold method report substantially higher
+absolute estimates, and Berger explicitly notes that patient volume shifts may
+make the pressure–flow displacement larger than in this preparation.
+
+A trial implementation separated end-expiratory from tidal abdominal-pressure
+transmission. It could reduce the simulated intercept only by also weakening
+the immediate caval/waterfall response documented in the experiment. That would
+replace one known simplification with an unmeasured hold-specific coefficient
+and alter ordinary heart–lung interaction throughout the app. It was therefore
+rejected and is not present in the model.
+
+### Calibration result
+
+At the model's 70 kg reference weight and the study-equivalent 540 mL tidal
+volume, PEEP 5 → 10 produces ΔPmsf +1.18 mmHg and ΔCO −6.3%, close to the
+published +1.1 mmHg and −6.9%. This agreement is encouraging face validity, not
+human validation.
+
+In contrast, four inspiratory holds at 300, 500, 700 and 900 mL (airway
+pressures about 8.3–15.3 cmH₂O) produce an extrapolated intercept around
+28 mmHg while the model's actual Pmsf is about 8.8 mmHg. The direction agrees
+with Berger; the magnitude does not. The interface and documentation now say so
+directly rather than naming the intercept as a measurement.
+
+### Deliberate limits
+
+The simulator has one systemic venous reservoir and one aggregate caval closing
+pressure. It cannot reproduce separate SVC, IVC, portal, hepatic-waterfall and
+azygos responses, which Berger invokes to explain flow recovery during a hold.
+Adding those beds solely to match one porcine protocol would obscure the
+didactic model and still would not establish a human target. Quantitative use of
+the extrapolated intercept therefore remains out of scope.
+
 ## 2026-08-11 — Add a volume-conserving pulmonary transit pathway
 
 ### Decision

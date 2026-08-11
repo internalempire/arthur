@@ -613,18 +613,23 @@ it.
 flow, alveolar pressure equilibrates with the airway and the circulation settles
 at a fixed lung volume; the mean right atrial pressure and flow over the last
 part of the hold are plotted as a small square. Several holds at different
-airway pressures — vary the tidal volume, or the PEEP — draw a venous return
-curve the way Maas and Berger do at the bedside, with mean systemic filling
-pressure as the extrapolated x-intercept.
+airway pressures — vary the tidal volume, or the PEEP — draw an extrapolated
+pressure–flow relation. The approach has been used at the bedside in
+postoperative patients and tested experimentally by Berger et al. in pigs. Its
+zero-flow intercept is an estimate, not a direct measurement of mean systemic
+filling pressure.
 
 The measured line does not lie on the analytic curve, and that is the point of
-having both. Four holds from 8 to 14 cmH₂O of plateau give a slope of
-0.27 L/min per mmHg against the model's own 0.73, and extrapolate to a mean
-systemic filling pressure of 20 mmHg against an actual 8.8. The reason is in the
-model and is real: every occlusion raises lung volume, which raises abdominal
-pressure, which raises mean systemic filling pressure — so each hold shifts the
-curve it is trying to sample, and the sampled line is flatter than the true one.
-The bedside method has exactly this confound.
+having both. Four inspiratory holds at 300, 500, 700 and 900 mL (about
+8.3–15.3 cmH₂O) give a slope near 0.19 L/min per mmHg against roughly 0.73
+implied by the model's resistance, and extrapolate to an intercept around
+28 mmHg against an actual Pmsf around 8.8. The reason is in the model and is
+physiologically plausible:
+every occlusion raises lung volume and abdominal pressure, shifting the relation
+it is trying to sample. Berger demonstrated the direction in pigs, but observed
+a much smaller mean excess of 3.0 mmHg with wide dispersion. The simulator
+therefore presents the value as an **extrapolated intercept**, not as a
+calibrated Pmsf measurement.
 
 ---
 
@@ -1157,8 +1162,10 @@ The full list, with the measurements behind it, is in
   conservation, convergence and the direction of established relationships are
   tested. There is no calibration source for each empirical constant, no
   sensitivity analysis, no comparison against experimental series and no
-  identifiability analysis. This is a mechanistic teaching model calibrated to
-  reproduce qualitative relationships, not a patient-specific predictor.
+  identifiability analysis. The PEEP/MSFP anchor from Berger is a nine-pig
+  experiment, not a human range, and the hold-derived intercept is explicitly
+  uncalibrated. This is a mechanistic teaching model calibrated to reproduce
+  qualitative relationships, not a patient-specific predictor.
 
 ---
 
@@ -1214,3 +1221,10 @@ The full list, with the measurements behind it, is in
     estimated by the recruitment-to-inflation ratio in acute respiratory
     distress syndrome. *Am J Respir Crit Care Med* 2020;201:178–187.
     doi:10.1164/rccm.201902-0334OC.
+20. Berger D, Moller PW, Weber A, et al. Effect of PEEP, blood volume, and
+    inspiratory hold maneuvers on venous return. *Am J Physiol Heart Circ
+    Physiol* 2016;311:H794–H806. doi:10.1152/ajpheart.00931.2015.
+21. Maas JJ, Pinsky MR, Geerts BF, et al. Estimation of mean systemic filling
+    pressure in postoperative cardiac surgery patients with three methods.
+    *Intensive Care Med* 2012;38:1452–1460.
+    doi:10.1007/s00134-012-2586-0.

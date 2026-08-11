@@ -6,7 +6,7 @@
 // telling the truth in both directions.
 
 import { Simulator } from '../src/model/simulator.js';
-import { defaultParams } from '../src/model/parameters.js';
+import { defaultParams, REFERENCE_WEIGHT_KG } from '../src/model/parameters.js';
 import { pvrComponents, NORMAL_FRC } from '../src/model/lung.js';
 import { systemicVenousVolumeState, venousReturnFlow } from '../src/model/circulation.js';
 import { applyBaroreflex } from '../src/model/baroreflex.js';
@@ -37,14 +37,21 @@ const HUMAN_ARDS = {
 };
 
 export const LITERATURE = {
-  'peep-euvolaemia': () => {
-    const a = settle({ peep: 5, vt: 420 });
-    const b = settle({ peep: 10, vt: 420 });
+  'peep-euvolaemic-pig': () => {
+    // Berger et al. studied nine anaesthetised pigs at 7.7 mL/kg, not a human
+    // euvolaemic cohort. The model manoeuvre uses the equivalent tidal volume
+    // at its 70 kg reference weight. The bands are deliberately wider than the
+    // reported paired means: they are an order-of-magnitude experimental anchor,
+    // not confidence intervals or a human treatment target.
+    const studyEquivalentVt = Math.round(7.7 * REFERENCE_WEIGHT_KG);
+    const a = settle({ peep: 5, vt: studyEquivalentVt });
+    const b = settle({ peep: 10, vt: studyEquivalentVt });
     const dCo = change(a.co, b.co);
     const dPmsf = b.pmsf - a.pmsf;
     return {
-      pass: dCo > -10 && dPmsf >= 1 && dPmsf <= 3,
-      detail: `ΔCO ${dCo.toFixed(1)}% (want better than −10), ΔPmsf ${dPmsf.toFixed(2)} mmHg (want 1..3)`,
+      pass: dCo >= -15 && dCo <= 5 && dPmsf >= 0.5 && dPmsf <= 1.8,
+      detail: `ΔCO ${dCo.toFixed(1)}% (pig mean −6.9%; allow −15..+5), `
+        + `ΔPmsf ${dPmsf.toFixed(2)} mmHg (pig mean +1.1; allow 0.5..1.8)`,
     };
   },
 

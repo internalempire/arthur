@@ -163,23 +163,29 @@ overdistension, and the simulator does not present it as an optimal-PEEP rule.
 
 Holding the airway freezes lung volume and pleural pressure, and the circulation
 settles. Each hold contributes one measured pressure–flow pair, and a series of
-them draws a venous return curve — the bedside method.
+them draws an extrapolated venous return relation. The points are measured; its
+zero-flow intercept is not.
 
 The model reproduces the method's known confound rather than hiding it. Four
-inspiratory holds at plateau pressures from 8 to 14 cmH₂O give a fitted slope of
-0.27 L/min per mmHg where the model's own resistance to venous return implies
-0.73, and an extrapolated mean systemic filling pressure of 20 mmHg where the
-model's is 8.8. Both protocols behave the same way — varying tidal volume at
-fixed PEEP, or varying PEEP between holds — so it is not a protocol artefact.
+inspiratory holds at 300, 500, 700 and 900 mL (plateau pressures around
+8.3–15.3 cmH₂O) give a fitted slope near 0.19 L/min per mmHg where the model's
+resistance to venous return implies roughly 0.73, and an extrapolated intercept
+around 28 mmHg where the model's Pmsf is about 8.8. Both protocols behave the
+same way — varying tidal volume at fixed PEEP, or varying PEEP between holds —
+so it is not merely a plotting artefact.
 
 The mechanism is the abdominal coupling: an occlusion holds the lung inflated,
 which pressurises the splanchnic reservoir, which raises mean systemic filling
 pressure. The curve therefore moves to the right by an amount that grows with
 the plateau pressure, and the points sample a family of curves rather than one.
-Reading the resulting intercept as a mean systemic filling pressure overestimates
-it. The magnitude here is larger than published comparisons suggest, which is a
-reason to treat the number as a demonstration of the bias rather than a
-calibrated estimate of it.
+Reading the resulting intercept as a direct mean systemic filling pressure
+overestimates it. Berger et al. found an excess of 3.0 (SD 5.1) mmHg across 37
+paired measurements in anaesthetised pigs, much smaller than this model's gap.
+Conversely, human postoperative and septic studies using the hold method report
+absolute estimates around 15–33 mmHg, so the porcine difference is not a safe
+human calibration target. The interface therefore names the value for what it
+is — an extrapolated intercept — and uses it to teach the bias, not quantify a
+patient's Pmsf.
 
 ---
 
@@ -326,3 +332,10 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
     estimated by the recruitment-to-inflation ratio in acute respiratory
     distress syndrome. *Am J Respir Crit Care Med* 2020;201:178–187.
     doi:10.1164/rccm.201902-0334OC.
+20. Berger D, Moller PW, Weber A, et al. Effect of PEEP, blood volume, and
+    inspiratory hold maneuvers on venous return. *Am J Physiol Heart Circ
+    Physiol* 2016;311:H794–H806. doi:10.1152/ajpheart.00931.2015.
+21. Maas JJ, Pinsky MR, Geerts BF, et al. Estimation of mean systemic filling
+    pressure in postoperative cardiac surgery patients with three methods.
+    *Intensive Care Med* 2012;38:1452–1460.
+    doi:10.1007/s00134-012-2586-0.

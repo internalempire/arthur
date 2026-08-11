@@ -150,7 +150,9 @@ export class Simulator {
    * releases after `seconds`, contributing one measured (right atrial pressure,
    * flow) pair — which is how a venous return curve is built at the bedside:
    * several holds at different airway pressures, and the line through the
-   * points has mean systemic filling pressure as its x-intercept.
+   * points has an extrapolated filling-pressure estimate as its x-intercept.
+   * It is not a direct Pmsf measurement: the manoeuvre can shift the venous
+   * return relation while it is being sampled.
    */
   startHold(kind, seconds = 12) {
     if (this.hold || this.resp.hold || this.resp.holdPending) return false;
