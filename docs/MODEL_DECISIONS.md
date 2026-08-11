@@ -438,9 +438,9 @@ opening pressure remain hard constraints.
 
 ### Human calibration result
 
-For the Cappio Borlino phenotype, PEEP 4 → 14 now gives 2.63 → 3.18 WU (+21%) at
-R/I 0.05 and 2.53 → 2.65 WU (+5%) at R/I 0.50. Across R/I 0 → 0.8, the derived
-PVR response changes monotonically from +26% to −3%. The four cohort-comparison
+For the Cappio Borlino phenotype, PEEP 4 → 14 now gives 2.64 → 3.16 WU (+20%) at
+R/I 0.05 and 2.54 → 2.64 WU (+4%) at R/I 0.50. Across R/I 0 → 0.8, the derived
+PVR response changes monotonically from +24% to −4%. The four cohort-comparison
 values remain inside the reported IQRs.
 
 ### Deliberate limits
@@ -499,3 +499,44 @@ A diagnostic PPV feature should return only after validation against independent
 human in-vivo data across contemporary ventilatory conditions, with an adequate
 pulmonary transit representation and without defining the reference response by
 the model's own stressed-volume manipulation.
+
+## 2026-08-11 — Restore the physiological dominance of both PVR limbs
+
+### Decision
+
+- Keep the open-lung PVR value and the curve minimum at FRC unchanged.
+- Split that FRC resistance equally between alveolar and extra-alveolar series
+  components so the change in the dominant mechanism occurs near FRC.
+- Add a quadratic loss-of-radial-traction term only below FRC. It is zero in
+  both value and slope at FRC, so it steepens the left limb without moving the
+  nadir or retuning the calibrated operating point.
+- Preserve the gradual right limb and the separate parallel pathway for closed
+  units. No new vascular compartment or state variable is introduced.
+
+### Why
+
+The preceding calibration fixed absolute human PVR values and correctly placed
+the minimum near FRC, but its visual decomposition was physiologically weak. In
+the normal reference lung, PVR at RV was only about 1.05 times the FRC value and
+the alveolar and extra-alveolar components crossed close to RV. Thus the total
+curve passed a merely directional test while failing to teach the mechanism in
+Cecconi, Collino and Pinsky 2026 Fig. 1C: extra-alveolar narrowing dominates at
+low volume, the components become comparable near FRC, and alveolar compression
+dominates toward TLC.
+
+With the revised shape, the normal fully open reference is approximately 1.74
+times the FRC value at RV and 1.56 times it at TLC. At RV, extra-alveolar
+resistance is about 3.4 times alveolar resistance; at TLC the relation reverses,
+with alveolar resistance about 5.5 times extra-alveolar resistance.
+
+### Deliberate limits
+
+Figure 1C is an unscaled clinical synthesis, not an in-vivo measurement from
+which those ratios can be estimated. The 50/50 FRC split and the low-volume gain
+are therefore explicit didactic shape coefficients. Thomas 1961 and Hakim 1982
+support volume dependence and vascular partitioning in animal preparations;
+Hakim also found a small high-volume increase outside the alveolar segment that
+the simpler clinical two-limb diagram does not show. This app follows the latter
+for clarity and does not use either source as a portable quantitative human
+target. Absolute human PVR and the PEEP response in ARDS remain constrained
+separately by the Cappio Borlino cohort tests.

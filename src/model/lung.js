@@ -538,10 +538,13 @@ export function lungRegions(p, lungVolume, plKnown = null, phiKnown = null) {
   return { diseased, recruited, easy, hard, openFraction, closedFraction, strain, pl, vascularFrc };
 }
 
-// Both mechanical limbs are driven by volume, and they share the term that makes
-// them rise with overdistension. Thomas 1961 and Hakim 1982 support this
-// qualitative mechanism, but both are animal preparations; their exact ratios
-// are no longer used as human calibration targets.
+// Both mechanical limbs are driven by volume, but the clinical teaching curve
+// assigns them opposite roles: alveolar compression produces the high-volume
+// limb, while loss of radial traction narrows extra-alveolar vessels at low
+// volume. Hakim 1982 also found a smaller high-volume increase outside the
+// alveolar segment in isolated dog lobes; that secondary effect is not imported
+// into this human didactic decomposition, and no animal ratio is used as a
+// quantitative target.
 //
 // For the didactic human curve the fully open lung has its minimum at NORMAL_FRC.
 // Clinical reviews draw the J-curve this way, whereas the old 2.87 L minimum was
@@ -550,17 +553,28 @@ export function lungRegions(p, lungVolume, plKnown = null, phiKnown = null) {
 // the positive slope from vascular stretch. The right limb then rises gradually
 // over the volumes the simulator can plausibly reach instead of reproducing an
 // animal maximal-inflation experiment.
-const K_STRETCH = 0.515;
-const EXTRA_FLOOR = 0.17;
-const F_ALV = 0.6;
-const F_EXTRA = 0.4;
-const K_UNFURL = K_STRETCH / (F_EXTRA * (1 - EXTRA_FLOOR));
+const K_STRETCH = 0.58;
+const EXTRA_FLOOR = 0.30;
+const F_ALV = 0.5;
+const F_EXTRA = 0.5;
+const K_UNFURL = (F_ALV * K_STRETCH) / (F_EXTRA * (1 - EXTRA_FLOOR));
+const LOW_VOLUME_TRACTION_GAIN = 4;
 
 // F_ALV is a modelling choice and cannot be made anything else. The published
 // partitions do not measure the same boundary and do not agree: capillaries 34%
 // by bolus, alveolar-wall capillaries 45% by micropuncture, the middle
 // distensible segment under 16% by occlusion — and that segment swings from 7%
-// to 53% with haematocrit alone. No measurement settles this one.
+// to 53% with haematocrit alone. No measurement settles this one. Equal shares
+// at FRC are therefore a didactic crossover, not an anatomical claim: they make
+// the clinical transition from extra-alveolar to alveolar predominance visible.
+//
+// The earlier exponential alone made PVR at RV only about 5% higher than at FRC.
+// LOW_VOLUME_TRACTION_GAIN adds the nonlinear narrowing expected when radial
+// parenchymal traction is lost below FRC. Its quadratic form is zero in both
+// value and slope at FRC, so it strengthens only the left limb without moving
+// the calibrated nadir or changing the open-lung PVR assigned there. The gain is
+// a transparent teaching coefficient; the Cecconi schematic has no numerical
+// y-axis and is not treated as a source of measured ratios.
 
 const unfurled = (strain) =>
   EXTRA_FLOOR + (1 - EXTRA_FLOOR) * Math.exp(-K_UNFURL * strain);
@@ -587,8 +601,12 @@ const HPV_GAIN = 1.1;
 export function pvrComponents(p, lungVolume, plKnown = null, phiKnown = null) {
   const r = lungRegions(p, lungVolume, plKnown, phiKnown);
   const stretch = Math.exp(K_STRETCH * r.strain);
+  const deflation = Math.max(0, -r.strain);
   const perUnitAlveolar = p.pvrBase * F_ALV * stretch;
-  const perUnitExtra = p.pvrBase * F_EXTRA * unfurled(r.strain) * stretch;
+  const perUnitExtra = p.pvrBase * (
+    F_EXTRA * unfurled(r.strain)
+    + LOW_VOLUME_TRACTION_GAIN * deflation * deflation
+  );
   const openPath = perUnitAlveolar + perUnitExtra;
   const closedPath = p.pvrBase * CLOSED_PATH_FACTOR * (1 + (p.hpv ?? 0) * HPV_GAIN);
   const openConductance = r.openFraction / openPath;
