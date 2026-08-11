@@ -38,7 +38,7 @@ export const PARAMETERS = [
     id: 'vt', group: 'ventilation', label: 'Tidal volume', unit: 'mL',
     min: 150, max: 900, step: 10, default: 450,
     appliesTo: ['vcv'],
-    help: 'Tidal volume — not airway pressure — is what moves the pulmonary vasculature. Two patients with the same VT and different plateau pressures have the same PVR.',
+    help: 'Tidal volume moves the patient along the volume-dependent pulmonary vascular curve, but the same VT does not guarantee the same PVR or right-ventricular load. Absolute lung volume, aerated-lung strain, recruitment, flow and the alveolar waterfall also matter.',
   },
   {
     id: 'pinsp', group: 'ventilation', label: 'Inspiratory pressure', unit: 'cmH₂O above PEEP',

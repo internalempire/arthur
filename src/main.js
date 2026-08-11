@@ -20,7 +20,10 @@ const waveforms = createWaveforms(el('waveforms'));
 const guyton = createGuyton(el('guyton'));
 const campbell = createCampbell(el('campbell'));
 const pvLoops = createPvLoops(el('pvloops'));
-const pvrCurve = createPvrCurve(el('pvr'));
+// A view-only interaction still needs to invalidate a paused canvas. Keeping
+// that callback separate from simulator state makes zoom unable to alter the
+// physiology it is displaying.
+const pvrCurve = createPvrCurve(el('pvr'), { onViewChange: invalidate });
 const thorax = createThorax(el('thorax'));
 const stats = createStats(el('stats'), { banner: el('invalid-banner') });
 const descriptions = createDescriptions();

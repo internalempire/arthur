@@ -124,6 +124,10 @@ const PANELS = [
   {
     match: 'Pulmonary vascular resistance against lung volume',
     title: 'Pulmonary vascular resistance',
+    // The PVR panel also carries zoom controls in its header. The full title is
+    // already the region label, so the compact disclosure name avoids covering
+    // the chart title at the normal two-column panel width.
+    disclosureTitle: 'PVR',
     summary: (sim) => {
       const m = sim.metrics;
       const comp = pvrComponents(sim.params, m.lungVolume);
@@ -210,7 +214,7 @@ export function createDescriptions() {
     const details = document.createElement('details');
     details.className = 'panel-data';
     const toggle = document.createElement('summary');
-    toggle.textContent = `${spec.title} — values`;
+    toggle.textContent = `${spec.disclosureTitle ?? spec.title} — values`;
     const table = document.createElement('table');
     details.append(toggle, summary, table);
     section.appendChild(details);

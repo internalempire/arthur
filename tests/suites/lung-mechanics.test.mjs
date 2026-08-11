@@ -1,7 +1,7 @@
 // Static lung mechanics, baby-lung strain, R/I calibration and the PVR operating point.
 import {
   SCENARIOS, defaultParams,
-  lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
+  lungRegions, pvrComponents, transpulmonaryAt, relaxationVolume, openFractionAt,
   calibrateRecruitmentToInflation, recruitmentToInflation,
   section, check, near, settled,
 } from '../support/model.mjs';
@@ -12,6 +12,40 @@ section('The two-compartment lung');
   check('a normal lung at its resting volume is fully open and unstrained',
     lungRegions(p, 2.2).openFraction > 0.97 && Math.abs(lungRegions(p, 2.2).strain) < 0.03,
     `open ${lungRegions(p, 2.2).openFraction.toFixed(3)}, strain ${lungRegions(p, 2.2).strain.toFixed(3)}`);
+
+  // The PVR panel teaches a series construction, so the fields it draws must
+  // remain the two opposing mechanical limbs and must add exactly to the open
+  // path. This protects the picture from drifting back into unrelated overlays.
+  {
+    const low = pvrComponents(p, 1.3, null, 1);
+    const frc = pvrComponents(p, 2.2, null, 1);
+    const high = pvrComponents(p, 6.0, null, 1);
+    check('the classical PVR components add in series to the open path',
+      near(frc.alveolarPath + frc.extraAlveolarPath, frc.openPath, 1e-12)
+        && near(frc.openPath, frc.total, 1e-12));
+    check('the two PVR limbs move in opposite directions across RV to TLC',
+      low.extraAlveolarPath > frc.extraAlveolarPath
+        && frc.extraAlveolarPath > high.extraAlveolarPath
+        && low.alveolarPath < frc.alveolarPath
+        && frc.alveolarPath < high.alveolarPath,
+      `extra ${low.extraAlveolarPath.toFixed(3)} → ${frc.extraAlveolarPath.toFixed(3)} → ${high.extraAlveolarPath.toFixed(3)}; `
+      + `alveolar ${low.alveolarPath.toFixed(3)} → ${frc.alveolarPath.toFixed(3)} → ${high.alveolarPath.toFixed(3)}`);
+    check('extra-alveolar vessels dominate at RV and alveolar vessels at TLC',
+      low.extraAlveolarPath > low.alveolarPath * 2
+        && frc.extraAlveolarPath / frc.alveolarPath > 0.8
+        && frc.extraAlveolarPath / frc.alveolarPath < 1.25
+        && high.alveolarPath > high.extraAlveolarPath * 2,
+      `extra/alveolar ${(
+        low.extraAlveolarPath / low.alveolarPath
+      ).toFixed(2)} at RV, ${(
+        frc.extraAlveolarPath / frc.alveolarPath
+      ).toFixed(2)} at FRC, ${(
+        high.extraAlveolarPath / high.alveolarPath
+      ).toFixed(2)} at TLC`);
+    check('both limbs of the total J-curve remain didactically visible',
+      low.total > frc.total * 1.4 && high.total > frc.total * 1.4,
+      `${(low.total / frc.total).toFixed(2)}× at RV and ${(high.total / frc.total).toFixed(2)}× at TLC versus FRC`);
+  }
 
   // The arithmetic of the baby lung. The claim is about the strain a tidal
   // volume *adds*, not the level it reaches: the two lungs start from different
@@ -97,8 +131,11 @@ section('The two-compartment lung');
     // flatter J means a reading taken at the wrong moment in the breath is less
     // wrong than the model used to claim. It is still a swing, and still a reason
     // to quote the cycle mean.
+    // Four hundredths of a Wood unit is enough to assert that the signal is
+    // still phase-dependent without forcing the visual right-limb retuning back
+    // toward the much steeper animal curve this model deliberately retired.
     check('resistance still swings within a breath, though far less than it used to',
-      hi - lo > 0.05 && near(sum / n, 1.27, 0.2),
+      hi - lo > 0.04 && near(sum / n, 1.27, 0.2),
       `mean ${(sum / n).toFixed(2)}, range ${lo.toFixed(2)}–${hi.toFixed(2)} Wood units`);
   }
 

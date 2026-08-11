@@ -30,7 +30,7 @@ work, not excuses.
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `pvr-human-frc-nadir` | The fully open mechanical J-curve has its minimum within 0.15 L of the model's 2.2 L human FRC. | agrees | Cecconi, Collino & Pinsky, *Intensive Care Med* 2026, Fig. 1C (clinical synthesis: minimum near FRC) |
-| `pvr-human-j-direction` | Both marked deflation (1.2 L) and overdistension (4.5 L) raise resistance above the value near FRC. This is a directional human teaching target, not a numerical fit to maximal animal inflation. | agrees | Cecconi, Collino & Pinsky 2026, Fig. 1C; Thomas et al. 1961 and Hakim et al. 1982 for qualitative mechanism |
+| `pvr-human-j-direction` | Total PVR is higher at RV and TLC than near FRC; extra-alveolar resistance predominates at RV and alveolar resistance at TLC. This is the qualitative topology of the human teaching curve, not a numerical fit to the unscaled schematic or to maximal animal inflation. | agrees | Cecconi, Collino & Pinsky 2026, Fig. 1C; Thomas et al. 1961 and Hakim et al. 1982 for qualitative mechanism |
 | `ppv-suspended-spontaneous` | During spontaneous breathing, pulse pressure variation is withheld rather than presented as an interpretable dynamic index. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
 | `ph-classification` | A hypervolaemic failing left ventricle with a wedge above 15 mmHg and a mean pulmonary artery pressure above 20 is classified post-capillary; a lung with a high vascular resistance and a low wedge is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
@@ -396,17 +396,26 @@ passing.
 
 ## What changed when the limbs were rebuilt
 
-Both limbs now follow volume, and they share the exponential that makes them
-rise. The old split — alveolar by strain, extra-alveolar by transpulmonary
-pressure — was argued from first principles and contradicted by three
-measurements, so it is gone. The three constants were fitted to four published
-figures, which is one more constraint than there are constants, so the fit could
-have failed.
+Both limbs now follow volume. The alveolar component rises exponentially with
+strain; the extra-alveolar component falls as vessels unfurl and receives a
+quadratic loss-of-radial-traction term only below FRC. That term is zero in both
+value and slope at FRC, so it restores a visible low-volume limb without moving
+the human-centred nadir. The old split — alveolar by strain, extra-alveolar by
+transpulmonary pressure — was argued from first principles and contradicted by
+three measurements, so it is gone.
+
+At FRC the two series components are assigned equal shares. This is a didactic
+crossover, not an anatomical partition: the published measurements define
+different vascular boundaries and cannot identify one portable human fraction.
+The current normal reference is approximately 1.74 times its FRC resistance at
+RV and 1.56 times at TLC. Those ratios make both mechanisms visible; they are not
+read from the unscaled Cecconi schematic or treated as human in-vivo targets.
 
 Seven rows moved from `not yet` to `agrees`, including every one anchored to
 Thomas, Hakim and Peták, and both recruitability rows.
 
-**One of those needed a correction to the row rather than to the model.** The
+**At that stage, one result needed a correction to the row rather than to the
+model.** The
 recruitability rows compared the model's own J-curve coefficient against a number
 Cappio Borlino measured with a pulmonary artery catheter. Those are different
 quantities, and in this model they move in opposite directions: raising PEEP from
@@ -448,13 +457,15 @@ oxygenation can cost more cardiac output than it gains in content —
 unreproducible, though the cardiac output half of it is exactly what the model
 does show.
 
-**Where the model disagrees with it.** The legend to its Figure 1C places the
-minimum of the resistance–volume curve *at* functional residual capacity. Thomas,
-Griffo & Roos measured it at 45–60% of maximal lung volume in 55 lungs, which is
-above FRC, and this model follows the measurement: its nadir sits at 2.87 L
-against an FRC of 2.2. The review is restating the textbook position, which is
-what almost every source does. Anyone teaching from this simulator should know
-that it takes the primary measurement over the restatement, and why.
+**Where the model now follows it.** The legend to Figure 1C places the minimum of
+the resistance–volume curve at functional residual capacity and shows opposing
+extra-alveolar and alveolar limbs. The current fully open reference follows that
+human clinical synthesis: its searched nadir is about 2.25 L against a 2.2 L
+normal FRC, with extra-alveolar narrowing dominant toward RV and alveolar
+compression dominant toward TLC. Thomas, Griffo & Roos measured a nadir at
+45–60% of maximal volume in excised dog lungs; that preparation remains evidence
+for volume dependence, but its exact geometry is no longer transported into the
+human teaching curve.
 
 **One thing the review prompted, first written up wrongly.** Holding tidal volume
 and chest wall compliance fixed and varying only lung compliance, the pleural

@@ -51,7 +51,7 @@ export const SCENARIOS = [
   {
     id: 'pulmonary-embolism',
     name: 'Acute pulmonary embolism',
-    note: 'Normal lungs, obstructed circulation — the mirror image of the ARDS case. Central venous pressure is high while the wedge is low, the right ventricle is twice the size of the left, and the septum is holding the left ventricle shut. Nothing here is wrong with the lung, so it is compliant and every cmH₂O of airway pressure reaches the pleural space. Switch to volume control, then raise PEEP, and watch what intubating this patient costs.',
+    note: 'Normal lungs, high aggregate pulmonary vascular load — the mirror image of the ARDS case. The raised PVR coefficient represents the effective bedside load without separating clot obstruction, critical closing pressure, calibre or viscosity. Central venous pressure is high while the wedge is low, the right ventricle is twice the size of the left, and the septum is holding the left ventricle shut. The selected tachycardia, systemic resistance and filling describe an already compensated phenotype: the model baroreflex senses only systemic MAP, not PVR or mPAP directly. Switch to volume control, then raise PEEP, and watch what intubating this patient costs.',
     params: {
       mode: 'spont', pmus: 6, peep: 0, rr: 24,
       pvrBase: 0.44, eesRv: 0.32, stressedVolume: 1050, svr: 1.25, hr: 118,
