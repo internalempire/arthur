@@ -1,9 +1,62 @@
 // Cross-layer contracts: curves, snapshots, literature claims and documented scenarios.
 import {
   Simulator, SCENARIOS, venousReturnCurve, venousReturnFlow,
-  readFileSync, SNAPSHOTS, LITERATURE,
+  readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
   section, check, near, settled,
 } from '../support/model.mjs';
+
+section('Public model API');
+{
+  const api = await import('../../src/model/index.js');
+  const expected = [
+    'CHAMBER', 'GROUPS', 'PARAMETERS', 'PPL_FRC', 'RESISTANCE_TO_WOOD',
+    'SCENARIOS', 'SCENARIO_BY_ID', 'Simulator', 'TRACE_SECONDS',
+    'cardiacFunctionCurve', 'clamp', 'cmH2OtoMmHg', 'curveIntersection',
+    'lungRegions', 'lungVolumeAtPl', 'openBand', 'preloadLimbs',
+    'pvrComponents', 'relaxationVolume', 'respiratorySystemCompliance',
+    'stepOpenFraction', 'venousReturnCurve',
+  ];
+  check('exports exactly the browser-facing model contract',
+    JSON.stringify(Object.keys(api).sort()) === JSON.stringify(expected.sort()),
+    `expected ${expected.length} exports, found ${Object.keys(api).length}`);
+
+  // Scan the browser entry point and every UI module. This turns the intended
+  // dependency direction into an executable boundary: future panels cannot
+  // silently couple themselves back to the layout of model internals.
+  const collectJavaScript = (directory) => {
+    const files = [];
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      const url = new URL(`${entry.name}${entry.isDirectory() ? '/' : ''}`, directory);
+      if (entry.isDirectory()) files.push(...collectJavaScript(url));
+      else if (entry.name.endsWith('.js')) files.push(url);
+    }
+    return files;
+  };
+  const browserFiles = [
+    new URL('../../src/main.js', import.meta.url),
+    ...collectJavaScript(new URL('../../src/ui/', import.meta.url)),
+  ];
+  const forbidden = [];
+  for (const file of browserFiles) {
+    const source = readFileSync(file, 'utf8');
+    for (const [, specifier] of source.matchAll(/from\s+['"]([^'"]+)['"]/g)) {
+      if (specifier.includes('/model/') && !specifier.endsWith('/model/index.js')) {
+        forbidden.push(`${file.pathname.split('/').pop()}: ${specifier}`);
+      }
+    }
+  }
+  const unloadable = [];
+  for (const file of browserFiles.slice(1)) {
+    try {
+      await import(file.href);
+    } catch (error) {
+      unloadable.push(`${file.pathname.split('/').pop()}: ${error.message}`);
+    }
+  }
+  check('main and UI use the public API and every UI module resolves',
+    forbidden.length === 0 && unloadable.length === 0,
+    [...forbidden, ...unloadable].join(', '));
+}
 
 section('The drawn curves agree with the integrator');
 for (const sc of SCENARIOS) {

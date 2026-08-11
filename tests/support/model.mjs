@@ -4,7 +4,7 @@
 // small harness keeps the physiological setup helpers identical across domain
 // suites without introducing a test framework or application dependency.
 
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { Simulator, DEFAULT_DT } from '../../src/model/simulator.js';
 import { SCENARIOS } from '../../src/model/scenarios.js';
 import { PARAMETERS, defaultParams } from '../../src/model/parameters.js';
@@ -32,7 +32,7 @@ export {
   pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
   lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,
   staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
-  recruitmentToInflation, readFileSync, SNAPSHOTS, LITERATURE,
+  recruitmentToInflation, readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
 };
 
 let currentSection = '';

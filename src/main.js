@@ -1,5 +1,4 @@
-import { Simulator } from './model/simulator.js';
-import { SCENARIOS, SCENARIO_BY_ID } from './model/scenarios.js';
+import { Simulator, SCENARIOS, SCENARIO_BY_ID } from './model/index.js';
 import { theme } from './ui/theme.js';
 import { createControls } from './ui/controls.js';
 import { createStats } from './ui/stats.js';

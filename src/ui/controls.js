@@ -1,4 +1,4 @@
-import { PARAMETERS, GROUPS } from '../model/parameters.js';
+import { PARAMETERS, GROUPS } from '../model/index.js';
 
 export function createControls(container, sim, onChange) {
   const rows = new Map();

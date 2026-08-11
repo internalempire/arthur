@@ -1,8 +1,8 @@
 import { Panel, niceTicks } from '../plot.js';
 import {
   venousReturnCurve, cardiacFunctionCurve, curveIntersection, preloadLimbs,
-} from '../../model/circulation.js';
-import { cmH2OtoMmHg } from '../../model/units.js';
+  cmH2OtoMmHg,
+} from '../../model/index.js';
 
 // The Guyton diagram. Both curves share right atrial pressure as their abscissa,
 // so their intersection is the operating point. Intrathoracic pressure slides

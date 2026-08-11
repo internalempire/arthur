@@ -1,4 +1,4 @@
-import { cmH2OtoMmHg, clamp } from '../../model/units.js';
+import { cmH2OtoMmHg, clamp } from '../../model/index.js';
 
 // A schematic of the pressure chamber within a pressure chamber. Everything
 // drawn here is bound to a model variable: the thorax expands with lung volume,

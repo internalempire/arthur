@@ -1,6 +1,5 @@
 import { Panel, niceTicks } from '../plot.js';
-import { pvrComponents } from '../../model/lung.js';
-import { RESISTANCE_TO_WOOD } from '../../model/units.js';
+import { pvrComponents, RESISTANCE_TO_WOOD } from '../../model/index.js';
 
 // Pulmonary vascular resistance against lung volume. The reference line is the
 // mechanical J-curve of a fully open lung; the patient line is the equivalent
