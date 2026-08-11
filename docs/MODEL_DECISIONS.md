@@ -8,6 +8,79 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-08-11 — Bound the aggregate baroreflex without adding new arcs
+
+### Decision
+
+- Keep one aggregate sympathetic state and its 15 s time constant. Do not add
+  separate vagal, cardiac-sympathetic, arterial-resistance and venous-tone
+  states solely to make the transient look more physiological.
+- Reinterpret the user-facing `baroreflex` control as **sensitivity**. It now
+  acts inside the saturating pressure-error relation, so positive outflow stays
+  between zero and one and withdrawal stays between zero and −0.25. Raising
+  sensitivity reaches full response at a smaller error; it cannot create a
+  response larger than full.
+- Make the chronotropic effector additive: full positive outflow adds 42/min to
+  the selected heart rate. The previous proportional effector increased an
+  already selected tachycardia a second time.
+- Keep systemic resistance and contractility as relative effectors and venous
+  recruitment at 200 mL per unit outflow. These remain aggregate teaching
+  coefficients, not identified human dose–response relationships.
+
+### Why
+
+The former equations allowed the sensitivity control to scale the maximum
+outflow itself. In a deliberately severe but permitted corner of the control
+space — baseline heart rate 170/min, stressed volume 200 mL, systemic resistance
+0.25, set point 110 mmHg and sensitivity 2 — outflow reached 1.945. The
+proportional chronotropic term then produced 351.9/min and the venous term
+mobilised 389 mL. This was false precision rather than a useful demonstration:
+the selected baseline rate already describes the patient's phenotype, and
+“twice the sensitivity” does not identify a biologically meaningful
+twice-maximal sympathetic state.
+
+The alternative of splitting the controller into several efferent arcs was
+rejected for this didactic model. Human experiments show that sinus-node and
+vascular responses do not share one latency: direct carotid stimulation changed
+the pulse interval after about 0.5–0.6 s and arterial pressure after 2–3 s
+([Borst et al. 1983](https://doi.org/10.1016/0165-1838(83)90004-8)), while the
+measured vagal cardiac delay varies with autonomic state
+([Keyl et al. 2001](https://pubmed.ncbi.nlm.nih.gov/11408442/)). A prospective
+study in 21 patients with septic shock also found materially different autonomic
+control despite achievement of the same mean-pressure target
+([Carrara et al. 2018](https://pmc.ncbi.nlm.nih.gov/articles/PMC5991174/)). One
+extra “more realistic” time constant would therefore not solve the
+identifiability problem; it would add an unsupported parameter.
+
+### Calibration result
+
+The additive 42/min reserve preserves the old full-response increment at the
+75/min reference state (75 × 0.55 = 41.25/min, rounded for the teaching
+coefficient). It is not claimed as a universal human chronotropic reserve. In
+the severe control-space corner above, the new outflow is 0.993, effective heart
+rate 211.7/min and venous recruitment 198.6 mL. Pressure remains frankly low at
+about 43 mmHg rather than being normalised by a super-response.
+
+In the shipped septic phenotype, disabling versus enabling the reflex changes
+MAP from about 63 to 82 mmHg, heart rate from 105 to 122/min and cardiac output
+from 3.9 to 4.4 L/min. Local preload reserve remains steep and a 500 mL volume
+increase still raises output by about 40% with the reflex on. The intended lesson
+— compensation can mask severe underfilling — is therefore retained without
+using pulse-pressure variation as a diagnostic cutoff.
+
+### Deliberate limits
+
+The 15 s first-order state is a slow aggregate compensator, not a simulation of
+human beat-to-beat baroreflex latency. After an abrupt fall in pressure the
+model's chronotropic response is still small at 3 s and incomplete at 15 s. It
+should be used for compensated-versus-uncompensated steady-state comparisons,
+not autonomic function testing, heart-rate variability, reflex timing or
+vasopressor prediction. Its afferent signal is a low-pass mean pressure, not
+pulsatile arterial-wall stretch. The fixed set point, withdrawal asymmetry and
+effector coefficients are didactic choices; ageing, sedation, neuropathy,
+sepsis, pre-existing sympathetic activation and chemoreflexes are not
+represented.
+
 ## 2026-08-11 — Treat Berger as an animal anchor, not a human calibration
 
 ### Decision
@@ -157,8 +230,8 @@ instantaneous by design; only delivery of changing flow is buffered.
   volume by 500 mL.
 - Model sympathetic venous tone as a shift of zero-pressure volume. One unit of
   positive baroreflex outflow lowers systemic venous unstressed volume by 200 mL
-  and mobilises the same volume as stressed, without adding blood; the
-  user-facing reflex gain can scale this response.
+  and mobilises the same volume as stressed, without adding blood. The later
+  baroreflex-boundary decision keeps that outflow at or below one.
 - Keep `csv` as an independent pressure–volume slope. The baroreflex no longer
   changes it.
 - Expose stressed volume, unstressed volume, tone-mobilised volume and effective

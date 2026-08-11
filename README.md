@@ -735,7 +735,7 @@ changes the pressure–volume slope; it does not stand in for venoconstriction.
 | Symbol | Meaning | Unit | Default | Range |
 |---|---|---|---|---|
 | `hr` | Heart rate, before reflex modulation | /min | 75 | 40 – 170 |
-| `baroreflex` | Baroreflex gain | × | 1.0 | 0 – 2 |
+| `baroreflex` | Baroreflex sensitivity | × | 1.0 | 0 – 2 |
 | `baroSetPoint` | Pressure the reflex defends | mmHg | 90 | 55 – 110 |
 | `eesLv` | LV end-systolic elastance | mmHg/mL | 3.0 | 0.3 – 6.0 |
 | `eesRv` | RV end-systolic elastance | mmHg/mL | 0.58 | 0.08 – 1.6 |
@@ -760,38 +760,52 @@ dyn·s·cm⁻⁵ = mmHg·s/mL × 80000/60.
 
 ### The baroreflex
 
-One sympathetic outflow with a 15 s time constant, driven by the error between
-mean arterial pressure and a set point, acting on heart rate, systemic
+One bounded sympathetic outflow with a 15 s time constant, driven by the error
+between mean arterial pressure and a set point, acting on heart rate, systemic
 resistance, unstressed-to-stressed venous volume recruitment and contractility
-together. Real arcs have
-different latencies; this is the level at which the teaching points live.
+together. The sensitivity control changes how quickly pressure error approaches
+full response; it cannot make the outflow exceed full response. Zero disables
+the compensator.
+
+This is a slow aggregate teaching mechanism, not a reconstruction of human
+beat-to-beat autonomic control. Human cardiac responses can begin within one
+beat ([Borst et al. 1983](https://doi.org/10.1016/0165-1838(83)90004-8)), and
+the cardiac delay itself changes with autonomic state
+([Keyl et al. 2001](https://pubmed.ncbi.nlm.nih.gov/11408442/)); sympathetic
+cardiac and vascular effects have different, slower time courses. The model
+deliberately does not add separate vagal, cardiac-sympathetic, arterial and
+venous states. Its 15 s constant should therefore be used to compare
+compensated and uncompensated steady states, not to interpret reflex latency.
 
 At unit positive outflow the venous effector shifts 200 mL out of unstressed
-volume; the user-facing reflex gain can scale this response. It changes neither
-total blood volume nor venous compliance. This coefficient preserves the former
-model's order of magnitude but is not a vasopressor dose–response calibration.
+volume. It changes neither total blood volume nor venous compliance. The heart
+rate effector adds at most 42/min rather than multiplying the selected baseline
+rate: a phenotype already set to 105 or 170/min must not acquire a larger reflex
+solely because it began tachycardic. Both coefficients preserve the former
+model's order of magnitude at the 75/min reference state; neither is a measured
+universal reserve or a vasopressor dose–response calibration.
 
-The response is asymmetric — a quarter gain when pressure is above the set point
-— because resting sympathetic tone is low and there is far more room to increase
-outflow than to withdraw it. Without that, a patient a few mmHg above the set
-point acquires an implausible bradycardia.
+The response is asymmetric — withdrawal is limited to one quarter of full
+positive outflow when pressure is above the set point — because resting
+sympathetic tone is low and there is far more room to increase outflow than to
+withdraw it. Without that, a patient a few mmHg above the set point acquires an
+implausible bradycardia.
 
-What it changes is not subtle. Setting the gain to zero recovers the model as it
-was before, and the comparison is the lesson:
+What it changes is not subtle. Setting the sensitivity to zero recovers the
+model as it was before, and the comparison is the lesson:
 
 | Septic shock preset | Reflex off | Reflex on |
 |---|---|---|
-| Mean arterial pressure | 58 mmHg | 80 mmHg |
-| Heart rate | 105 | 131 |
-| Cardiac output | 3.6 L/min | 4.2 L/min |
-| Pulse pressure variation | 17% | 17% |
-| Cardiac output after 500 mL | +71% | +46% |
+| Mean arterial pressure | 63 mmHg | 82 mmHg |
+| Heart rate | 105 | 122 |
+| Cardiac output | 3.9 L/min | 4.4 L/min |
+| Local preload reserve | 14.8%/mmHg | 13.9%/mmHg |
+| Cardiac output after 500 mL | +57% | +40% |
 
 With the reflex on, the pressure looks nearly acceptable while the patient is
-just as volume-depleted. The rate says otherwise, the pulse pressure variation
-says otherwise, and the fluid still works. That is compensated shock, and a
-simulator without a reflex cannot show it — every patient simply becomes
-hypotensive in proportion to the insult.
+still on the steep part of the cardiac-function curve, and the fluid still
+works. That is compensated shock, and a simulator without a reflex cannot show
+it — every patient simply becomes hypotensive in proportion to the insult.
 
 ### Body position
 
@@ -895,15 +909,15 @@ catheter-derived value is separately labelled in the app.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.27 | 95 | −1.0 | 21/9 | 9 | 1.2 | 0.93 | 6% |
+| Healthy, breathing spontaneously | 5.29 | 95 | −1.0 | 21/9 | 9 | 1.2 | 0.93 | 6% |
 | Healthy, passive volume control | 4.91 | 93 | 1.4 | 21/12 | 10 | 1.2 | 0.88 | 2% |
 | PEEP escalation | 4.54 | 90 | 3.8 | 22/13 | 10 | 1.3 | 0.87 | 1% |
-| Septic shock, fluid responsive | 4.40 | 82 | 1.7 | 16/10 | 4 | 1.2 | 0.73 | 2% |
-| Big pleural swings, no variation | 6.72 | 92 | 1.1 | 24/15 | 9 | 1.2 | 0.89 | 7% |
-| ARDS with right ventricular failure | 3.99 | 85 | 3.7 | 28/20 | 4 | 4.3 | 1.65 | 1% |
-| Acute pulmonary embolism | 4.10 | 94 | 5.8 | 39/33 | 4 | 7.5 | 2.02 | 11% |
-| Cardiogenic pulmonary oedema | 3.53 | 87 | 5.0 | 44/38 | 35 | 1.2 | 0.86 | 6% |
-| Weaning the failing left ventricle | 3.28 | 87 | 1.1 | 36/31 | 33 | 1.2 | 0.88 | 21% |
+| Septic shock, fluid responsive | 4.36 | 81 | 1.8 | 16/9 | 4 | 1.2 | 0.72 | 1% |
+| Big pleural swings, no variation | 6.77 | 92 | 1.1 | 24/15 | 9 | 1.2 | 0.88 | 5% |
+| ARDS with right ventricular failure | 3.98 | 85 | 3.6 | 27/19 | 4 | 4.3 | 1.64 | 1% |
+| Acute pulmonary embolism | 4.06 | 94 | 5.8 | 39/32 | 4 | 7.5 | 2.03 | 9% |
+| Cardiogenic pulmonary oedema | 3.52 | 87 | 5.0 | 44/38 | 35 | 1.2 | 0.86 | 6% |
+| Weaning the failing left ventricle | 3.55 | 87 | 1.2 | 40/31 | 33 | 1.2 | 0.91 | 17% |
 | Stiff chest wall | 4.37 | 90 | 3.3 | 18/10 | 9 | 1.2 | 0.82 | 4% |
 | COPD with dynamic hyperinflation | 4.58 | 91 | 4.2 | 20/12 | 10 | 1.3 | 0.84 | 3% |
 | Intra-abdominal hypertension | 3.55 | 87 | 0.8 | 13/7 | 5 | 1.2 | 0.74 | 1% |
@@ -1120,9 +1134,13 @@ The full list, with the measurements behind it, is in
 
 - **Simplified autonomic control.** One aggregate baroreflex modulates heart
   rate, systemic resistance, venous stressed-volume recruitment and
-  contractility; there is no chemoreflex or separate efferent time course. The
-  200 mL-per-unit venous recruitment coefficient is didactic, not a calibrated
-  norepinephrine dose–response relationship.
+  contractility; there is no chemoreflex, vagal limb or separate efferent time
+  course. Its bounded output and additive 42/min chronotropic reserve prevent
+  super-physiological high-gain responses, but do not turn the aggregate 15 s
+  state into a human transient model; its afferent signal is low-pass mean
+  pressure rather than pulsatile arterial-wall stretch. The 200 mL-per-unit
+  venous recruitment coefficient is didactic, not a calibrated norepinephrine
+  dose–response relationship.
 - **No gas exchange.** No oxygen, CO₂, pH or shunt. Hypoxic vasoconstriction is
   a coefficient on derecruited lung, not a consequence of an alveolar oxygen
   tension.

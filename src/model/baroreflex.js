@@ -11,6 +11,8 @@
 // with a time constant, driving heart rate, systemic resistance, venous tone and
 // contractility together. That is a simplification — the four have different
 // latencies in reality — but it is the level at which the teaching points live.
+// In particular, this slow aggregate state must not be read as the latency of
+// the human beat-to-beat cardiac baroreflex.
 
 export const BARO = {
   tau: 15,          // s, effector time constant
@@ -18,7 +20,15 @@ export const BARO = {
   // Effector change at full response. Venous recruitment is a volume because
   // sympathetic venoconstriction shifts the zero-pressure volume; it does not
   // have to change the compliance slope or add blood to the circulation.
-  heartRate: 0.55,
+  // An additive reserve avoids counting an already elevated selected heart
+  // rate twice. A proportional effector made the same reflex output far more
+  // tachycardic at a baseline of 170/min than at 75/min, reaching >350/min when
+  // combined with the formerly unbounded high-gain control.
+  // 42/min preserves the former full-response increment at the 75/min
+  // reference state (75 * 0.55 = 41.25) without scaling it up again when the
+  // selected phenotype is already tachycardic. It is an internal continuity
+  // calibration, not a claimed universal human chronotropic reserve.
+  heartRateReserve: 42, // /min added at full positive response
   resistance: 0.45,
   venousRecruitment: 200, // mL moved from unstressed to stressed volume
   inotropy: 0.30,
@@ -33,18 +43,21 @@ export function createBaroreflexState() {
 }
 
 /**
- * Advance the effector by one step and return its output. At gain 1 its target
- * lies in [-0.25, 1]; the user-facing gain can scale that range. `map` is the
- * mean arterial pressure the reflex senses — a mean, not an instantaneous
- * value, because that is what a baroreceptor integrates.
+ * Advance the effector by one step and return its output. The user-facing
+ * sensitivity acts inside the saturating pressure-error curve, so every
+ * positive setting retains the same bounded effector range [-0.25, 1]. A
+ * sensitivity above one reaches full response at a smaller pressure error; it
+ * cannot invent a response larger than "full". `map` is the model's low-pass
+ * mean-pressure teaching signal. Real arterial baroreceptors sense pulsatile
+ * arterial-wall stretch; that afferent encoding is outside this model.
  */
 export function stepBaroreflex(p, state, map, dt) {
-  const gain = p.baroreflex ?? 0;
-  if (gain <= 0) { state.outflow = 0; return 0; }
+  const sensitivity = p.baroreflex ?? 0;
+  if (sensitivity <= 0) { state.outflow = 0; return 0; }
 
   const error = p.baroSetPoint - map;
-  const raw = Math.tanh(error / BARO.errorScale);
-  const target = gain * (raw >= 0 ? raw : raw * BARO.withdrawalFraction);
+  const raw = Math.tanh(sensitivity * error / BARO.errorScale);
+  const target = raw >= 0 ? raw : raw * BARO.withdrawalFraction;
 
   state.outflow += (target - state.outflow) * (dt / BARO.tau);
   return state.outflow;
@@ -56,7 +69,7 @@ export function stepBaroreflex(p, state, map, dt) {
  * four thousand times a second would be the most expensive thing in the model.
  */
 export function applyBaroreflex(effective, base, outflow) {
-  effective.hr = base.hr * (1 + BARO.heartRate * outflow);
+  effective.hr = base.hr + BARO.heartRateReserve * outflow;
   effective.svr = base.svr * (1 + BARO.resistance * outflow);
   // Positive outflow reduces the systemic venous unstressed volume. Negative
   // outflow returns some volume to it. Total blood volume and the user-selected

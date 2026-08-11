@@ -86,8 +86,10 @@ not a model of infusion kinetics or transcapillary redistribution.
 
 The baroreflex does something different. Each unit of positive sympathetic
 outflow lowers the unstressed volume by 200 mL and therefore mobilises the same
-amount as stressed volume; the user-facing gain can scale this response. Total
-blood and the selected compliance remain unchanged.
+amount as stressed volume. The user-facing sensitivity changes how rapidly a
+pressure error approaches full response, but the outflow is bounded and cannot
+mobilise more than 200 mL. Total blood and the selected compliance remain
+unchanged.
 The elastic component of mean systemic filling pressure is then stressed volume
 divided by compliance; abdominal pressure contributes separately through the
 splanchnic coupling already present in the model.
@@ -194,11 +196,16 @@ patient's Pmsf.
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 
 - **One reflex arc, no chemoreflex.** The arterial baroreflex is present as a
-  single sympathetic outflow with one time constant; the real arcs to heart rate,
-  resistance, venous tone and contractility have different latencies, and there
-  is no chemoreflex at all. Venous tone has one fixed recruitment coefficient
-  rather than a drug-specific or patient-specific dose response. Set the gain
-  to zero to see the uncompensated model.
+  bounded, single sympathetic outflow with one 15 s time constant; the real
+  vagal and sympathetic arcs to heart rate, resistance, venous tone and
+  contractility have different latencies, and there is no chemoreflex at all.
+  Heart rate receives an additive reserve rather than a percentage of the
+  selected baseline, but this only removes an extreme double count: it is not a
+  patient-specific chronotropic model. Venous tone has one fixed recruitment
+  coefficient rather than a drug-specific dose response. Set sensitivity to
+  zero to see the uncompensated model, and do not use the transient to infer a
+  human baroreflex latency. The afferent signal is low-pass mean pressure rather
+  than pulsatile arterial-wall stretch.
 - **Variation can report right ventricular afterload rather than preload.** As
   lung compliance falls, airway pressure swings the pulmonary
   vessels harder within each breath, and more of the pulse pressure variation is
