@@ -6,8 +6,9 @@
 // table anyone can open — which turns out to be useful with a mouse too, when
 // you want the number rather than the pixel.
 
-import { RESISTANCE_TO_WOOD } from '../model/units.js';
-import { pvrComponents, lungRegions } from '../model/lung.js';
+import {
+  RESISTANCE_TO_WOOD, pvrComponents, lungRegions,
+} from '../model/index.js';
 
 const n = (v, d = 1) => (Number.isFinite(v) ? v.toFixed(d) : '—');
 

@@ -1,5 +1,5 @@
 import { Panel, niceTicks } from '../plot.js';
-import { TRACE_SECONDS } from '../../model/simulator.js';
+import { TRACE_SECONDS } from '../../model/index.js';
 
 // Three time-aligned strips. Respiratory and haemodynamic pressures are kept on
 // separate strips rather than sharing one plot with two y-axes: cmH2O and mmHg

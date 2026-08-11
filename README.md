@@ -1068,6 +1068,7 @@ docs/POSTMORTEM-2026-08-09.md  the errors made while anchoring the J-curve, and 
 src/
   main.js                 transport, scenario wiring, animation loop
   model/
+    index.js              selective public API consumed by main and the UI
     units.js              cmH2O / mmHg conversion — the only place it happens
     parameters.js         every user-facing knob; the panel builds itself from this
     scenarios.js          presets, each with the question it is meant to answer
@@ -1091,7 +1092,7 @@ src/
 node tests/run.mjs
 ```
 
-198 checks, no framework and no dependencies:
+200 checks, no framework and no dependencies:
 
 - **Volume conservation** across every scenario, to 0.01 mL.
 - **Compartment positivity** across every scenario and across a deterministic
@@ -1116,6 +1117,8 @@ node tests/run.mjs
   acknowledged rather than discovered.
 - **Documentation** — the scenario table in this file is checked against a fresh
   run of the model.
+- **Public API boundary** — browser modules can consume the model only through
+  `src/model/index.js`, whose selective export surface is itself checked.
 
 ---
 

@@ -1,8 +1,8 @@
 import { Panel, niceTicks } from '../plot.js';
-import { PPL_FRC, respiratorySystemCompliance } from '../../model/respiratory.js';
 import {
+  PPL_FRC, respiratorySystemCompliance,
   lungVolumeAtPl, relaxationVolume, openBand, stepOpenFraction,
-} from '../../model/lung.js';
+} from '../../model/index.js';
 
 // The Campbell diagram. Pleural pressure follows the chest wall compliance
 // curve; airway pressure follows the respiratory system curve. The horizontal

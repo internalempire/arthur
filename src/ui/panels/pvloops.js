@@ -1,5 +1,5 @@
 import { Panel } from '../plot.js';
-import { CHAMBER } from '../../model/circulation.js';
+import { CHAMBER } from '../../model/index.js';
 
 // Sagawa pressure–volume loops. Pressures here are transmural, which is what
 // the myocardium experiences — so the loops keep their shape when intrathoracic
