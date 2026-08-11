@@ -76,6 +76,26 @@ export function createCirculationState(p) {
   };
 }
 
+/**
+ * Partition the systemic venous reservoir without changing its total volume.
+ *
+ * `vSv` is the blood physically present. Fluid changes it. Venous tone instead
+ * shifts the reservoir's zero-pressure (unstressed) volume, thereby mobilising
+ * an equal amount as stressed volume. `csv` remains the independent slope that
+ * converts that stressed volume into elastic filling pressure.
+ */
+export function systemicVenousVolumeState(p, c) {
+  const toneVolume = p.venousToneVolume ?? 0;
+  const unstressedVolume = VASC.vuSv - toneVolume;
+  const stressedVolume = c.vSv - unstressedVolume;
+  return {
+    toneVolume,
+    unstressedVolume,
+    stressedVolume,
+    elasticPressure: stressedVolume / p.csv,
+  };
+}
+
 // Double-hill ventricular activation, normalised to a peak of 1.
 function ventricularActivation(tn) {
   const a1 = 0.28, n1 = 1.9, a2 = 0.46, n2 = 18;
@@ -225,7 +245,8 @@ export function stepCirculation(p, c, resp, dt) {
   // and raises mean systemic filling pressure. With a collapsed one (zone I/II)
   // the same pressure obliterates the capacitance vessels instead, raising the
   // resistance to venous return rather than the pressure head.
-  const pmsfElastic = (c.vSv - VASC.vuSv) / p.csv;
+  const venousVolume = systemicVenousVolumeState(p, c);
+  const pmsfElastic = venousVolume.elasticPressure;
   const abdZone = clamp((pmsfElastic - 2) / 8, 0, 1);
   const pmsf = pmsfElastic + ABD_VENOUS_FRACTION * pab * abdZone;
   const rvrEff = p.rvr * (1 + 0.5 * (1 - abdZone) * Math.max(0, pab - 2) / 4);
@@ -283,6 +304,9 @@ export function stepCirculation(p, c, resp, dt) {
   c.p = {
     ra: pRa, rv: pRv, la: pLa, lv: pLv, sa: pSa, pa: pPa, pv: pPv,
     pmsf, pCrit, pPeri, ppl, palv, pab, rvrEff, abdZone,
+    venousToneVolume: venousVolume.toneVolume,
+    venousUnstressed: venousVolume.unstressedVolume,
+    stressedVenous: venousVolume.stressedVolume,
     raTm: pRaTm, rvTm: pRvTm, lvTm: pLvTm, laTm: pLaTm,
     zone3, pvr, vHeart,
   };

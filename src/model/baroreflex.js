@@ -14,10 +14,12 @@
 export const BARO = {
   tau: 15,          // s, effector time constant
   errorScale: 20,   // mmHg of error giving about three quarters of full response
-  // Fractional change at full response.
+  // Effector change at full response. Venous recruitment is a volume because
+  // sympathetic venoconstriction shifts the zero-pressure volume; it does not
+  // have to change the compliance slope or add blood to the circulation.
   heartRate: 0.55,
   resistance: 0.45,
-  venousTone: 0.30, // as a *fall* in venous compliance, which raises Pmsf
+  venousRecruitment: 200, // mL moved from unstressed to stressed volume
   inotropy: 0.30,
   // Resting sympathetic tone is low, so there is far more room to increase
   // outflow than to withdraw it. Without this asymmetry a patient sitting a few
@@ -30,9 +32,10 @@ export function createBaroreflexState() {
 }
 
 /**
- * Advance the effector by one step and return its output, in [-0.25, 1].
- * `map` is the mean arterial pressure the reflex senses — a mean, not an
- * instantaneous value, because that is what a baroreceptor integrates.
+ * Advance the effector by one step and return its output. At gain 1 its target
+ * lies in [-0.25, 1]; the user-facing gain can scale that range. `map` is the
+ * mean arterial pressure the reflex senses — a mean, not an instantaneous
+ * value, because that is what a baroreceptor integrates.
  */
 export function stepBaroreflex(p, state, map, dt) {
   const gain = p.baroreflex ?? 0;
@@ -54,7 +57,11 @@ export function stepBaroreflex(p, state, map, dt) {
 export function applyBaroreflex(effective, base, outflow) {
   effective.hr = base.hr * (1 + BARO.heartRate * outflow);
   effective.svr = base.svr * (1 + BARO.resistance * outflow);
-  effective.csv = base.csv * (1 - BARO.venousTone * outflow);
+  // Positive outflow reduces the systemic venous unstressed volume. Negative
+  // outflow returns some volume to it. Total blood volume and the user-selected
+  // venous compliance remain unchanged in both directions.
+  effective.csv = base.csv;
+  effective.venousToneVolume = BARO.venousRecruitment * outflow;
   effective.eesLv = base.eesLv * (1 + BARO.inotropy * outflow);
   effective.eesRv = base.eesRv * (1 + BARO.inotropy * outflow);
 }

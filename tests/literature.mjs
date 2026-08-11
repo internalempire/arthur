@@ -8,7 +8,8 @@
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams } from '../src/model/parameters.js';
 import { pvrComponents, NORMAL_FRC } from '../src/model/lung.js';
-import { venousReturnFlow } from '../src/model/circulation.js';
+import { systemicVenousVolumeState, venousReturnFlow } from '../src/model/circulation.js';
+import { applyBaroreflex } from '../src/model/baroreflex.js';
 
 function settle(overrides, seconds = 30) {
   const s = new Simulator();
@@ -186,6 +187,27 @@ export const LITERATURE = {
       pass: Math.abs(deeper - deep) / deep < 0.02 && onSlope < deep * 0.95,
       detail: `flow ${deep.toFixed(1)} then ${deeper.toFixed(1)} mL/s six mmHg lower `
         + `(plateau), ${onSlope.toFixed(1)} above the closing pressure`,
+    };
+  },
+
+  'venous-tone-volume-shift': () => {
+    // Isolate the venous effector from the simultaneous chronotropic,
+    // inotropic and arterial-resistance effects of the aggregate baroreflex.
+    const base = defaultParams();
+    const effective = { ...base };
+    const reservoir = { vSv: 3500 };
+    const before = systemicVenousVolumeState(base, reservoir);
+    applyBaroreflex(effective, base, 0.5);
+    const after = systemicVenousVolumeState(effective, reservoir);
+    return {
+      pass: reservoir.vSv === 3500 && effective.csv === base.csv
+        && after.unstressedVolume < before.unstressedVolume
+        && after.stressedVolume > before.stressedVolume
+        && after.elasticPressure > before.elasticPressure,
+      detail: `at fixed 3500 mL and compliance ${base.csv}, unstressed ${before.unstressedVolume.toFixed(0)}`
+        + ` → ${after.unstressedVolume.toFixed(0)} mL, stressed ${before.stressedVolume.toFixed(0)}`
+        + ` → ${after.stressedVolume.toFixed(0)} mL, pressure ${before.elasticPressure.toFixed(1)}`
+        + ` → ${after.elasticPressure.toFixed(1)} mmHg`,
     };
   },
 };

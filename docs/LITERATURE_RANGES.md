@@ -33,6 +33,26 @@ work, not excuses.
 | `ppv-suspended-spontaneous` | During spontaneous breathing, pulse pressure variation is withheld rather than presented as an interpretable dynamic index. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
 | `ph-classification` | A hypervolaemic failing left ventricle with a wedge above 15 mmHg and a mean pulmonary artery pressure above 20 is classified post-capillary; a lung with a high vascular resistance and a low wedge is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
+| `venous-tone-volume-shift` | At fixed blood volume, increasing venous tone lowers unstressed volume and mobilises the same amount as stressed volume, raising mean systemic pressure without requiring a change in the pressure–volume slope. | agrees | Young, *Control of Cardiac Output* 2010, ch. 2; Adda et al., *Crit Care* 2021;25:302 |
+
+## Current phase-3 volume semantics
+
+The three user-visible mechanisms are intentionally independent:
+
+1. `stressedVolume` adds or removes actual blood from the systemic venous
+   reservoir one-for-one, as a deliberately instantaneous fluid or diuresis
+   control.
+2. Baroreflex venous tone shifts the zero-pressure volume: positive outflow
+   moves blood from unstressed to stressed volume without changing total blood.
+3. `csv` changes the volume–pressure slope without reclassifying any volume as
+   stressed or unstressed.
+
+This follows the experimental teaching geometry: increased tone shifts the
+volume–pressure relation left with little change in slope, and human septic-shock
+data support a norepinephrine-related increase in stressed volume and mean
+systemic pressure. The model's 200 mL recruitment per unit of reflex outflow is
+a transparent didactic coefficient, not a norepinephrine dose–response
+calibration.
 
 ## Current phase-2 calibration
 

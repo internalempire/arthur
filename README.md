@@ -694,13 +694,16 @@ appear in the UI and in every scenario.
 
 | Symbol | Meaning | Unit | Default | Range |
 |---|---|---|---|---|
-| `stressedVolume` | Stressed volume | mL | 700 | 200 – 1800 |
-| `csv` | Venous compliance | mL/mmHg | 100 | 30 – 200 |
+| `stressedVolume` | Baseline stressed volume | mL | 700 | 200 – 1800 |
+| `csv` | Venous compliance (slope) | mL/mmHg | 100 | 30 – 200 |
 | `rvr` | Resistance to venous return | mmHg·s/mL | 0.072 | 0.02 – 0.30 |
 | `svr` | Systemic vascular resistance | mmHg·s/mL | 1.05 | 0.25 – 3.0 |
 
 Changing `stressedVolume` moves blood into or out of the venous reservoir — a
-fluid bolus or a diuresis — rather than silently rescaling the model.
+fluid bolus or a diuresis — rather than silently rescaling the model. Venous
+tone is separate: it lowers the reservoir's zero-pressure volume and mobilises
+the same amount into stressed volume without adding blood. Changing `csv`
+changes the pressure–volume slope; it does not stand in for venoconstriction.
 
 ### Cardiac function
 
@@ -734,8 +737,14 @@ dyn·s·cm⁻⁵ = mmHg·s/mL × 80000/60.
 
 One sympathetic outflow with a 15 s time constant, driven by the error between
 mean arterial pressure and a set point, acting on heart rate, systemic
-resistance, venous compliance and contractility together. Real arcs have
+resistance, unstressed-to-stressed venous volume recruitment and contractility
+together. Real arcs have
 different latencies; this is the level at which the teaching points live.
+
+At unit positive outflow the venous effector shifts 200 mL out of unstressed
+volume; the user-facing reflex gain can scale this response. It changes neither
+total blood volume nor venous compliance. This coefficient preserves the former
+model's order of magnitude but is not a vasopressor dose–response calibration.
 
 The response is asymmetric — a quarter gain when pressure is above the set point
 — because resting sympathetic tone is low and there is far more room to increase
@@ -872,7 +881,7 @@ catheter-derived value is separately labelled in the app.
 | Weaning the failing left ventricle | 3.64 | 87 | 0.6 | 40/31 | 32 | 1.2 | 0.89 | 20% |
 | Stiff chest wall | 4.27 | 90 | 3.3 | 18/10 | 9 | 1.2 | 0.81 | 3% |
 | COPD with dynamic hyperinflation | 4.55 | 90 | 4.2 | 20/12 | 10 | 1.3 | 0.84 | 3% |
-| Intra-abdominal hypertension | 3.43 | 87 | 0.8 | 12/6 | 4 | 1.2 | 0.73 | 4% |
+| Intra-abdominal hypertension | 3.39 | 85 | 0.7 | 12/6 | 4 | 1.2 | 0.73 | 4% |
 
 ### How the presets are built
 
@@ -935,7 +944,7 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | Constant | Value | Meaning |
 |---|---|---|
 | `vuSa`, `cSa` | 700 mL, 1.35 mL/mmHg | systemic arterial unstressed volume and compliance |
-| `vuSv` | 2800 mL | systemic venous unstressed volume |
+| `vuSv` | 2800 mL | systemic venous unstressed volume at neutral tone |
 | `vuPa`, `cPa` | 90 mL, 4.2 mL/mmHg | pulmonary arterial |
 | `vuPv`, `cPv` | 180 mL, 8.5 mL/mmHg | pulmonary venous |
 | `rPulVen` | 0.008 mmHg·s/mL | pulmonary venous resistance |
@@ -1084,8 +1093,10 @@ The full list, with the measurements behind it, is in
 [docs/PHYSIOLOGY.md](docs/PHYSIOLOGY.md). In short:
 
 - **Simplified autonomic control.** One aggregate baroreflex modulates heart
-  rate and systemic resistance; there is no chemoreflex, separate efferent time
-  course or reflex change in venous tone and contractility.
+  rate, systemic resistance, venous stressed-volume recruitment and
+  contractility; there is no chemoreflex or separate efferent time course. The
+  200 mL-per-unit venous recruitment coefficient is didactic, not a calibrated
+  norepinephrine dose–response relationship.
 - **No gas exchange.** No oxygen, CO₂, pH or shunt. Hypoxic vasoconstriction is
   a coefficient on derecruited lung, not a consequence of an alveolar oxygen
   tension.
@@ -1164,3 +1175,8 @@ The full list, with the measurements behind it, is in
 14. Hakim TS, Michel RP, Chang HK. Effect of lung inflation on pulmonary
     vascular resistance by arterial and venous occlusion. *J Appl Physiol*
     1982;53:1110–1115.
+15. Young DB. Venous return. In: *Control of Cardiac Output*. Morgan & Claypool
+    Life Sciences; 2010. NCBI Bookshelf NBK54476.
+16. Adda I, Lai C, Teboul JL, et al. Norepinephrine potentiates the efficacy of
+    volume expansion on mean systemic pressure in septic shock. *Crit Care*
+    2021;25:302. doi:10.1186/s13054-021-03711-5.
