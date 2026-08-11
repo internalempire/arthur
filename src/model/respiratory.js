@@ -22,12 +22,22 @@
 import { clamp } from './units.js';
 import {
   transpulmonaryAt, transpulmonaryAtFixed, relaxationVolume, lungComplianceAt,
-  stepOpenFraction, openBand, hysteresisGap, RECOIL_AT_FRC,
+  stepOpenFraction, openBand, hysteresisGap, staticEndExpiratoryVolume, RECOIL_AT_FRC,
 } from './lung.js';
 
 // Pleural pressure at the relaxation volume. Its negative is the
 // transpulmonary recoil at FRC, which is why alveolar pressure there is zero.
 export const PPL_FRC = -5; // cmH2O
+
+// A flow-limited airway behaves like a Starling resistor: once the passive
+// expiratory flow reaches the choke point, a larger alveolar-to-mouth gradient
+// cannot empty the lung faster. We express the cap as a minimum emptying time
+// constant, so maximal flow still rises with lung volume instead of becoming an
+// arbitrary fixed L/s. The 4.5 s envelope is a didactic severe-obstruction anchor,
+// not a universal COPD constant; `raw` continues to carry ordinary resistance.
+export const EXPIRATORY_FLOW_LIMIT = {
+  minimumTimeConstant: 4.5, // s
+};
 
 export function createRespiratoryState() {
   return {
@@ -52,6 +62,13 @@ export function createRespiratoryState() {
     lastVt: 0,
     lastAutoPeep: 0,
     lastPplSwing: 0,
+    // Latched at the transition into inspiration. Dynamic hyperinflation is the
+    // end-expiratory volume above the passive equilibrium at the same applied
+    // PEEP — not total FRC and not the tidal volume still being delivered.
+    lastEndExpiratoryVolume: 0,
+    lastTrappedVolume: 0,
+    eflLimitedThisBreath: false,
+    lastEflActive: false,
     relaxVolume: 0,
     plSolved: null,
     atCapacity: false,
@@ -264,6 +281,20 @@ export function stepRespiratory(p, r, dt) {
     r.holdPending = null;
   }
 
+  // Capture end-expiratory volume before the first inspiratory integration
+  // step adds gas. Comparing it with the static equilibrium at the same applied
+  // PEEP keeps loss-of-recoil hyperinflation separate from dynamically trapped
+  // volume. With hysteresis on, use the branch the lung is actually occupying.
+  if (r.prevPhase === 'exp' && r.phase === 'insp') {
+    r.lastEndExpiratoryVolume = vRelax + r.v;
+    const staticEelv = staticEndExpiratoryVolume(
+      p, p.peep, hysteretic ? r.openFraction : null,
+    );
+    r.lastTrappedVolume = Math.max(0, (r.lastEndExpiratoryVolume - staticEelv) * 1000);
+    r.lastEflActive = r.eflLimitedThisBreath;
+    r.eflLimitedThisBreath = false;
+  }
+
   // --- flow ----------------------------------------------------------------
   const palv = alveolar(r.v, r.pmus);
   const pao = airwayOpeningPressure(p, r, period);
@@ -273,7 +304,20 @@ export function stepRespiratory(p, r, dt) {
     r.flow = p.vt / 1000 / p.ti;
   } else {
     const target = pao === null ? p.peep : pao;
-    r.flow = (target - palv) / p.raw;
+    const passiveFlow = (target - palv) / p.raw;
+    if (r.phase === 'exp' && p.efl === 'on' && passiveFlow < 0) {
+      // `r.v` is gas above the zero-PEEP relaxation volume. Its ratio to the
+      // minimum emptying time is the maximal outward flow. Below the choke
+      // point downstream pressure no longer accelerates expiration; once PEEP
+      // is high enough that passive flow falls below the cap, it acts as true
+      // back-pressure again. This is the airway analogue of the vascular
+      // waterfall already used in the venous-return model.
+      const maxOutwardFlow = Math.max(0, r.v) / EXPIRATORY_FLOW_LIMIT.minimumTimeConstant;
+      r.flow = Math.max(passiveFlow, -maxOutwardFlow);
+      if (r.flow > passiveFlow + 1e-12) r.eflLimitedThisBreath = true;
+    } else {
+      r.flow = passiveFlow;
+    }
   }
 
   // The floor is the emptiest the lung can get, not the relaxation volume:

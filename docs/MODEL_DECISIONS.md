@@ -8,6 +8,82 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-08-11 — Add one expiratory choke, not a regional COPD lung
+
+### Decision
+
+- Keep loss of recoil (`clung`), linear airway resistance (`raw`) and available
+  expiratory time as separate existing mechanisms.
+- Add one binary `efl` control. When on, passive expiratory flow cannot exceed a
+  volume-dependent maximal-flow envelope. The envelope is expressed as a 4.5 s
+  minimum emptying time constant; ordinary `Raw × Crs` flow still applies when
+  it is slower.
+- Do not add fast and slow lung units, regional airway resistances or new gas
+  compartments. The flow cap is the airway analogue of a Starling resistor: at
+  the choke, lowering downstream pressure further cannot accelerate expiration.
+- Measure dynamic trapped volume as actual end-expiratory lung volume minus the
+  passive equilibrium volume at the same applied PEEP. This keeps emphysematous
+  static hyperinflation separate from breath-to-breath gas trapping.
+- Enable EFL in the COPD preset and leave it off by default elsewhere.
+
+### Why
+
+The former single linear resistance could generate auto-PEEP when expiration
+was short, but it could not represent expiratory flow limitation: every change
+in mouth pressure changed flow. Consequently, in the COPD preset, external PEEP
+0 → 5 cmH₂O raised total PEEP about 6.5 → 11.4 cmH₂O, increased end-expiratory
+volume about 3.41 → 3.95 L and reduced cardiac output. That is a reasonable
+response for simple resistive incomplete emptying, but not for the flow-limited
+phenotype the preset claimed.
+
+In nine passively ventilated COPD patients, PEEP below the critical fraction of
+intrinsic PEEP left end-expiratory volume, total PEEP and haemodynamics
+substantially unchanged; above the choke it caused further hyperinflation and
+reduced cardiac index
+([Ranieri et al. 1993](https://pubmed.ncbi.nlm.nih.gov/8420430/)). Similar
+downstream-pressure independence below PEEPi was observed by
+[van den Berg et al. 1991](https://pubmed.ncbi.nlm.nih.gov/1936227/). Earlier
+human studies established occult PEEPi and the circulatory cost of inadvertent
+hyperinflation ([Pepe and Marini 1982](https://pubmed.ncbi.nlm.nih.gov/7046541/);
+[Tuxen and Lane 1987](https://doi.org/10.1164/ajrccm/136.4.872)). The key
+heart–lung lesson is therefore the existence of a choke, not a detailed model
+of small-airway anatomy.
+
+### Calibration result
+
+With EFL on in the obstructed phenotype, external PEEP 0 → 5 leaves total PEEP
+at about 12.1 cmH₂O and EELV at about 4.02 L. Applied PEEP substitutes for part
+of the intrinsic pressure rather than adding to absolute lung volume. At PEEP
+13, total PEEP rises to about 19.3 cmH₂O, EELV to 4.79 L, CVP to 7.0 mmHg and
+cardiac output falls from about 4.38 to 4.18 L/min.
+
+At the shipped PEEP of 5, increasing expiratory time by slowing respiratory
+rate from 26 to 12/min reduces intrinsic PEEP from about 7.1 to 1.3 cmH₂O,
+dynamic trapped volume from about 782 to 146 mL and restores cardiac output from
+about 4.38 to 4.85 L/min. The acute vascular coefficient changes much less than
+the filling pathway; chronic COPD pulmonary vascular disease is not silently
+added to the preset.
+
+The 4.5 s envelope preserves the order of magnitude of severe obstructive
+emptying and a visible low-PEEP plateau. It is not fitted to the published 85%
+critical fraction and must not be used as a bedside PEEP threshold.
+
+### Deliberate limits
+
+`efl` is binary and the maximal-flow envelope is one aggregate curve. Real COPD
+has volume-dependent airway compression, heterogeneous regional time constants,
+airway closure, collateral ventilation and patient-specific responses to PEEP.
+The model has none of those. It also does not model CO₂, dead space, V/Q,
+bronchodilators, secretions, inspiratory threshold work, triggering or
+dyssynchrony. The external-PEEP comparison is intended for the passive
+controlled phenotype used in the human studies, not assisted-ventilation
+titration.
+
+Dynamic trapped volume is a model-derived separation from its own static
+pressure–volume equilibrium, not a bedside measurement of occult regional
+trapping. The feature exists only to connect incomplete expiration to mean
+intrathoracic pressure, measured-versus-transmural filling and cardiac output.
+
 ## 2026-08-11 — Bound the aggregate baroreflex without adding new arcs
 
 ### Decision

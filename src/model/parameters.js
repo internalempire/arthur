@@ -89,6 +89,16 @@ export const PARAMETERS = [
     min: 1, max: 40, step: 0.5, default: 5,
   },
   {
+    id: 'efl', group: 'mechanics', label: 'Expiratory flow limitation',
+    type: 'choice',
+    options: [
+      { value: 'off', label: 'Off' },
+      { value: 'on', label: 'On' },
+    ],
+    default: 'off',
+    help: 'A collapsible-airway choke during expiration: below its critical downstream pressure, a larger pressure gradient cannot increase expiratory flow. This distinguishes flow limitation from high linear resistance without adding regional lung compartments.',
+  },
+  {
     id: 'collapsed', group: 'mechanics', label: 'Collapsed lung', unit: 'fraction',
     min: 0, max: 0.8, step: 0.05, default: 0,
     help: 'How much of the lung is shut at rest. Resting volume is no longer something you set — it follows from how much lung is open and how compliant it is, which is what lets recruitment raise it. A lung that has lost its recoil rests high; a collapsed one rests low.',

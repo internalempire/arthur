@@ -129,7 +129,8 @@ const TILES = [
   {
     id: 'peep', label: 'Total PEEP', unit: 'cmH₂O', kind: 'measured',
     get: (m) => m.totalPeep.toFixed(1),
-    sub: (m) => `intrinsic ${m.autoPeep.toFixed(1)}`,
+    sub: (m) => `intrinsic ${m.autoPeep.toFixed(1)} · dynamically trapped ${m.trappedVolume.toFixed(0)} mL`
+      + (m.expiratoryFlowLimited ? ' · EFL active' : ''),
     status: (m) => (m.autoPeep > 1.5 ? ['warning', 'gas trapping'] : null),
   },
   {

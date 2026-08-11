@@ -3,6 +3,7 @@ import { resolveParams } from './position.js';
 import { createBaroreflexState, stepBaroreflex, applyBaroreflex } from './baroreflex.js';
 import {
   createRespiratoryState, stepRespiratory, respiratorySystemCompliance,
+  EXPIRATORY_FLOW_LIMIT,
 } from './respiratory.js';
 import { pvrComponents, lungRegions, relaxationVolume, openBand } from './lung.js';
 import {
@@ -520,11 +521,20 @@ export class Simulator {
       lungStrain: regions.strain,
       pplat: r.lastPplat, ppeak: r.lastPpeak, autoPeep: r.lastAutoPeep,
       totalPeep: p.peep + r.lastAutoPeep,
+      endExpiratoryVolume: r.lastEndExpiratoryVolume,
+      trappedVolume: r.lastTrappedVolume,
+      expiratoryFlowLimited: r.lastEflActive,
       drivingPressure: r.lastPplat - (p.peep + r.lastAutoPeep),
       pplSwing: r.lastPplSwing,
       vtDelivered: r.lastVt,
       stressIndex: siReasons.length ? null : r.lastStressIndex,
-      crs, expTimeConstant: (crs / 1000) * p.raw,
+      crs,
+      // Linear Raw×Crs is the emptying time only until a flow-limited airway
+      // imposes a slower maximum-expiratory-flow envelope. Report the active
+      // model, not the simpler number the model has superseded.
+      expTimeConstant: p.efl === 'on'
+        ? Math.max((crs / 1000) * p.raw, EXPIRATORY_FLOW_LIMIT.minimumTimeConstant)
+        : (crs / 1000) * p.raw,
       pvr: c.p.pvr,
       // The J-curve coefficient the model integrates with. Not the same number a
       // clinician derives from a catheter, because the model also carries an

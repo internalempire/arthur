@@ -19,7 +19,7 @@ import {
 import { applyBaroreflex, BARO } from '../src/model/baroreflex.js';
 import {
   pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
-  lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,
+  lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction, staticEndExpiratoryVolume,
   calibrateRecruitmentToInflation, recruitmentToInflation,
 } from '../src/model/lung.js';
 import { readFileSync } from 'node:fs';
@@ -258,6 +258,58 @@ describe('Physiological relations');
   check('removing septal coupling lets the left ventricle fill',
     noSeptum.metrics.lvEdv > septum.metrics.lvEdv,
     `${septum.metrics.lvEdv.toFixed(1)} -> ${noSeptum.metrics.lvEdv.toFixed(1)} mL`);
+}
+
+// -------------------------------------------- expiratory flow limitation --
+
+describe('Expiratory flow limitation');
+{
+  const obstructed = {
+    mode: 'vcv', pmus: 0, vt: 500, rr: 26, ti: 0.9, raw: 24, clung: 300,
+  };
+  const noLimit = settled({ ...obstructed, peep: 0, efl: 'off' }, 45);
+  const flowLimited = settled({ ...obstructed, peep: 0, efl: 'on' }, 45);
+  check('the expiratory choke adds trapping beyond linear resistance alone',
+    flowLimited.metrics.trappedVolume > noLimit.metrics.trappedVolume + 400
+      && flowLimited.metrics.co < noLimit.metrics.co - 0.2,
+    `trapped ${noLimit.metrics.trappedVolume.toFixed(0)} -> ${flowLimited.metrics.trappedVolume.toFixed(0)} mL, `
+      + `CO ${noLimit.metrics.co.toFixed(2)} -> ${flowLimited.metrics.co.toFixed(2)} L/min`);
+
+  // In a flow-limited patient, modest downstream PEEP substitutes for part of
+  // intrinsic PEEP without raising absolute EELV or total PEEP. Once it exceeds
+  // the choke pressure it becomes real back-pressure again. This is the single
+  // COPD-specific relation worth adding for heart-lung teaching; it is not a
+  // patient-specific PEEP titration rule.
+  const peep5 = settled({ ...obstructed, peep: 5, efl: 'on' }, 45);
+  const peep13 = settled({ ...obstructed, peep: 13, efl: 'on' }, 45);
+  check('PEEP below the choke does not add dynamic hyperinflation',
+    Math.abs(peep5.metrics.endExpiratoryVolume - flowLimited.metrics.endExpiratoryVolume) < 0.05
+      && Math.abs(peep5.metrics.totalPeep - flowLimited.metrics.totalPeep) < 0.2,
+    `EELV ${flowLimited.metrics.endExpiratoryVolume.toFixed(2)} -> ${peep5.metrics.endExpiratoryVolume.toFixed(2)} L, `
+      + `total PEEP ${flowLimited.metrics.totalPeep.toFixed(1)} -> ${peep5.metrics.totalPeep.toFixed(1)} cmH2O`);
+  check('PEEP above the choke adds volume and haemodynamic cost',
+    peep13.metrics.endExpiratoryVolume > peep5.metrics.endExpiratoryVolume + 0.5
+      && peep13.metrics.cvp > peep5.metrics.cvp + 1.5
+      && peep13.metrics.co < peep5.metrics.co - 0.1,
+    `EELV ${peep5.metrics.endExpiratoryVolume.toFixed(2)} -> ${peep13.metrics.endExpiratoryVolume.toFixed(2)} L, `
+      + `CVP ${peep5.metrics.cvp.toFixed(1)} -> ${peep13.metrics.cvp.toFixed(1)} mmHg, `
+      + `CO ${peep5.metrics.co.toFixed(2)} -> ${peep13.metrics.co.toFixed(2)} L/min`);
+
+  const longExpiration = settled({
+    ...obstructed, peep: 5, efl: 'on', rr: 12, ti: 1,
+  }, 45);
+  check('more expiratory time unloads the circulation',
+    longExpiration.metrics.autoPeep < peep5.metrics.autoPeep - 4
+      && longExpiration.metrics.trappedVolume < peep5.metrics.trappedVolume - 500
+      && longExpiration.metrics.co > peep5.metrics.co + 0.3,
+    `intrinsic PEEP ${peep5.metrics.autoPeep.toFixed(1)} -> ${longExpiration.metrics.autoPeep.toFixed(1)}, `
+      + `trapped ${peep5.metrics.trappedVolume.toFixed(0)} -> ${longExpiration.metrics.trappedVolume.toFixed(0)} mL, `
+      + `CO ${peep5.metrics.co.toFixed(2)} -> ${longExpiration.metrics.co.toFixed(2)} L/min`);
+
+  const staticEelv = staticEndExpiratoryVolume(peep5.params, peep5.params.peep);
+  check('trapped volume is measured above static equilibrium at the same PEEP',
+    near(peep5.metrics.trappedVolume,
+      (peep5.metrics.endExpiratoryVolume - staticEelv) * 1000, 0.1));
 }
 
 // ------------------------------------------------------- pulmonary transit --
