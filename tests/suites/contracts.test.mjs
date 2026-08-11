@@ -4,6 +4,7 @@ import {
   readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
   section, check, near, settled,
 } from '../support/model.mjs';
+import { pvrZoomDomain } from '../../src/ui/panels/pvrcurve.js';
 
 section('Public model API');
 {
@@ -56,6 +57,19 @@ section('Public model API');
   check('main and UI use the public API and every UI module resolves',
     forbidden.length === 0 && unloadable.length === 0,
     [...forbidden, ...unloadable].join(', '));
+}
+
+section('PVR chart vertical zoom');
+{
+  const fitted = pvrZoomDomain(2.4, 1.2, 1);
+  const centred = pvrZoomDomain(2.4, 1.2, 2);
+  const clampedLow = pvrZoomDomain(2.4, 0.1, 3);
+  const clampedHigh = pvrZoomDomain(2.4, 2.3, 3);
+  check('fit preserves the complete resistance range', fitted.yLo === 0 && fitted.yHi === 2.4);
+  check('zoom narrows and centres the vertical range',
+    near(centred.yLo, 0.6, 1e-9) && near(centred.yHi, 1.8, 1e-9));
+  check('zoom focus is clamped at both full-range boundaries',
+    clampedLow.yLo === 0 && near(clampedHigh.yHi, 2.4, 1e-9));
 }
 
 // ------------------------------------------------ pulmonary claim contracts --

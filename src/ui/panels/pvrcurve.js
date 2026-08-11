@@ -11,10 +11,90 @@ import { lungVolumeAtPl, pvrComponents, RESISTANCE_TO_WOOD } from '../../model/i
 // opposing limbs the panel exists to teach.
 
 const TLC_REFERENCE_PRESSURE = 35; // cmH2O: the fully open lung's model TLC anchor
+const ZOOM_LEVELS = Object.freeze([1, 1.5, 2, 3]);
 
-export function createPvrCurve(canvas) {
+/**
+ * Return the visible PVR range for a vertical zoom centred on `focusY`.
+ *
+ * Lung volume deliberately stays fitted from RV to TLC at every level: losing
+ * either limb would weaken the panel's central teaching comparison. The focus
+ * is clamped near the ends so zooming never creates empty space outside the
+ * full fitted range.
+ */
+export function pvrZoomDomain(fullYHi, focusY, factor = 1) {
+  const upper = Math.max(1e-6, Number(fullYHi) || 0);
+  const zoom = Math.max(1, Number(factor) || 1);
+  if (zoom === 1) return { yLo: 0, yHi: upper };
+
+  const span = upper / zoom;
+  const focus = Number.isFinite(focusY)
+    ? Math.min(upper, Math.max(0, focusY))
+    : upper / 2;
+  const yLo = Math.min(upper - span, Math.max(0, focus - span / 2));
+  return { yLo, yHi: yLo + span };
+}
+
+export function createPvrCurve(canvas, { onViewChange } = {}) {
   const panel = new Panel(canvas, { padding: [22, 16, 50, 48] });
   let vMinSeen = Infinity, vMaxSeen = -Infinity, breathSeen = -1;
+  let zoomIndex = 0;
+  let zoomFocus = null;
+  let latestPatientPvr = null;
+
+  // Native buttons keep the chart operable by keyboard. The middle control is
+  // both a state readout and an explicit escape hatch back to the complete
+  // curve; zoom must remain reversible even while the simulation is paused.
+  const zoomControls = document.createElement('div');
+  zoomControls.className = 'pvr-zoom';
+  zoomControls.setAttribute('role', 'group');
+  zoomControls.setAttribute('aria-label', 'Vertical zoom for PVR chart');
+
+  const zoomOut = document.createElement('button');
+  zoomOut.type = 'button';
+  zoomOut.textContent = '\u2212';
+  zoomOut.setAttribute('aria-label', 'Zoom out vertically on PVR chart');
+  zoomOut.title = 'Zoom out vertically';
+
+  const zoomReset = document.createElement('button');
+  zoomReset.type = 'button';
+  zoomReset.className = 'pvr-zoom-reset';
+  zoomReset.setAttribute('aria-label', 'Reset PVR chart to the full vertical range');
+  zoomReset.title = 'Fit the full PVR range';
+
+  const zoomIn = document.createElement('button');
+  zoomIn.type = 'button';
+  zoomIn.textContent = '+';
+  zoomIn.setAttribute('aria-label', 'Zoom in vertically on PVR chart');
+  zoomIn.title = 'Zoom in vertically around the current patient value';
+
+  zoomControls.append(zoomOut, zoomReset, zoomIn);
+  canvas.insertAdjacentElement('afterend', zoomControls);
+
+  function syncZoomControls() {
+    const factor = ZOOM_LEVELS[zoomIndex];
+    zoomOut.disabled = zoomIndex === 0;
+    zoomIn.disabled = zoomIndex === ZOOM_LEVELS.length - 1;
+    zoomReset.disabled = zoomIndex === 0;
+    zoomReset.textContent = zoomIndex === 0 ? 'Fit' : `${Math.round(factor * 100)}%`;
+    zoomReset.setAttribute('aria-label', zoomIndex === 0
+      ? 'PVR chart already fitted to the full vertical range'
+      : `Reset PVR chart from ${Math.round(factor * 100)} percent zoom to the full vertical range`);
+  }
+
+  function setZoomIndex(next) {
+    const clamped = Math.min(ZOOM_LEVELS.length - 1, Math.max(0, next));
+    if (clamped === zoomIndex) return;
+    if (zoomIndex === 0 && clamped > 0) zoomFocus = latestPatientPvr;
+    zoomIndex = clamped;
+    if (zoomIndex === 0) zoomFocus = null;
+    syncZoomControls();
+    onViewChange?.();
+  }
+
+  zoomOut.addEventListener('click', () => setZoomIndex(zoomIndex - 1));
+  zoomIn.addEventListener('click', () => setZoomIndex(zoomIndex + 1));
+  zoomReset.addEventListener('click', () => setZoomIndex(0));
+  syncZoomControls();
 
   function render(sim, colors) {
     panel.resize();
@@ -63,13 +143,16 @@ export function createPvrCurve(canvas) {
     const patientPvr = patient.total * RESISTANCE_TO_WOOD;
     const patientVisible = r.lungVolume >= xLo && r.lungVolume <= xHi;
     if (patientVisible) yHi = Math.max(yHi, patientPvr);
-    panel.setDomain(xLo, xHi, 0, yHi * 1.05);
+    const fullYHi = yHi * 1.05;
+    latestPatientPvr = patientVisible ? patientPvr : fullYHi / 2;
+    const view = pvrZoomDomain(fullYHi, zoomFocus ?? latestPatientPvr, ZOOM_LEVELS[zoomIndex]);
+    panel.setDomain(xLo, xHi, view.yLo, view.yHi);
 
     panel.grid(colors, {
       // Named volume landmarks carry the teaching message more directly than
       // an undifferentiated row of litre ticks. Their values are printed below.
       xTicks: Object.values(landmarks), xFormat: () => '',
-      yTicks: niceTicks(0, yHi, 4), yFormat: (v) => v.toFixed(1),
+      yTicks: niceTicks(view.yLo, view.yHi, 4), yFormat: (v) => v.toFixed(1),
       xLabel: 'Lung volume (L)',
       yLabel: 'PVR (Wood units)',
     });

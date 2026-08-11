@@ -20,7 +20,16 @@ export class Panel {
     // How much of the top right belongs to the values disclosure. Measured here
     // rather than per frame, since it only changes when the layout does.
     const data = this.canvas.parentElement?.querySelector('.panel-data');
-    this.reservedRight = data ? Math.ceil(data.getBoundingClientRect().width) + 10 : 0;
+    if (data) {
+      // Reserve the disclosure's actual occupied strip, including any controls
+      // placed to its right. Measuring only its width made a shifted disclosure
+      // overlap canvas titles as soon as a panel gained a small toolbar.
+      const canvasRect = this.canvas.getBoundingClientRect();
+      const dataRect = data.getBoundingClientRect();
+      this.reservedRight = Math.ceil(Math.max(0, canvasRect.right - dataRect.left)) + 10;
+    } else {
+      this.reservedRight = 0;
+    }
     // Belt and braces against the layout feedback loop the CSS also guards
     // against: whatever happens, never allocate a backing store larger than a
     // screen's worth of pixels.
