@@ -14,7 +14,9 @@ import { PARAMETERS, defaultParams } from '../src/model/parameters.js';
 import {
   venousReturnCurve, cardiacFunctionCurve, venousReturnFlow,
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
+  systemicVenousVolumeState,
 } from '../src/model/circulation.js';
+import { applyBaroreflex, BARO } from '../src/model/baroreflex.js';
 import {
   pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
   lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,
@@ -64,6 +66,45 @@ for (const sc of SCENARIOS) {
   s.advance(40, true);
   const after = totalVolume(s.circ);
   check(sc.id, near(before, after, 0.01), `${before.toFixed(4)} -> ${after.toFixed(4)} mL`);
+}
+
+// -------------------------------- stressed and unstressed venous volume ----
+
+describe('Stressed volume, venous tone and compliance');
+{
+  const base = defaultParams();
+  const reservoir = { vSv: 3500 };
+  const resting = systemicVenousVolumeState(base, reservoir);
+  check('baseline partition uses the fixed systemic venous zero-pressure volume',
+    resting.unstressedVolume === 2800 && resting.stressedVolume === 700
+      && near(resting.elasticPressure, 7, 1e-12));
+
+  const effective = { ...base };
+  applyBaroreflex(effective, base, 0.5);
+  const constricted = systemicVenousVolumeState(effective, reservoir);
+  check('venous tone mobilises volume from unstressed to stressed',
+    constricted.toneVolume === BARO.venousRecruitment * 0.5
+      && constricted.unstressedVolume === 2700 && constricted.stressedVolume === 800);
+  check('venous tone preserves reservoir volume and compliance',
+    reservoir.vSv === 3500 && effective.csv === base.csv);
+
+  const stiffer = systemicVenousVolumeState({ ...base, csv: 50 }, reservoir);
+  check('changing compliance changes pressure, not the volume partition',
+    stiffer.stressedVolume === resting.stressedVolume
+      && stiffer.unstressedVolume === resting.unstressedVolume
+      && near(stiffer.elasticPressure, 2 * resting.elasticPressure, 1e-12));
+
+  const s = new Simulator();
+  s.params = { ...defaultParams(), baroreflex: 0 };
+  s.reset();
+  const bloodBefore = totalVolume(s.circ);
+  const venousBefore = s.circ.vSv;
+  const csvBefore = s.params.csv;
+  s.setParam('stressedVolume', s.params.stressedVolume + 500);
+  check('the stressed-volume control adds the same amount of actual blood',
+    near(totalVolume(s.circ) - bloodBefore, 500, 1e-9)
+      && near(s.circ.vSv - venousBefore, 500, 1e-9));
+  check('adding fluid does not change venous compliance', s.params.csv === csvBefore);
 }
 
 // ------------------------------------------------------------- positivity ----

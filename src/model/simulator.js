@@ -6,8 +6,8 @@ import {
 } from './respiratory.js';
 import { pvrComponents, lungRegions, relaxationVolume, openBand } from './lung.js';
 import {
-  createCirculationState, stepCirculation, VASC, venousReturnBackPressure,
-  preloadSensitivity,
+  createCirculationState, stepCirculation, venousReturnBackPressure,
+  preloadSensitivity, systemicVenousVolumeState,
 } from './circulation.js';
 import { cmH2OtoMmHg, RESISTANCE_TO_DYN, RESISTANCE_TO_WOOD } from './units.js';
 
@@ -333,6 +333,7 @@ export class Simulator {
 
   computeMetrics() {
     const p = this.effective ?? this.params, c = this.circ, r = this.resp;
+    const venousVolume = systemicVenousVolumeState(p, c);
     const { ppv, svv } = this.variation();
     const last = this.beatHistory[this.beatHistory.length - 1] ?? {};
     const ema = this.ema ?? {
@@ -515,7 +516,10 @@ export class Simulator {
       minuteVentilation: (r.lastVt * p.rr) / 1000,
       bloodVolume: COMPARTMENTS.reduce((t, k) => t + c[k], 0),
       minCompartment: Math.min(...COMPARTMENTS.map((k) => c[k])),
-      stressedVenous: c.vSv - VASC.vuSv,
+      stressedVenous: venousVolume.stressedVolume,
+      unstressedVenous: venousVolume.unstressedVolume,
+      venousToneVolume: venousVolume.toneVolume,
+      effectiveCsv: p.csv,
     };
   }
 }

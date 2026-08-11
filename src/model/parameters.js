@@ -106,14 +106,14 @@ export const PARAMETERS = [
 
   // --------------------------------------------------------------------- volume
   {
-    id: 'stressedVolume', group: 'volume', label: 'Stressed volume', unit: 'mL',
+    id: 'stressedVolume', group: 'volume', label: 'Baseline stressed volume', unit: 'mL',
     min: 200, max: 1800, step: 25, default: 700,
-    help: 'The blood volume above the point where vessels begin to stretch. With venous compliance it sets mean systemic filling pressure — the x-intercept of the venous return curve.',
+    help: 'The adjustable baseline volume above the systemic venous zero-pressure volume. Changing it adds or removes the same amount of blood from the venous reservoir; venous tone can then mobilise an additional amount without adding blood.',
   },
   {
-    id: 'csv', group: 'volume', label: 'Venous compliance', unit: 'mL/mmHg',
+    id: 'csv', group: 'volume', label: 'Venous compliance (slope)', unit: 'mL/mmHg',
     min: 30, max: 200, step: 5, default: 100,
-    help: 'Venoconstriction lowers compliance, raising Pmsf for the same volume. This is what a vasopressor does to the venous side.',
+    help: 'The change in venous volume per mmHg. It converts stressed volume into elastic filling pressure, but is independent of the venous-tone shift between unstressed and stressed volume.',
   },
   {
     id: 'rvr', group: 'volume', label: 'Resistance to venous return', unit: 'mmHg·s/mL',

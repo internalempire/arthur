@@ -72,12 +72,38 @@ numbers. The following all reproduce:
   from 1.23 to 1.28 within the breath, because it is instantaneous and follows
   lung volume; in presets with a smaller tidal excursion the swing is 0.3 or
   less.
-- Intra-abdominal hypertension raises Pmsf to 19 mmHg while *lowering* cardiac
+- Intra-abdominal hypertension raises Pmsf to 21 mmHg while *lowering* cardiac
   output, because the closing pressure of the vena cava rises with it.
 
 ---
 
-## 2. What the occlusion manoeuvres show
+## 2. Volume, venous tone and compliance are separate
+
+The adjustable `stressedVolume` is the baseline amount above the systemic
+venous zero-pressure volume. Moving the control by 500 mL adds or removes 500 mL
+of actual blood from that reservoir. It is an instantaneous teaching manoeuvre,
+not a model of infusion kinetics or transcapillary redistribution.
+
+The baroreflex does something different. Each unit of positive sympathetic
+outflow lowers the unstressed volume by 200 mL and therefore mobilises the same
+amount as stressed volume; the user-facing gain can scale this response. Total
+blood and the selected compliance remain unchanged.
+The elastic component of mean systemic filling pressure is then stressed volume
+divided by compliance; abdominal pressure contributes separately through the
+splanchnic coupling already present in the model.
+
+This is the important physiological distinction. Increased vascular tone shifts
+the volume–pressure relation left with little change in slope, and human septic
+shock data support the “fluid-like” increase in stressed volume and mean
+systemic pressure produced by norepinephrine. The model does not claim that 200
+mL is a measured universal value: it was selected to preserve the prior
+macroscopic response while correcting the mechanism. In the shipped septic
+phenotype, reflex outflow around 0.42 mobilises about 83 mL at unchanged total
+blood volume and venous compliance.
+
+---
+
+## 3. What the occlusion manoeuvres show
 
 Holding the airway freezes lung volume and pleural pressure, and the circulation
 settles. Each hold contributes one measured pressure–flow pair, and a series of
@@ -101,14 +127,16 @@ calibrated estimate of it.
 
 ---
 
-## 3. Limitations
+## 4. Limitations
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 
 - **One reflex arc, no chemoreflex.** The arterial baroreflex is present as a
   single sympathetic outflow with one time constant; the real arcs to heart rate,
   resistance, venous tone and contractility have different latencies, and there
-  is no chemoreflex at all. Set the gain to zero to see the uncompensated model.
+  is no chemoreflex at all. Venous tone has one fixed recruitment coefficient
+  rather than a drug-specific or patient-specific dose response. Set the gain
+  to zero to see the uncompensated model.
 - **Variation can report right ventricular afterload rather than preload.** As
   lung compliance falls, airway pressure swings the pulmonary
   vessels harder within each breath, and more of the pulse pressure variation is
@@ -229,3 +257,8 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 14. Hakim TS, Michel RP, Chang HK. Effect of lung inflation on pulmonary
     vascular resistance by arterial and venous occlusion. *J Appl Physiol*
     1982;53:1110–1115.
+15. Young DB. Venous return. In: *Control of Cardiac Output*. Morgan & Claypool
+    Life Sciences; 2010. NCBI Bookshelf NBK54476.
+16. Adda I, Lai C, Teboul JL, et al. Norepinephrine potentiates the efficacy of
+    volume expansion on mean systemic pressure in septic shock. *Crit Care*
+    2021;25:302. doi:10.1186/s13054-021-03711-5.
