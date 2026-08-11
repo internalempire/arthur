@@ -444,9 +444,12 @@ resolves that, so the length of a manoeuvre does not matter, only its pressure.
 ```
 vascular_FRC = volume held by fully open tissue at resting recoil
 strain       = lung_volume / (open * vascular_FRC) - 1
-stretch      = exp(0.515 * strain)
-unfurled     = 0.17 + 0.83 * exp(-1.55 * strain)
-R_open       = PVR0 * (0.6 * stretch + 0.4 * unfurled * stretch)
+deflation    = max(0, -strain)
+stretch      = exp(0.58 * strain)
+unfurled     = 0.30 + 0.70 * exp(-0.829 * strain)
+R_alveolar   = PVR0 * 0.5 * stretch
+R_extra      = PVR0 * (0.5 * unfurled + 4 * deflation^2)
+R_open       = R_alveolar + R_extra
 R_closed     = 3 * PVR0 * (1 + 1.1 * hpv)
 conductance  = open / R_open + (1 - open) / R_closed
 PVR          = 1 / conductance
@@ -470,10 +473,12 @@ Both mechanical limbs still follow volume:
 - The Peták group 2008: hysteresis against transpulmonary pressure is abolished
   when the same data are plotted against volume.
 
-`K_unfurl=1.55` is derived so that unfurling and stretch have equal and opposite
-slopes at zero strain. It is not a fit to an animal maximal inflation. Strain is
-referenced to what this patient's fully open tissue would hold at resting recoil,
-so a small stiff ARDS lung can reach the right limb at a total volume below 2.2 L.
+`K_UNFURL≈0.829` is derived so that unfurling and stretch have equal and opposite
+slopes at zero strain. The quadratic low-volume term is zero in both value and
+slope at FRC: it makes loss of radial traction visible without moving the nadir.
+Neither coefficient is a fit to an animal maximal inflation. Strain is referenced
+to what this patient's fully open tissue would hold at resting recoil, so a small
+stiff ARDS lung can reach the right limb at a total volume below 2.2 L.
 
 Open and derecruited units are two vascular pathways in parallel. Open units
 follow the J-curve. Derecruited units remain poorly perfused and HPV raises only
@@ -496,8 +501,11 @@ R/I uses the applied 10 cmH₂O step rather than Chen's airway-opening correctio
 R/I is protocol-dependent, and a high value does not prove that high PEEP avoids
 overdistension. The opening-sigmoid width and threefold closed-path factor are
 aggregate teaching coefficients, not measured anatomical constants. Regional
-perfusion, vascular remodelling, thrombotic obstruction, hypercapnia and hypoxic
-tone outside derecruited units are not represented here.
+perfusion, flow-dependent vascular recruitment and distension, vascular
+remodelling, hypercapnia, viscosity and hypoxic tone outside derecruited units
+are not represented here. Thrombotic obstruction is not a separate anatomical
+mechanism: the acute pulmonary embolism preset uses `pvrBase` as an aggregate
+effective pulmonary vascular load.
 
 ### Vascular waterfall and West zones
 
@@ -908,6 +916,12 @@ never varied are `pinsp`, `csv`, `rvr`, `pericardium`, `septal` and `piston` —
 those are left for the user to explore by hand, which is what the pericardial
 and septal gains in particular are for.
 
+Presets are settled phenotypes, not simulations of disease onset. In particular,
+the pulmonary-embolism preset's selected tachycardia, systemic resistance and
+filling state already encode a compensated clinical presentation. Its baroreflex
+can subsequently react only to systemic MAP; it does not sense PVR, mPAP, right-
+heart distension or hypoxaemia directly.
+
 ### The variables each scenario sets
 
 | Scenario (`id`) | Overrides |
@@ -1048,10 +1062,11 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `TOTAL_LUNG_CAPACITY` | 6.0 L | reached at `TLC_PRESSURE`; with the resting volume, pins the tissue curve |
 | `TLC_PRESSURE` | 35 cmH₂O | transpulmonary pressure at total lung capacity |
 | `PRELOAD_STEEP` | 0.10 /mmHg | reserve above which filling buys output; calibrated against the model's own response to 500 mL, not published |
-| `K_ALV` | 0.515 | stretch: how steeply inflation narrows every vessel |
-| `K_EXTRA` | 3.35 | unfurling: how quickly leaving collapse opens the extra-alveolar vessels |
-| `EXTRA_FLOOR` | 0.17 | what survives of that once they are fully unfurled |
-| `F_ALV`, `F_EXTRA` | 0.6, 0.4 | J-curve weights |
+| `K_STRETCH` | 0.58 | exponential high-volume alveolar limb |
+| `K_UNFURL` | ≈0.829, derived | decay of the extra-alveolar unfurling term; chosen to balance slopes at FRC |
+| `EXTRA_FLOOR` | 0.30 | residual extra-alveolar contribution after unfurling |
+| `F_ALV`, `F_EXTRA` | 0.5, 0.5 | didactic crossover of the two series components at FRC, not an anatomical partition |
+| `LOW_VOLUME_TRACTION_GAIN` | 4 | quadratic loss of radial traction below FRC; zero in value and slope at FRC |
 
 ---
 
@@ -1173,7 +1188,12 @@ The full list, with the measurements behind it, is in
   state into a human transient model; its afferent signal is low-pass mean
   pressure rather than pulsatile arterial-wall stretch. The 200 mL-per-unit
   venous recruitment coefficient is didactic, not a calibrated norepinephrine
-  dose–response relationship.
+  dose–response relationship. It senses only filtered systemic MAP, not PVR,
+  mPAP, right-heart distension or hypoxaemia. Some clinical presets therefore
+  encode autonomic compensation in their selected baseline heart rate,
+  resistance and filling state rather than generating it from the disease.
+  Coronary circulation is absent, so raising systemic pressure does not directly
+  improve right-ventricular coronary perfusion in the model.
 - **No gas exchange.** No oxygen, CO₂, pH or shunt. Hypoxic vasoconstriction is
   a coefficient on derecruited lung, not a consequence of an alveolar oxygen
   tension.
@@ -1186,6 +1206,14 @@ The full list, with the measurements behind it, is in
 - **No regional pulmonary circulation.** Open and derecruited vascular pathways
   are aggregate parallel conductances. Dependent regions, local West zones,
   gravitational gradients, hypercapnia and vascular remodelling are absent.
+- **Pulmonary vascular load is aggregated.** The model separates its mechanical
+  J-curve coefficient from catheter-derived PVR and includes one fractional
+  alveolar waterfall, but does not separately resolve thrombotic obstruction,
+  non-alveolar critical closing pressure, blood viscosity or haematocrit,
+  pressure/flow-dependent vascular recruitment and distension, characteristic
+  impedance or wave reflection. The pulmonary-embolism preset therefore raises
+  an effective aggregate `pvrBase`; it does not identify which physical
+  determinant produced that bedside load.
 - **Pulse pressure variation is descriptive, not a fluid-responsiveness
   decision.** The model shows how respiratory mechanics alter PPV and SVV, but
   does not apply a 13% cutoff or calibrate variation against response to a model

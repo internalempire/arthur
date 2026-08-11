@@ -1,6 +1,6 @@
 // Cross-layer contracts: curves, snapshots, literature claims and documented scenarios.
 import {
-  Simulator, SCENARIOS, venousReturnCurve, venousReturnFlow,
+  Simulator, SCENARIOS, PARAMETERS, venousReturnCurve, venousReturnFlow,
   readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
   section, check, near, settled,
 } from '../support/model.mjs';
@@ -56,6 +56,31 @@ section('Public model API');
   check('main and UI use the public API and every UI module resolves',
     forbidden.length === 0 && unloadable.length === 0,
     [...forbidden, ...unloadable].join(', '));
+}
+
+// ------------------------------------------------ pulmonary claim contracts --
+
+// These are user-facing physiological semantics rather than numerical outputs.
+// Keep them executable because both claims were previously documented in a way
+// that overreached the model: equal VT was equated with equal PVR, and the PE
+// preset looked like a specific Poiseuille-resistance mechanism rather than the
+// deliberately aggregate bedside load it represents.
+section('Pulmonary vascular claims exposed to the user stay qualified');
+{
+  const vt = PARAMETERS.find((p) => p.id === 'vt');
+  const pe = SCENARIOS.find((s) => s.id === 'pulmonary-embolism');
+  check('equal VT is not claimed to guarantee equal PVR',
+    vt?.help.includes('same VT does not guarantee the same PVR')
+      && vt.help.includes('alveolar waterfall'));
+  check('pulmonary embolism is labelled as aggregate load',
+    pe?.note.includes('aggregate pulmonary vascular load')
+      && pe.note.includes('baroreflex senses only systemic MAP'));
+
+  const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8');
+  check('README carries the active two-limb coefficients',
+    readme.includes('stretch      = exp(0.58 * strain)')
+      && readme.includes('F_ALV`, `F_EXTRA` | 0.5, 0.5')
+      && !readme.includes('stretch      = exp(0.515 * strain)'));
 }
 
 section('The drawn curves agree with the integrator');

@@ -209,7 +209,13 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   coefficient rather than a drug-specific dose response. Set sensitivity to
   zero to see the uncompensated model, and do not use the transient to infer a
   human baroreflex latency. The afferent signal is low-pass mean pressure rather
-  than pulsatile arterial-wall stretch.
+  than pulsatile arterial-wall stretch. It does not sense PVR, mPAP, right-heart
+  distension or hypoxaemia directly: an increased pulmonary load recruits the
+  reflex only if its downstream effect lowers systemic MAP. Clinical presets
+  may already encode compensation in their selected heart rate, systemic
+  resistance and filling state. There is no coronary circulation, so the model
+  also omits the direct benefit that defending systemic pressure can have on
+  right-ventricular coronary perfusion.
 - **Variation can report right ventricular afterload rather than preload.** As
   lung compliance falls, airway pressure swings the pulmonary
   vessels harder within each breath, and more of the pulse pressure variation is
@@ -276,6 +282,16 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   zones or regional HPV. This corrects the previous all-or-none whole-lung
   behaviour without claiming to reproduce the heterogeneity that makes ARDS
   ARDS.
+- **Pulmonary vascular load is an effective aggregate.** The mechanical
+  coefficient integrated by the model is reported separately from catheter-
+  derived `(mPAP − wedge) / CO`, and an alveolar waterfall contributes its own
+  closing-pressure load. The model does not additionally separate thrombotic
+  obstruction, non-alveolar critical closing pressure, blood viscosity or
+  haematocrit, pressure/flow-dependent vascular recruitment and distension,
+  characteristic impedance or wave reflection. Acute pulmonary embolism is
+  therefore represented by a raised effective `pvrBase`, not by clot anatomy or
+  a claim that calibre alone explains the load. This is sufficient to study the
+  RV response but not to infer the physical composition of a measured PVR.
 - **EFL is one expiratory choke.** It is a binary maximal-flow envelope with a
   fixed 4.5 s severe-obstruction anchor, not a distribution of fast and slow
   units. It reproduces the directional low-PEEP plateau and the haemodynamic
