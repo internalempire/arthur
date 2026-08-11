@@ -110,24 +110,6 @@ for (const [id, kind] of [['hold-exp', 'expiratory'], ['hold-insp', 'inspiratory
   });
 }
 
-// The tidal volume challenge. It refuses rather than misreports: a patient who
-// is breathing, or already at 8 mL/kg, has no manoeuvre to perform.
-el('tidal-challenge').addEventListener('click', (e) => {
-  const btn = e.currentTarget;
-  if (sim.challenge) {
-    sim.cancelTidalChallenge();
-  } else {
-    const blockers = sim.startTidalChallenge();
-    if (blockers.length) {
-      btn.title = blockers[0];
-      btn.classList.add('btn-refused');
-      setTimeout(() => btn.classList.remove('btn-refused'), 1400);
-    }
-  }
-  syncManoeuvreButtons();
-  dirty = true;
-});
-
 /**
  * Show which manoeuvres are running, from the model rather than from a timeout.
  *
@@ -148,17 +130,12 @@ function syncManoeuvreButtons() {
         ? 'Occlude at end-expiration and plot the resulting pressure and flow'
         : 'Occlude at end-inspiration and plot the resulting pressure and flow');
   }
-  const tv = el('tidal-challenge');
-  tv.classList.toggle('btn-busy', !!sim.challenge);
-  if (sim.challenge) tv.title = 'Challenge running — click to cancel';
 }
 
 el('reset').addEventListener('click', () => {
   const current = scenarioSelect.value;
   sim.clearMeasuredPoints();
   sim.cancelHold();
-  sim.cancelTidalChallenge();
-  sim.clearChallengeResult();
   sim.reset();
   if (current) applyScenario(current); else controls.sync();
   clearTrails();

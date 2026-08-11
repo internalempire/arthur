@@ -239,8 +239,8 @@ the reference frame rather than being applied as a term.
 
 ## 5. Manoeuvres
 
-Three things can be done *to* the patient rather than set on them. All of them
-change what the ventilator delivers without moving the sliders, because a
+Two occlusion manoeuvres can be done *to* the patient rather than set on them.
+They change what the ventilator delivers without moving the sliders, because a
 manoeuvre is not a new setting.
 
 ### Occlusion holds
@@ -250,41 +250,6 @@ equilibrates with the airway and the circulation settles at a fixed lung volume.
 Each hold contributes one measured point to the Guyton diagram; several at
 different airway pressures draw a venous return curve the way the bedside draws
 one.
-
-### The tidal volume challenge
-
-```
-window 1   thirty seconds at the patient's own tidal volume
-window 2   thirty seconds at 8 mL/kg
-ΔPPV       mean variation in window 2 − mean in window 1
-```
-
-Variation needs a breath big enough to load and unload the heart, and protective
-ventilation does not provide one — which is why the model withholds the index
-below 8 mL/kg. Myatra et al. (*Crit Care Med* 2017;45:415–21) turned that into a
-manoeuvre: raise the volume, read the *change*, put the ventilator back. A rise
-above 3.5 percentage points identifies a preload-dependent patient, the reasoning
-being that a slope is still readable from a small perturbation even where the
-absolute value is not.
-
-Both windows are averaged over their settled portion. That is not fussiness:
-variation is computed from the beats in one respiratory cycle, so at four or five
-beats per breath a single reading moves by more than a point depending on which
-beats land where in the cycle. Comparing an instantaneous baseline against an
-averaged result puts that noise straight into the delta.
-
-**Where it holds and where it does not.** The ordering is right — ΔPPV falls
-3.4 → 0.1 points as stressed volume goes 300 → 1100 mL, in the same order as
-those patients' actual response to a bolus. The threshold is crossed in the
-septic responder preset (4.5 points), which is the patient the trial studied.
-A patient merely dry at a resting heart rate sits at 3.4–3.6, straddling the
-line; at a heart rate of 130 the same manoeuvre gives 5.2. The threshold is left
-at the published value rather than lowered to what the model reaches, because a
-model that cannot fall short of a number cannot be shown to be wrong about it.
-
-The manoeuvre refuses rather than misreports. A spontaneously breathing patient
-has no set tidal volume to raise, and one already at 8 mL/kg has nothing to raise
-it from; in both cases the button declines and says why.
 
 ## 6. The pulmonary circulation
 
@@ -1015,7 +980,6 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `TOTAL_LUNG_CAPACITY` | 6.0 L | reached at `TLC_PRESSURE`; with the resting volume, pins the tissue curve |
 | `TLC_PRESSURE` | 35 cmH₂O | transpulmonary pressure at total lung capacity |
 | `PRELOAD_STEEP` | 0.10 /mmHg | reserve above which filling buys output; calibrated against the model's own response to 500 mL, not published |
-| `TIDAL_CHALLENGE.threshold` | 3.5 points | Myatra 2017; published, not calibrated |
 | `K_ALV` | 0.515 | stretch: how steeply inflation narrows every vessel |
 | `K_EXTRA` | 3.35 | unfurling: how quickly leaving collapse opens the extra-alveolar vessels |
 | `EXTRA_FLOOR` | 0.17 | what survives of that once they are fully unfurled |
@@ -1031,6 +995,7 @@ styles/app.css
 tools/serve.mjs           static server that refuses to be cached, for editing
 docs/PHYSIOLOGY.md        calibration, verification against the sources, limitations
 docs/LITERATURE_RANGES.md published findings as executable rows, and where the model fails them
+docs/MODEL_DECISIONS.md   dated rationale for substantive modelling changes
 docs/POSTMORTEM-2026-08-09.md  the errors made while anchoring the J-curve, and how they were caught
 src/
   main.js                 transport, scenario wiring, animation loop
@@ -1058,7 +1023,7 @@ src/
 node tests/run.mjs
 ```
 
-72 checks, no framework and no dependencies:
+179 checks, no framework and no dependencies:
 
 - **Volume conservation** across every scenario, to 0.01 mL.
 - **Compartment positivity** across every scenario and across a deterministic
@@ -1135,18 +1100,20 @@ The full list, with the measurements behind it, is in
 - **No gas exchange.** No oxygen, CO₂, pH or shunt. Hypoxic vasoconstriction is
   a coefficient on derecruited lung, not a consequence of an alveolar oxygen
   tension.
-- **Pulse pressure variation reproduces the true positive, and one false
-  positive weakly.** Above about 900 mL of stressed volume the zone III fraction
+- **Pulse pressure variation is descriptive, not a fluid-responsiveness
+  decision.** The model shows how respiratory mechanics alter PPV and SVV, but
+  does not apply a 13% cutoff or calibrate variation against response to a model
+  bolus. Low tidal volume, spontaneous effort and the other applicability limits
+  remain visible. Above about 900 mL of stressed volume the zone III fraction
   reaches 96–100% and the lung starts squeezing blood forward into the left
   atrium with each breath, so variation rises again — 1.7% at 900 mL to 3.6% at
   1400 mL — in patients who gain nothing from a bolus. That is the classical
   direct-filling component, and it appears where it should. It is weak: the real
   thing reaches double figures. The other classical sources, irregular effort and
   arrhythmia, are genuinely absent.
-- **The tidal volume challenge is marginal in the patient it should be clearest
-  in.** It orders patients correctly and crosses the published threshold in the
-  tachycardic septic responder, but a patient merely dry at a resting heart rate
-  sits at 3.4–3.6 points against a threshold of 3.5.
+- **No tidal-volume challenge.** The model's PPV amplitude and pulmonary transit
+  are not accurate enough for a 3.5-point diagnostic threshold to be informative;
+  presenting the manoeuvre would risk teaching a model-specific false result.
 - **Almost no transit delay between the ventricles**, and at very high PVR the
   pulmonary artery diastolic pressure runs higher than it should because the
   vascular compartment's time constant exceeds the cardiac cycle. This is about

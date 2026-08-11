@@ -37,28 +37,11 @@ const TILES = [
   {
     id: 'ppv', label: 'Pulse pressure var.', unit: '%', kind: 'derived',
     get: (m) => m.ppv.toFixed(0),
-    // While a challenge runs, the tile says which window is being measured; once
-    // it finishes, the change is what the manoeuvre was for, so it stays there
-    // in place of the stroke volume variation until it is cleared.
-    sub: (m) => {
-      const t = m.tidalChallenge;
-      if (t.running) {
-        return t.phase === 'baseline'
-          ? `challenge: measuring at ${(m.vtDelivered ?? 0).toFixed(0)} mL`
-          : `challenge: measuring at 8 mL/kg`;
-      }
-      if (t.result) {
-        const d = t.result.dPpv;
-        return `challenge ${d >= 0 ? '+' : ''}${d.toFixed(1)} points `
-          + `(${t.result.ppvBefore.toFixed(1)} → ${t.result.ppvAfter.toFixed(1)}%)`;
-      }
-      if (t.stale) return `SVV ${m.svv.toFixed(0)}% · challenge no longer applies`;
-      return `SVV ${m.svv.toFixed(0)}%`;
-    },
+    sub: (m) => `SVV ${m.svv.toFixed(0)}%`,
     quality: (m) => m.interpretability.ppv,
-    // Only a claim about preload when the index is actually applicable.
-    status: (m) => (m.interpretability.ppv.level === 'ok' && m.ppv >= 13
-      ? ['serious', 'suggests preload dependence'] : null),
+    // Intentionally no diagnostic colour threshold: the model demonstrates how
+    // ventilation changes PPV, but is not calibrated to turn it into a fluid-
+    // responsiveness decision. See docs/MODEL_DECISIONS.md.
   },
   {
     id: 'preload', label: 'Preload reserve', unit: '%/mmHg', kind: 'coefficient',
