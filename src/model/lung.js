@@ -595,6 +595,12 @@ export function pvrComponents(p, lungVolume, plKnown = null, phiKnown = null) {
   const closedConductance = r.closedFraction / closedPath;
   const totalConductance = openConductance + closedConductance;
   return {
+    // The two series elements of the open vascular path are exposed so the
+    // teaching plot can show the classical opposing limbs explicitly. They are
+    // not two parallel perfusion beds: alveolar and extra-alveolar resistance
+    // add in series to make `openPath`.
+    alveolarPath: perUnitAlveolar,
+    extraAlveolarPath: perUnitExtra,
     openPath,
     closedPath,
     openBed: openPath / r.openFraction,

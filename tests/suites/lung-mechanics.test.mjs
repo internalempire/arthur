@@ -1,7 +1,7 @@
 // Static lung mechanics, baby-lung strain, R/I calibration and the PVR operating point.
 import {
   SCENARIOS, defaultParams,
-  lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
+  lungRegions, pvrComponents, transpulmonaryAt, relaxationVolume, openFractionAt,
   calibrateRecruitmentToInflation, recruitmentToInflation,
   section, check, near, settled,
 } from '../support/model.mjs';
@@ -12,6 +12,25 @@ section('The two-compartment lung');
   check('a normal lung at its resting volume is fully open and unstrained',
     lungRegions(p, 2.2).openFraction > 0.97 && Math.abs(lungRegions(p, 2.2).strain) < 0.03,
     `open ${lungRegions(p, 2.2).openFraction.toFixed(3)}, strain ${lungRegions(p, 2.2).strain.toFixed(3)}`);
+
+  // The PVR panel teaches a series construction, so the fields it draws must
+  // remain the two opposing mechanical limbs and must add exactly to the open
+  // path. This protects the picture from drifting back into unrelated overlays.
+  {
+    const low = pvrComponents(p, 1.3, null, 1);
+    const frc = pvrComponents(p, 2.2, null, 1);
+    const high = pvrComponents(p, 6.0, null, 1);
+    check('the classical PVR components add in series to the open path',
+      near(frc.alveolarPath + frc.extraAlveolarPath, frc.openPath, 1e-12)
+        && near(frc.openPath, frc.total, 1e-12));
+    check('the two PVR limbs move in opposite directions across RV to TLC',
+      low.extraAlveolarPath > frc.extraAlveolarPath
+        && frc.extraAlveolarPath > high.extraAlveolarPath
+        && low.alveolarPath < frc.alveolarPath
+        && frc.alveolarPath < high.alveolarPath,
+      `extra ${low.extraAlveolarPath.toFixed(3)} → ${frc.extraAlveolarPath.toFixed(3)} → ${high.extraAlveolarPath.toFixed(3)}; `
+      + `alveolar ${low.alveolarPath.toFixed(3)} → ${frc.alveolarPath.toFixed(3)} → ${high.alveolarPath.toFixed(3)}`);
+  }
 
   // The arithmetic of the baby lung. The claim is about the strain a tidal
   // volume *adds*, not the level it reaches: the two lungs start from different
