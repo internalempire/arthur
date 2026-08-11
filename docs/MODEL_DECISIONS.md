@@ -8,6 +8,82 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-08-11 — Add a volume-conserving pulmonary transit pathway
+
+### Decision
+
+- Insert a pressureless transport volume between pulmonary arterial flow and
+  pulmonary venous delivery. Eight serial well-mixed stages give it a fixed
+  2.0 s mean transport time with a finite spread of transit times.
+- Keep pulmonary venous pressure in the instantaneous PVR gradient. The new
+  state delays volume and flow, not propagation of a pressure wave.
+- Reallocate 160 mL of zero-pressure volume from the existing pulmonary artery
+  and vein to initialise the pathway. Total blood volume, their stressed
+  volumes and their resting pressures therefore remain unchanged.
+- Keep the direct pulmonary venous piston, septal interaction and pericardial
+  interaction outside the delay. They are immediate mechanical routes and are
+  not blood newly traversing the pulmonary circuit.
+- Use transit only as a mechanistic timing constraint. Do not restore the tidal-
+  volume challenge, a PPV cutoff or the retired Michard calibration.
+
+### Why
+
+The pre-phase audit showed some buffering but too little separation. After an
+isolated fall in RV contractility, the first LV beat was preserved but the next
+beat had already fallen; in ventilation, the RV-to-LV lag was about one beat.
+Pinsky describes a sustained RV-output reduction appearing in LV preload and
+output after two to three beats. The contemporary ATS teaching synthesis also
+places the lower pulse pressure in expiration because of pulmonary transit.
+
+Increasing pulmonary arterial or venous compliance enough to create this lag
+would also alter resting pressure–volume behaviour and worsen the already slow
+pulmonary arterial decay at high PVR. Three pressureless alternatives were
+therefore compared:
+
+- one first-order 1.5 s reservoir conserved volume but filtered the respiratory
+  signal too strongly;
+- a pure circular delay retained amplitude but returned an unrealistically rigid
+  copy of each perturbation, moved the ventilated LV nadir into inspiration at
+  1.0 s, and disturbed the Guyton operating-point agreement in the weaning
+  scenario;
+- eight serial stages retained a distributed response without the rigid echo.
+  At 1.5 s their respiratory phase was still too early; 2.0 s was the shortest
+  tested mean time that placed the LV nadir in expiration while preserving the
+  2–3-beat step response.
+
+The retained internal state is eight `Float64` volumes (64 bytes per simulator)
+and eight simple transport updates per circulation step. `vPt` is their visible
+sum and keeps this blood explicit in the volume-conservation checks.
+
+### Calibration result
+
+With ventilation, baroreflex, piston, septal and pericardial effects removed, an
+abrupt RV contractility reduction changes RV stroke volume from about 70.3 to
+49.9 mL on the first affected beat. LV stroke volume remains about 70.3 mL for
+the first two observations, then reads 70.1 and 68.8 mL: the transported effect
+is detectable by the third following beat. Total blood remains 5080 mL.
+Under passive positive-pressure ventilation, the LV stroke-volume nadir remains
+in expiration rather than moving into inspiration.
+
+Re-running the older constraints exposed two stale numerical claims. The
+Michard-derived requirement that hypovolaemia produce at least five more PPV
+points than a fuller state was removed, consistently with the phase-1 decision
+that PPV is descriptive rather than calibrated. The Fougères paper was also
+re-read: it reports a 13±9% cardiac-index fall with higher PEEP and 14±10%
+recovery with passive leg raising at high PEEP, not the ≥1.5-fold between-volume
+ratio previously attributed to it. Its executable constraint now retains the
+supported direction only: greater central filling attenuates the PEEP cost.
+
+### Deliberate limits
+
+The 2.0 s mean time is a teaching calibration, not a universal physiological
+constant. A real lung has a distribution of regional pathways and transit times
+that changes with flow, vascular volume, recruitment and disease. Eight serial
+mixing stages approximate only a distribution in time; they do not reproduce
+regional capillary perfusion, contrast transit time or patient-specific PPV
+amplitude. The mean time itself remains fixed. Pressure effects remain
+instantaneous by design; only delivery of changing flow is buffered.
+
 ## 2026-08-11 — Separate fluid, venous tone and venous compliance
 
 ### Decision
@@ -98,8 +174,8 @@ After 45 s of equilibration, PEEP 4 → 14 produces:
 
 | Phenotype | Model | Human cohort medians [IQR] |
 |---|---|---|
-| Low recruitability | 2.71 → 3.35 WU, +24% | 2.00 [1.50–3.71] → 3.04 [2.08–4.75] WU, +52% ratio of medians |
-| Higher recruitability | 2.45 → 2.64 WU, +8% | 2.80 [2.31–3.61] → 2.94 [2.10–3.75] WU, +5% ratio of medians |
+| Low recruitability | 2.68 → 3.28 WU, +22% | 2.00 [1.50–3.71] → 3.04 [2.08–4.75] WU, +52% ratio of medians |
+| Higher recruitability | 2.45 → 2.62 WU, +7% | 2.80 [2.31–3.61] → 2.94 [2.10–3.75] WU, +5% ratio of medians |
 
 All four absolute model values are inside the published IQRs. The low-recruiter
 response is intentionally not forced to +52%: a ratio of cohort medians is not

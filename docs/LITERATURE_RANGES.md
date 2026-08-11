@@ -22,7 +22,7 @@ work, not excuses.
 | id | Manoeuvre and expected result | Status | Source |
 |---|---|---|---|
 | `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
-| `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
+| `peep-volume-status` | The haemodynamic cost of PEEP depends on central filling: raising PEEP from 5 to 15 reduces output more in the underfilled model than in the euvolaemic model. This is a directional teaching constraint. Fougères et al. measured a 13±9% cardiac-index fall with higher PEEP and a 14±10% restoration with passive leg raising at high PEEP; they did **not** report the former model target of a ≥1.5× between-state ratio. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
 | `pvr-recruitability-low` | In a low-recruitability human ARDS phenotype, PEEP 4 → 14 keeps derived PVR inside the trial's two IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-high` | In a high-recruitability phenotype, the same manoeuvre stays inside 2.31–3.61 → 2.10–3.75 WU and changes PVR by −10% to +20%; the trial's cohort medians changed +5%, P = 0.55. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-dissociation` | Sweeping the model's recruitability control from 0 to 1 progressively attenuates the PEEP-related PVR rise by at least 15 percentage points. No sign change is required: the measured high-recruiter median was still +5%. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
@@ -34,6 +34,12 @@ work, not excuses.
 | `ph-classification` | A hypervolaemic failing left ventricle with a wedge above 15 mmHg and a mean pulmonary artery pressure above 20 is classified post-capillary; a lung with a high vascular resistance and a low wedge is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
 | `venous-tone-volume-shift` | At fixed blood volume, increasing venous tone lowers unstressed volume and mobilises the same amount as stressed volume, raising mean systemic pressure without requiring a change in the pressure–volume slope. | agrees | Young, *Control of Cardiac Output* 2010, ch. 2; Adda et al., *Crit Care* 2021;25:302 |
+| `pulmonary-transit-beats` | After an isolated sustained fall in RV output, the first LV beat remains buffered and the LV response becomes detectable over the following 2–3 beats. This is a timing constraint, not a PPV-amplitude calibration. | agrees | Pinsky, *Crit Care Clin* 1990;6:663–678; Yuriditsky et al., *ATS Scholar* 2025;6:94–108 |
+
+The earlier ≥1.5× `peep-volume-status` threshold was retired during phase 4 after
+the source was re-read. The human experiment supports the effect of central
+filling on the PEEP response, but not that numerical ratio. Retaining the ratio
+would make a local model calibration masquerade as an in-vivo measurement.
 
 ## Current phase-3 volume semantics
 
@@ -67,8 +73,8 @@ The active calibration is deliberately hierarchical:
    volume-dependent mechanism. Their exact nadir, maximal-inflation ratios and
    vascular partitions are no longer executable human targets.
 
-The model now gives 2.71 → 3.35 WU (+24%) in the low-recruitability calibration
-phenotype and 2.45 → 2.64 WU (+8%) in the high-recruitability phenotype after 45
+The model now gives 2.68 → 3.28 WU (+22%) in the low-recruitability calibration
+phenotype and 2.45 → 2.62 WU (+7%) in the high-recruitability phenotype after 45
 s of equilibration. All four values fall within the published IQRs. The first
 response is smaller than the +52% ratio of cohort medians; it is retained rather
 than overfitted because the paper does not report the median paired percentage
@@ -139,7 +145,9 @@ figures in this file are cycle means where the swing is material.
 transit delay." That was wrong. The pulmonary circulation is already two
 compartments in series, and transit delay is a question about their volumes and
 compliances — parallel lung regions have nothing to do with it. Transit delay
-remains open and is unrelated to this work.
+was still open at that point and was unrelated to that work. It is now addressed
+separately by the pressureless flow pathway recorded in
+[MODEL_DECISIONS.md](MODEL_DECISIONS.md).
 
 ## What making recruitment mechanical changed
 

@@ -66,8 +66,9 @@ found, and it was found by serving with no-store.
 ## 2. What makes it a model rather than an animation
 
 Nothing in the display is scripted. The circulation is a closed loop of eight
-compliant compartments with conserved volume, integrated at 0.25 ms. The single
-design decision that produces every classical teaching point is that **each
+pressure-bearing compliant compartments plus one pressureless eight-stage
+pulmonary transport pathway, with conserved volume and integration at 0.25 ms.
+The single design decision that produces every classical teaching point is that **each
 compartment is referenced to the pressure that actually surrounds it**:
 
 | Compartment | Symbol | Surrounding pressure |
@@ -164,7 +165,8 @@ This single term produces both of the effects described in §4.
 
 ## 4. The circulation
 
-`src/model/circulation.js`. Eight compliant compartments, volume conserved,
+`src/model/circulation.js`. Eight pressure-bearing compliant compartments and
+one eight-stage pulmonary flow-transport pathway, volume conserved,
 integrated with forward Euler at dt = 0.25 ms — small relative to the shortest
 time constant in the system, the valve resistances at ≈7.5 ms.
 
@@ -445,8 +447,8 @@ and drove the severe ARDS phenotype to roughly 10–16 WU.
 a non-recruiter were the same lung at different resting volumes, so raising PEEP
 gave them identical volume gain and identical transpulmonary pressure and there
 was nothing left to tell them apart. Recruitability is now explicit. In the
-human calibration phenotype, PEEP 4 → 14 gives 2.71 → 3.35 WU (+24%) at low
-recruitability and 2.45 → 2.64 WU (+8%) at higher recruitability. All four values
+human calibration phenotype, PEEP 4 → 14 gives 2.68 → 3.28 WU (+22%) at low
+recruitability and 2.45 → 2.62 WU (+7%) at higher recruitability. All four values
 lie inside the IQRs reported by Cappio Borlino et al.; the response is not fitted
 to the ratio of cohort medians.
 
@@ -870,18 +872,18 @@ catheter-derived value is separately labelled in the app.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.42 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
-| Healthy, passive volume control | 5.03 | 94 | 1.4 | 22/12 | 10 | 1.2 | 0.90 | 2% |
-| PEEP escalation | 4.51 | 90 | 3.7 | 22/13 | 10 | 1.3 | 0.84 | 2% |
-| Septic shock, fluid responsive | 4.38 | 81 | 1.7 | 16/10 | 4 | 1.2 | 0.71 | 8% |
-| Big pleural swings, no variation | 6.95 | 94 | 1.4 | 25/16 | 10 | 1.2 | 0.90 | 5% |
-| ARDS with right ventricular failure | 3.91 | 85 | 3.4 | 27/19 | 4 | 4.1 | 1.65 | 2% |
-| Acute pulmonary embolism | 4.13 | 94 | 5.5 | 39/32 | 4 | 7.5 | 2.01 | 9% |
-| Cardiogenic pulmonary oedema | 3.51 | 87 | 4.6 | 43/37 | 34 | 1.2 | 0.85 | 5% |
-| Weaning the failing left ventricle | 3.64 | 87 | 0.6 | 40/31 | 32 | 1.2 | 0.89 | 20% |
-| Stiff chest wall | 4.27 | 90 | 3.3 | 18/10 | 9 | 1.2 | 0.81 | 3% |
-| COPD with dynamic hyperinflation | 4.55 | 90 | 4.2 | 20/12 | 10 | 1.3 | 0.84 | 3% |
-| Intra-abdominal hypertension | 3.39 | 85 | 0.7 | 12/6 | 4 | 1.2 | 0.73 | 4% |
+| Healthy, breathing spontaneously | 5.27 | 95 | −1.0 | 21/9 | 9 | 1.2 | 0.93 | 6% |
+| Healthy, passive volume control | 4.91 | 93 | 1.4 | 21/12 | 10 | 1.2 | 0.88 | 2% |
+| PEEP escalation | 4.54 | 90 | 3.8 | 22/13 | 10 | 1.3 | 0.87 | 1% |
+| Septic shock, fluid responsive | 4.40 | 82 | 1.7 | 16/10 | 4 | 1.2 | 0.73 | 2% |
+| Big pleural swings, no variation | 6.72 | 92 | 1.1 | 24/15 | 9 | 1.2 | 0.89 | 7% |
+| ARDS with right ventricular failure | 3.96 | 85 | 3.7 | 27/19 | 4 | 4.1 | 1.66 | 1% |
+| Acute pulmonary embolism | 4.10 | 94 | 5.8 | 39/33 | 4 | 7.5 | 2.02 | 11% |
+| Cardiogenic pulmonary oedema | 3.53 | 87 | 5.0 | 44/38 | 35 | 1.2 | 0.86 | 6% |
+| Weaning the failing left ventricle | 3.28 | 87 | 1.1 | 36/31 | 33 | 1.2 | 0.88 | 21% |
+| Stiff chest wall | 4.37 | 90 | 3.3 | 18/10 | 9 | 1.2 | 0.82 | 4% |
+| COPD with dynamic hyperinflation | 4.58 | 91 | 4.2 | 20/12 | 10 | 1.3 | 0.84 | 3% |
+| Intra-abdominal hypertension | 3.55 | 87 | 0.8 | 13/7 | 5 | 1.2 | 0.74 | 1% |
 
 ### How the presets are built
 
@@ -892,9 +894,9 @@ smallest set that makes that question answerable.
   lungs, same heart; the only change is `mode`, and central venous pressure goes
   from −1.0 to +1.5 while cardiac output falls.
 - **Septic shock** is low `stressedVolume` and low `svr`, with a large enough
-  `vt` and a reduced `ccw` for the pleural swing to reach the circulation.
-  Raising `stressedVolume` by 500 mL lifts cardiac output from 3.7 to
-  6.2 L/min — 68% — and collapses the variation. The true positive.
+  `vt` and a reduced `ccw` for the pleural swing to reach the circulation. A
+  fluid increment raises output because the patient lies on the steep Guyton
+  limb; PPV remains a descriptive waveform output, not the verdict.
 - **Big pleural swings, no variation** is the same patient resuscitated, with a
   very large `pmus` against a stiff `ccw`. The pleural swing exceeds 20 cmH₂O
   and pulse pressure variation stays near 6%, because a swing is necessary for
@@ -945,8 +947,9 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 |---|---|---|
 | `vuSa`, `cSa` | 700 mL, 1.35 mL/mmHg | systemic arterial unstressed volume and compliance |
 | `vuSv` | 2800 mL | systemic venous unstressed volume at neutral tone |
-| `vuPa`, `cPa` | 90 mL, 4.2 mL/mmHg | pulmonary arterial |
-| `vuPv`, `cPv` | 180 mL, 8.5 mL/mmHg | pulmonary venous |
+| `vuPa`, `cPa` | 50 mL, 4.2 mL/mmHg | pulmonary arterial; resting stressed volume unchanged |
+| `PULMONARY_TRANSIT` | 160 mL, 2.0 s, 8 stages | pressureless pathway with a fixed mean flow-transport time |
+| `vuPv`, `cPv` | 60 mL, 8.5 mL/mmHg | pulmonary venous; resting stressed volume unchanged |
 | `rPulVen` | 0.008 mmHg·s/mL | pulmonary venous resistance |
 | Valve resistances | 0.004 – 0.006 mmHg·s/mL | tricuspid, pulmonic, mitral, aortic |
 
@@ -1021,7 +1024,7 @@ src/
 node tests/run.mjs
 ```
 
-179 checks, no framework and no dependencies:
+187 checks, no framework and no dependencies:
 
 - **Volume conservation** across every scenario, to 0.01 mL.
 - **Compartment positivity** across every scenario and across a deterministic
@@ -1031,12 +1034,12 @@ node tests/run.mjs
   Cardiac output is deliberately not used: it is latched at a beat boundary, so
   which sample lands on the boundary shifts with the step.
 - **Determinism** — identical parameters give identical results.
-- **Eleven physiological relations**, by direction rather than by value: PEEP
+- **Physiological relations**, by direction rather than by value: PEEP
   raises CVP and lowers output, spontaneous breathing lowers measured CVP while
-  raising transmural pressure and output, hypovolaemia raises pulse pressure
-  variation, a short expiratory time traps gas, a stiff chest wall raises the
-  pleural swing, RV failure dilates the RV, removing septal coupling lets the LV
-  fill.
+  raising transmural pressure and output, a fluid increment raises output more
+  when underfilled, a short expiratory time traps gas, a stiff chest wall raises
+  the pleural swing, RV failure dilates the RV, and removing septal coupling lets
+  the LV fill. PPV is deliberately not required to separate filling states.
 - **The J-curve's nadir found by search**, not asserted — the test would fail if
   the curve were monotonic.
 - **Integrator/drawing agreement** — the simulated state lies on the drawn
@@ -1109,18 +1112,22 @@ The full list, with the measurements behind it, is in
   bolus. Low tidal volume, spontaneous effort and the other applicability limits
   remain visible. Above about 900 mL of stressed volume the zone III fraction
   reaches 96–100% and the lung starts squeezing blood forward into the left
-  atrium with each breath, so variation rises again — 1.7% at 900 mL to 3.6% at
+  atrium with each breath, so variation rises again — 1.5% at 900 mL to 3.8% at
   1400 mL — in patients who gain nothing from a bolus. That is the classical
   direct-filling component, and it appears where it should. It is weak: the real
   thing reaches double figures. The other classical sources, irregular effort and
   arrhythmia, are genuinely absent.
 - **No tidal-volume challenge.** The model's PPV amplitude and pulmonary transit
-  are not accurate enough for a 3.5-point diagnostic threshold to be informative;
+  are not quantitatively validated for a 3.5-point diagnostic threshold;
   presenting the manoeuvre would risk teaching a model-specific false result.
-- **Almost no transit delay between the ventricles**, and at very high PVR the
-  pulmonary artery diastolic pressure runs higher than it should because the
-  vascular compartment's time constant exceeds the cardiac cycle. This is about
-  the pulmonary vessels, not the lung units, which are now two populations.
+- **Simplified pulmonary transit.** Eight pressureless mixing stages with a
+  fixed 2.0 s mean transport time delay flow but not pressure. They reproduce
+  the 2–3-beat ordering of RV and LV changes and place the LV nadir in expiration
+  without imposing a rigid echo. They are not regional capillary paths, do not
+  adapt their mean time to cardiac output or disease, and are not equivalent to
+  contrast transit time. At very high PVR the pulmonary artery diastolic pressure
+  can still run higher than it should because the arterial vascular time
+  constant exceeds the cardiac cycle.
 - **Ejection fraction runs low** by roughly 5–10 points; stroke volume, cardiac
   output and loop shape are right, the ratio is pessimistic.
 - **Forward Euler**, with flows limited so no compartment can be drained past a
@@ -1180,3 +1187,8 @@ The full list, with the measurements behind it, is in
 16. Adda I, Lai C, Teboul JL, et al. Norepinephrine potentiates the efficacy of
     volume expansion on mean systemic pressure in septic shock. *Crit Care*
     2021;25:302. doi:10.1186/s13054-021-03711-5.
+17. Pinsky MR. The effects of mechanical ventilation on the cardiovascular
+    system. *Crit Care Clin* 1990;6:663–678.
+18. Fougères E, Teboul JL, Richard C, et al. Hemodynamic impact of a positive
+    end-expiratory pressure setting in acute respiratory distress syndrome:
+    importance of the volume status. *Crit Care Med* 2010;38:802–807.

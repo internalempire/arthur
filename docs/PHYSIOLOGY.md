@@ -103,7 +103,38 @@ blood volume and venous compliance.
 
 ---
 
-## 3. What the occlusion manoeuvres show
+## 3. Pulmonary transit is a flow buffer, not a pressure delay
+
+The pulmonary artery and vein were already compartments in series, but their
+small compliance time constants transmitted an isolated fall in RV output to LV
+stroke volume after roughly one beat. The model now places a 160 mL pressureless
+transport pathway between pulmonary arterial inflow and pulmonary venous
+delivery. Eight serial mixing stages give it a 2.0 s mean transport time while
+its physical blood volume remains part of the conserved circulation.
+
+This distinction matters. Pulmonary venous pressure still acts immediately on
+the pressure gradient across the lung; a pressure wave is not held for 2.0 s.
+What is buffered is blood flow: after an isolated fall in RV contractility the
+first LV beat remains essentially unchanged, the second changes little, and the
+effect becomes detectable over the next two to three beats. During positive-
+pressure ventilation this places the delayed LV stroke-volume nadir in
+expiration, after the inspiratory reduction in RV filling.
+
+The pathway adds no blood. Its initial 160 mL was reallocated from the former
+pulmonary arterial and venous zero-pressure volumes while preserving their
+stressed volumes and resting pressures. It also leaves the direct pulmonary
+venous “piston” route intact: inflation can still squeeze blood already on the
+venous side toward the LV before the RV effect arrives.
+
+The 2.0 s value is a didactic mean-time calibration to the reported 2–3-beat
+ordering, not a contrast transit time or a patient-specific measurement. Eight
+stages introduce some dispersion rather than returning a rigid delayed copy of
+the RV signal, but their mean time remains fixed rather than changing with
+cardiac output, PVR, recruitment or pulmonary blood volume distribution.
+
+---
+
+## 4. What the occlusion manoeuvres show
 
 Holding the airway freezes lung volume and pleural pressure, and the circulation
 settles. Each hold contributes one measured pressure–flow pair, and a series of
@@ -127,7 +158,7 @@ calibrated estimate of it.
 
 ---
 
-## 4. Limitations
+## 5. Limitations
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 
@@ -148,22 +179,21 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 - **No gas exchange.** There is no oxygen, CO₂, pH or shunt. Hypoxic pulmonary
   vasoconstriction is a coefficient on derecruited lung, not a consequence of an
   alveolar oxygen tension.
-- **Pulse pressure variation reproduces one false positive, weakly, and misses
-  the rest.** The true positive is reproduced well — high variation in the fluid
-  responder, low in the non-responder. This entry previously said the model
-  produced no false positives at all; that was written before the well-filled end
-  of the range was examined, and it is wrong.
+- **Pulse pressure variation has a weak filled-end rise.** The model no longer
+  claims a monotonic separation between a fluid responder and non-responder:
+  pulmonary transit changes the amplitude and phase, while the direct pulmonary
+  venous piston can raise variation again at high filling.
 
   There is one, and it has a mechanism. Above about 900 mL of stressed volume the
   West zone III fraction reaches 96–100%, and with the capillaries open along
   their whole length the lung can squeeze blood forward into the left atrium with
-  each breath — the `piston` term. Variation then rises again, from 1.7% at 900 mL
-  to 3.6% at 1400 mL, in patients who gain nothing from a bolus. Setting `piston`
-  to zero collapses it to 1.1%, which is how the mechanism was identified. This is
+  each breath — the `piston` term. Variation then rises again, from 1.5% at 900 mL
+  to 3.8% at 1400 mL, in patients who gain nothing from a bolus. Setting `piston`
+  to zero collapses it to 1.0%, which is how the mechanism was identified. This is
   the direct-filling component of the classical Δup, and it appears exactly where
   it should: only when the patient is full enough for zone III to be everywhere.
 
-  It is a weak false positive — 3.6% would not mislead anyone, where the real
+  It is a weak false positive — 3.8% would not mislead anyone, where the real
   thing reaches double figures. And the other classical sources are still absent:
   irregular, variable-depth efforts and arrhythmia, neither of which this model
   has, since effort is a reproducible half-sine and the rhythm is metronomic.
@@ -183,12 +213,12 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   pressure falls below aortic pressure, and with a double-hill activation that
   happens a little early. Stroke volume, cardiac output and the loop shape are
   right; the ratio is pessimistic by roughly 5–10 points.
-- **Two pulmonary compartments give almost no transit delay.** In a real chest
-  the fall in right ventricular output reaches the left ventricle two or three
-  beats later, which separates the Δup and Δdown components of pulse pressure
-  variation. Here they largely overlap and partly cancel. This is a question
-  about the volumes and compliances of the two vascular compartments in series,
-  and is unrelated to the lung being split into two populations of units.
+- **Pulmonary transit is an eight-stage fixed-time approximation.** It separates
+  the immediate direct-filling component from the delayed RV-to-LV flow effect
+  and reproduces their ordering, but not real regional capillary paths. Its
+  2.0 s mean time does not adapt to cardiac output, PVR, recruitment or pulmonary
+  vascular disease and must not be interpreted as a contrast transit
+  measurement or as quantitative PPV validation.
 - **Hysteresis is optional and instantaneous.** With the flag off, units open and
   close at the same pressure and nothing done to the lung lasts. With it on they
   close at `pClose`, so a recruitment manoeuvre leaves something behind and a
@@ -262,3 +292,8 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 16. Adda I, Lai C, Teboul JL, et al. Norepinephrine potentiates the efficacy of
     volume expansion on mean systemic pressure in septic shock. *Crit Care*
     2021;25:302. doi:10.1186/s13054-021-03711-5.
+17. Pinsky MR. The effects of mechanical ventilation on the cardiovascular
+    system. *Crit Care Clin* 1990;6:663–678.
+18. Fougères E, Teboul JL, Richard C, et al. Hemodynamic impact of a positive
+    end-expiratory pressure setting in acute respiratory distress syndrome:
+    importance of the volume status. *Crit Care Med* 2010;38:802–807.
