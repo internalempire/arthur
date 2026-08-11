@@ -91,6 +91,8 @@ const PANELS = [
         ['Expiratory time constant', `${n(m.expTimeConstant, 2)} s`],
         ['Plateau pressure', `${n(m.pplat)} cmH₂O`],
         ['Total PEEP', `${n(m.totalPeep)} cmH₂O (intrinsic ${n(m.autoPeep)})`],
+        ['Dynamic trapped volume', `${n(m.trappedVolume, 0)} mL above static equilibrium at the same PEEP`],
+        ['Expiratory flow limitation', m.expiratoryFlowLimited ? 'active during the last expiration' : 'not active'],
       ];
     },
   },

@@ -112,6 +112,19 @@ Ppl  = Ppl(FRC) + V / Ccw − Pmus
 flow = (Pao − Palv) / Raw
 ```
 
+With expiratory flow limitation on, that passive outward flow is capped by a
+maximal expiratory flow–volume envelope:
+
+```
+maximum expiratory flow = volume above zero-PEEP relaxation / 4.5 s
+```
+
+The lower of passive resistive flow and this maximum empties the lung. Below
+the choke, lowering downstream airway pressure further cannot increase flow;
+once external PEEP is high enough to reduce passive flow below the cap, it
+becomes true back-pressure again. This is one aggregate Starling-resistor-like
+airway, not a regional COPD lung.
+
 `Ppl(FRC) = −5 cmH₂O`, so transpulmonary recoil at the relaxation volume is
 +5 cmH₂O and alveolar pressure there is zero.
 
@@ -148,9 +161,18 @@ chatter and the breath fragment.
 ### Intrinsic PEEP
 
 Emergent, not configured. If expiratory time is short relative to the expiratory
-time constant `τ = Raw · Crs`, volume does not return to the relaxation volume
-and end-expiratory alveolar pressure exceeds the set PEEP. The COPD preset
-generates 6.4 cmH₂O this way with no change to the set PEEP.
+time constant `τ = Raw · Crs`, volume does not return to static equilibrium and
+end-expiratory alveolar pressure exceeds the set PEEP. With EFL on, the reported
+emptying time is at least 4.5 s because maximal expiratory flow can become slower
+than the linear resistance predicts.
+
+The COPD preset generates about 7.1 cmH₂O of intrinsic PEEP and 782 mL of
+dynamic trapped volume at external PEEP 5. Trapped volume means actual EELV
+minus the passive equilibrium volume at the same applied PEEP; it therefore does
+not mislabel loss-of-recoil static hyperinflation as dynamic trapping. At low
+external PEEP the choke can hold total PEEP and absolute EELV nearly constant;
+above it, PEEP adds volume and haemodynamic cost. This is a directional teaching
+relation, not a bedside PEEP titration rule.
 
 ### Abdominal coupling
 
@@ -325,8 +347,9 @@ ARDS preset carries `clung=40` and reads 36 mL/cmH2O at the bedside.
 balances the chest wall, `V(5)`, and it rises when pressure opens more units -
 which is why proning now adds volume instead of only opening units, and why `frc`
 is gone as a parameter. A lung that has lost its elastic recoil rests high
-without being told to: the COPD preset is `clung=300` and nothing else, and it
-sits at 2.69 L before a breath is delivered.
+without being told to: raising `clung` to the COPD preset's 300 is sufficient to
+put its pre-breath relaxation volume around 2.66 L. Airway resistance and EFL
+then determine the additional dynamic volume; they do not set this static one.
 
 There is no closed form for the inverse once the open fraction is in it, so
 transpulmonary pressure is found numerically. In the integrator the solve is
@@ -711,6 +734,7 @@ appear in the UI and in every scenario.
 | `clung` | Lung compliance with all of it open | mL/cmH₂O | 200 | 20 – 420 |
 | `ccw` | Chest wall compliance | mL/cmH₂O | 200 | 40 – 300 |
 | `raw` | Airway resistance | cmH₂O/L/s | 5 | 1 – 40 |
+| `efl` | Expiratory flow limitation | off/on | off | — |
 | `collapsed` | Fraction of the lung shut at rest | — | 0 | 0 – 0.8 |
 | `pab0` | Baseline abdominal pressure | cmH₂O | 4 | 0 – 30 |
 | `abdCoupling` | Diaphragm–abdomen coupling | cmH₂O/L | 4 | 0 – 12 |
@@ -898,7 +922,7 @@ and septal gains in particular are for.
 | Cardiogenic pulmonary oedema (`lv-failure`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=10`, `rr=18`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=95` |
 | Weaning the failing left ventricle (`weaning`) | `mode=spont`, `pmus=10`, `peep=0`, `rr=26`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=110` |
 | Stiff chest wall (`obesity`) | `mode=vcv`, `pmus=0`, `vt=500`, `peep=8`, `rr=16`, `ccw=75`, `pab0=12` |
-| COPD with dynamic hyperinflation (`copd`) | `mode=vcv`, `pmus=0`, `vt=500`, `peep=5`, `rr=26`, `ti=0.9`, `raw=24`, `clung=300` |
+| COPD with dynamic hyperinflation (`copd`) | `mode=vcv`, `pmus=0`, `vt=500`, `peep=5`, `rr=26`, `ti=0.9`, `raw=24`, `clung=300`, `efl=on` |
 | Intra-abdominal hypertension (`iah`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=8`, `rr=16`, `pab0=22`, `abdCoupling=6` |
 
 ### What each one settles at
@@ -919,7 +943,7 @@ catheter-derived value is separately labelled in the app.
 | Cardiogenic pulmonary oedema | 3.52 | 87 | 5.0 | 44/38 | 35 | 1.2 | 0.86 | 6% |
 | Weaning the failing left ventricle | 3.55 | 87 | 1.2 | 40/31 | 33 | 1.2 | 0.91 | 17% |
 | Stiff chest wall | 4.37 | 90 | 3.3 | 18/10 | 9 | 1.2 | 0.82 | 4% |
-| COPD with dynamic hyperinflation | 4.58 | 91 | 4.2 | 20/12 | 10 | 1.3 | 0.84 | 3% |
+| COPD with dynamic hyperinflation | 4.54 | 91 | 4.5 | 20/12 | 10 | 1.3 | 0.84 | 4% |
 | Intra-abdominal hypertension | 3.55 | 87 | 0.8 | 13/7 | 5 | 1.2 | 0.74 | 1% |
 
 ### How the presets are built
@@ -967,9 +991,14 @@ smallest set that makes that question answerable.
   of cardiac output, and PEEP 12 costs 39%.
 - **The two left-heart presets** share their cardiac parameters and differ only
   in ventilation, which isolates what weaning does to a failing ventricle.
-- **Stiff chest wall**, **COPD** and **intra-abdominal hypertension** each vary
-  one mechanical parameter group and leave the heart entirely at default, so the
-  haemodynamic change can only have come from mechanics.
+- **Stiff chest wall**, **COPD** and **intra-abdominal hypertension** leave the
+  heart entirely at default, so the haemodynamic change can only have come from
+  mechanics. COPD deliberately separates three existing ideas: high `clung`
+  raises the static resting volume, high `raw` slows ordinary emptying, and EFL
+  caps maximal expiratory flow. Short available expiratory time then determines
+  how much additional gas is dynamically trapped. Slowing the rate unloads the
+  circulation without changing the heart; low external PEEP is absorbed below
+  the choke, while higher PEEP adds volume, CVP and output cost.
 
 ---
 
@@ -1009,6 +1038,7 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `SEPTAL.rvRef` / `lvRef` | 145 / 135 mL | volumes above which the septum shifts |
 | `SEPTAL.systolic` | 0.042 | systolic interdependence gain |
 | `PPL_FRC` | −5 cmH₂O | pleural pressure at the relaxation volume |
+| `EXPIRATORY_FLOW_LIMIT.minimumTimeConstant` | 4.5 s | severe-obstruction maximal-flow envelope when EFL is on; a didactic anchor, not a universal COPD constant |
 | `NORMAL_FRC` | 2.2 L | resting volume of a fully open lung; collapse is measured against it |
 | `PL_EASY`, `SPREAD_EASY` | 0, 1.3 cmH₂O | opening threshold and spread for normal units |
 | `SPREAD_HARD` | 7 cmH₂O | spread of opening pressures for diseased units |
@@ -1061,7 +1091,7 @@ src/
 node tests/run.mjs
 ```
 
-187 checks, no framework and no dependencies:
+198 checks, no framework and no dependencies:
 
 - **Volume conservation** across every scenario, to 0.01 mL.
 - **Compartment positivity** across every scenario and across a deterministic
@@ -1144,6 +1174,12 @@ The full list, with the measurements behind it, is in
 - **No gas exchange.** No oxygen, CO₂, pH or shunt. Hypoxic vasoconstriction is
   a coefficient on derecruited lung, not a consequence of an alveolar oxygen
   tension.
+- **One expiratory choke, not a regional COPD lung.** EFL imposes one binary,
+  volume-dependent maximal-flow envelope with a fixed 4.5 s anchor. It can show
+  downstream-pressure independence, dynamic trapping and their haemodynamic
+  cost, but not heterogeneous time constants, secretions, bronchodilation,
+  airway closure, inspiratory threshold work, triggering or dyssynchrony. Its
+  low-versus-high external-PEEP comparison is not a titration rule.
 - **No regional pulmonary circulation.** Open and derecruited vascular pathways
   are aggregate parallel conductances. Dependent regions, local West zones,
   gravitational gradients, hypercapnia and vascular remodelling are absent.
@@ -1246,3 +1282,16 @@ The full list, with the measurements behind it, is in
     pressure in postoperative cardiac surgery patients with three methods.
     *Intensive Care Med* 2012;38:1452–1460.
     doi:10.1007/s00134-012-2586-0.
+22. Ranieri VM, Giuliani R, Cinnella G, et al. Physiologic effects of positive
+    end-expiratory pressure in patients with chronic obstructive pulmonary
+    disease during acute ventilatory failure and controlled mechanical
+    ventilation. *Am Rev Respir Dis* 1993;147:5–13.
+23. van den Berg B, Stam H, Bogaard JM. Effects of PEEP on respiratory
+    mechanics in patients with COPD on mechanical ventilation. *Eur Respir J*
+    1991;4:561–567.
+24. Pepe PE, Marini JJ. Occult positive end-expiratory pressure in mechanically
+    ventilated patients with airflow obstruction: the auto-PEEP effect.
+    *Am Rev Respir Dis* 1982;126:166–170.
+25. Tuxen DV, Lane S. The effects of ventilatory pattern on hyperinflation,
+    airway pressures, and circulation in mechanical ventilation of patients
+    with severe air-flow obstruction. *Am Rev Respir Dis* 1987;136:872–879.

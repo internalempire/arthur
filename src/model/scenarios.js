@@ -84,8 +84,11 @@ export const SCENARIOS = [
   {
     id: 'copd',
     name: 'COPD with dynamic hyperinflation',
-    note: 'High airway resistance and too little expiratory time. The lung is hyperinflated because it has lost its elastic recoil — a compliance of 300 rather than a resting volume set by hand — so it rests high before a single breath is delivered. Gas trapping then raises it further, generating intrinsic PEEP the ventilator never displayed and pushing the lung up the right limb of the J-curve.',
-    params: { mode: 'vcv', pmus: 0, vt: 500, peep: 5, rr: 26, ti: 0.9, raw: 24, clung: 300 },
+    note: 'Lost recoil raises the resting volume; high resistance, expiratory flow limitation and too little expiratory time trap additional gas above it. The resulting intrinsic PEEP raises measured CVP while cardiac output falls. Slow the rate or shorten inspiration to let the lung empty, then raise external PEEP: below the expiratory choke it adds little, but above it becomes true back-pressure and costs output.',
+    params: {
+      mode: 'vcv', pmus: 0, vt: 500, peep: 5, rr: 26, ti: 0.9,
+      raw: 24, clung: 300, efl: 'on',
+    },
   },
   {
     id: 'iah',

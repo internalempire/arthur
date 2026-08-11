@@ -21,6 +21,7 @@ work, not excuses.
 
 | id | Manoeuvre and expected result | Status | Source |
 |---|---|---|---|
+| `copd-flow-limited-peep` | In the flow-limited COPD phenotype, raising external PEEP from 0 to 5 cmH₂O leaves total PEEP and end-expiratory lung volume nearly unchanged; raising it beyond the choke increases lung volume and lowers cardiac output. This is a directional waterfall constraint, not a portable 85%-of-PEEPi titration rule. | agrees | Ranieri et al., *Am Rev Respir Dis* 1993;147:5–13; van den Berg et al., *Eur Respir J* 1991;4:561–7 |
 | `peep-euvolaemic-pig` | Experimental anchor, not a human clinical range: in nine anaesthetised pigs at 7.7 mL/kg, PEEP 5 → 10 raised balloon-occlusion MSFP 12.9 → 14.0 mmHg (+1.1) and changed pulmonary arterial flow 2.75 → 2.56 L/min (−6.9%, `p=0.094`). At the equivalent reference-weight tidal volume, the model allows ΔPmsf +0.5 to +1.8 mmHg and ΔCO −15% to +5%; these are model tolerances around the reported means, not study confidence intervals. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–H806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on central filling: raising PEEP from 5 to 15 reduces output more in the underfilled model than in the euvolaemic model. This is a directional teaching constraint. Fougères et al. measured a 13±9% cardiac-index fall with higher PEEP and a 14±10% restoration with passive leg raising at high PEEP; they did **not** report the former model target of a ≥1.5× between-state ratio. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
 | `pvr-recruitability-low` | At R/I 0.05 in the human ARDS calibration phenotype, PEEP 4 → 14 keeps derived PVR inside the low-recruiter trial IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
@@ -40,6 +41,23 @@ The earlier ≥1.5× `peep-volume-status` threshold was retired during phase 4 a
 the source was re-read. The human experiment supports the effect of central
 filling on the PEEP response, but not that numerical ratio. Retaining the ratio
 would make a local model calibration masquerade as an in-vivo measurement.
+
+## Current phase-8 EFL semantics
+
+`raw` remains a linear resistance and `clung` remains the fully open lung's
+compliance. `efl=on` adds one distinct fact: during expiration, flow cannot
+exceed a maximal flow–volume envelope, even if the alveolar-to-mouth pressure
+gradient rises further. The envelope is represented by a 4.5 s minimum emptying
+time constant. It is an aggregate severe-obstruction teaching coefficient, not
+a measured universal COPD value.
+
+Dynamic trapped volume is actual EELV minus the passive equilibrium volume at
+the same external PEEP. Static hyperinflation from loss of recoil is therefore
+not counted as breath-to-breath trapping. In the passive flow-limited phenotype,
+PEEP 0 → 5 substitutes external for intrinsic pressure without materially
+raising absolute EELV or total PEEP; above the choke, further PEEP adds volume
+and haemodynamic cost. The row checks this direction but deliberately does not
+fit Ranieri's 85% cohort threshold or expose it as a treatment rule.
 
 ## Current phase-5 R/I semantics
 
@@ -150,16 +168,12 @@ do.
 volume of the *whole* J-curve reference changed, and that fixed a second error in
 the opposite direction: the previous version referenced distension to the
 patient's own resting volume, so a chronically hyperinflated lung had zero strain
-by definition and hyperinflation was free. The COPD preset's resistance was 1.7
-Wood units where the preset's own note claimed the lung was being pushed up the
-right limb of the curve. It is now 2.97 over a breath, and the note is true.
-
-A caution about reading that number, which caught me out. Pulmonary vascular
-resistance here is instantaneous, and it follows lung volume, so in a patient
-with a large tidal excursion it swings within the breath — 2.55 to 3.52 Wood
-units in this preset, a swing of 0.97. A single reading is a reading at a phase,
-not a property of the patient, and I quoted one as though it were the latter. The
-figures in this file are cycle means where the swing is material.
+by definition and hyperinflation was free. Subsequent human re-centring flattened
+the curve substantially. With EFL now active, the current COPD preset averages
+about 1.26 Wood units and swings about 1.23–1.29 within the breath. The change is
+directionally present but modest; the dominant acute haemodynamic cost comes
+from persistent intrathoracic pressure and impaired filling, not from an
+invented COPD pulmonary vasculopathy.
 
 **A correction.** An earlier version of this file said the two-region lung was
 "the same structural change that would give the model a real right-to-left

@@ -324,11 +324,12 @@ export function lungComplianceAt(p, lungVolume, eps = 0.25) {
 }
 
 /** End-expiratory equilibrium volume during a passive static PEEP step. */
-function staticEndExpiratoryVolume(p, peep) {
-  const vRelax = relaxationVolume(p);
+export function staticEndExpiratoryVolume(p, peep, phi = null) {
+  const vRelax = relaxationVolume(p, phi);
   const ccw = Math.max(1e-6, (p.ccw ?? 200) / 1000);
   const balance = (volume) =>
-    -RECOIL_AT_FRC + (volume - vRelax) / ccw + transpulmonaryAt(p, volume) - peep;
+    -RECOIL_AT_FRC + (volume - vRelax) / ccw
+    + (phi === null ? transpulmonaryAt(p, volume) : transpulmonaryAtFixed(p, volume, phi)) - peep;
 
   let lo = 0.02;
   let hi = Math.max(12, lungVolumeAtPl(p, 80) * 1.05);

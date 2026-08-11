@@ -11,6 +11,6 @@ export const SNAPSHOTS = {
   'lv-failure': { co: 3.52, map: 86.5, cvp: 5.03, papMean: 39.3, paop: 35.09, pvr: 1.23 },
   'weaning': { co: 3.55, map: 86.7, cvp: 1.15, papMean: 37.4, paop: 33.30, pvr: 1.18 },
   'obesity': { co: 4.37, map: 89.6, cvp: 3.32, papMean: 14.8, paop: 9.04, pvr: 1.18 },
-  'copd': { co: 4.58, map: 90.9, cvp: 4.23, papMean: 16.8, paop: 10.27, pvr: 1.27 },
+  'copd': { co: 4.54, map: 90.5, cvp: 4.46, papMean: 16.9, paop: 10.37, pvr: 1.28 },
   'iah': { co: 3.55, map: 87.2, cvp: 0.83, papMean: 10.1, paop: 4.51, pvr: 1.20 },
 };

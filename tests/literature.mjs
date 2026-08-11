@@ -37,6 +37,29 @@ const HUMAN_ARDS = {
 };
 
 export const LITERATURE = {
+  'copd-flow-limited-peep': () => {
+    // Ranieri et al. observed a waterfall-like response in nine mechanically
+    // ventilated COPD patients: PEEP below the critical fraction of intrinsic
+    // PEEP did not raise EELV or alter haemodynamics; PEEP above it did. Match
+    // the direction and separation, not their cohort's 85% numerical threshold.
+    const phenotype = {
+      mode: 'vcv', pmus: 0, vt: 500, rr: 26, ti: 0.9,
+      raw: 24, clung: 300, efl: 'on',
+    };
+    const zero = settle({ ...phenotype, peep: 0 }, 45);
+    const below = settle({ ...phenotype, peep: 5 }, 45);
+    const above = settle({ ...phenotype, peep: 13 }, 45);
+    return {
+      pass: Math.abs(below.endExpiratoryVolume - zero.endExpiratoryVolume) < 0.05
+        && Math.abs(below.totalPeep - zero.totalPeep) < 0.2
+        && above.endExpiratoryVolume > below.endExpiratoryVolume + 0.5
+        && above.co < below.co - 0.1,
+      detail: `PEEP 0 → 5: EELV ${zero.endExpiratoryVolume.toFixed(2)} → ${below.endExpiratoryVolume.toFixed(2)} L, `
+        + `total PEEP ${zero.totalPeep.toFixed(1)} → ${below.totalPeep.toFixed(1)}; `
+        + `PEEP 13: EELV ${above.endExpiratoryVolume.toFixed(2)} L, CO ${above.co.toFixed(2)} L/min`,
+    };
+  },
+
   'peep-euvolaemic-pig': () => {
     // Berger et al. studied nine anaesthetised pigs at 7.7 mL/kg, not a human
     // euvolaemic cohort. The model manoeuvre uses the equivalent tidal volume

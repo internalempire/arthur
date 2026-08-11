@@ -66,12 +66,16 @@ numbers. The following all reproduce:
   4.10 → 3.82 L/min. Setting `riRatio` to zero separates the response: the
   coefficient rises 4.57 → 4.62, derived PVR 4.92 → 7.08 and output falls
   4.03 → 3.60 L/min.
-- COPD with a short expiratory time: 6.4 cmH₂O of intrinsic PEEP appears with no
-  change in the set PEEP, and the hyperinflated lung sits on the right limb of
-  the J-curve at 1.25 Wood units averaged over a breath. That resistance swings
-  from 1.23 to 1.28 within the breath, because it is instantaneous and follows
-  lung volume; in presets with a smaller tidal excursion the swing is 0.3 or
-  less.
+- COPD with expiratory flow limitation: at external PEEP 5, about 7.1 cmH₂O of
+  intrinsic PEEP and 782 mL of dynamic trapped volume raise CVP while cardiac
+  output falls. Slowing respiratory rate from 26 to 12/min reduces those to
+  about 1.3 cmH₂O and 146 mL and restores output. External PEEP 0 → 5 leaves
+  total PEEP and absolute EELV almost unchanged below the choke; higher PEEP
+  becomes true back-pressure. The hyperinflated lung remains on the right limb
+  of the J-curve, but its resistance coefficient changes only modestly, around
+  1.23–1.29 WU within a breath. The acute lesson is impaired filling from
+  persistent intrathoracic pressure, not simulated chronic pulmonary vascular
+  disease.
 - Intra-abdominal hypertension raises Pmsf to 21 mmHg while *lowering* cardiac
   output, because the closing pressure of the vena cava rises with it.
 
@@ -272,6 +276,13 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   zones or regional HPV. This corrects the previous all-or-none whole-lung
   behaviour without claiming to reproduce the heterogeneity that makes ARDS
   ARDS.
+- **EFL is one expiratory choke.** It is a binary maximal-flow envelope with a
+  fixed 4.5 s severe-obstruction anchor, not a distribution of fast and slow
+  units. It reproduces the directional low-PEEP plateau and the haemodynamic
+  cost above the choke, but not regional trapping, airway closure, secretions,
+  bronchodilation, CO₂, work of breathing, triggering or dyssynchrony. Dynamic
+  trapped volume is measured against this model's own static equilibrium and
+  external PEEP must not be titrated from its threshold.
 - **Forward Euler.** Stable across the shipped ranges, and flows are now limited
   so no compartment can be drained past a 1 mL floor; a 250-configuration sweep
   of the whole control space finds no negative volume, no non-finite value and
@@ -346,3 +357,16 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
     pressure in postoperative cardiac surgery patients with three methods.
     *Intensive Care Med* 2012;38:1452–1460.
     doi:10.1007/s00134-012-2586-0.
+22. Ranieri VM, Giuliani R, Cinnella G, et al. Physiologic effects of positive
+    end-expiratory pressure in patients with chronic obstructive pulmonary
+    disease during acute ventilatory failure and controlled mechanical
+    ventilation. *Am Rev Respir Dis* 1993;147:5–13.
+23. van den Berg B, Stam H, Bogaard JM. Effects of PEEP on respiratory
+    mechanics in patients with COPD on mechanical ventilation. *Eur Respir J*
+    1991;4:561–567.
+24. Pepe PE, Marini JJ. Occult positive end-expiratory pressure in mechanically
+    ventilated patients with airflow obstruction: the auto-PEEP effect.
+    *Am Rev Respir Dis* 1982;126:166–170.
+25. Tuxen DV, Lane S. The effects of ventilatory pattern on hyperinflation,
+    airway pressures, and circulation in mechanical ventilation of patients
+    with severe air-flow obstruction. *Am Rev Respir Dis* 1987;136:872–879.
