@@ -116,8 +116,10 @@ const PANELS = [
     title: 'Pulmonary vascular resistance',
     summary: (sim) => {
       const m = sim.metrics;
-      const side = m.lungVolume < 2.2 ? 'below' : 'above';
-      return `Lung volume ${n(m.lungVolume, 2)} L, ${side} the 2.2 L resting volume of a fully open lung. `
+      const comp = pvrComponents(sim.params, m.lungVolume);
+      const side = m.lungVolume < comp.vascularFrc ? 'below' : 'above';
+      return `Lung volume ${n(m.lungVolume, 2)} L, ${side} this patient's ${n(comp.vascularFrc, 2)} L `
+        + `resting volume if fully open. `
         + `${n(m.openFraction * 100, 0)}% of the lung is open, so each open unit is holding `
         + `${m.lungStrain >= 0 ? `${n(m.lungStrain * 100, 0)}% more` : `${n(-m.lungStrain * 100, 0)}% less`} `
         + `than it would at rest. The model's `
@@ -130,11 +132,19 @@ const PANELS = [
       const comp = pvrComponents(sim.params, m.lungVolume);
       return [
         ['Lung volume', `${n(m.lungVolume, 2)} L`],
+        ['Fully open vascular FRC', `${n(comp.vascularFrc, 2)} L`],
         ['Open fraction', `${n(m.openFraction * 100, 0)}%`],
         ['Strain per open unit', `${n(m.lungStrain * 100, 0)}%`],
         ['Reopened by pressure', `${n(m.recruitedFraction * 100, 0)}% of the lung`],
-        ['Intra-alveolar component', `${n(comp.alveolar * RESISTANCE_TO_WOOD, 2)} Wood units`],
-        ['Extra-alveolar component', `${n(comp.extraAlveolar * RESISTANCE_TO_WOOD, 2)} Wood units`],
+        ['Open-unit vascular bed', `${n(comp.openBed * RESISTANCE_TO_WOOD, 2)} Wood units`],
+        // A logistic opening curve never reaches exactly 100%, so an otherwise
+        // normal lung can retain a mathematically tiny closed branch with a
+        // several-thousand-WU equivalent resistance. Suppress that numerical
+        // artefact when less than 0.5% of the lung belongs to the branch.
+        ['Derecruited-unit vascular bed', comp.closedFraction >= 0.005 && Number.isFinite(comp.closedBed)
+          ? `${n(comp.closedBed * RESISTANCE_TO_WOOD, 2)} Wood units`
+          : 'not present'],
+        ['Flow through open units', `${n(comp.openFlowShare * 100, 0)}% of pulmonary flow`],
         ['Model resistance coefficient', `${n(m.pvrCoefficientWood, 2)} Wood units`],
         ['Derived (mPAP − wedge) / CO', m.pvrDerivedWood === null ? 'not derivable' : `${n(m.pvrDerivedWood, 2)} Wood units`],
         ['Zone 3 fraction', `${n(m.zone3 * 100, 0)}%`],

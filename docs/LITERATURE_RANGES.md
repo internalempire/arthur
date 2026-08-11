@@ -23,19 +23,48 @@ work, not excuses.
 |---|---|---|---|
 | `peep-euvolaemia` | PEEP 5 → 10 at a protective tidal volume raises mean systemic filling pressure by 1–3 mmHg, so the gradient for venous return is largely defended and the fall in cardiac output stays under 10% in a euvolaemic patient. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on volume status: raising PEEP from 5 to 15 costs a hypovolaemic patient at least 1.5 times what it costs a euvolaemic one. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
-| `pvr-recruitability-low` | In a poorly recruitable lung (R/I < 0.5), PEEP 4 → 14 raises pulmonary vascular resistance by at least 25%. The trial's medians give 160 → 243 dyn·s·cm⁻⁵, +52%, P < 0.01. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | In a highly recruitable lung (R/I ≥ 0.5), the same PEEP change leaves resistance essentially unchanged: between −10% and +20%, the measured +5% with a band of ±15 either side of it. The trial's medians give 224 → 235 dyn·s·cm⁻⁵, +5%, P = 0.55. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-dissociation` | Sweeping recruitability from 0 to 1 with everything else held identical moves the response monotonically from a rise to a fall, crossing zero once. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-low` | In a low-recruitability human ARDS phenotype, PEEP 4 → 14 keeps derived PVR inside the trial's two IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | In a high-recruitability phenotype, the same manoeuvre stays inside 2.31–3.61 → 2.10–3.75 WU and changes PVR by −10% to +20%; the trial's cohort medians changed +5%, P = 0.55. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-dissociation` | Sweeping the model's recruitability control from 0 to 1 progressively attenuates the PEEP-related PVR rise by at least 15 percentage points. No sign change is required: the measured high-recruiter median was still +5%. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
-| `pvr-nadir-position` | Resistance is minimal at 45–60% of maximal lung volume. | agrees | Thomas, Griffo & Roos, *J Appl Physiol* 1961;16:451–6, Discussion (n = 55 lungs) |
-| `pvr-at-maximal-inflation` | At maximal inflation resistance is 1.6–2.4× its minimum. | agrees | Thomas et al. 1961, Fig. 6 (both experiments give 1.8–2.1×) |
-| `pvr-at-low-volume` | At 30% of maximal volume it is only 1.05–1.4× the minimum — the deflation limb is far flatter than the inflation limb. | agrees | Thomas et al. 1961, Fig. 6 (~1.2× in both) |
-| `pvr-clinical-range` | Across transpulmonary pressures of 2.5 to 22 cmH₂O — the range this simulator runs in — resistance changes by between −20% and +40%. | agrees | Peták group, *J Appl Physiol* 2008, doi:10.1152/japplphysiol.00831.2007 — **reported, not read here**: +15 ± 1% with positive-pressure inflation, −3 ± 0.3% with negative, hysteresis against Ptp abolished when plotted against volume |
-| `pvr-extraalveolar-shape` | The extra-alveolar limb is itself U-shaped: it falls, then turns back up, ending at least 1.1× its minimum at maximal inflation. | agrees | Hakim, Michel & Chang, *J Appl Physiol* 1982;53:1110–5, Fig. 3 (arterial + venous segments: 9.2 → 7.8 → 9.9 mmHg over Ptp 0 → 20) |
+| `pvr-human-frc-nadir` | The fully open mechanical J-curve has its minimum within 0.15 L of the model's 2.2 L human FRC. | agrees | Cecconi, Collino & Pinsky, *Intensive Care Med* 2026, Fig. 1C (clinical synthesis: minimum near FRC) |
+| `pvr-human-j-direction` | Both marked deflation (1.2 L) and overdistension (4.5 L) raise resistance above the value near FRC. This is a directional human teaching target, not a numerical fit to maximal animal inflation. | agrees | Cecconi, Collino & Pinsky 2026, Fig. 1C; Thomas et al. 1961 and Hakim et al. 1982 for qualitative mechanism |
 | `ppv-suspended-spontaneous` | During spontaneous breathing, pulse pressure variation is withheld rather than presented as an interpretable dynamic index. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
 | `ph-classification` | A hypervolaemic failing left ventricle with a wedge above 15 mmHg and a mean pulmonary artery pressure above 20 is classified post-capillary; a lung with a high vascular resistance and a low wedge is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
+
+## Current phase-2 calibration
+
+The active calibration is deliberately hierarchical:
+
+1. Human in-vivo catheter measurements constrain the absolute PVR and the
+   response to PEEP in low- and high-recruitability ARDS phenotypes.
+2. The contemporary clinical review constrains the human teaching geometry:
+   the mechanical minimum lies near FRC and both deflation and overdistension
+   raise RV afterload.
+3. Thomas, Hakim and the isolated-lung work constrain only the qualitative
+   volume-dependent mechanism. Their exact nadir, maximal-inflation ratios and
+   vascular partitions are no longer executable human targets.
+
+The model now gives 2.71 → 3.35 WU (+24%) in the low-recruitability calibration
+phenotype and 2.45 → 2.64 WU (+8%) in the high-recruitability phenotype after 45
+s of equilibration. All four values fall within the published IQRs. The first
+response is smaller than the +52% ratio of cohort medians; it is retained rather
+than overfitted because the paper does not report the median paired percentage
+change and this remains a teaching model.
+
+The calibration phenotype is not the shipped “ARDS with right ventricular
+failure” preset. It uses normal RV contractility and `pvrBase=0.09`, because the
+study did not describe a uniform severe-RV-failure cohort. Reusing the extreme
+preset made its internally high afterload validate itself and produced values
+around 10–16 WU, far outside the human measurements.
+
+## Historical calibration notes (superseded)
+
+The sections below preserve how earlier formulations were investigated. Their
+numerical outputs and passing-row claims are historical; the table above and
+[MODEL_DECISIONS.md](MODEL_DECISIONS.md) are the current specification.
 
 ## How the recruitability rows were closed
 

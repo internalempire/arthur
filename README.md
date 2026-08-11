@@ -401,87 +401,75 @@ resolves that, so the length of a manoeuvre does not matter, only its pressure.
 ### The J-curve
 
 ```
-stretch         = exp(0.515 * strain)                     both compartments
-unfurled        = 0.17 + 0.83 * exp(-3.35 * strain)       extra-alveolar only
-R_alveolar      = 0.6 * PVR0 * stretch            / open * hypoxic
-R_extraalveolar = 0.4 * PVR0 * unfurled * stretch / open * hypoxic
-hypoxic         = 1 + hpv * 1.1 * (1 - open)
-PVR             = R_alveolar + R_extraalveolar
+vascular_FRC = volume held by fully open tissue at resting recoil
+strain       = lung_volume / (open * vascular_FRC) - 1
+stretch      = exp(0.515 * strain)
+unfurled     = 0.17 + 0.83 * exp(-1.55 * strain)
+R_open       = PVR0 * (0.6 * stretch + 0.4 * unfurled * stretch)
+R_closed     = 3 * PVR0 * (1 + 1.1 * hpv)
+conductance  = open / R_open + (1 - open) / R_closed
+PVR          = 1 / conductance
 ```
 
-**Both limbs follow volume, and they share the term that makes them rise.** An
-earlier version drove the alveolar limb by strain and the extra-alveolar one by
-transpulmonary pressure, reasoning that radial traction is a stress rather than a
-volume. Three measurements say otherwise, and they are the ones this curve is now
-fitted to:
+**The curve is human-centred and the pathways are parallel.** The fully open
+curve reaches its minimum at 2.25 L, within 50 mL of the model's 2.2 L normal
+FRC. The old minimum at 2.87 L and its maximal-inflation ratios were fitted to
+excised dog lungs. Those experiments remain useful for the volume-dependent
+mechanism, but their exact numerical geometry is no longer treated as a human
+in-vivo target.
+
+Both mechanical limbs still follow volume:
 
 - Thomas, Griffo & Roos 1961: resistance plotted against transpulmonary pressure
   shows wide hysteresis between inflation and deflation, and plotted against
-  volume it does not. Their conclusion is that resistance is *"volume-dependent
-  rather than pressure-dependent"*.
+  volume it does not.
 - Hakim, Michel & Chang 1982: the volume-related changes are identical under
   positive- and negative-pressure inflation while the pressure-related ones are
-  not, and inflation produces *"a volume-dependent increase in the resistance of
-  both alveolar and extra-alveolar vessels"*.
+  not.
 - The Peták group 2008: hysteresis against transpulmonary pressure is abolished
   when the same data are plotted against volume.
 
-So `stretch` is one exponential in strain applied to **both** compartments, which
-is Hakim's sentence as arithmetic: inflation narrows every vessel. What separates
-them is that the extra-alveolar compartment is also unfurled by the parenchyma as
-the lung leaves collapse, a term that falls with strain toward a floor. Their sum
-is the J, and the extra-alveolar limb is itself U-shaped — falling, then overtaken
-by stretch — which is what Hakim's arterial and venous segments do: 9.2 → 7.8 →
-9.9 mmHg across transpulmonary pressures of 0 to 20.
+`K_unfurl=1.55` is derived so that unfurling and stretch have equal and opposite
+slopes at zero strain. It is not a fit to an animal maximal inflation. Strain is
+referenced to what this patient's fully open tissue would hold at resting recoil,
+so a small stiff ARDS lung can reach the right limb at a total volume below 2.2 L.
 
-The three constants are fitted to four published figures, each an executable row
-in `docs/LITERATURE_RANGES.md`: where the nadir sits, the ratio at maximal
-inflation, the ratio at low volume, and the change across the transpulmonary
-pressures this simulator runs in. Four constraints on three constants, so the fit
-could have failed. The constants it replaced missed three of the four by factors
-of up to five — the right limb was 8.9× the nadir at maximal inflation against a
-measured 1.8–2.1×, and +193% across the clinical range against a measured +15% to
-−3%.
-
-The nadir now lands at 2.87 L, which is 48% of maximal volume — Thomas measured
-45–60% in 55 lungs. That is above FRC, not at it, which is where the textbook
-figure puts it.
-
-Two separate things push the left limb up, and separating them is what the two
-populations buy. Vessels in units that remain open are narrowed by low strain.
-Units that are *shut* remove their vessels from the circuit entirely, which is
-the `1/open` term, and hypoxic vasoconstriction makes what perfusion still
-reaches them expensive. In a badly collapsed lung the second effect dominates the
-first, which is why derecruitment costs so much more than deflation.
+Open and derecruited units are two vascular pathways in parallel. Open units
+follow the J-curve. Derecruited units remain poorly perfused and HPV raises only
+their resistance. Their conductances add; their resistances do not. The previous
+formula divided by the open fraction and multiplied the entire lung by HPV while
+describing closed units as still perfused. Numerically that removed their pathway
+and drove the severe ARDS phenotype to roughly 10–16 WU.
 
 **Why this replaced a single compartment.** With one compartment, a recruiter and
 a non-recruiter were the same lung at different resting volumes, so raising PEEP
 gave them identical volume gain and identical transpulmonary pressure and there
-was nothing left to tell them apart. Recruitability was being inferred from
-resting volume rather than represented. It is now the `recruitable` parameter,
-and the response to PEEP 4 → 14 runs from +15% to −21% across its range. The same
-change fixed an error in the other direction: distension used to be referenced to
-the patient's own resting volume, so a chronically hyperinflated lung had zero
-strain by definition and hyperinflation was free. Note that this resistance is
-instantaneous and follows lung volume, so in a patient with a large tidal
-excursion it swings within the breath — 1.22 to 1.34 Wood units in the COPD
-preset. Quote the cycle mean, not a sample.
+was nothing left to tell them apart. Recruitability is now explicit. In the
+human calibration phenotype, PEEP 4 → 14 gives 2.71 → 3.35 WU (+24%) at low
+recruitability and 2.45 → 2.64 WU (+8%) at higher recruitability. All four values
+lie inside the IQRs reported by Cappio Borlino et al.; the response is not fitted
+to the ratio of cohort medians.
 
-**What it deliberately does not do.** Recruited units add compliance in a real
-lung; here the pressure–volume relationship is still linear. Recruitment is a
-vascular and gas-exchange event in this model, not a mechanical one. That is why
-proning changes the opening pressure rather than the resting volume, and why
-end-expiratory lung volume does not rise when units open.
+**Limits.** `recruitable` is still a fraction of collapsed units that may open,
+not the bedside R/I ratio. The threefold closed-path factor is an aggregate
+teaching coefficient, not a measured anatomical constant. Regional perfusion,
+vascular remodelling, thrombotic obstruction, hypercapnia and hypoxic tone
+outside derecruited units are not represented here.
 
 ### Vascular waterfall and West zones
 
 ```
-Q_pul = max(0, (Ppa − max(Ppv, Palv)) / PVR)
+P_downstream = Ppv + 0.45 * max(0, Palv - Ppv)
+Q_pul        = max(0, (Ppa - P_downstream) / PVR)
 ```
 
 Where alveolar pressure exceeds pulmonary venous pressure, alveolar pressure —
-not left atrial pressure — is the downstream pressure for flow (Permutt). West
-zone 1 stops flow entirely.
+not left atrial pressure — contributes to the downstream pressure for flow
+(Permutt). It applies to 45% of the aggregate bed, at the upper end of published
+34–45% alveolar-capillary partitions. The previous all-or-none formula put the
+entire pulmonary circulation behind the waterfall: crossing `Palv=Ppv` could
+therefore add several Wood units abruptly. The current fraction represents a
+mixture of vascular segments and West zones without adding regional compartments.
 
 ### The pulmonary piston
 
@@ -731,7 +719,7 @@ fluid bolus or a diuresis — rather than silently rescaling the model.
 
 | Symbol | Meaning | Unit | Default | Range |
 |---|---|---|---|---|
-| `pvrBase` | Resistance coefficient at the J-curve nadir | mmHg·s/mL | 0.07 | 0.03 – 0.60 |
+| `pvrBase` | Resistance coefficient of a fully open lung at its resting-volume nadir | mmHg·s/mL | 0.07 | 0.03 – 0.60 |
 | `hpv` | Hypoxic vasoconstriction gain | × | 1.0 | 0 – 3 |
 | `recruitable` | Fraction of the collapsed lung that can be reopened | × | 0.4 | 0 – 1 |
 | `pOpen` | Transpulmonary pressure at which half the recruitable lung is open | cmH₂O | 20 | 5 – 40 |
@@ -789,8 +777,8 @@ haemodynamic findings look like:
 
 | | Lung volume | PVR | RV:LV | Cardiac output |
 |---|---|---|---|---|
-| ARDS preset, supine → prone | 1.70 → 1.89 L | 5.5 → 4.5 WU | 2.26 → 2.03 | 2.68 → 2.90 L/min |
-| Healthy preset, supine → prone | 2.77 → 2.64 L | 1.31 → 1.25 WU | 0.88 → 0.85 | 5.04 → 4.92 L/min |
+| ARDS preset, supine → prone | 1.20 → 1.25 L | 4.09 → 3.89 WU | 1.65 → 1.61 | 3.91 → 3.88 L/min |
+| Healthy preset, supine → prone | 2.74 → 2.62 L | 1.18 → 1.18 WU | 0.90 → 0.85 | 5.03 → 4.88 L/min |
 
 The recruitable lung gains; the normal one pays the stiffer chest wall and
 receives nothing back. The controls keep showing the supine mechanics
@@ -799,17 +787,18 @@ throughout — turning someone over does not change how stiff their lung is — 
 
 ### Two different pulmonary resistances
 
-`pvrBase` sets the coefficient the integrator divides by. That is **not** the
-number a catheter gives you, and the app shows both:
+`pvrBase` is the fully open reference from which the parallel open/derecruited
+bed coefficient is computed. That resulting coefficient is **not** necessarily
+the number a catheter gives you, and the app shows both:
 
 - **Pulmonary resistance coefficient** — the model's own J-curve value.
 - **PVR, derived** — (mPAP − wedge) / CO, computed the way a clinician would.
 
-They agree at baseline (1.44 against 1.46 Wood units) and diverge by up to 46%
-in scenarios where the alveolar waterfall and zone conditions carry part of the
-load that the catheter formula folds into a single resistance. Reporting the
-coefficient alone under the name PVR, as an earlier version did, invites reading
-a model constant as a measurement.
+They are close at baseline (about 1.18 against 1.29 Wood units) and diverge when
+the alveolar waterfall contributes a pressure load that the catheter formula
+folds into its single resistance. Reporting the coefficient alone under the name
+PVR, as an earlier version did, invites reading a model constant as a
+measurement.
 
 ### What each readout is, and whether it can be read
 
@@ -866,23 +855,24 @@ and septal gains in particular are for.
 
 ### What each one settles at
 
-Steady state after 30 s of simulated time. Pressures in mmHg, flow in L/min, PVR
-in Wood units.
+Steady state after 30 s of simulated time. Pressures in mmHg, flow in L/min; the
+PVR column is the model resistance coefficient in Wood units. The
+catheter-derived value is separately labelled in the app.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.43 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
-| Healthy, passive volume control | 5.05 | 94 | 1.4 | 22/13 | 10 | 1.3 | 0.89 | 2% |
-| PEEP escalation | 4.47 | 90 | 3.7 | 27/18 | 9 | 2.1 | 0.93 | 6% |
-| Septic shock, fluid responsive | 4.33 | 81 | 1.7 | 19/13 | 4 | 1.5 | 0.79 | 18% |
-| Big pleural swings, no variation | 6.96 | 94 | 1.3 | 27/17 | 10 | 1.2 | 0.94 | 4% |
-| ARDS with right ventricular failure | 3.14 | 78 | 5.2 | 34/28 | 3 | 5.5 | 2.03 | 8% |
-| Acute pulmonary embolism | 4.16 | 94 | 5.4 | 39/33 | 4 | 7.3 | 2.02 | 8% |
-| Cardiogenic pulmonary oedema | 3.52 | 87 | 4.6 | 44/38 | 34 | 1.8 | 0.88 | 6% |
-| Weaning the failing left ventricle | 3.66 | 87 | 0.6 | 40/31 | 32 | 1.3 | 0.89 | 20% |
-| Stiff chest wall | 4.27 | 90 | 3.3 | 18/10 | 9 | 1.3 | 0.82 | 4% |
-| COPD with dynamic hyperinflation | 4.54 | 90 | 4.2 | 23/13 | 10 | 1.7 | 0.89 | 6% |
-| Intra-abdominal hypertension | 3.42 | 86 | 0.8 | 15/8 | 4 | 1.4 | 0.79 | 8% |
+| Healthy, breathing spontaneously | 5.42 | 96 | −0.9 | 23/10 | 9 | 1.2 | 0.92 | 8% |
+| Healthy, passive volume control | 5.03 | 94 | 1.4 | 22/12 | 10 | 1.2 | 0.90 | 2% |
+| PEEP escalation | 4.51 | 90 | 3.7 | 22/13 | 10 | 1.3 | 0.84 | 2% |
+| Septic shock, fluid responsive | 4.38 | 81 | 1.7 | 16/10 | 4 | 1.2 | 0.71 | 8% |
+| Big pleural swings, no variation | 6.95 | 94 | 1.4 | 25/16 | 10 | 1.2 | 0.90 | 5% |
+| ARDS with right ventricular failure | 3.91 | 85 | 3.4 | 27/19 | 4 | 4.1 | 1.65 | 2% |
+| Acute pulmonary embolism | 4.13 | 94 | 5.5 | 39/32 | 4 | 7.5 | 2.01 | 9% |
+| Cardiogenic pulmonary oedema | 3.51 | 87 | 4.6 | 43/37 | 34 | 1.2 | 0.85 | 5% |
+| Weaning the failing left ventricle | 3.64 | 87 | 0.6 | 40/31 | 32 | 1.2 | 0.89 | 20% |
+| Stiff chest wall | 4.27 | 90 | 3.3 | 18/10 | 9 | 1.2 | 0.81 | 3% |
+| COPD with dynamic hyperinflation | 4.55 | 90 | 4.2 | 20/12 | 10 | 1.3 | 0.84 | 3% |
+| Intra-abdominal hypertension | 3.43 | 87 | 0.8 | 12/6 | 4 | 1.2 | 0.73 | 4% |
 
 ### How the presets are built
 
@@ -904,21 +894,20 @@ smallest set that makes that question answerable.
 - **ARDS** is a small, stiff, collapsed lung (`collapsed`, `clung`) with a weak right
   ventricle, a raised `pvrBase`, and — as shipped — over half of the collapse
   reopenable (`recruitable=0.55`). Across a PEEP titration from 0 to 20 the
-  resistance coefficient falls 7.6 → 6.0 Wood units, but cardiac output falls
-  the whole way, 3.56 → 2.89 L/min: the preload cost outruns the afterload
-  benefit at every step. Filling the patient to `stressedVolume=1050` lifts the
-  whole curve (3.80 → 3.32) without changing its shape.
+  resistance coefficient falls 4.42 → 3.89 Wood units, but derived PVR rises
+  4.44 → 5.55 WU and cardiac output falls 4.14 → 3.73 L/min: the preload and
+  waterfall costs outrun the coefficient benefit.
 
   Set `recruitable=0` — the same collapsed lung, now consolidated rather than
-  closed — and the titration inverts. Resistance now *rises* with PEEP, 8.0 →
-  10.4, and output falls twice as fast, 3.38 → 2.02. Nothing else about the
-  patient changed. That is the comparison this preset exists for, and it is the
-  one a single-compartment lung could not show.
+  closed — and the titration separates further. The coefficient rises 4.57 →
+  4.62 WU, derived PVR rises 4.93 → 7.85 WU, and output falls 3.97 → 3.24.
+  Nothing else about the patient changed. That is the comparison this preset
+  exists for, and it is the one a single-compartment lung could not show.
 
   A PEEP that buys output does exist, but only in a lung that is both highly
   recruitable and well filled: at `recruitable=0.9`, `pOpen=12` and
-  `stressedVolume=1400`, resistance falls 6.4 → 3.8 and output holds a broad
-  plateau out to PEEP 12–16 before declining. The plateau is shallow — the
+  `stressedVolume=1400`, derived PVR stays around 3.5 WU and output holds a broad
+  plateau from PEEP 4–12 before declining. The plateau is shallow — the
   differences along it are comparable to the respiratory swing, so it should be
   read as "PEEP stops costing anything here", not as a peak to titrate to. The
   optimal PEEP for a failing right ventricle is a property of neither the lung
@@ -1094,12 +1083,15 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 The full list, with the measurements behind it, is in
 [docs/PHYSIOLOGY.md](docs/PHYSIOLOGY.md). In short:
 
-- **No autonomic control.** No baroreflex, no chemoreflex. Real patients defend
-  their blood pressure; this one does not, so falls in cardiac output are larger
-  and more sustained than at the bedside.
+- **Simplified autonomic control.** One aggregate baroreflex modulates heart
+  rate and systemic resistance; there is no chemoreflex, separate efferent time
+  course or reflex change in venous tone and contractility.
 - **No gas exchange.** No oxygen, CO₂, pH or shunt. Hypoxic vasoconstriction is
   a coefficient on derecruited lung, not a consequence of an alveolar oxygen
   tension.
+- **No regional pulmonary circulation.** Open and derecruited vascular pathways
+  are aggregate parallel conductances. Dependent regions, local West zones,
+  gravitational gradients, hypercapnia and vascular remodelling are absent.
 - **Pulse pressure variation is descriptive, not a fluid-responsiveness
   decision.** The model shows how respiratory mechanics alter PPV and SVV, but
   does not apply a 13% cutoff or calibrate variation against response to a model
@@ -1160,3 +1152,15 @@ The full list, with the measurements behind it, is in
    critically ill patients. *Chest* 1985;88:653–8.
 10. Teboul JL, Monnet X, Chemla D, Michard F. Arterial pulse pressure variation
     with mechanical ventilation. *Am J Respir Crit Care Med* 2019;199:22–31.
+11. Cappio Borlino S, et al. The effect of positive end-expiratory pressure on
+    pulmonary vascular resistance depends on lung recruitability in patients
+    with ARDS. *Am J Respir Crit Care Med* 2024;210:900–907.
+    doi:10.1164/rccm.202402-0383OC.
+12. Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical
+    bedside implications. *Intensive Care Med* 2026.
+    doi:10.1007/s00134-026-08583-3.
+13. Thomas LJ Jr, Griffo ZJ, Roos A. Effect of negative pressure inflation of
+    the lung on pulmonary vascular resistance. *J Appl Physiol* 1961;16:451–456.
+14. Hakim TS, Michel RP, Chang HK. Effect of lung inflation on pulmonary
+    vascular resistance by arterial and venous occlusion. *J Appl Physiol*
+    1982;53:1110–1115.

@@ -1,11 +1,11 @@
 import { Panel, niceTicks } from '../plot.js';
-import { pvrComponents, PVR_NADIR_VOLUME } from '../../model/lung.js';
+import { pvrComponents } from '../../model/lung.js';
 import { RESISTANCE_TO_WOOD } from '../../model/units.js';
 
-// Pulmonary vascular resistance against lung volume. Intra-alveolar vessels are
-// compressed by inflation; extra-alveolar vessels are tethered open by it. Their
-// sum is J-shaped, so both atelectasis and overdistension load the right
-// ventricle, and the best place to be is neither.
+// Pulmonary vascular resistance against lung volume. The reference line is the
+// mechanical J-curve of a fully open lung; the patient line is the equivalent
+// resistance after open and derecruited vascular beds have been combined in
+// parallel. They are deliberately not stacked: parallel resistances do not add.
 //
 // The dashed line is how much of the lung is open at each volume, on its own
 // 0–100% scale. It is drawn because for this patient it is what shapes the
@@ -35,18 +35,22 @@ export function createPvrCurve(canvas) {
     const xLo = 0.6;
     const xHi = Math.max(4.2, r.lungVolume + 0.6);
     const samples = 90;
-    const alv = [], ext = [], tot = [], openPct = [];
+    const reference = [], tot = [], openPct = [];
     let yHi = 0;
     for (let i = 0; i < samples; i++) {
       const v = xLo + ((xHi - xLo) * i) / (samples - 1);
       const comp = pvrComponents(p, v);
-      const a = comp.alveolar * RESISTANCE_TO_WOOD;
-      const e = comp.extraAlveolar * RESISTANCE_TO_WOOD;
-      alv.push(v, a); ext.push(v, e); tot.push(v, a + e);
+      // Supplying phi=1 isolates the fully open human reference curve at the
+      // same volume without changing any of the patient's other parameters.
+      const fullyOpen = pvrComponents(p, v, null, 1).total * RESISTANCE_TO_WOOD;
+      const total = comp.total * RESISTANCE_TO_WOOD;
+      reference.push(v, fullyOpen); tot.push(v, total);
       openPct.push(v, comp.openFraction);
-      yHi = Math.max(yHi, a + e);
+      yHi = Math.max(yHi, total, fullyOpen);
     }
-    yHi = Math.min(yHi, pvrComponents(p, PVR_NADIR_VOLUME).total * RESISTANCE_TO_WOOD * 7);
+    const vascularFrc = pvrComponents(p, r.lungVolume).vascularFrc;
+    const referenceNadir = pvrComponents(p, vascularFrc, null, 1).total * RESISTANCE_TO_WOOD;
+    yHi = Math.min(yHi, referenceNadir * 7);
     panel.setDomain(xLo, xHi, 0, yHi * 1.05);
 
     panel.grid(colors, {
@@ -72,19 +76,17 @@ export function createPvrCurve(canvas) {
     const openScaled = openPct.map((n, i) => (i % 2 ? n * yHi * 1.05 : n));
     panel.line(openScaled, { color: colors.ink, width: 1.2, alpha: 0.35, dash: [4, 4] });
 
-    panel.line(alv, { color: colors.airway, width: 1.6, alpha: 0.85 });
-    panel.line(ext, { color: colors.pleural, width: 1.6, alpha: 0.85 });
+    panel.line(reference, { color: colors.pleural, width: 1.6, alpha: 0.75, dash: [5, 3] });
     panel.line(tot, { color: colors.flow, width: 2.4 });
 
     panel.unclip();
 
     const at = (arr, frac) => { const i = (Math.floor(arr.length * frac) & ~1); return [arr[i], arr[i + 1]]; };
-    let [lx, ly] = at(alv, 0.86);
-    panel.label('Intra-alveolar', lx, ly, { color: colors.text.airway, align: 'right', dx: -4, dy: -8, halo: colors.surface });
-    [lx, ly] = at(ext, 0.1);
-    panel.label('Extra-alveolar', lx, ly, { color: colors.text.pleural, dx: 6, dy: -8, halo: colors.surface });
+    let [lx, ly] = at(reference, 0.82);
+    panel.label('Fully open reference', lx, ly,
+      { color: colors.text.pleural, align: 'right', dx: -4, dy: -8, halo: colors.surface });
     [lx, ly] = at(tot, 0.45);
-    panel.label('Total', lx, ly, { color: colors.text.flow, dx: 4, dy: 12, halo: colors.surface });
+    panel.label('Patient total', lx, ly, { color: colors.text.flow, dx: 4, dy: 12, halo: colors.surface });
 
     // The label names the line; the number belongs at the patient's own volume,
     // which is the only place on this curve where it says anything about them.
