@@ -17,8 +17,9 @@
 // normal units, which close on deflation and reopen at low pressure, and
 // diseased units, which are shut at rest and reopen only if they are
 // recruitable at all. Consolidated lung is collapsed and stays collapsed however
-// hard it is pushed. Recruitability is now a property of the patient rather than
-// a consequence of their resting volume.
+// hard it is pushed. The user describes recruitability with the bedside R/I
+// ratio; the fraction of diseased units that can open is an internal consequence
+// of that measurement, not a second user-facing definition of the same concept.
 //
 // Units are treated as either open at full size or shut — the sponge
 // idealisation. It is why the arithmetic below works, and it is also the reason
@@ -57,11 +58,36 @@ export const NORMAL_FRC = 2.2; // L
 const PL_EASY = 0;
 const SPREAD_EASY = 1.3; // cmH2O
 
-// Diseased units open progressively over tens of cmH2O, which is why a
-// recruitment manoeuvre is a ramp and not a switch.
-const SPREAD_HARD = 7; // cmH2O
+// Diseased units open along a distribution, rather than at one threshold. This
+// width is a didactic shape coefficient, not a claimed anatomical measurement.
+// It is deliberately narrower than the former 7 cmH2O: that broad curve made
+// even a completely openable ARDS compartment produce R/I < 0.15 during the
+// standard 5 -> 15 cmH2O manoeuvre, outside the human range the control names.
+const SPREAD_HARD = 2; // cmH2O
+
+// The reference manoeuvre used by Chen et al. and by the human PVR calibration:
+// R/I is protocol-dependent, so these pressures belong in the definition and
+// must not be hidden in a test fixture.
+export const RI_LOW_PEEP = 5;
+export const RI_HIGH_PEEP = 15;
 
 const logistic = (x) => 1 / (1 + Math.exp(-x));
+
+/**
+ * Fraction of the diseased compartment that is capable of reopening.
+ *
+ * Resolved simulator parameters carry this value explicitly. Direct callers of
+ * the lung helpers (tests, diagrams and small analyses) may pass only `riRatio`;
+ * in that case the same calibration is performed lazily. Keeping this internal
+ * avoids presenting a fraction of units and a bedside R/I as interchangeable
+ * patient inputs — they are not.
+ */
+function openableDiseasedFraction(p) {
+  if (Number.isFinite(p.openableDiseasedFraction)) {
+    return clamp(p.openableDiseasedFraction, 0, 1);
+  }
+  return calibrateRecruitmentToInflation(p).openableFraction;
+}
 
 // Transpulmonary pressure at the relaxation volume: the recoil that holds the
 // lung open against the chest wall, and the negative of pleural pressure there.
@@ -76,9 +102,9 @@ export const RECOIL_AT_FRC = 5; // cmH2O
  */
 export function openFractionAt(p, pl, shift = 0) {
   const diseased = clamp(p.collapsed ?? 0, 0, 0.95);
-  const recruitable = clamp(p.recruitable ?? 0, 0, 1);
+  const openable = openableDiseasedFraction(p);
   const normalOpen = (1 - diseased) * logistic((pl - (PL_EASY - shift)) / SPREAD_EASY);
-  const recruited = diseased * recruitable
+  const recruited = diseased * openable
     * logistic((pl - ((p.pOpen ?? 20) - shift)) / SPREAD_HARD);
   return clamp(normalOpen + recruited, 0.05, 1);
 }
@@ -297,6 +323,183 @@ export function lungComplianceAt(p, lungVolume, eps = 0.25) {
   return (dv / (2 * eps)) * 1000; // mL/cmH2O
 }
 
+/** End-expiratory equilibrium volume during a passive static PEEP step. */
+function staticEndExpiratoryVolume(p, peep) {
+  const vRelax = relaxationVolume(p);
+  const ccw = Math.max(1e-6, (p.ccw ?? 200) / 1000);
+  const balance = (volume) =>
+    -RECOIL_AT_FRC + (volume - vRelax) / ccw + transpulmonaryAt(p, volume) - peep;
+
+  let lo = 0.02;
+  let hi = Math.max(12, lungVolumeAtPl(p, 80) * 1.05);
+  for (let i = 0; i < 44; i++) {
+    const mid = (lo + hi) / 2;
+    if (balance(mid) < 0) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/**
+ * Apply the bedside recruitment-to-inflation arithmetic to this model lung.
+ *
+ * Chen et al.'s single-breath method subtracts the volume expected from low-
+ * PEEP respiratory-system compliance from the measured change in EELV. The
+ * remainder is recruited volume; its compliance divided by low-PEEP Crs is
+ * R/I. The simulator has no separate airway-opening pressure, so the effective
+ * pressure step is the applied 10 cmH2O step. That limitation is surfaced in
+ * the UI and documentation rather than silently borrowing `pOpen`, which is a
+ * transpulmonary alveolar opening pressure and is not the same measurement.
+ */
+function assessRecruitmentToInflation(p) {
+  const lowEelv = staticEndExpiratoryVolume(p, RI_LOW_PEEP);
+  const highEelv = staticEndExpiratoryVolume(p, RI_HIGH_PEEP);
+  const lungCompliance = lungComplianceAt(p, lowEelv);
+  const lowCompliance = 1 / (1 / lungCompliance + 1 / Math.max(1e-6, p.ccw ?? 200));
+  const pressureStep = RI_HIGH_PEEP - RI_LOW_PEEP;
+  const deltaEelv = (highEelv - lowEelv) * 1000;
+  const predictedInflation = lowCompliance * pressureStep;
+  const recruitedVolume = deltaEelv - predictedInflation;
+  const rawRatio = predictedInflation > 1e-9 ? recruitedVolume / predictedInflation : 0;
+
+  return {
+    lowPeep: RI_LOW_PEEP,
+    highPeep: RI_HIGH_PEEP,
+    lowEelv,
+    highEelv,
+    deltaEelv,
+    lowCompliance,
+    predictedInflation,
+    recruitedVolume,
+    recruitedCompliance: recruitedVolume / pressureStep,
+    // A negative value means the average compliance over the step was lower
+    // than its low-PEEP tangent (pure inflation/overdistension), not "negative
+    // recruitment". Bedside R/I is reported from zero upward, so the clinical
+    // readout is floored while the raw value remains available for tests.
+    rawRatio,
+    ratio: Math.max(0, rawRatio),
+  };
+}
+
+const riAssessmentCache = new Map();
+let lastCalibrationKey = null;
+let lastCalibration = null;
+
+const recruitmentKey = (p, fraction = '') => [
+  Number(p.collapsed ?? 0), Number(p.clung ?? 200), Number(p.ccw ?? 200),
+  Number(p.pOpen ?? 20), Number(p.riRatio ?? 0), fraction,
+].join('|');
+
+/**
+ * The model-implied R/I for the standard 5 -> 15 cmH2O reference manoeuvre.
+ * The result is cached because panels may ask for it repeatedly while the
+ * patient parameters have not changed.
+ */
+export function recruitmentToInflation(p) {
+  const openableFraction = openableDiseasedFraction(p);
+  const key = recruitmentKey(p, openableFraction.toFixed(8));
+  if (riAssessmentCache.has(key)) return riAssessmentCache.get(key);
+  const result = assessRecruitmentToInflation({ ...p, openableDiseasedFraction: openableFraction });
+  if (riAssessmentCache.size >= 128) riAssessmentCache.clear();
+  riAssessmentCache.set(key, result);
+  return result;
+}
+
+/**
+ * Translate a requested bedside R/I into the latent fraction of diseased units
+ * that may reopen. R/I and "fraction recruitable" are not synonyms, so this is
+ * a numerical calibration against the same static PEEP manoeuvre used to label
+ * the control.
+ *
+ * The collapsed compartment is a hard physical ceiling. If the requested R/I
+ * would require more than all of it, the closest attainable phenotype is
+ * returned with `limited: true`; callers can then warn instead of inventing
+ * additional lung. A short scan makes the solve robust when an opening pressure
+ * lies outside the reference manoeuvre and the response is not monotone.
+ */
+export function calibrateRecruitmentToInflation(p) {
+  const target = clamp(Number(p.riRatio ?? 0), 0, 2);
+  const key = recruitmentKey(p);
+  if (key === lastCalibrationKey && lastCalibration) return lastCalibration;
+
+  // Most simulator phenotypes have no collapsed compartment. Their R/I is not
+  // zero but inapplicable, and running two nested pressure-volume solves merely
+  // to discover that no units can recruit would dominate startup and test time.
+  if (Number(p.collapsed ?? 0) <= 0) {
+    const result = {
+      target,
+      openableFraction: 0,
+      achieved: 0,
+      maximum: 0,
+      assessment: null,
+      limited: target > 0,
+    };
+    lastCalibrationKey = key;
+    lastCalibration = result;
+    return result;
+  }
+
+  const at = (openableFraction) => {
+    const assessment = assessRecruitmentToInflation({
+      ...p,
+      openableDiseasedFraction: clamp(openableFraction, 0, 1),
+    });
+    return { openableFraction, assessment };
+  };
+
+  // R/I zero deliberately means no hard-to-open compartment. The uncorrected
+  // tissue curve can have a slightly negative raw ratio through overdistension;
+  // it must not be cancelled by adding a small amount of occult recruitment.
+  let chosen = at(0);
+  let maximum = chosen;
+  if (target > 0 && Number(p.collapsed ?? 0) > 0) {
+    const samples = [chosen];
+    for (let i = 1; i <= 12; i++) {
+      const sample = at(i / 12);
+      samples.push(sample);
+      if (sample.assessment.ratio > maximum.assessment.ratio) maximum = sample;
+    }
+
+    if (target >= maximum.assessment.ratio - 1e-5) {
+      chosen = maximum;
+    } else {
+      // Use the first upward crossing: it is the smallest latent compartment
+      // consistent with the measured ratio and avoids choosing a second branch
+      // when the opening sigmoid lies partly outside the pressure step.
+      let lower = null;
+      let upper = null;
+      for (let i = 1; i < samples.length; i++) {
+        if (samples[i - 1].assessment.ratio <= target
+            && samples[i].assessment.ratio >= target) {
+          lower = samples[i - 1];
+          upper = samples[i];
+          break;
+        }
+      }
+      if (lower && upper) {
+        for (let i = 0; i < 24; i++) {
+          const middle = at((lower.openableFraction + upper.openableFraction) / 2);
+          if (middle.assessment.ratio < target) lower = middle; else upper = middle;
+        }
+        chosen = upper;
+      } else {
+        chosen = maximum;
+      }
+    }
+  }
+
+  const result = {
+    target,
+    openableFraction: clamp(chosen.openableFraction, 0, 1),
+    achieved: chosen.assessment.ratio,
+    maximum: maximum.assessment.ratio,
+    assessment: chosen.assessment,
+    limited: target > chosen.assessment.ratio + 0.01,
+  };
+  lastCalibrationKey = key;
+  lastCalibration = result;
+  return result;
+}
+
 /**
  * How much of the lung is open, and how hard the open part is being stretched.
  *
@@ -310,14 +513,14 @@ export function lungComplianceAt(p, lungVolume, eps = 0.25) {
  */
 export function lungRegions(p, lungVolume, plKnown = null, phiKnown = null) {
   const diseased = clamp(p.collapsed ?? 0, 0, 0.95);
-  const recruitable = clamp(p.recruitable ?? 0, 0, 1);
+  const openable = openableDiseasedFraction(p);
   const pl = plKnown ?? transpulmonaryAt(p, lungVolume);
 
   const easy = logistic((pl - PL_EASY) / SPREAD_EASY);
   const hard = logistic((pl - (p.pOpen ?? 20)) / SPREAD_HARD);
 
   const normalOpen = (1 - diseased) * easy;
-  const recruited = diseased * recruitable * hard;
+  const recruited = diseased * openable * hard;
   // With hysteresis running, how much is open is a state rather than a function
   // of the present pressure, and the resistance has to be read off the state.
   const openFraction = phiKnown ?? clamp(normalOpen + recruited, 0.05, 1);

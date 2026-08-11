@@ -60,12 +60,12 @@ numbers. The following all reproduce:
   output from 4.7 to 6.3 L/min. At euvolaemia the same bolus gains about 12%
   and variation is 2%.
 - ARDS with right ventricular failure: at its shipped PEEP the RV:LV
-  end-diastolic ratio is 1.65, the resistance coefficient is 4.09 WU and the
-  catheter-derived value is about 4.98 WU. Across PEEP 0 → 20 the coefficient
-  falls 4.42 → 3.89 while derived PVR rises 4.44 → 5.55 WU and output falls
-  4.14 → 3.73 L/min. Setting `recruitable` to zero separates the response: the
-  coefficient rises 4.57 → 4.62, derived PVR 4.93 → 7.85 and output falls
-  3.97 → 3.24 L/min.
+  end-diastolic ratio is 1.65, the resistance coefficient is 4.26 WU and the
+  catheter-derived value is about 4.83 WU. Across PEEP 0 → 20 the coefficient
+  falls 4.57 → 3.66 while derived PVR rises 4.67 → 5.28 WU and output falls
+  4.10 → 3.82 L/min. Setting `riRatio` to zero separates the response: the
+  coefficient rises 4.57 → 4.62, derived PVR 4.92 → 7.08 and output falls
+  4.03 → 3.60 L/min.
 - COPD with a short expiratory time: 6.4 cmH₂O of intrinsic PEEP appears with no
   change in the set PEEP, and the hyperinflated lung sits on the right limb of
   the J-curve at 1.25 Wood units averaged over a breath. That resistance swings
@@ -134,7 +134,32 @@ cardiac output, PVR, recruitment or pulmonary blood volume distribution.
 
 ---
 
-## 4. What the occlusion manoeuvres show
+## 4. R/I is a manoeuvre-defined phenotype
+
+The user-facing recruitability control is the recruitment-to-inflation ratio
+measured over a passive PEEP 5 → 15 cmH₂O reference manoeuvre. The model computes
+the change in end-expiratory lung volume, subtracts the volume predicted from
+low-PEEP respiratory-system compliance, and divides the resulting recruited
+compliance by that low-PEEP compliance. It then solves for the smallest internal
+fraction of diseased units that reproduces the requested R/I.
+
+This prevents three concepts from collapsing into one slider: `collapsed` is how
+much lung is closed, `clung` is the tissue compliance if all of it were open, and
+R/I is how much recruitment the specified pressure step produces relative to
+inflation of the baby lung. The internal openable fraction is capped at one. If
+the requested R/I would require more lung than is collapsed, or the selected
+opening pressure lies outside the manoeuvre, the achieved value is shown with a
+caution instead of silently changing collapse.
+
+The 0.5 split is retained only as the cohort median used by Chen et al. and by
+Cappio Borlino et al.; it is not a validated treatment threshold. The model also
+lacks a separate airway-opening-pressure measurement, so it cannot apply that
+bedside correction. Finally, R/I does not establish that high PEEP avoids
+overdistension, and the simulator does not present it as an optimal-PEEP rule.
+
+---
+
+## 5. What the occlusion manoeuvres show
 
 Holding the airway freezes lung volume and pleural pressure, and the circulation
 settles. Each hold contributes one measured pressure–flow pair, and a series of
@@ -158,7 +183,7 @@ calibrated estimate of it.
 
 ---
 
-## 5. Limitations
+## 6. Limitations
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 
@@ -297,3 +322,7 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 18. Fougères E, Teboul JL, Richard C, et al. Hemodynamic impact of a positive
     end-expiratory pressure setting in acute respiratory distress syndrome:
     importance of the volume status. *Crit Care Med* 2010;38:802–807.
+19. Chen L, Del Sorbo L, Grieco DL, et al. Potential for lung recruitment
+    estimated by the recruitment-to-inflation ratio in acute respiratory
+    distress syndrome. *Am J Respir Crit Care Med* 2020;201:178–187.
+    doi:10.1164/rccm.201902-0334OC.

@@ -6,6 +6,10 @@
 // assert an outcome, the model applies the three mechanical changes and lets
 // the outcome fall out of them, so the balance can be inspected.
 
+import {
+  calibrateRecruitmentToInflation, recruitmentToInflation,
+} from './lung.js';
+
 export const PRONE = {
   // The anterior chest wall now rests against the bed and cannot expand, so the
   // chest wall stiffens. Reported reductions in compliance cluster around a
@@ -28,24 +32,44 @@ export const PRONE = {
 };
 
 /**
- * The parameters the model actually integrates with. Supine returns the user's
- * values unchanged; prone applies the three mechanical changes above.
+ * The parameters the model actually integrates with. Supine adds only the
+ * R/I-derived internal state; prone then applies the three mechanical changes
+ * above.
  *
  * Position is resolved here rather than written back into the controls so that
  * the sliders keep showing the patient's supine mechanics — turning someone
  * over does not change how stiff their lung is.
  *
- * Note what is missing: end-expiratory lung volume does not rise here, though it
- * does in a recruitable patient at the bedside. That is the same gap stated in
- * lung.js — recruited units are a vascular and gas-exchange event in this model,
- * not a mechanical one — and it is left in one place rather than patched here.
+ * R/I is calibrated in the supine mechanics shown by the controls. Proning then
+ * changes the pressure distribution while holding the latent openable fraction
+ * fixed: recalibrating it after turning the patient would force the same R/I in
+ * both positions and erase the recruitment effect that position is meant to
+ * demonstrate.
  */
 export function resolveParams(p) {
-  if (p.position !== 'prone') return p;
-  return {
+  const calibration = calibrateRecruitmentToInflation(p);
+  const supine = {
     ...p,
+    openableDiseasedFraction: calibration.openableFraction,
+    riTarget: calibration.target,
+    riAchieved: calibration.achieved,
+    riMaximum: calibration.maximum,
+    riLimited: calibration.limited,
+    riAssessment: calibration.assessment,
+  };
+  if (p.position !== 'prone') return supine;
+
+  const positioned = {
+    ...supine,
     ccw: p.ccw * PRONE.chestWallFactor,
     pab0: p.pab0 + PRONE.abdominalRise,
     pOpen: Math.max(5, (p.pOpen ?? 20) - PRONE.openingPressureDrop),
+  };
+  if (Number(p.collapsed ?? 0) <= 0) return positioned;
+  const assessment = recruitmentToInflation(positioned);
+  return {
+    ...positioned,
+    riAchieved: assessment.ratio,
+    riAssessment: assessment,
   };
 }
