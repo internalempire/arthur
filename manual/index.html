@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>arthur — manual</title>
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<a class="skip" href="#content">Skip to content</a>
+
+<header class="topbar">
+  <button id="menu" class="icon" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+  <a class="brand" href="#/home">
+    <strong>arthur</strong>
+    <span>manual</span>
+  </a>
+  <div class="search">
+    <input id="q" type="search" placeholder="Search pages…" autocomplete="off"
+           aria-label="Search pages" role="combobox" aria-expanded="false" aria-controls="results">
+    <ul id="results" role="listbox" hidden></ul>
+  </div>
+  <button id="theme" class="icon" aria-label="Switch colour scheme">◐</button>
+</header>
+
+<div class="shell">
+  <nav id="sidebar" aria-label="Manual contents"></nav>
+  <main id="content" tabindex="-1">
+    <article id="page" class="prose"></article>
+    <nav class="seq" aria-label="Previous and next page">
+      <a id="prev" rel="prev"></a>
+      <a id="next" rel="next"></a>
+    </nav>
+  </main>
+  <aside id="toc" aria-label="On this page"></aside>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

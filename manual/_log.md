@@ -1,0 +1,67 @@
+# Log
+
+> Append-only record of what was done to the manual and when. Newest last.
+
+**2026-08-14 — Viewer built.** Single-page shell over plain markdown: hash router, sidebar from `manifest.json`, in-page table of contents, previous/next, search over titles and summaries, light and dark schemes. `marked` and KaTeX are vendored into `manual/vendor` (960K, no external requests). zero-md was evaluated and not used: it resolves seven packages from a CDN at runtime, and its shadow DOM would have fought the surrounding layout.
+
+**2026-08-14 — Renderer shared with the linter.** Markdown and maths rendering moved to `render.mjs` so `tools/lint.mjs` verifies pages through the same code the browser runs. Maths is tokenised before markdown parses, because running KaTeX over parsed HTML lets marked mangle the LaTeX first.
+
+**2026-08-14 — First page.** `pulmonary-vascular-resistance` written, merging what the plan had as two pages. Chosen as the first because it exercises every convention at once: an implementation worth explaining, a reversal to account for, coefficients that cannot be cited, and real clinical limits.
+
+**2026-08-14 — Conventions recorded.** Two rules in `_schema.md` come from defects that shipped: display-math delimiters alone on their line, and one line per paragraph. Both files had passed a source-level check.
+
+**2026-08-14 — Dev server.** `tools/serve.mjs` now serves directory indexes, so the manual answers at `/manual/`, and takes its port from `PORT`.
+
+**2026-08-14 — Stage 2: physiological foundations.** Eight pages written: transmural pressure, pleural pressure, abdominal pressure, venous return, vascular waterfalls, ventricular interdependence, ventriculo-arterial coupling, and the four effects of a breath. Every quantity quoted was measured by running the model rather than recalled.
+
+**2026-08-14 — Guyton figure added.** `figure/generate.mjs` now also draws the venous return and cardiac function curves at two levels of PEEP, using the same `venousReturnCurve` and `cardiacFunctionCurve` the app plots. A first version evaluated them against the instantaneous state and its crossing disagreed with the integrator by 5%; it now uses the cycle-mean operating point, and mean right atrial pressure matches.
+
+**2026-08-14 — Two findings worth recording.** The pericardium does nothing below 430 mL of total heart volume, so most scenarios never engage it, and even a frankly dilated heart loses under 2% of output to it. And isolating any single coupling requires disabling the baroreflex first, or the reflex absorbs the effect and the experiment measures compensation.
+
+**2026-08-14 — Symbols must be defined.** New convention in `_schema.md`: every symbol in a formula gets a definition list under it, naming what it is and its units. Retrofitted to all ten pages already written. Prompted by the elastance formula on the coupling page, where a reader had to infer from context that $P$ was a pressure and $E$ an elastance.
+
+**2026-08-14 — `_todo.md` added.** Planned work, so an acknowledged gap is not mistaken for an oversight. First entry is a cardiac tamponade scenario and the pericardial volume control it would need.
+
+**2026-08-14 — The waterfall asymmetry, stated properly.** The venous side uses one closing pressure where the superior and inferior caval routes see different surrounding pressures, while the pulmonary side splits the bed. The rewritten section says what the model therefore cannot show, and admits the asymmetry survives because only the pulmonary simplification broke an executable check — a statement about test coverage, not about defensibility.
+
+**2026-08-14 — Lint rule widened.** A link to a machinery page (`_todo.md`, `_schema.md`) is valid if the file exists, not only if the slug is in the manifest. Verified that genuinely broken links still fail.
+
+**2026-08-14 — Stage 3: respiratory mechanics.** Seven pages: equation of motion, pressure–volume curve, two-population lung, recruitment and R/I, hysteresis, stress index, expiratory flow limitation.
+
+**2026-08-14 — Two more figures.** The lung pressure–volume curve at three compliances, and airway pressure through a constant-flow inspiration in a recruiting, a linear and a distending lung — the last carrying the model's own fitted stress indices of 0.72, 1.03 and 1.80. A shared chart helper now backs three of the four figures. Its first output was invalid XML: a label reading "SI < 1" put a raw `<` into the document, so figure text is escaped now.
+
+**2026-08-14 — The stress-index figure was understating SI < 1.** Reported by Nicola from the rendered page, and correct. The three cases shared an absolute pressure axis on which the distending breath rises 63 cmH₂O and the recruiting one 10, so the smaller curvature occupied about 1% of the plot height while the larger occupied 12%. The curvature was real throughout — measured as deviation from a straight line at mid-inspiration, +8.6% of the rise for the recruiting case against −16.0% for the distending one. Both axes are now normalised to each breath's own rise, and at mid-inspiration the three curves sit at 58.3%, 49.0% and 33.7%. A plotting fault, not a model fault.
+
+**2026-08-14 — Bedside reading of the stress index.** New section and figure: one real volume-controlled breath, unnormalised, with the fitted power law and a straight rise drawn over it, and the excluded resistive onset marked. Also recorded a limit found while building it — volume control here runs constant flow for the whole inspiratory time and has no pause, so the reported plateau is computed rather than measured during a hold.
+
+**2026-08-14 — Hysteresis figure.** The two limbs as volume against transpulmonary pressure, opening at 20 and closing at 12 cmH₂O, drawn from `openBand` so the loop is the band the play operator actually uses.
+
+**2026-08-14 — Chart helper gained a right margin and dashed series.** Legend labels were being clipped at the fixed 150 px right pad.
+
+**2026-08-14 — The hysteresis figure was drawing the wrong thing.** Reported by Nicola against the classical loop, and the criticism was structural rather than cosmetic. The figure sampled `openBand` at each pressure independently, which gives the two edges of the band — the extreme states the lung *could* be in — not a path. A hysteresis loop is a trajectory. It is now an actual inflation to 35 cmH₂O and back, carried through `stepOpenFraction` at every step.
+
+**2026-08-14 — Which exposed a real defect.** The redrawn loop closes at the top and not at the bottom: 0.36 L inflating against 0.72 L deflating at zero transpulmonary pressure. The cause is that `openFractionAt` applies the `pOpen` − `pClose` gap to *both* unit populations, so normal units close only below −8 cmH₂O and the whole undiseased share stays open at zero. The gap is a statement about recruitable units and applying it to the rest of the lung is a side effect. Recorded in `_todo.md` with both candidate fixes and the reason neither is obviously right; the tidal range is unaffected, which is why it had gone unnoticed.
+
+**2026-08-14 — Stress-index figure redrawn in the form a ventilator shows.** Three panels — normal, over-distension, tidal recruitment — each a full breath scaled to its own pressure range, with the fitted segment highlighted, carrying the model's own indices of 1.03, 1.80 and 0.72. This replaces both the normalised comparison and the single-breath-with-fit figure: three independently scaled panels solve the shared-axis problem outright, which is why the classical figure is drawn that way.
+
+**2026-08-14 — Hysteresis: the feature does not do what the page claimed.** Nicola rejected a second hysteresis figure against the textbook loop, and checking why turned up more than a drawing fault.
+
+Two findings. The loop cannot close at the bottom at any physiological pressure — the `pOpen` − `pClose` gap shifts both unit populations, so normal units stay open below zero transpulmonary pressure and the limbs converge only at −12 cmH₂O, at the numerical floor. And, more seriously, an incremental followed by a decremental PEEP trial retains **no** recruitment at all: the limbs are identical to three decimal places at every opening pressure from 20 to 50 cmH₂O. `stepOpenFraction` re-clamps the state into the band every step, and each expiration drags it back onto the deflation limb at that breath's minimum pressure, so memory is destroyed once per breath.
+
+What the model does deliver is a level shift — a cycled lung sits on its deflation limb, up to 21 percentage points more open at the closing pressure — which is real and teachable. The page's earlier table showed exactly that and described it as what a manoeuvre leaves behind, which was wrong. Page rewritten, summary line corrected, the rationale section now records that choosing a mechanism which could in principle produce the behaviour, without checking that it did, is the error. Both defects are in `_todo.md` with candidate fixes.
+
+The figure is now the level shift against PEEP rather than a pressure–volume loop, because a loop drawn from this model would claim a path dependence it does not have.
+
+**2026-08-14 — Retraction: the hysteresis feature does have memory.** The previous entry claimed an incremental/decremental PEEP trial retained nothing and that the play operator lost its state every breath. That was wrong, and a review by another model caught it.
+
+The claim rested on one protocol — PEEP 4 → 24 → 4 at 400 mL with `pClose` = `pOpen` − 8 — which fails for two independent reasons, both already documented in `tests/suites/recruitment.test.mjs` and both reproducible: a 400 mL breath reaches the opening limb by itself, so a manoeuvre adds 2.3 points instead of 15.9; and a final PEEP of 4 puts end-expiratory transpulmonary pressure far below every closing pressure tried, so the lung shuts on the way down. Sweeping `pOpen` from 20 to 50 while holding the gap at 8 kept both faults fixed, which is why the sweep looked conclusive.
+
+Run the protocol the tests use — 250 mL, `pOpen` 22, `pClose` 6, PEEP 10 → 35 → 10 — and the lung goes from 80.3% to 96.2% open at the same PEEP, with the resistance coefficient falling from 1.41 to 1.21 WU. The limbs separate properly against transpulmonary pressure and converge above 20 cmH₂O.
+
+Two process failures, not one. Designing a protocol whose settings guarantee the null result and then generalising from it is the mirror of the postmortem's "tests that passed for the wrong reason". And the existing suite already tested this, green, in the file the page is about — checking it would have taken a minute.
+
+Page rewritten: retitled *Recruitment hysteresis*, since the model represents recruitment/derecruitment hysteresis and not tissue hysteresis, and the inability to draw a classical pressure–volume loop is therefore out of scope rather than a defect. The figure is now the incremental and decremental limbs of one continuous state plotted against end-expiratory transpulmonary pressure — the previous "hysteresis off versus on against PEEP" compared two model configurations rather than two paths, and conflated PEEP with the transpulmonary pressure `pClose` is defined in. Postmortem narrative removed from the page and kept here.
+
+The one defect that survives review is real and unchanged: the `pOpen` − `pClose` shift is applied to both unit populations. `_todo.md` now carries the reviewer's proposed separation of the stateful recruitable fraction from the single-valued normal one.
+
+**2026-08-14 — Physiological documentation audit.** Corrected unit conversions and variable definitions in abdominal pressure and vascular waterfalls; aligned the EFL equation with the actual zero-PEEP relaxation reference; separated fluid responsiveness from the venous-return plateau; relabelled MAP/SV as a load surrogate rather than effective arterial elastance; and qualified stress-index, PVR, pleural-pressure and breath-timing claims that were stronger than the implementation or literature supports. The hysteresis figure is now described explicitly as recruitment state against end-expiratory transpulmonary pressure, not as a classical pressure–volume loop. Structural issues requiring code decisions were consolidated in `_todo.md` rather than changed silently.
