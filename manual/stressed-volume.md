@@ -22,9 +22,9 @@ $$
 
 This equation separates three interventions that are often blurred together. Adding fluid increases the amount of blood in the circulation. Venoconstriction shifts existing blood from the unstressed to the stressed part. Reducing compliance makes the same stressed volume generate more pressure. Their pressure effects can resemble one another, but their mechanisms and clinical consequences do not.
 
-![Systemic venous pressure-volume relation at neutral and increased tone](figure/venous-volume.svg)
+![Added fluid moving the model state along a fixed systemic venous pressure-volume relation](figure/stressed-volume.svg)
 
-The two lines have the same slope. A fluid bolus moves the state to the right along one line; increased tone shifts the whole relation left. The straight lines are the model's deliberately simple reservoir, not a claim that the human venous pressure-volume relation is perfectly linear.
+The relation is held fixed while 500 mL is added to the reservoir: the point moves from 3,500 mL and 7 mmHg to 4,000 mL and 12 mmHg. The compliance is 100 mL/mmHg; because pressure is on the vertical axis, the visible slope is its inverse, 0.01 mmHg/mL. This straight line is the model's deliberately simple reservoir, not a claim that the human venous pressure-volume relation is perfectly linear.
 
 ### Stressed volume is not fluid responsiveness
 

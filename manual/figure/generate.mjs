@@ -256,7 +256,7 @@ function chart({
       + `<text class="label" x="${PAD.l + plotW + 50}" y="${dy + 4}">${esc(s.label)}</text>`;
   }).join('\n');
   const note = notes.map((t, i) => `<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 40 + series.length * 22 + i * 16}">${esc(t)}</text>`).join('\n');
-  const dots = markers.map((m) => `<circle class="dot" cx="${x(m.x).toFixed(1)}" cy="${y(m.y).toFixed(1)}" r="4"/>`
+  const dots = markers.map((m) => `<circle class="dot"${m.color ? ` style="fill:var(--fig-${m.color}, ${m.color === 'alv' ? '#d1495b' : '#1f6feb'})"` : ''} cx="${x(m.x).toFixed(1)}" cy="${y(m.y).toFixed(1)}" r="4"/>`
     + (m.label ? `<text class="label" x="${(x(m.x) + (m.dx ?? 7)).toFixed(1)}" y="${(y(m.y) + (m.dy ?? -8)).toFixed(1)}">${esc(m.label)}</text>` : '')).join('\n');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" class="${ROOT}" role="img" aria-label="${esc(title)}">
@@ -277,28 +277,59 @@ ${note}
 
 // --- systemic venous volume, pressure and tone -----------------------------
 
-function venousVolumeFigure() {
+function stressedVolumeFigure() {
   const p = { ...defaultParams(), csv: 100 };
-  const pressureAt = (vSv, toneVolume) => Math.max(0,
-    systemicVenousVolumeState({ ...p, venousToneVolume: toneVolume }, { vSv }).elasticPressure);
+  const pressureAt = (vSv, toneVolume = 0) =>
+    systemicVenousVolumeState({ ...p, venousToneVolume: toneVolume }, { vSv }).elasticPressure;
   const volumes = [];
-  for (let volume = 2500; volume <= 4100; volume += 20) volumes.push(volume);
-  const baseline = volumes.map((volume) => [volume, pressureAt(volume, 0)]);
-  const constricted = volumes.map((volume) => [volume, pressureAt(volume, 200)]);
+  // Start at the model's zero-pressure volume. Extending the algebra below
+  // that intercept would draw negative elastic recoil, while flooring it would
+  // no longer be the equation the running model uses.
+  for (let volume = 2800; volume <= 4100; volume += 20) volumes.push(volume);
+  const relation = volumes.map((volume) => [volume, pressureAt(volume)]);
   return chart({
-    title: 'Fluid moves along the venous pressure-volume curve; tone shifts it',
+    title: 'Added fluid moves the state along one venous pressure-volume relation',
+    xLabel: 'Blood in the systemic venous reservoir (mL)',
+    yLabel: 'Elastic filling pressure (mmHg)',
+    series: [{ label: 'neutral-tone relation', points: relation }],
+    xTick: 300, yTick: 2, xDomain: [2750, 4100], yDomain: [0, 14], padRight: 210,
+    markers: [
+      { x: 3500, y: pressureAt(3500), label: '3,500 mL · 7 mmHg' },
+      { x: 4000, y: pressureAt(4000), label: '+500 mL · 12 mmHg', dx: -116 },
+    ],
+    notes: ['C = 100 mL/mmHg', 'slope = 0.01 mmHg/mL', '+500 mL → +5 mmHg'],
+  });
+}
+
+function venousToneFigure() {
+  const p = { ...defaultParams(), csv: 100 };
+  const pressureAt = (vSv, toneVolume) =>
+    systemicVenousVolumeState({ ...p, venousToneVolume: toneVolume }, { vSv }).elasticPressure;
+  const neutral = [];
+  const constricted = [];
+  // Each relation starts at its own zero-pressure volume: 2,800 mL at neutral
+  // tone and 2,600 mL after 200 mL has been mobilised.
+  for (let volume = 2800; volume <= 4100; volume += 20) neutral.push([volume, pressureAt(volume, 0)]);
+  for (let volume = 2600; volume <= 4100; volume += 20) constricted.push([volume, pressureAt(volume, 200)]);
+  const fixedVolume = 3500;
+  return chart({
+    title: 'Venous tone raises elastic pressure without adding blood',
     xLabel: 'Blood in the systemic venous reservoir (mL)',
     yLabel: 'Elastic filling pressure (mmHg)',
     series: [
-      { label: 'neutral tone', points: baseline },
-      { label: '200 mL mobilised by tone', points: constricted },
+      { label: 'neutral tone', points: neutral },
+      { label: '200 mL mobilised', points: constricted },
+      { label: 'same 3,500 mL', points: [
+        [fixedVolume, pressureAt(fixedVolume, 0)],
+        [fixedVolume, pressureAt(fixedVolume, 200)],
+      ] },
     ],
-    xTick: 400, yTick: 2, xDomain: [2500, 4100], yDomain: [0, 16], padRight: 190,
+    xTick: 300, yTick: 2, xDomain: [2550, 4100], yDomain: [0, 16], padRight: 205,
     markers: [
-      { x: 3500, y: pressureAt(3500, 0), label: 'baseline' },
-      { x: 4000, y: pressureAt(4000, 0), label: '+500 mL fluid', dx: -102 },
+      { x: fixedVolume, y: pressureAt(fixedVolume, 0), label: 'neutral · 7 mmHg', dy: 18 },
+      { x: fixedVolume, y: pressureAt(fixedVolume, 200), label: 'with tone · 9 mmHg', color: 'alv' },
     ],
-    notes: ['same slope: 100 mL/mmHg', 'fluid: move along curve', 'tone: shift curve left'],
+    notes: ['blood volume unchanged', 'C = 100 mL/mmHg', 'V₀: 2,800 → 2,600 mL'],
   });
 }
 
@@ -607,7 +638,8 @@ const figures = {
   'pv-curve.svg': pvCurveFigure(),
   'stress-index.svg': stressIndexFigure(),
   'hysteresis.svg': hysteresisFigure(),
-  'venous-volume.svg': venousVolumeFigure(),
+  'stressed-volume.svg': stressedVolumeFigure(),
+  'venous-tone.svg': venousToneFigure(),
   'baroreflex.svg': baroreflexFigure(),
   'preload-reserve.svg': preloadReserveFigure(),
   'ppv.svg': ppvFigure(),

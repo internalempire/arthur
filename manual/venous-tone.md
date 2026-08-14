@@ -8,9 +8,11 @@
 
 The systemic veins are the circulation's main capacitance reservoir. Sympathetic venoconstriction reduces that capacity. At the same total blood volume, less volume can remain unstressed, so more of the reservoir distends the vascular wall and contributes to [mean systemic filling pressure](venous-return.md).
 
-In pressure-volume terms, venoconstriction shifts the relation left. A fluid bolus instead moves the operating point rightward along the relation. A change in venous compliance alters its slope.
+In pressure-volume terms, venoconstriction shifts the relation left. A fluid bolus instead moves the operating point rightward along a fixed relation. A change in venous compliance changes the pressure gained for a given added volume.
 
-![Systemic venous pressure-volume relation at neutral and increased tone](figure/venous-volume.svg)
+![Venous tone shifting the pressure-volume relation while reservoir volume remains fixed](figure/venous-tone.svg)
+
+At the marked 3,500 mL reservoir volume, mobilising 200 mL lowers the zero-pressure volume from 2,800 to 2,600 mL and raises elastic filling pressure from 7 to 9 mmHg. The operating point moves vertically because no blood has been added. Both relations retain the same 100 mL/mmHg compliance; on these axes that corresponds to the same 0.01 mmHg/mL slope.
 
 This is why norepinephrine can have a clinically useful “fluid-like” venous effect without being fluid. Human septic-shock studies show that changing norepinephrine modifies mean systemic pressure and the haemodynamic response to a reversible volume challenge. That does not make venous tone equivalent to volume expansion: norepinephrine simultaneously alters arterial resistance, cardiac loading and sometimes contractility.
 
