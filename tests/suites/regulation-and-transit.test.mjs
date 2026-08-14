@@ -1,6 +1,6 @@
 // Beat-to-beat transport, aggregate autonomic control and occlusion manoeuvres.
 import {
-  Simulator, defaultParams, PULMONARY_TRANSIT,
+  Simulator, defaultParams, pulmonaryTransitEstimate, PULMONARY_TRANSIT,
   applyBaroreflex, BARO,
   section, check, near, settled, totalVolume,
 } from '../support/model.mjs';
@@ -48,9 +48,55 @@ section('Pulmonary transit');
   check('the transport pathway supplies the interval without creating blood',
     beats[1].pt < baseline.pt - 10
       && near(totalVolume(s.circ), bloodBefore, 0.01)
-      && s.metrics.pulmonaryTransitTime === PULMONARY_TRANSIT.meanTime,
+      && Number.isFinite(s.metrics.pulmonaryTransitTime)
+      && Number.isFinite(s.metrics.pulmonaryTransportTime),
     `pathway ${baseline.pt.toFixed(1)} -> ${beats[1].pt.toFixed(1)} mL, `
       + `blood ${bloodBefore.toFixed(2)} -> ${totalVolume(s.circ).toFixed(2)} mL`);
+
+  // Central-volume behaviour is the new structural constraint. Hold volume
+  // fixed and halve flow, then hold flow fixed and add pulmonary blood: both
+  // operations must lengthen the estimate without inventing a disease-specific
+  // correction term.
+  const p = defaultParams();
+  const referenceState = { vPa: 100, vPt: 160, vPv: 115, svRv: 70, sv: 70 };
+  const referenceTransit = pulmonaryTransitEstimate(p, referenceState);
+  const lowFlowTransit = pulmonaryTransitEstimate(p, { ...referenceState, svRv: 35 });
+  const highVolumeTransit = pulmonaryTransitEstimate(p, { ...referenceState, vPv: 215 });
+  check('mean transit time follows pulmonary blood volume divided by RV output',
+    near(lowFlowTransit.circuitMeanTime, referenceTransit.circuitMeanTime * 2, 1e-12)
+      && highVolumeTransit.circuitMeanTime > referenceTransit.circuitMeanTime,
+    `${referenceTransit.circuitMeanTime.toFixed(1)} s reference, `
+      + `${lowFlowTransit.circuitMeanTime.toFixed(1)} s at half flow, `
+      + `${highVolumeTransit.circuitMeanTime.toFixed(1)} s with added volume`);
+
+  // Matched respiratory rate, heart rate and ventilator settings isolate the
+  // pulmonary circulation. The magnitudes are model outputs, but the ordering
+  // is the intended bedside lesson: obstruction and especially congested low
+  // output prolong transit rather than sharing one fixed two-second delay.
+  const common = {
+    baroreflex: 0, mode: 'vcv', pmus: 0, vt: 450, peep: 5,
+    rr: 18, ti: 1, hr: 75,
+  };
+  const reference = settled(common, 45);
+  const embolism = settled({
+    ...common, pvrBase: 0.44, eesRv: 0.32,
+    stressedVolume: 1050, svr: 1.25,
+  }, 45);
+  const congestion = settled({
+    ...common, eesLv: 0.8, lvStiff: 0.04,
+    stressedVolume: 950, svr: 1.25,
+  }, 45);
+  check('embolism prolongs transit in a matched ventilatory experiment',
+    embolism.metrics.pulmonaryTransitTime > reference.metrics.pulmonaryTransitTime + 2
+      && embolism.metrics.pulmonaryBloodVolume > reference.metrics.pulmonaryBloodVolume,
+    `${reference.metrics.pulmonaryTransitTime.toFixed(1)} -> `
+      + `${embolism.metrics.pulmonaryTransitTime.toFixed(1)} s`);
+  check('congested low output prolongs it further',
+    congestion.metrics.pulmonaryTransitTime > embolism.metrics.pulmonaryTransitTime + 5
+      && near(congestion.metrics.pulmonaryTransportTime, PULMONARY_TRANSIT.maximumMeanTime, 0.02),
+    `${embolism.metrics.pulmonaryTransitTime.toFixed(1)} -> `
+      + `${congestion.metrics.pulmonaryTransitTime.toFixed(1)} s; staged buffer `
+      + `${congestion.metrics.pulmonaryTransportTime.toFixed(1)} s`);
 
   // In positive-pressure ventilation the RV loses preload during inspiration;
   // after pulmonary transit, the LV nadir belongs in expiration. Only the phase
@@ -58,7 +104,7 @@ section('Pulmonary transit');
   const ventilated = new Simulator();
   ventilated.params = {
     ...defaultParams(), baroreflex: 0, mode: 'vcv', pmus: 0, vt: 560,
-    peep: 8, rr: 18, ti: 1.2, stressedVolume: 330, svr: 0.85, hr: 105, ccw: 150,
+    peep: 8, rr: 18, ti: 1.2, hr: 75,
   };
   ventilated.reset();
   ventilated.advance(30, true);

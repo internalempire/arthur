@@ -18,7 +18,7 @@ One positive-pressure inspiration does four things at once. Taken separately eac
 
 ### Why the timing matters
 
-Effects (1) and (2) act on the right ventricle *during* inspiration. Effect (3), the fall, acts on the left ventricle **later** — because the blood whose ejection was reduced has to cross the lung first. In a normal circulation that takes on the order of two seconds, several heartbeats.
+Effects (1) and (2) act on the right ventricle *during* inspiration. Effect (3), the fall, acts on the left ventricle **later** — because the blood whose ejection was reduced has to cross the lung first. The model's staged buffering component is close to two seconds in the reference circulation, while its whole PA-to-LA central-volume estimate is longer. Both change with pulmonary blood volume and forward flow.
 
 At common heart and respiratory rates, the arterial pressure trough caused by inspiration often appears in **expiration**. A clinician who expects cause and effect to coincide may attribute the fall to the wrong phase of the breath. The exact phase depends on heart rate, respiratory rate and pulmonary transit.
 
@@ -36,23 +36,17 @@ The four effects are not added as corrections to the displayed waveforms, but ne
 | RV afterload | lung volume enters `pvrAt`, and alveolar pressure enters the effective downstream pressure of the pulmonary circuit |
 | LV preload, piston | lung volume above resting volume lowers the pulmonary venous unstressed volume, in proportion to the zone III index |
 | LV afterload | pleural pressure is added to the left ventricle's transmural pressure, so aortic ejection meets a lower transmural load |
-| the delay | the eight-stage [pulmonary transit](pulmonary-transit.md) pathway, 2.0 s mean time |
+| the delay | the eight-stage [pulmonary transit](pulmonary-transit.md) pathway, with mean time derived from pulmonary blood volume and RV output |
 
 The piston is on its own control (`piston`) and is gated by the zone III index, because squeezing the pulmonary bed only works where the capillaries are open.
 
 ### What the model shows
 
-One breath at 600 mL and 12 per minute, in a moderately underfilled patient with a lung compliance of 60:
+After an isolated sustained fall in RV contractility, the first affected RV beat has not yet changed LV stroke volume. The left-sided response becomes detectable over the following two to three beats. Total blood volume remains conserved while the staged pulmonary compartment supplies that interval.
 
-| | range within the breath | swing |
-|---|---|---|
-| pleural pressure | −3.87 → −0.86 cmH₂O | 3.00 |
-| right ventricular stroke volume | 18.2 → 26.6 mL | 8.4 |
-| left ventricular stroke volume | 22.0 → 26.0 mL | 4.0 |
+The delay is now state-dependent rather than one fixed constant. In matched passive experiments, pulmonary embolism lengthens the PA-to-LA estimate relative to the reference circulation, and congested low-output LV failure lengthens it further. The [pulmonary transit](pulmonary-transit.md) page gives the experiment, the three separate readouts and their limits.
 
-Pulse pressure variation reads 18.8% and stroke volume variation 16.6%, over 9.1 heartbeats per breath.
-
-Two things in that table carry the page. The left ventricular swing is **half** the right ventricular one: the pulmonary compartments are compliant, and they buffer the oscillation rather than transmitting it intact. The trough of left ventricular stroke volume arrives **1.64 s after** the right ventricular trough. That exact lag is produced by the staged transport pathway, whose total mean time is itself fixed at 2.0 s.
+This timing result does not validate PPV or SVV amplitude. The compliant pulmonary circuit filters the RV variation, while the piston, septum, pericardium and LV afterload act through separate immediate routes. Their superposition determines the final arterial waveform.
 
 ---
 
@@ -71,7 +65,7 @@ The delay is the one place where a mechanism was added specifically to get the *
 ### Of the construction
 
 - **The four effects are the four this model has.** Bronchial circulation, direct compression of the heart by inflated lung, and the mechanical effect of lung volume on cardiac fossa geometry are absent.
-- **The transit time is fixed at 2.0 s.** A real lung's transit distribution changes with flow, vascular volume, recruitment and disease, so the lag between right and left ventricular events is more variable than the model makes it.
+- **Transit remains aggregate.** Its mean now changes with represented pulmonary blood volume and RV output, but one staged path cannot reproduce regional capillary transit, shunt or contrast kinetics. The staged portion is bounded to 0.8–6 s for numerical stability.
 - **One pleural pressure**, so no regional differences in how the breath reaches different parts of the heart.
 - The piston is a single coefficient acting on pulmonary venous unstressed volume. It is a stand-in for a distributed squeezing of a compliant bed, not a representation of it.
 - Spontaneous effort is one waveform with one amplitude control: no inspiratory threshold load, no expiratory muscle recruitment, no dyssynchrony.
@@ -79,7 +73,7 @@ The delay is the one place where a mechanism was added specifically to get the *
 ### Of clinical application
 
 - The magnitudes above belong to one phenotype at one setting. They demonstrate an ordering and a ratio, not values to expect in a patient.
-- **The delay is the most transferable finding on this page and the least quantitative.** That the arterial trough follows the inspiratory cause by several beats is robust; that it is 1.64 s is a property of this model's transit pathway.
+- **The delay is the most transferable finding on this page and the least quantitative.** That the arterial consequence follows the right-sided cause is robust; its exact interval and respiratory phase depend on the selected model state.
 - Nothing here tells you which of the four dominates in a given patient. The model can be used to explore its own phenotypes, but it cannot identify the dominant mechanism in an individual patient from a table or waveform alone.
 
 ---

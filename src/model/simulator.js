@@ -8,7 +8,7 @@ import {
 import { pvrComponents, lungRegions, relaxationVolume, openBand } from './lung.js';
 import {
   createCirculationState, stepCirculation, venousReturnBackPressure,
-  preloadSensitivity, systemicVenousVolumeState, PULMONARY_TRANSIT,
+  preloadSensitivity, systemicVenousVolumeState,
 } from './circulation.js';
 import { cmH2OtoMmHg, RESISTANCE_TO_DYN, RESISTANCE_TO_WOOD } from './units.js';
 
@@ -558,7 +558,9 @@ export class Simulator {
       pvrClosedBed: pvrComp.closedBed,
       pvrOpenFlowShare: pvrComp.openFlowShare,
       zone3: c.p.zone3,
-      pulmonaryTransitTime: PULMONARY_TRANSIT.meanTime,
+      pulmonaryTransitTime: c.p.pulmonaryTransitTime,
+      pulmonaryTransportTime: c.p.pulmonaryTransportTime,
+      pulmonaryBloodVolume: c.p.pulmonaryBloodVolume,
       pulmonaryTransitVolume: c.vPt,
       pulmonaryTransitFlow: (c.q.pulTransit * 60) / 1000,
       minuteVentilation: (r.lastVt * p.rr) / 1000,

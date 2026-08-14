@@ -24,10 +24,6 @@ The respiratory model recalculates `relaxationVolume(p)` from lung compliance an
 
 The model computes $(\overline P_{pa}-P_{la})/\dot Q$ even when its zone III index flags left atrial pressure as an invalid wedge surrogate. The immediate safety fix is to propagate that caution to the derived-PVR interpretability state or relabel the quantity as an internal hydraulic estimate. A more complete alternative would model an occlusion pressure, but that requires a separate decision about what a lumped non-regional pulmonary bed can support honestly.
 
-### Make pulmonary transit depend on flow and pulmonary blood volume
-
-The eight mixing stages preserve a useful RV-to-LV delay, but their total mean time is fixed at 2.0 s. Pulmonary blood volume changes with flow so that the displayed transit time does not. A future version should derive mean transit from pulmonary transport volume and flow, with bounds for numerical stability, and verify the phase of respiratory variation across low output, congestion and pulmonary embolism.
-
 ### Define `clung` independently from baby-lung size
 
 `clung` currently scales both the slope and expandable capacity of fully open tissue, while `collapsed` separately removes aerated units. Presets that reduce both can count part of the baby-lung reduction twice. Before changing equations, each scenario should state whether `clung` represents intrinsic tissue mechanics, functional lung size or whole-lung compliance; the control and tissue curve should then be made consistent with one definition.

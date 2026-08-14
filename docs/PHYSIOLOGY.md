@@ -109,17 +109,28 @@ blood volume and venous compliance.
 
 ---
 
-## 3. Pulmonary transit is a flow buffer, not a pressure delay
+## 3. Pulmonary transit is a volume-to-flow relation, not a pressure delay
 
 The pulmonary artery and vein were already compartments in series, but their
 small compliance time constants transmitted an isolated fall in RV output to LV
-stroke volume after roughly one beat. The model now places a 160 mL pressureless
+stroke volume after roughly one beat. The model places a 160 mL pressureless
 transport pathway between pulmonary arterial inflow and pulmonary venous
-delivery. Eight serial mixing stages give it a 2.0 s mean transport time while
-its physical blood volume remains part of the conserved circulation.
+delivery. Its physical blood volume remains part of the conserved circulation.
+
+Mean PA-to-LA transit is now estimated from the central-volume relation:
+
+`mean transit time = represented pulmonary blood volume / mean RV output`.
+
+Represented pulmonary blood volume is the sum of the PA, staged pathway and PV
+compartments. The last completed RV stroke volume times heart rate supplies a
+mean forward flow without treating the normal zero pulmonic-valve flow of
+diastole as circulatory arrest. The eight stages use the share of whole-circuit
+time corresponding to their original 160 mL allocation, bounded to 0.8–6 s and
+adapted over 2 s to prevent respiratory beat-to-beat aliasing.
 
 This distinction matters. Pulmonary venous pressure still acts immediately on
-the pressure gradient across the lung; a pressure wave is not held for 2.0 s.
+the pressure gradient across the lung; a pressure wave is not held back with the
+blood volume.
 What is buffered is blood flow: after an isolated fall in RV contractility the
 first LV beat remains essentially unchanged, the second changes little, and the
 effect becomes detectable over the next two to three beats. During positive-
@@ -132,11 +143,17 @@ stressed volumes and resting pressures. It also leaves the direct pulmonary
 venous “piston” route intact: inflation can still squeeze blood already on the
 venous side toward the LV before the RV effect arrives.
 
-The 2.0 s value is a didactic mean-time calibration to the reported 2–3-beat
-ordering, not a contrast transit time or a patient-specific measurement. Eight
-stages introduce some dispersion rather than returning a rigid delayed copy of
-the RV signal, but their mean time remains fixed rather than changing with
-cardiac output, PVR, recruitment or pulmonary blood volume distribution.
+At the healthy operating point the staged part remains close to the former 2.0 s
+calibration, preserving the reported 2–3-beat ordering. It now shortens when
+forward flow is high relative to pulmonary volume and lengthens when output is
+low or blood accumulates in the pulmonary circuit. Eight stages introduce some
+dispersion rather than returning a rigid delayed copy of the RV signal.
+
+The displayed whole-circuit value is still a model estimate, not a contrast
+transit measurement. Measurement landmarks matter: an RV-to-LV CMR bolus time
+includes chamber and sampling effects that this PA-to-LA volume relation does
+not. Regional capillary perfusion and patient-specific transit distributions
+remain absent.
 
 ---
 
@@ -261,12 +278,12 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   pressure falls below aortic pressure, and with a double-hill activation that
   happens a little early. Stroke volume, cardiac output and the loop shape are
   right; the ratio is pessimistic by roughly 5–10 points.
-- **Pulmonary transit is an eight-stage fixed-time approximation.** It separates
-  the immediate direct-filling component from the delayed RV-to-LV flow effect
-  and reproduces their ordering, but not real regional capillary paths. Its
-  2.0 s mean time does not adapt to cardiac output, PVR, recruitment or pulmonary
-  vascular disease and must not be interpreted as a contrast transit
-  measurement or as quantitative PPV validation.
+- **Pulmonary transit is an eight-stage aggregate approximation.** Its mean time
+  now changes with represented pulmonary blood volume and RV output, but it
+  still has no regional perfusion, shunt, bronchial flow or contrast kinetics.
+  The 0.8–6 s staged bounds and 2 s adaptation are numerical guardrails, and the
+  displayed PA-to-LA estimate must not be interpreted as a measured RV-to-LV
+  contrast transit time or as quantitative PPV validation.
 - **Hysteresis is optional and instantaneous.** With the flag off, units open and
   close at the same pressure and nothing done to the lung lasts. With it on they
   close at `pClose`, so a recruitment manoeuvre leaves something behind and a

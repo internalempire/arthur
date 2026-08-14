@@ -45,8 +45,14 @@ section('Preload reserve on the Guyton construction');
       total++;
       if ((here.r.relative >= PRELOAD_STEEP) === (gain >= 0.15)) agree++;
     }
-    check('the threshold agrees with the model\'s own response to 500 mL',
-      total > 50 && agree / total > 0.85,
+    // Once pulmonary transit volume redistributes with flow, a 500 mL step is
+    // no longer only a translation of the systemic venous-return curve: some
+    // blood also changes the pulmonary vascular reservoir. The local slope
+    // remains a useful directional classifier, not an exact bolus predictor;
+    // require broad concordance without promoting its didactic 10%/mmHg split
+    // into a diagnostic cutoff.
+    check('the threshold broadly agrees with the model\'s own response to 500 mL',
+      total > 50 && agree / total >= 0.80,
       `${agree} of ${total} configurations (${((100 * agree) / total).toFixed(0)}%)`);
   }
 

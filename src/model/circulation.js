@@ -47,17 +47,60 @@ export const VASC = {
 // pulmonary veins. Eight small well-mixed stages approximate an advective
 // distribution: unlike one exponential reservoir they retain useful respiratory
 // amplitude, and unlike a pure delay they do not create a rigid echo in the
-// closed loop. Their 2 s total mean time, combined with the compliant PA/PV,
-// makes a sustained RV-output change emerge at the LV over roughly 2–3 beats at
-// the baseline heart rate and moves the ventilator-induced LV nadir into
-// expiration, without pretending every blood element takes exactly the same
-// path. The initial 160 mL is not new blood: the same amount was removed from
-// the PA/PV zero-pressure volumes above.
+// closed loop. At the reference flow their 160 mL gives a 2 s mean time. The
+// active time now follows the central-volume relation (volume / RV output), so
+// low flow traverses the same pathway more slowly and high flow more quickly.
+// This is the explicit transport subvolume, not a contrast-derived RV-to-LV
+// transit time for the entire pulmonary vascular bed. The initial 160 mL is not
+// new blood: the same amount was removed from the PA/PV zero-pressure volumes
+// above.
 export const PULMONARY_TRANSIT = {
-  meanTime: 2, // s
+  referenceMeanTime: 2, // s at the reference 80 mL/s flow
+  // At reset the pulmonary artery, staged pathway and pulmonary vein contain
+  // 100 + 160 + 115 mL. The staged pathway therefore supplies this share of
+  // the model's PA-to-LA residence time; the pressure-bearing PA/PV
+  // compartments already provide the remainder of the storage dynamics.
+  explicitVolumeFraction: 160 / 375,
+  minimumMeanTime: 0.8, // s, numerical/interpretive guardrail at very high flow
+  maximumMeanTime: 6, // s, lets stored blood drain during profound low flow
+  adaptationTime: 2, // s, suppresses breath-by-breath velocity aliasing
   stages: 8,
   initialVolume: 160, // mL, reference allocation at 80 mL/s steady flow
 };
+
+/**
+ * Mean residence time of the explicit pulmonary transport volume.
+ *
+ * The most recent complete RV beat supplies a stable forward-flow estimate;
+ * instantaneous pulmonic flow would fall to zero every diastole and make blood
+ * velocity jump between artificial extremes. The clamp is a model-domain
+ * boundary, not a physiological normal range. It prevents an almost arrested
+ * circulation from turning one pressureless compartment into an arbitrarily
+ * long numerical memory while still allowing low-output states to lengthen the
+ * delay substantially.
+ */
+export function pulmonaryTransitEstimate(p, c) {
+  // `svRv` is first measured at the initial beat boundary; use the seeded LV
+  // stroke volume during that one-beat bootstrap rather than letting an
+  // undefined flow contaminate every conserved compartment with NaN.
+  const rvStrokeVolume = c.svRv ?? c.sv;
+  const rvOutput = Math.max(0, (rvStrokeVolume * p.hr) / 60); // mL/s
+  const pulmonaryBloodVolume = c.vPa + c.vPt + c.vPv;
+  // Keep the displayed circuit estimate finite near arrest. The staged buffer
+  // has its own tighter bound below, so this reporting guardrail does not alter
+  // ordinary transport dynamics.
+  const circuitMeanTime = pulmonaryBloodVolume / Math.max(rvOutput, 1);
+  const transportMeanTime = clamp(
+    circuitMeanTime * PULMONARY_TRANSIT.explicitVolumeFraction,
+    PULMONARY_TRANSIT.minimumMeanTime,
+    PULMONARY_TRANSIT.maximumMeanTime,
+  );
+  return { rvOutput, pulmonaryBloodVolume, circuitMeanTime, transportMeanTime };
+}
+
+export function pulmonaryTransitMeanTime(p, c) {
+  return pulmonaryTransitEstimate(p, c).transportMeanTime;
+}
 
 const VALVE = { tricuspid: 0.004, pulmonic: 0.004, mitral: 0.005, aortic: 0.006 };
 
@@ -152,7 +195,12 @@ function pulmonaryTransitState(c) {
   if (!c.pulmonaryTransit) {
     const volume = new Float64Array(PULMONARY_TRANSIT.stages);
     volume.fill(c.vPt / PULMONARY_TRANSIT.stages);
-    c.pulmonaryTransit = { volume };
+    c.pulmonaryTransit = {
+      volume,
+      circuitMeanTime: PULMONARY_TRANSIT.referenceMeanTime
+        / PULMONARY_TRANSIT.explicitVolumeFraction,
+      meanTime: PULMONARY_TRANSIT.referenceMeanTime,
+    };
   }
   return c.pulmonaryTransit;
 }
@@ -316,7 +364,21 @@ export function stepCirculation(p, c, resp, dt) {
   // lengths. All stage volumes are physical parts of `vPt`; the array only
   // records their internal distribution and is not additional hidden blood.
   const transit = pulmonaryTransitState(c);
-  const transitStageTime = PULMONARY_TRANSIT.meanTime / PULMONARY_TRANSIT.stages;
+  const transitEstimate = pulmonaryTransitEstimate(p, c);
+  // Let sustained haemodynamics, rather than alternation between individual
+  // respiratory beats, set transport velocity. Without this small low-pass the
+  // beat used to estimate RV output also changes stage speed, and the model can
+  // move the LV nadir between inspiration and expiration by numerical aliasing.
+  const transitAdaptation = 1 - Math.exp(-dt / PULMONARY_TRANSIT.adaptationTime);
+  transit.circuitMeanTime += transitAdaptation
+    * (transitEstimate.circuitMeanTime - transit.circuitMeanTime);
+  transit.meanTime = clamp(
+    transit.circuitMeanTime * PULMONARY_TRANSIT.explicitVolumeFraction,
+    PULMONARY_TRANSIT.minimumMeanTime,
+    PULMONARY_TRANSIT.maximumMeanTime,
+  );
+  const transitMeanTime = transit.meanTime;
+  const transitStageTime = transitMeanTime / PULMONARY_TRANSIT.stages;
   const qPulTransit = transit.volume[transit.volume.length - 1] / transitStageTime;
   const qPulVen = (pPv - pLa) / VASC.rPulVen;
 
@@ -363,6 +425,12 @@ export function stepCirculation(p, c, resp, dt) {
     ra: pRa, rv: pRv, la: pLa, lv: pLv, sa: pSa, pa: pPa, pv: pPv,
     pmsf, pCrit, pPeri, ppl, palv, pab, rvrEff, abdZone,
     pulmonaryTransitVolume: c.vPt,
+    pulmonaryTransportTime: transitMeanTime,
+    // Keep the displayed central-volume estimate algebraically transparent.
+    // Only the time used by the staged buffer is smoothed; otherwise the
+    // reported PBV / RV-output relation would temporarily be untrue.
+    pulmonaryTransitTime: transitEstimate.circuitMeanTime,
+    pulmonaryBloodVolume: transitEstimate.pulmonaryBloodVolume,
     venousToneVolume: venousVolume.toneVolume,
     venousUnstressed: venousVolume.unstressedVolume,
     stressedVenous: venousVolume.stressedVolume,
