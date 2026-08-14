@@ -128,14 +128,20 @@ section('Scenario teaching mechanisms');
 }
 
 {
-  const metrics = scenarioMetrics('swing-no-variation');
-  // The preset note currently teaches from PPV. That lesson can only pass if
-  // the same model considers PPV interpretable in the encoded breathing mode.
-  demonstrates['swing-no-variation'] = metrics.pplSwing > 15
-    && metrics.interpretability.ppv.level === 'ok';
-  check('large-swing preset is honestly recorded as not demonstrating its PPV claim',
-    !demonstrates['swing-no-variation'],
-    `${metrics.pplSwing.toFixed(1)} cmH2O swing, PPV ${metrics.interpretability.ppv.level}`);
+  const metrics = scenarioMetrics('swing-limited-reserve');
+  // A spontaneous patient cannot validate a PPV claim. The independent
+  // teaching contrast is therefore large transmitted pressure versus the
+  // local slope of the settled Guyton operating point, which remains defined
+  // without passive ventilation or a regular arterial waveform.
+  demonstrates['swing-limited-reserve'] = metrics.pplSwing > 15
+    && !metrics.preload.steep
+    && metrics.preload.relative < 0.10
+    && metrics.interpretability.ppv.level === 'unavailable';
+  check('large pleural swings remain distinct from preload reserve',
+    demonstrates['swing-limited-reserve'],
+    `${metrics.pplSwing.toFixed(1)} cmH2O swing, `
+      + `${(metrics.preload.relative * 100).toFixed(1)}%/mmHg reserve, `
+      + `PPV ${metrics.interpretability.ppv.level}`);
 }
 
 {

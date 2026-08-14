@@ -932,7 +932,7 @@ heart distension or hypoxaemia directly.
 | Healthy, passive volume control (`healthy-vcv`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=5`, `rr=14` |
 | PEEP escalation (`peep-escalation`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=14`, `rr=14` |
 | Septic shock, fluid responsive (`septic-responder`) | `mode=vcv`, `pmus=0`, `vt=560`, `peep=8`, `rr=18`, `ccw=150`, `stressedVolume=330`, `svr=0.85`, `hr=105` |
-| Big pleural swings, no variation (`swing-no-variation`) | `mode=spont`, `pmus=22`, `peep=6`, `rr=24`, `ccw=100`, `stressedVolume=950`, `svr=0.75`, `hr=100` |
+| Large pleural swings, limited preload reserve (`swing-limited-reserve`) | `mode=spont`, `pmus=22`, `peep=6`, `rr=24`, `ccw=100`, `stressedVolume=950`, `svr=0.75`, `hr=100` |
 | ARDS with right ventricular failure (`ards-rv`) | `mode=vcv`, `pmus=0`, `vt=350`, `peep=12`, `rr=24`, `collapsed=0.42`, `clung=40`, `eesRv=0.28`, `pvrBase=0.17`, `hpv=1.6`, `riRatio=0.7`, `pOpen=18` |
 | Acute pulmonary embolism (`pulmonary-embolism`) | `mode=spont`, `pmus=6`, `peep=0`, `rr=24`, `pvrBase=0.44`, `eesRv=0.32`, `stressedVolume=1050`, `svr=1.25`, `hr=118` |
 | Cardiogenic pulmonary oedema (`lv-failure`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=10`, `rr=18`, `eesLv=0.6`, `lvStiff=0.040`, `stressedVolume=1050`, `svr=1.25`, `hr=95`, `ccw=75` |
@@ -952,7 +952,7 @@ catheter-derived value is separately labelled in the app.
 | Healthy, passive volume control | 4.91 | 93 | 1.4 | 21/12 | 10 | 1.2 | 0.88 | 2% |
 | PEEP escalation | 4.54 | 90 | 3.8 | 22/13 | 10 | 1.3 | 0.87 | 1% |
 | Septic shock, fluid responsive | 4.36 | 81 | 1.8 | 16/9 | 4 | 1.2 | 0.72 | 1% |
-| Big pleural swings, no variation | 6.77 | 92 | 1.1 | 24/15 | 9 | 1.2 | 0.88 | 5% |
+| Large pleural swings, limited preload reserve | 6.77 | 92 | 1.1 | 24/15 | 9 | 1.2 | 0.88 | unavailable |
 | ARDS with right ventricular failure | 3.98 | 85 | 3.6 | 27/19 | 4 | 4.3 | 1.64 | 1% |
 | Acute pulmonary embolism | 4.06 | 94 | 5.8 | 39/32 | 4 | 7.5 | 2.03 | 9% |
 | Cardiogenic pulmonary oedema | 1.61 | 68 | 7.4 | 52/47 | 46 | 1.2 | 0.77 | 22% |
@@ -972,11 +972,13 @@ smallest set that makes that question answerable.
   `vt` and a reduced `ccw` for the pleural swing to reach the circulation. A
   fluid increment raises output because the patient lies on the steep Guyton
   limb; PPV remains a descriptive waveform output, not the verdict.
-- **Big pleural swings, no variation** is the same patient resuscitated, with a
-  very large `pmus` against a stiff `ccw`. The pleural swing exceeds 20 cmH₂O
-  and pulse pressure variation stays near 6%, because a swing is necessary for
-  variation but the flat part of the Starling curve decides whether any of it
-  reaches the stroke volume.
+- **Large pleural swings, limited preload reserve** is the same patient
+  resuscitated, with a very large `pmus` against a stiff `ccw`. The pleural
+  swing exceeds 20 cmH₂O while the local Guyton preload reserve is about
+  6.5% of output per mmHg, below the model's steep-limb threshold. PPV is not
+  quoted because spontaneous effort makes it uninterpretable; the lesson is
+  the separation between transmitted pressure and position on the filling
+  curve.
 - **ARDS** is a small, stiff, collapsed lung (`collapsed`, `clung`) with a weak right
   ventricle, a raised `pvrBase`, and — as shipped — a high-recruiter phenotype
   (`riRatio=0.7`). Across a PEEP titration from 0 to 20 the resistance
