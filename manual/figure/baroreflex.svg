@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" class="arthur-fig" role="img" aria-label="The model baroreflex is bounded and asymmetric around its set point">
+<style>
+  svg.arthur-fig .bg { fill: none }
+  svg.arthur-fig .axis { stroke: var(--fig-axis, #9aa4b2); stroke-width: 1 }
+  svg.arthur-fig .grid { stroke: var(--fig-grid, #d7dce3); stroke-width: 1; stroke-dasharray: 2 4 }
+  svg.arthur-fig .tick { fill: var(--fig-muted, #6b7480); font: 11px system-ui, sans-serif }
+  svg.arthur-fig .label { fill: var(--fig-text, #2b3138); font: 12px system-ui, sans-serif }
+  svg.arthur-fig .title { fill: var(--fig-text, #2b3138); font: 600 13px system-ui, sans-serif }
+  svg.arthur-fig .lm { stroke: var(--fig-grid, #d7dce3); stroke-width: 1 }
+  svg.arthur-fig .lm-text { fill: var(--fig-muted, #6b7480); font: 600 11px system-ui, sans-serif }
+  svg.arthur-fig .total { stroke: var(--fig-total, #1f6feb); stroke-width: 2.5; fill: none }
+  svg.arthur-fig .alv { stroke: var(--fig-alv, #d1495b); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .extra { stroke: var(--fig-extra, #2a9d8f); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .nadir { stroke: var(--fig-total, #1f6feb); stroke-width: 1; stroke-dasharray: 3 3 }
+  svg.arthur-fig .dot { fill: var(--fig-total, #1f6feb); stroke: none }
+  @media (prefers-color-scheme: dark) {
+    svg.arthur-fig .axis { stroke: #5b6472 }
+    svg.arthur-fig .grid, svg.arthur-fig .lm { stroke: #363d47 }
+    svg.arthur-fig .tick, svg.arthur-fig .lm-text { fill: #8b95a3 }
+    svg.arthur-fig .label, svg.arthur-fig .title { fill: #d6dbe2 }
+    svg.arthur-fig .total, svg.arthur-fig .nadir { stroke: #58a6ff }
+    svg.arthur-fig .dot { fill: #58a6ff }
+    svg.arthur-fig .alv { stroke: #f08c9a }
+    svg.arthur-fig .extra { stroke: #4fd1c1 }
+  }
+</style>
+<rect class="bg" width="760" height="430"/>
+<text class="title" x="66" y="16">The model baroreflex is bounded and asymmetric around its set point</text>
+<line class="grid" x1="66" y1="365.0" x2="550" y2="365.0"/><text class="tick" x="57" y="369.0" text-anchor="end">-0.25</text>
+<line class="grid" x1="66" y1="299.8" x2="550" y2="299.8"/><text class="tick" x="57" y="303.8" text-anchor="end">0</text>
+<line class="grid" x1="66" y1="234.6" x2="550" y2="234.6"/><text class="tick" x="57" y="238.6" text-anchor="end">0.25</text>
+<line class="grid" x1="66" y1="169.4" x2="550" y2="169.4"/><text class="tick" x="57" y="173.4" text-anchor="end">0.5</text>
+<line class="grid" x1="66" y1="104.2" x2="550" y2="104.2"/><text class="tick" x="57" y="108.2" text-anchor="end">0.75</text>
+<line class="grid" x1="66" y1="39.0" x2="550" y2="39.0"/><text class="tick" x="57" y="43.0" text-anchor="end">1</text>
+<text class="tick" x="66.0" y="396" text-anchor="middle">50</text>
+<text class="tick" x="126.5" y="396" text-anchor="middle">60</text>
+<text class="tick" x="187.0" y="396" text-anchor="middle">70</text>
+<text class="tick" x="247.5" y="396" text-anchor="middle">80</text>
+<text class="tick" x="308.0" y="396" text-anchor="middle">90</text>
+<text class="tick" x="368.5" y="396" text-anchor="middle">100</text>
+<text class="tick" x="429.0" y="396" text-anchor="middle">110</text>
+<text class="tick" x="489.5" y="396" text-anchor="middle">120</text>
+<text class="tick" x="550.0" y="396" text-anchor="middle">130</text>
+<line class="axis" x1="66" y1="26" x2="66" y2="378"/>
+<line class="axis" x1="66" y1="299.8" x2="550" y2="299.8"/>
+<path class="total" style="stroke-dasharray:none" d="M66.0 104.8 L72.0 107.6 L78.1 110.4 L84.2 113.4 L90.2 116.4 L96.3 119.6 L102.3 122.9 L108.3 126.3 L114.4 129.8 L120.5 133.4 L126.5 137.2 L132.6 141.1 L138.6 145.1 L144.7 149.2 L150.7 153.4 L156.8 157.8 L162.8 162.3 L168.8 166.9 L174.9 171.7 L180.9 176.5 L187.0 181.5 L193.1 186.6 L199.1 191.8 L205.1 197.1 L211.2 202.5 L217.3 208.0 L223.3 213.7 L229.4 219.4 L235.4 225.2 L241.4 231.1 L247.5 237.1 L253.6 243.1 L259.6 249.3 L265.6 255.4 L271.7 261.7 L277.8 267.9 L283.8 274.3 L289.9 280.6 L295.9 287.0 L301.9 293.4 L308.0 299.8 L314.0 301.4 L320.1 303.0 L326.1 304.6 L332.2 306.2 L338.3 307.7 L344.3 309.3 L350.4 310.9 L356.4 312.4 L362.5 313.9 L368.5 315.5 L374.5 316.9 L380.6 318.4 L386.6 319.9 L392.7 321.3 L398.8 322.7 L404.8 324.1 L410.9 325.4 L416.9 326.8 L423.0 328.1 L429.0 329.4 L435.0 330.6 L441.1 331.8 L447.1 333.0 L453.2 334.1 L459.3 335.3 L465.3 336.4 L471.4 337.4 L477.4 338.5 L483.5 339.5 L489.5 340.4 L495.5 341.4 L501.6 342.3 L507.6 343.2 L513.7 344.0 L519.8 344.8 L525.8 345.6 L531.9 346.4 L537.9 347.1 L544.0 347.8 L550.0 348.5"/>
+<path class="alv" style="stroke-dasharray:none" d="M66.0 53.0 L72.0 54.0 L78.1 55.0 L84.2 56.2 L90.2 57.4 L96.3 58.8 L102.3 60.3 L108.3 62.0 L114.4 63.9 L120.5 65.9 L126.5 68.1 L132.6 70.5 L138.6 73.1 L144.7 76.0 L150.7 79.2 L156.8 82.6 L162.8 86.4 L168.8 90.5 L174.9 94.9 L180.9 99.7 L187.0 104.8 L193.1 110.4 L199.1 116.4 L205.1 122.9 L211.2 129.8 L217.3 137.2 L223.3 145.1 L229.4 153.4 L235.4 162.3 L241.4 171.7 L247.5 181.5 L253.6 191.8 L259.6 202.5 L265.6 213.7 L271.7 225.2 L277.8 237.1 L283.8 249.3 L289.9 261.7 L295.9 274.3 L301.9 287.0 L308.0 299.8 L314.0 303.0 L320.1 306.2 L326.1 309.3 L332.2 312.4 L338.3 315.5 L344.3 318.4 L350.4 321.3 L356.4 324.1 L362.5 326.8 L368.5 329.4 L374.5 331.8 L380.6 334.1 L386.6 336.4 L392.7 338.5 L398.8 340.4 L404.8 342.3 L410.9 344.0 L416.9 345.6 L423.0 347.1 L429.0 348.5 L435.0 349.8 L441.1 351.0 L447.1 352.1 L453.2 353.1 L459.3 354.1 L465.3 354.9 L471.4 355.7 L477.4 356.4 L483.5 357.1 L489.5 357.7 L495.5 358.3 L501.6 358.8 L507.6 359.2 L513.7 359.6 L519.8 360.0 L525.8 360.4 L531.9 360.7 L537.9 361.0 L544.0 361.2 L550.0 361.5"/>
+<path class="extra" style="stroke-dasharray:none" d="M66.0 44.0 L72.0 44.0 L78.1 44.1 L84.2 44.1 L90.2 44.2 L96.3 44.3 L102.3 44.4 L108.3 44.5 L114.4 44.6 L120.5 44.8 L126.5 45.1 L132.6 45.3 L138.6 45.7 L144.7 46.1 L150.7 46.6 L156.8 47.2 L162.8 48.0 L168.8 48.9 L174.9 50.0 L180.9 51.4 L187.0 53.0 L193.1 55.0 L199.1 57.4 L205.1 60.3 L211.2 63.9 L217.3 68.1 L223.3 73.1 L229.4 79.2 L235.4 86.4 L241.4 94.9 L247.5 104.8 L253.6 116.4 L259.6 129.8 L265.6 145.1 L271.7 162.3 L277.8 181.5 L283.8 202.5 L289.9 225.2 L295.9 249.3 L301.9 274.3 L308.0 299.8 L314.0 306.2 L320.1 312.4 L326.1 318.4 L332.2 324.1 L338.3 329.4 L344.3 334.1 L350.4 338.5 L356.4 342.3 L362.5 345.6 L368.5 348.5 L374.5 351.0 L380.6 353.1 L386.6 354.9 L392.7 356.4 L398.8 357.7 L404.8 358.8 L410.9 359.6 L416.9 360.4 L423.0 361.0 L429.0 361.5 L435.0 361.9 L441.1 362.2 L447.1 362.5 L453.2 362.7 L459.3 362.9 L465.3 363.1 L471.4 363.2 L477.4 363.3 L483.5 363.4 L489.5 363.5 L495.5 363.5 L501.6 363.6 L507.6 363.6 L513.7 363.6 L519.8 363.7 L525.8 363.7 L531.9 363.7 L537.9 363.7 L544.0 363.7 L550.0 363.7"/>
+<text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Aggregate sympathetic outflow</text>
+<text class="label" x="308" y="424" text-anchor="middle">Low-pass mean arterial pressure (mmHg)</text>
+<line class="total" style="stroke-dasharray:none" x1="566" y1="48" x2="594" y2="48"/><text class="label" x="600" y="52">sensitivity 0.5×</text>
+<line class="alv" style="stroke-dasharray:none" x1="566" y1="70" x2="594" y2="70"/><text class="label" x="600" y="74">sensitivity 1×</text>
+<line class="extra" style="stroke-dasharray:none" x1="566" y1="92" x2="594" y2="92"/><text class="label" x="600" y="96">sensitivity 2×</text>
+<text class="tick" x="566" y="132">set point 90 mmHg</text>
+<text class="tick" x="566" y="148">maximum response: 1</text>
+<text class="tick" x="566" y="164">maximum withdrawal: −0.25</text>
+</svg>

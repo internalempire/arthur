@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" class="arthur-fig" role="img" aria-label="Preload reserve is the local gain in output when filling pressure rises">
+<style>
+  svg.arthur-fig .bg { fill: none }
+  svg.arthur-fig .axis { stroke: var(--fig-axis, #9aa4b2); stroke-width: 1 }
+  svg.arthur-fig .grid { stroke: var(--fig-grid, #d7dce3); stroke-width: 1; stroke-dasharray: 2 4 }
+  svg.arthur-fig .tick { fill: var(--fig-muted, #6b7480); font: 11px system-ui, sans-serif }
+  svg.arthur-fig .label { fill: var(--fig-text, #2b3138); font: 12px system-ui, sans-serif }
+  svg.arthur-fig .title { fill: var(--fig-text, #2b3138); font: 600 13px system-ui, sans-serif }
+  svg.arthur-fig .lm { stroke: var(--fig-grid, #d7dce3); stroke-width: 1 }
+  svg.arthur-fig .lm-text { fill: var(--fig-muted, #6b7480); font: 600 11px system-ui, sans-serif }
+  svg.arthur-fig .total { stroke: var(--fig-total, #1f6feb); stroke-width: 2.5; fill: none }
+  svg.arthur-fig .alv { stroke: var(--fig-alv, #d1495b); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .extra { stroke: var(--fig-extra, #2a9d8f); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .nadir { stroke: var(--fig-total, #1f6feb); stroke-width: 1; stroke-dasharray: 3 3 }
+  svg.arthur-fig .dot { fill: var(--fig-total, #1f6feb); stroke: none }
+  @media (prefers-color-scheme: dark) {
+    svg.arthur-fig .axis { stroke: #5b6472 }
+    svg.arthur-fig .grid, svg.arthur-fig .lm { stroke: #363d47 }
+    svg.arthur-fig .tick, svg.arthur-fig .lm-text { fill: #8b95a3 }
+    svg.arthur-fig .label, svg.arthur-fig .title { fill: #d6dbe2 }
+    svg.arthur-fig .total, svg.arthur-fig .nadir { stroke: #58a6ff }
+    svg.arthur-fig .dot { fill: #58a6ff }
+    svg.arthur-fig .alv { stroke: #f08c9a }
+    svg.arthur-fig .extra { stroke: #4fd1c1 }
+  }
+</style>
+<rect class="bg" width="760" height="430"/>
+<text class="title" x="66" y="16">Preload reserve is the local gain in output when filling pressure rises</text>
+<line class="grid" x1="66" y1="378.0" x2="540" y2="378.0"/><text class="tick" x="57" y="382.0" text-anchor="end">2</text>
+<line class="grid" x1="66" y1="315.1" x2="540" y2="315.1"/><text class="tick" x="57" y="319.1" text-anchor="end">3</text>
+<line class="grid" x1="66" y1="252.3" x2="540" y2="252.3"/><text class="tick" x="57" y="256.3" text-anchor="end">4</text>
+<line class="grid" x1="66" y1="189.4" x2="540" y2="189.4"/><text class="tick" x="57" y="193.4" text-anchor="end">5</text>
+<line class="grid" x1="66" y1="126.6" x2="540" y2="126.6"/><text class="tick" x="57" y="130.6" text-anchor="end">6</text>
+<line class="grid" x1="66" y1="63.7" x2="540" y2="63.7"/><text class="tick" x="57" y="67.7" text-anchor="end">7</text>
+<text class="tick" x="66.0" y="396" text-anchor="middle">4</text>
+<text class="tick" x="145.0" y="396" text-anchor="middle">6</text>
+<text class="tick" x="224.0" y="396" text-anchor="middle">8</text>
+<text class="tick" x="303.0" y="396" text-anchor="middle">10</text>
+<text class="tick" x="382.0" y="396" text-anchor="middle">12</text>
+<text class="tick" x="461.0" y="396" text-anchor="middle">14</text>
+<text class="tick" x="540.0" y="396" text-anchor="middle">16</text>
+<line class="axis" x1="66" y1="26" x2="66" y2="378"/>
+<line class="axis" x1="66" y1="378.0" x2="540" y2="378.0"/>
+<path class="total" style="stroke-dasharray:none" d="M66.0 356.0 L69.9 351.4 L73.9 346.9 L77.8 342.4 L81.8 337.9 L85.7 333.5 L89.7 329.1 L93.6 324.6 L97.6 320.2 L101.5 315.8 L105.5 311.4 L109.4 307.0 L113.4 302.7 L117.3 298.3 L121.3 294.0 L125.2 289.7 L129.2 285.5 L133.1 281.2 L137.1 277.0 L141.0 272.8 L145.0 268.7 L148.9 264.5 L152.9 260.4 L156.8 256.4 L160.8 252.3 L164.7 248.3 L168.7 244.4 L172.6 240.4 L176.6 236.6 L180.5 232.7 L184.5 228.9 L188.4 225.2 L192.4 221.5 L196.3 217.9 L200.3 214.2 L204.2 210.7 L208.2 207.2 L212.1 203.7 L216.1 200.3 L220.0 197.0 L224.0 193.7 L227.9 190.5 L231.9 187.3"/>
+<path class="alv" style="stroke-dasharray:none" d="M235.8 184.1 L239.8 181.0 L243.7 178.0 L247.7 175.0 L251.6 172.1 L255.6 169.3 L259.5 166.4 L263.5 163.6 L267.4 160.9 L271.4 158.2 L275.3 155.6 L279.3 153.0 L283.2 150.5 L287.2 148.0 L291.1 145.5 L295.1 143.0 L299.0 140.7 L303.0 138.3 L306.9 136.0 L310.9 133.7 L314.8 131.5 L318.8 129.3 L322.7 127.1 L326.7 125.0 L330.6 122.9 L334.6 120.8 L338.5 118.7 L342.5 116.7 L346.4 114.7 L350.4 112.8 L354.3 110.8 L358.3 108.9 L362.2 107.0 L366.2 105.1 L370.1 103.3 L374.1 101.4 L378.0 99.6 L382.0 97.8 L385.9 96.1 L389.9 94.3 L393.8 92.6 L397.8 90.9 L401.7 89.2 L405.7 87.5 L409.6 85.8 L413.6 84.2 L417.5 82.6 L421.5 80.9 L425.4 79.3 L429.4 77.8 L433.3 76.2 L437.3 74.6 L441.2 73.1 L445.2 71.6 L449.1 70.0 L453.1 68.5 L457.0 67.1 L461.0 65.6 L464.9 64.1 L468.9 62.7 L472.8 61.2 L476.8 59.8 L480.7 58.4 L484.7 57.0 L488.6 55.6 L492.6 54.2 L496.5 52.8 L500.5 51.4 L504.4 50.1 L508.4 48.7 L512.3 47.4 L516.3 46.1 L520.2 44.8 L524.2 43.5 L528.1 42.2 L532.1 40.9 L536.0 39.6 L540.0 38.3"/>
+<circle class="dot" cx="164.7" cy="248.3" r="4"/><text class="label" x="171.7" y="240.3">lower filling</text>
+<circle class="dot" cx="401.7" cy="89.2" r="4"/><text class="label" x="311.7" y="81.2">higher filling</text>
+<text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Equilibrium flow (L/min)</text>
+<text class="label" x="303" y="424" text-anchor="middle">Mean systemic filling pressure (mmHg)</text>
+<line class="total" style="stroke-dasharray:none" x1="556" y1="48" x2="584" y2="48"/><text class="label" x="590" y="52">steep limb</text>
+<line class="alv" style="stroke-dasharray:none" x1="556" y1="70" x2="584" y2="70"/><text class="label" x="590" y="74">plateau limb</text>
+<text class="tick" x="556" y="110">10% of current flow per mmHg</text>
+<text class="tick" x="556" y="126">is a model classifier,</text>
+<text class="tick" x="556" y="142">not a bedside cutoff</text>
+</svg>

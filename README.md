@@ -661,10 +661,10 @@ filling pressure.
 
 The measured line does not lie on the analytic curve, and that is the point of
 having both. Four inspiratory holds at 300, 500, 700 and 900 mL (about
-8.3–15.3 cmH₂O) give a slope near 0.19 L/min per mmHg against roughly 0.73
-implied by the model's resistance, and extrapolate to an intercept around
-28 mmHg against an actual Pmsf around 8.8. The reason is in the model and is
-physiologically plausible:
+8.3–15.3 cmH₂O) give a slope near 0.21 L/min per mmHg against roughly 0.76
+implied by the model's effective resistance, and extrapolate to an intercept
+around 24.7 mmHg against an actual Pmsf around 10.0. The reason is in the model
+and is physiologically plausible:
 every occlusion raises lung volume and abdominal pressure, shifting the relation
 it is trying to sample. Berger demonstrated the direction in pigs, but observed
 a much smaller mean excess of 3.0 mmHg with wide dispersion. The simulator
@@ -708,7 +708,7 @@ responsive, so the reserve that corresponds to that was measured rather than
 assumed. Across 60 randomised configurations varying stressed volume, systemic
 resistance, heart rate, right ventricular contractility, venous compliance, PEEP,
 resistance to venous return and abdominal pressure, a threshold of 0.10
-classifies about 90% of them the same way the model's own response to 500 mL
+classifies about 83% of them the same way the model's own response to 500 mL
 does, and the test asserts that.
 
 The cases it gets wrong fall into two groups, both instructive. A patient can

@@ -668,10 +668,10 @@ export function preloadLimbs(p, c, mean, span = 14, nPoints = 48) {
 // It is calibrated against this model, not taken from a paper, and that is worth
 // stating plainly. The clinical convention is that a patient is fluid responsive
 // if 500 mL raises cardiac output by 15%, so the sensitivity that corresponds to
-// that was measured rather than assumed: across 69 randomised configurations
+// that was measured rather than assumed: across 60 deterministic configurations
 // varying stressed volume, systemic resistance, heart rate, right ventricular
 // contractility, venous compliance, PEEP, resistance to venous return and
-// abdominal pressure, a threshold of 0.10 classifies 90% of them the same way
+// abdominal pressure, a threshold of 0.10 classifies 83% of them the same way
 // the model's own response to 500 mL does.
 //
 // The cases it gets wrong are the interesting ones and they fall into two
