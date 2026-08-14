@@ -1078,6 +1078,7 @@ styles/app.css
 tools/serve.mjs           static server that refuses to be cached, for editing
 docs/PHYSIOLOGY.md        calibration, verification against the sources, limitations
 docs/LITERATURE_RANGES.md published findings as executable rows, and where the model fails them
+docs/SCENARIO_VALIDATION.md  whether each preset actually demonstrates its stated clinical lesson
 docs/MODEL_DECISIONS.md   dated rationale for substantive modelling changes
 docs/POSTMORTEM-2026-08-09.md  the errors made while anchoring the J-curve, and how they were caught
 src/

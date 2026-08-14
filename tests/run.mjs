@@ -15,6 +15,7 @@ const SUITES = [
   './suites/circulation.test.mjs',
   './suites/lung-mechanics.test.mjs',
   './suites/recruitment.test.mjs',
+  './suites/scenario-interpretability.test.mjs',
   './suites/contracts.test.mjs',
 ];
 
