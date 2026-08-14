@@ -29,7 +29,7 @@ $$
 
 A stiff lung raises airway and alveolar pressure steeply, but in this simplified construction the pleural swing is unchanged if the same volume enters against the same chest wall. The fraction of airway pressure transmitted to the pleural space therefore falls as the lung stiffens: the pleural-pressure numerator remains similar while the airway-pressure denominator grows.
 
-The clinical consequence is important and frequently inverted: **a high plateau pressure in a stiff lung is not evidence of high intrathoracic pressure**. The patient with ARDS at 32 cmH₂O of plateau may be transmitting less to the mediastinum than a patient with normal lungs at 20. What raises transmission is a stiff *chest wall* — obesity, oedema, a raised diaphragm, an open abdomen closed under tension. See [obesity and intra-abdominal hypertension](scenario-abdomen-and-chest-wall.md).
+The clinical consequence is important and frequently inverted: **a high plateau pressure in a stiff lung is not evidence of high intrathoracic pressure**. The patient with ARDS at 32 cmH₂O of plateau may be transmitting less to the mediastinum than a patient with normal lungs at 20. What raises transmission is a stiff *chest wall* — obesity, oedema, a raised diaphragm, an open abdomen closed under tension. See the [stiff chest-wall and intra-abdominal-hypertension presets](scenarios.md#stiff-chest-wall).
 
 ---
 
@@ -122,4 +122,4 @@ Proning is resolved at integration time rather than written back into the slider
 
 ## See also
 
-[Transmural pressure](transmural-pressure.md) · [Equation of motion](equation-of-motion.md) · [Abdominal pressure](abdominal-pressure.md) · [Pressure–volume curve](pressure-volume-curve.md) · [The four effects of a breath](the-four-effects-of-a-breath.md) · [Obesity and the abdomen](scenario-abdomen-and-chest-wall.md) · [Controls: mechanics](controls-mechanics.md)
+[Transmural pressure](transmural-pressure.md) · [Equation of motion](equation-of-motion.md) · [Abdominal pressure](abdominal-pressure.md) · [Pressure–volume curve](pressure-volume-curve.md) · [The four effects of a breath](the-four-effects-of-a-breath.md) · [Chest-wall and abdominal scenarios](scenarios.md#stiff-chest-wall) · [Controls: mechanics](controls-mechanics.md)

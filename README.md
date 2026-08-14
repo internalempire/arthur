@@ -911,10 +911,12 @@ so a preset describes the same patient regardless of which one you opened first.
 Touching any control switches the picker to *Custom*, so a scenario name is
 never attached to a patient it no longer describes.
 
-Twenty of the twenty-six parameters are used by at least one scenario. The six
-never varied are `pinsp`, `csv`, `rvr`, `pericardium`, `septal` and `piston` —
-those are left for the user to explore by hand, which is what the pericardial
-and septal gains in particular are for.
+Twenty-three of the thirty-four parameters are used by at least one scenario.
+The eleven never varied are `pinsp`, `position`, `csv`, `rvr`, `baroreflex`,
+`baroSetPoint`, `pericardium`, `septal`, `hysteresis`, `pClose` and `piston` —
+those are left for the user to explore by hand. Hysteresis is deliberately an
+experiment rather than a starting phenotype, and the pericardial and septal
+gains exist mainly to isolate their mechanisms.
 
 Presets are settled phenotypes, not simulations of disease onset. In particular,
 the pulmonary-embolism preset's selected tachycardia, systemic resistance and
@@ -933,8 +935,7 @@ heart distension or hypoxaemia directly.
 | Big pleural swings, no variation (`swing-no-variation`) | `mode=spont`, `pmus=22`, `peep=6`, `rr=24`, `ccw=100`, `stressedVolume=950`, `svr=0.75`, `hr=100` |
 | ARDS with right ventricular failure (`ards-rv`) | `mode=vcv`, `pmus=0`, `vt=350`, `peep=12`, `rr=24`, `collapsed=0.42`, `clung=40`, `eesRv=0.28`, `pvrBase=0.17`, `hpv=1.6`, `riRatio=0.7`, `pOpen=18` |
 | Acute pulmonary embolism (`pulmonary-embolism`) | `mode=spont`, `pmus=6`, `peep=0`, `rr=24`, `pvrBase=0.44`, `eesRv=0.32`, `stressedVolume=1050`, `svr=1.25`, `hr=118` |
-| Cardiogenic pulmonary oedema (`lv-failure`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=10`, `rr=18`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=95` |
-| Weaning the failing left ventricle (`weaning`) | `mode=spont`, `pmus=10`, `peep=0`, `rr=26`, `eesLv=1.2`, `lvStiff=0.034`, `stressedVolume=1050`, `svr=1.25`, `hr=110` |
+| Cardiogenic pulmonary oedema (`lv-failure`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=10`, `rr=18`, `eesLv=0.6`, `lvStiff=0.040`, `stressedVolume=1050`, `svr=1.25`, `hr=95`, `ccw=75` |
 | Stiff chest wall (`obesity`) | `mode=vcv`, `pmus=0`, `vt=500`, `peep=8`, `rr=16`, `ccw=75`, `pab0=12` |
 | COPD with dynamic hyperinflation (`copd`) | `mode=vcv`, `pmus=0`, `vt=500`, `peep=5`, `rr=26`, `ti=0.9`, `raw=24`, `clung=300`, `efl=on` |
 | Intra-abdominal hypertension (`iah`) | `mode=vcv`, `pmus=0`, `vt=450`, `peep=8`, `rr=16`, `pab0=22`, `abdCoupling=6` |
@@ -954,8 +955,7 @@ catheter-derived value is separately labelled in the app.
 | Big pleural swings, no variation | 6.77 | 92 | 1.1 | 24/15 | 9 | 1.2 | 0.88 | 5% |
 | ARDS with right ventricular failure | 3.98 | 85 | 3.6 | 27/19 | 4 | 4.3 | 1.64 | 1% |
 | Acute pulmonary embolism | 4.06 | 94 | 5.8 | 39/32 | 4 | 7.5 | 2.03 | 9% |
-| Cardiogenic pulmonary oedema | 3.52 | 87 | 5.0 | 44/38 | 35 | 1.2 | 0.86 | 6% |
-| Weaning the failing left ventricle | 3.55 | 87 | 1.2 | 40/31 | 33 | 1.2 | 0.91 | 17% |
+| Cardiogenic pulmonary oedema | 1.61 | 68 | 7.4 | 52/47 | 46 | 1.2 | 0.77 | 22% |
 | Stiff chest wall | 4.37 | 90 | 3.3 | 18/10 | 9 | 1.2 | 0.82 | 4% |
 | COPD with dynamic hyperinflation | 4.54 | 91 | 4.5 | 20/12 | 10 | 1.3 | 0.84 | 4% |
 | Intra-abdominal hypertension | 3.55 | 87 | 0.8 | 13/7 | 5 | 1.2 | 0.74 | 1% |
@@ -1000,11 +1000,19 @@ smallest set that makes that question answerable.
   nor the filling alone.
 - **Pulmonary embolism** is the deliberate mirror: `clung`, `ccw` and `collapsed` are
   all left at normal, and the entire abnormality is `pvrBase` with a right
-  ventricle that cannot meet it. Because the lung is compliant, pleural
-  transmission is full — so switching this preset to `vcv` at PEEP 5 costs 11%
-  of cardiac output, and PEEP 12 costs 39%.
-- **The two left-heart presets** share their cardiac parameters and differ only
-  in ventilation, which isolates what weaning does to a failing ventricle.
+  ventricle that cannot meet it. Switching to passive ventilation and raising
+  PEEP further loads that ventricle, but the current model's output cost is
+  modest and phase-dependent; the preset demonstrates vulnerability, not a
+  numerical intubation-risk estimate.
+- **Cardiogenic pulmonary oedema** is deliberately afterload-dominant: severe LV
+  systolic and diastolic failure, high filling pressure and a stiff thoracic
+  envelope. In the same settled patient, PEEP 0 → 10 lowers LV transmural
+  end-systolic pressure and end-systolic volume more than it lowers end-diastolic
+  volume; respiratory-cycle-averaged output rises about 7%. The selected
+  phenotype makes one possible positive-pressure response visible and is not a
+  prediction for every failing ventricle. The former weaning preset was removed
+  because the model lacks enough of the mechanisms that make weaning-induced
+  pulmonary oedema clinically reproducible.
 - **Stiff chest wall**, **COPD** and **intra-abdominal hypertension** leave the
   heart entirely at default, so the haemodynamic change can only have come from
   mechanics. COPD deliberately separates three existing ideas: high `clung`

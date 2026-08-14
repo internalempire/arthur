@@ -248,6 +248,13 @@ export class Simulator {
         t: this.time,
         pp: this.sysRun - this.diaRun,
         sv: c.sv,
+        // Keep the matched LV beat with its stroke volume. Scenario-level
+        // afterload experiments must average complete beats across respiration;
+        // pairing a mean output with one phase-selected EDV, ESV or end-systolic
+        // pressure would make the proposed causal signature internally mixed.
+        lvEdv: c.lvEdv,
+        lvEsv: c.lvEsv,
+        lvEsp: c.lvEsp,
         sbp: this.sysRun,
         dbp: this.diaRun,
         papSys: this.papSysRun,

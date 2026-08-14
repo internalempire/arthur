@@ -125,4 +125,4 @@ The `0.6` splanchnic fraction, the transition window and the resistance coeffici
 
 ## See also
 
-[Transmural pressure](transmural-pressure.md) · [Pleural pressure](pleural-pressure.md) · [Venous return](venous-return.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Stressed volume](stressed-volume.md) · [Obesity and the abdomen](scenario-abdomen-and-chest-wall.md) · [Controls: mechanics](controls-mechanics.md)
+[Transmural pressure](transmural-pressure.md) · [Pleural pressure](pleural-pressure.md) · [Venous return](venous-return.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Stressed volume](stressed-volume.md) · [Chest-wall and abdominal scenarios](scenarios.md#stiff-chest-wall) · [Controls: mechanics](controls-mechanics.md)
