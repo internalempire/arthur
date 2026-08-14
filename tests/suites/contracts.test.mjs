@@ -9,13 +9,17 @@ import { pvrZoomDomain } from '../../src/ui/panels/pvrcurve.js';
 section('Public model API');
 {
   const api = await import('../../src/model/index.js');
+  // The recruitment-state helpers are intentionally public: the Campbell panel
+  // must draw the same already-aerated/recruitable separation as the integrator
+  // without bypassing this model boundary and importing lung.js directly.
   const expected = [
     'CHAMBER', 'GROUPS', 'PARAMETERS', 'PPL_FRC', 'RESISTANCE_TO_WOOD',
     'SCENARIOS', 'SCENARIO_BY_ID', 'Simulator', 'TRACE_SECONDS',
     'cardiacFunctionCurve', 'clamp', 'cmH2OtoMmHg', 'curveIntersection',
-    'lungRegions', 'lungVolumeAtPl', 'openBand', 'preloadLimbs',
-    'pvrComponents', 'relaxationVolume', 'respiratorySystemCompliance',
-    'stepOpenFraction', 'venousReturnCurve',
+    'lungRegions', 'lungVolumeAtPl', 'openBand', 'openFractionFromRecruitmentState',
+    'preloadLimbs', 'pvrComponents', 'recruitmentBand', 'relaxationVolume',
+    'respiratorySystemCompliance', 'stepOpenFraction', 'stepRecruitedFraction',
+    'venousReturnCurve',
   ];
   check('exports exactly the browser-facing model contract',
     JSON.stringify(Object.keys(api).sort()) === JSON.stringify(expected.sort()),
