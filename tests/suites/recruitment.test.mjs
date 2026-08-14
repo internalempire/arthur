@@ -138,6 +138,28 @@ section('Recruitment hysteresis');
     settled({ ...ARDS, hysteresis: 'off', peep: 10 }, 45).metrics.openFraction
       === settled({ ...ARDS, hysteresis: 'off', peep: 10, pClose: 3 }, 45).metrics.openFraction);
 
+  // Hysteresis belongs only to collapsed-but-openable units. This assertion is
+  // deliberately made at negative as well as positive pressures: the former
+  // implementation shifted the normal population's closing curve and could
+  // pass every ordinary ventilator-range test while remaining structurally
+  // wrong.
+  {
+    const healthy = { ...defaultParams(), collapsed: 0, hysteresis: 'on', pOpen: 22, pClose: 6 };
+    const gap = [-10, -5, 0, 5, 15]
+      .map((pl) => { const band = openBand(healthy, pl); return band.hi - band.lo; });
+    check('a lung with no collapsed compartment has no recruitment hysteresis',
+      gap.every((value) => value === 0),
+      gap.map((value) => value.toExponential(1)).join(', '));
+
+    const off = settled({ ...healthy, hysteresis: 'off', mode: 'vcv', vt: 450, peep: 10 }, 20);
+    const on = settled({ ...healthy, mode: 'vcv', vt: 450, peep: 10 }, 20);
+    check('healthy mechanics are bit-identical with hysteresis on and off',
+      on.resp.plSolved === off.resp.plSolved
+        && on.resp.lungVolume === off.resp.lungVolume
+        && on.metrics.openFraction === off.metrics.openFraction,
+      `Pl ${off.resp.plSolved} vs ${on.resp.plSolved}`);
+  }
+
   // The point of the whole thing: a manoeuvre that leaves something behind.
   const held = manoeuvre({ pClose: 6, peep: 10 });
   check('a recruitment manoeuvre leaves the lung more open than it found it',

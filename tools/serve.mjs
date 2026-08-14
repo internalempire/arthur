@@ -19,7 +19,7 @@ import { extname, join, normalize, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const PORT = Number(process.argv[2] ?? 8499);
+const PORT = Number(process.argv[2] ?? process.env.PORT ?? 8499);
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -41,14 +41,18 @@ function resolve(urlPath) {
 }
 
 const server = createServer(async (req, res) => {
-  const path = resolve(req.url);
+  let path = resolve(req.url);
   if (!path) {
     res.writeHead(403).end('outside the project');
     return;
   }
   try {
-    const info = await stat(path);
-    if (info.isDirectory()) throw new Error('directory');
+    let info = await stat(path);
+    // A directory serves its index.html, so the manual can live at /manual/.
+    if (info.isDirectory()) {
+      path = join(path, 'index.html');
+      info = await stat(path);
+    }
     res.writeHead(200, {
       'Content-Type': TYPES[extname(path)] ?? 'application/octet-stream',
       'Content-Length': info.size,

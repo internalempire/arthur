@@ -21,8 +21,10 @@
 
 import { clamp } from './units.js';
 import {
-  transpulmonaryAt, transpulmonaryAtFixed, relaxationVolume, lungComplianceAt,
-  stepOpenFraction, openBand, hysteresisGap, staticEndExpiratoryVolume, RECOIL_AT_FRC,
+  transpulmonaryAt, transpulmonaryAtRecruitmentState, relaxationVolume, lungComplianceAt,
+  stepRecruitedFraction, recruitmentBand, openFractionFromRecruitmentState,
+  hysteresisGap, staticEndExpiratoryVolume, staticEndExpiratoryVolumeAtRecruitmentState,
+  RECOIL_AT_FRC,
 } from './lung.js';
 
 // Pleural pressure at the relaxation volume. Its negative is the
@@ -76,8 +78,11 @@ export function createRespiratoryState() {
     siSamples: [],
     siClock: 0,
     lastStressIndex: null,
-    // Null until the first step decides which branch this lung starts on.
+    // Total open fraction is retained for circulation and display. The actual
+    // hysteretic state is only the share of whole lung made of recruited,
+    // diseased units; already-aerated lung continues to follow present pressure.
     openFraction: null,
+    recruitedFraction: null,
     pplatCandidate: 0,
     pplMin: Infinity,
     pplMax: -Infinity,
@@ -191,9 +196,13 @@ export function stepRespiratory(p, r, dt) {
   // the recruitment transition is steep. Thus pClose === pOpen is exactly the
   // same model as hysteresis off, as the control promises.
   const hysteretic = p.hysteresis === 'on' && hysteresisGap(p) > 1e-9;
-  if (hysteretic && !(r.openFraction > 0)) {
-    // A lung that has never been inflated sits on the opening branch.
-    r.openFraction = openBand(p, RECOIL_AT_FRC).lo;
+  if (hysteretic && !(r.recruitedFraction >= 0)) {
+    // A lung that has never been inflated starts on the opening branch. This
+    // state is an absolute fraction of the whole lung, not a second user input.
+    r.recruitedFraction = recruitmentBand(p, RECOIL_AT_FRC).lo;
+  } else if (!hysteretic) {
+    // Do not resurrect stale recruitment if hysteresis is switched off and on.
+    r.recruitedFraction = null;
   }
 
   // Alveolar pressure at a given volume above that reference: the chest wall's
@@ -201,14 +210,17 @@ export function stepRespiratory(p, r, dt) {
   // calculation and for the pressures reported afterwards, so they cannot drift
   // apart.
   //
-  // With hysteresis the open fraction is frozen for the step — it is a state the
-  // step then updates — which makes the lung a straight line within the step and
-  // the inverse a closed form. Without it, the fraction follows the pressure and
-  // the inverse is a solve, warm-started from the last answer.
+  // With hysteresis only the recruitable diseased share is frozen for the step.
+  // Normal lung still follows present pressure, so both branches require a
+  // warm-started inverse solve. Freezing the total open fraction here was the
+  // structural error that gave normal lung an ARDS-like memory.
   const alveolar = (v, pmus) => {
     r.plSolved = hysteretic
-      ? transpulmonaryAtFixed(p, vRelax + v, r.openFraction)
+      ? transpulmonaryAtRecruitmentState(p, vRelax + v, r.recruitedFraction, r.plSolved)
       : transpulmonaryAt(p, vRelax + v, r.plSolved);
+    r.openFraction = hysteretic
+      ? openFractionFromRecruitmentState(p, r.plSolved, r.recruitedFraction)
+      : null;
     return (PPL_FRC + v / ccw - pmus) + r.plSolved;
   };
 
@@ -233,7 +245,10 @@ export function stepRespiratory(p, r, dt) {
     r.lungVolume = vRelax + r.v;
     r.relaxVolume = vRelax;
     r.pab = p.pab0 + p.abdCoupling * r.v;
-    if (hysteretic) r.openFraction = stepOpenFraction(p, r.openFraction, r.pl);
+    if (hysteretic) {
+      r.recruitedFraction = stepRecruitedFraction(p, r.recruitedFraction, r.pl);
+      r.openFraction = openFractionFromRecruitmentState(p, r.pl, r.recruitedFraction);
+    }
     r.prevPhase = r.phase;
     return r;
   }
@@ -287,9 +302,9 @@ export function stepRespiratory(p, r, dt) {
   // volume. With hysteresis on, use the branch the lung is actually occupying.
   if (r.prevPhase === 'exp' && r.phase === 'insp') {
     r.lastEndExpiratoryVolume = vRelax + r.v;
-    const staticEelv = staticEndExpiratoryVolume(
-      p, p.peep, hysteretic ? r.openFraction : null,
-    );
+    const staticEelv = hysteretic
+      ? staticEndExpiratoryVolumeAtRecruitmentState(p, p.peep, r.recruitedFraction)
+      : staticEndExpiratoryVolume(p, p.peep);
     r.lastTrappedVolume = Math.max(0, (r.lastEndExpiratoryVolume - staticEelv) * 1000);
     r.lastEflActive = r.eflLimitedThisBreath;
     r.eflLimitedThisBreath = false;
@@ -365,7 +380,10 @@ export function stepRespiratory(p, r, dt) {
   // The state the next step will read. Updated after the pressures rather than
   // before them, so what is reported and what the flow was computed from are the
   // same lung.
-  if (hysteretic) r.openFraction = stepOpenFraction(p, r.openFraction, r.pl);
+  if (hysteretic) {
+    r.recruitedFraction = stepRecruitedFraction(p, r.recruitedFraction, r.pl);
+    r.openFraction = openFractionFromRecruitmentState(p, r.pl, r.recruitedFraction);
+  }
 
   // --- per-breath bookkeeping ----------------------------------------------
   r.pplMin = Math.min(r.pplMin, ppl);

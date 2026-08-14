@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" class="arthur-fig" role="img" aria-label="Recruitment retained during an incremental and decremental PEEP trial">
+<style>
+  svg.arthur-fig .bg { fill: none }
+  svg.arthur-fig .axis { stroke: var(--fig-axis, #9aa4b2); stroke-width: 1 }
+  svg.arthur-fig .grid { stroke: var(--fig-grid, #d7dce3); stroke-width: 1; stroke-dasharray: 2 4 }
+  svg.arthur-fig .tick { fill: var(--fig-muted, #6b7480); font: 11px system-ui, sans-serif }
+  svg.arthur-fig .label { fill: var(--fig-text, #2b3138); font: 12px system-ui, sans-serif }
+  svg.arthur-fig .title { fill: var(--fig-text, #2b3138); font: 600 13px system-ui, sans-serif }
+  svg.arthur-fig .lm { stroke: var(--fig-grid, #d7dce3); stroke-width: 1 }
+  svg.arthur-fig .lm-text { fill: var(--fig-muted, #6b7480); font: 600 11px system-ui, sans-serif }
+  svg.arthur-fig .total { stroke: var(--fig-total, #1f6feb); stroke-width: 2.5; fill: none }
+  svg.arthur-fig .alv { stroke: var(--fig-alv, #d1495b); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .extra { stroke: var(--fig-extra, #2a9d8f); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .nadir { stroke: var(--fig-total, #1f6feb); stroke-width: 1; stroke-dasharray: 3 3 }
+  svg.arthur-fig .dot { fill: var(--fig-total, #1f6feb); stroke: none }
+  @media (prefers-color-scheme: dark) {
+    svg.arthur-fig .axis { stroke: #5b6472 }
+    svg.arthur-fig .grid, svg.arthur-fig .lm { stroke: #363d47 }
+    svg.arthur-fig .tick, svg.arthur-fig .lm-text { fill: #8b95a3 }
+    svg.arthur-fig .label, svg.arthur-fig .title { fill: #d6dbe2 }
+    svg.arthur-fig .total, svg.arthur-fig .nadir { stroke: #58a6ff }
+    svg.arthur-fig .dot { fill: #58a6ff }
+    svg.arthur-fig .alv { stroke: #f08c9a }
+    svg.arthur-fig .extra { stroke: #4fd1c1 }
+  }
+</style>
+<rect class="bg" width="760" height="430"/>
+<text class="title" x="66" y="16">Recruitment retained during an incremental and decremental PEEP trial</text>
+<line class="grid" x1="66" y1="378.0" x2="560" y2="378.0"/><text class="tick" x="57" y="382.0" text-anchor="end">65</text>
+<line class="grid" x1="66" y1="334.0" x2="560" y2="334.0"/><text class="tick" x="57" y="338.0" text-anchor="end">70</text>
+<line class="grid" x1="66" y1="290.0" x2="560" y2="290.0"/><text class="tick" x="57" y="294.0" text-anchor="end">75</text>
+<line class="grid" x1="66" y1="246.0" x2="560" y2="246.0"/><text class="tick" x="57" y="250.0" text-anchor="end">80</text>
+<line class="grid" x1="66" y1="202.0" x2="560" y2="202.0"/><text class="tick" x="57" y="206.0" text-anchor="end">85</text>
+<line class="grid" x1="66" y1="158.0" x2="560" y2="158.0"/><text class="tick" x="57" y="162.0" text-anchor="end">90</text>
+<line class="grid" x1="66" y1="114.0" x2="560" y2="114.0"/><text class="tick" x="57" y="118.0" text-anchor="end">95</text>
+<line class="grid" x1="66" y1="70.0" x2="560" y2="70.0"/><text class="tick" x="57" y="74.0" text-anchor="end">100</text>
+<text class="tick" x="139.2" y="396" text-anchor="middle">10</text>
+<text class="tick" x="230.7" y="396" text-anchor="middle">15</text>
+<text class="tick" x="322.1" y="396" text-anchor="middle">20</text>
+<text class="tick" x="413.6" y="396" text-anchor="middle">25</text>
+<text class="tick" x="505.1" y="396" text-anchor="middle">30</text>
+<line class="axis" x1="66" y1="26" x2="66" y2="378"/>
+<line class="axis" x1="66" y1="378.0" x2="560" y2="378.0"/>
+<path class="total" style="stroke-dasharray:none" d="M125.0 334.6 L150.5 290.3 L175.3 243.9 L199.9 197.8 L224.8 154.7 L278.3 93.6 L338.9 73.4 L403.2 70.3 L468.6 70.0 L534.6 70.0"/>
+<path class="alv" style="stroke-dasharray:none" d="M534.6 70.0 L468.6 70.0 L403.1 70.0 L338.3 70.2 L274.4 71.3 L211.9 77.2 L181.8 86.1 L153.1 103.7 L126.4 134.2 L101.6 179.6"/>
+<text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Lung open (%)</text>
+<text class="label" x="313" y="424" text-anchor="middle">End-expiratory transpulmonary pressure (cmH₂O)</text>
+<line class="total" style="stroke-dasharray:none" x1="576" y1="48" x2="604" y2="48"/><text class="label" x="610" y="52">incremental</text>
+<line class="alv" style="stroke-dasharray:none" x1="576" y1="70" x2="604" y2="70"/><text class="label" x="610" y="74">decremental</text>
+<text class="tick" x="576" y="110">only the collapsed but recruitable</text>
+<text class="tick" x="576" y="126">part of the lung retains memory</text>
+<text class="tick" x="576" y="142">on the way down</text>
+</svg>
