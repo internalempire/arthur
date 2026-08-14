@@ -8,6 +8,58 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-08-14 — Retire weaning and make LV unloading an explicit matched experiment
+
+### Decision
+
+- Remove the `weaning` preset. The physiological phenomenon remains real, but
+  the compact model cannot reproduce it with enough clinical fidelity to make a
+  preset more informative than misleading.
+- Retain one `lv-failure` preset and make its teaching experiment explicit:
+  compare the same settled patient at PEEP 0 and 10 cmH2O.
+- Select a severe, afterload-sensitive phenotype (`eesLv=0.6`,
+  `lvStiff=0.040`) with a stiff thoracic envelope (`ccw=75`). The latter is
+  required to transmit enough airway pressure to pleural pressure for afterload
+  relief to exceed the simultaneous loss of venous return.
+- Judge the intervention from cardiac output averaged over several respiratory
+  cycles, not the last completed beat. The beat-level tile deliberately retains
+  respiratory variation and is therefore phase-dependent.
+- Require the causal signature in an executable check: PEEP must lower LV
+  transmural end-systolic pressure, end-systolic volume must fall more than
+  end-diastolic volume, and mean output must rise by at least 5%.
+
+### Why
+
+The former two-preset comparison was not controlled: heart rate and respiratory
+rate differed as well as ventilatory mode. When those variables were matched,
+spontaneous breathing did not raise mean PAOP or lower output. Reproducing
+weaning-induced pulmonary oedema would require important mechanisms that are
+absent here — work of breathing and myocardial oxygen demand, sympathetic
+activation, ischaemia, dynamic mitral regurgitation, central blood-volume
+redistribution, fluid filtration and the time course of a spontaneous breathing
+trial. Keeping the preset would make a familiar clinical label substitute for a
+mechanism the model does not generate.
+
+The LV afterload mechanism itself is already physically present: pleural
+pressure is added to LV cavity pressure but not to systemic arterial pressure,
+so raising pleural pressure lowers the transmural pressure required for
+ejection. In the former `lv-failure` phenotype, preload loss still outweighed
+that benefit and output fell slightly. The revised phenotype does not change the
+equation; it moves the demonstration to an afterload-dominant part of the same
+model. Its low output, high filling pressure and stiff thoracic envelope are
+therefore part of the lesson and must remain visible as limitations, not be
+presented as the typical cardiogenic-pulmonary-oedema patient.
+
+### Deliberate limits
+
+The revised preset demonstrates one possible haemodynamic response to positive
+pressure, not a treatment prediction. It still has no gas exchange, respiratory
+muscle work, myocardial oxygen balance, coronary circulation, mitral
+regurgitation or pulmonary-oedema fluid kinetics. A different balance of
+contractility, filling, vascular resistance and pressure transmission can
+produce no output change or a fall despite the same reduction in LV transmural
+afterload.
+
 ## 2026-08-11 — Keep pulmonary vascular load aggregated at the bedside level
 
 ### Decision

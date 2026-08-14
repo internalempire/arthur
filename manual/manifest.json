@@ -219,39 +219,7 @@
       "pages": [
         [
           "scenarios",
-          "How the presets are meant to be used"
-        ],
-        [
-          "scenario-healthy",
-          "Spontaneous, passive volume control, and a PEEP escalation"
-        ],
-        [
-          "scenario-septic-shock",
-          "Compensation masking severe underfilling"
-        ],
-        [
-          "scenario-ards-rv",
-          "A stiff lung loading a failing right ventricle"
-        ],
-        [
-          "scenario-pulmonary-embolism",
-          "An effective aggregate pulmonary load"
-        ],
-        [
-          "scenario-cardiogenic-oedema",
-          "Positive pressure unloading the left ventricle"
-        ],
-        [
-          "scenario-weaning",
-          "Why the failing left ventricle fails at extubation"
-        ],
-        [
-          "scenario-copd",
-          "Dynamic hyperinflation and the expiratory choke"
-        ],
-        [
-          "scenario-abdomen-and-chest-wall",
-          "Obesity and intra-abdominal hypertension"
+          "All clinical presets, the question each asks, and the limits of the answer"
         ]
       ]
     },

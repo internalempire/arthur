@@ -36,7 +36,7 @@ Three further mechanisms load the low-volume limb in a real patient, and the J-c
 
 The right ventricle is a thin-walled pump that tolerates volume far better than pressure — see [the right ventricle](the-right-ventricle.md). Its afterload is minimised near FRC, and *both* directions away from FRC raise it. This is the mechanical basis of the observation that ventilating an injured lung can cause acute cor pulmonale, and of the practice of limiting plateau and driving pressure for reasons that have nothing to do with alveolar rupture.
 
-It also explains a clinical trap: raising PEEP in a poorly recruitable lung moves the aerated units up the *right* limb without opening anything, so resistance rises. In a recruitable lung the same PEEP moves collapsed units onto the curve at all, and resistance can fall or stay flat. The PEEP response of pulmonary resistance therefore **interacts with recruitability**; it is not a specific test of recruitability by itself. See [recruitment and R/I](recruitment-and-ri.md) and [ARDS with right ventricular failure](scenario-ards-rv.md).
+It also explains a clinical trap: raising PEEP in a poorly recruitable lung moves the aerated units up the *right* limb without opening anything, so resistance rises. In a recruitable lung the same PEEP moves collapsed units onto the curve at all, and resistance can fall or stay flat. The PEEP response of pulmonary resistance therefore **interacts with recruitability**; it is not a specific test of recruitability by itself. See [recruitment and R/I](recruitment-and-ri.md) and [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure).
 
 ---
 
@@ -198,7 +198,7 @@ The closed-path factor and phenotype were constrained jointly against the numeri
 - **Do not read the coefficient as a patient's PVR.** It is an internal quantity. The value labelled *derived* is comparable in form to catheter PVR only when the left-atrial-pressure wedge surrogate is valid.
 - **The absolute pressure–flow values are calibrated in one phenotype**, at PEEP 4–14, against one human ARDS cohort. The high-PEEP rows are outside the model's zone III assumption, so this should not be described as catheter-level validation. Elsewhere in the control space the model is directionally interpretable and quantitatively unvalidated.
 - **This is not a PEEP titration tool.** R/I is not a prescription, a high R/I does not establish that high PEEP is safe, and the model deliberately does not turn the PEEP response of resistance into a recommendation.
-- **In the pulmonary embolism preset**, a raised `pvrBase` is an *effective aggregate load*. It reproduces the pressure, flow and right-ventricular consequences of obstruction without representing clot burden, embolic distribution or a right-shifted pressure–flow relation as separate quantities. See [acute pulmonary embolism](scenario-pulmonary-embolism.md).
+- **In the pulmonary embolism preset**, a raised `pvrBase` is an *effective aggregate load*. It reproduces the pressure, flow and right-ventricular consequences of obstruction without representing clot burden, embolic distribution or a right-shifted pressure–flow relation as separate quantities. See [acute pulmonary embolism](scenarios.md#acute-pulmonary-embolism).
 - Nothing here defends right ventricular **coronary** perfusion, which is absent from the model and is a real part of the clinical spiral.
 
 ---
@@ -256,4 +256,4 @@ The first two are topological: they test the shape, not a fitted number, because
 
 ## See also
 
-[The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Hypoxic vasoconstriction](hypoxic-vasoconstriction.md) · [The right ventricle](the-right-ventricle.md) · [Transmural pressure](transmural-pressure.md) · [Interpretability](interpretability.md) · [The PVR curve panel](panel-pvr-curve.md) · [ARDS with right ventricular failure](scenario-ards-rv.md)
+[The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Hypoxic vasoconstriction](hypoxic-vasoconstriction.md) · [The right ventricle](the-right-ventricle.md) · [Transmural pressure](transmural-pressure.md) · [Interpretability](interpretability.md) · [The PVR curve panel](panel-pvr-curve.md) · [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure)

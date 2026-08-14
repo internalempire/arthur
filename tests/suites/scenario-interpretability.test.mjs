@@ -13,9 +13,28 @@ import {
 
 const byId = new Map(SCENARIOS.map((scenario) => [scenario.id, scenario]));
 
-function scenarioMetrics(id, overrides = {}, seconds = 20) {
+function scenarioSimulator(id, overrides = {}, seconds = 20) {
   const scenario = byId.get(id);
-  return settled({ ...scenario.params, ...overrides }, seconds).metrics;
+  return settled({ ...scenario.params, ...overrides }, seconds);
+}
+
+function scenarioMetrics(id, overrides = {}, seconds = 20) {
+  return scenarioSimulator(id, overrides, seconds).metrics;
+}
+
+// The tile intentionally reports the last completed beat so respiratory
+// variation remains visible. A scenario intervention instead needs a mean over
+// several breaths, otherwise its result depends on the instant at which the
+// comparison is sampled.
+function recentLvBeatMeans(simulator, seconds = 10) {
+  const beats = simulator.beatHistory.filter((beat) => beat.t > simulator.time - seconds);
+  const mean = (key) => beats.reduce((total, beat) => total + beat[key], 0) / beats.length;
+  return {
+    output: (mean('sv') * simulator.metrics.effectiveHr) / 1000,
+    edv: mean('lvEdv'),
+    esv: mean('lvEsv'),
+    esp: mean('lvEsp'),
+  };
 }
 
 // Mean the continuously sampled waveform separately during inflation and
@@ -51,6 +70,10 @@ function phaseMeans(id) {
 }
 
 const demonstrates = {};
+
+section('Scenario catalogue decisions');
+check('weaning remains retired rather than represented by an unvalidated preset',
+  !byId.has('weaning'));
 
 section('Scenario teaching mechanisms');
 
@@ -152,40 +175,20 @@ section('Scenario teaching mechanisms');
 }
 
 {
-  const commonVentilation = { mode: 'vcv', pmus: 0, vt: 450, rr: 18 };
-  const normalLow = settled({ ...commonVentilation, peep: 0 }, 20).metrics;
-  const normalHigh = settled({ ...commonVentilation, peep: 10 }, 20).metrics;
-  const failingLow = scenarioMetrics('lv-failure', { peep: 0 });
-  const failingHigh = scenarioMetrics('lv-failure', { peep: 10 });
-  const normalRetention = normalHigh.co / normalLow.co;
-  const failingRetention = failingHigh.co / failingLow.co;
-  demonstrates['lv-failure'] = failingHigh.paop > 25
-    && failingRetention > normalRetention + 0.03
-    && failingHigh.co <= failingLow.co;
-  check('LV-failure preset shows relative afterload relief, not an absolute CO rise',
+  const lowPeep = scenarioSimulator('lv-failure', { peep: 0 }, 45);
+  const highPeep = scenarioSimulator('lv-failure', { peep: 10 }, 45);
+  const low = recentLvBeatMeans(lowPeep);
+  const high = recentLvBeatMeans(highPeep);
+  const edvLoss = low.edv - high.edv;
+  const esvLoss = low.esv - high.esv;
+  demonstrates['lv-failure'] = highPeep.metrics.paop > 30
+    && high.output > low.output * 1.05
+    && high.esp < low.esp - 2
+    && esvLoss > edvLoss + 0.5;
+  check('LV-failure preset converts transmural afterload relief into higher output',
     demonstrates['lv-failure'],
-    `CO retained: normal ${(normalRetention * 100).toFixed(0)}%, `
-      + `failing LV ${(failingRetention * 100).toFixed(0)}%`);
-}
-
-{
-  const spontaneous = scenarioMetrics('weaning');
-  const matchedPositivePressure = scenarioMetrics('weaning', {
-    mode: 'vcv', pmus: 0, vt: 450, peep: 10,
-  });
-  const shippedHeartRatesDiffer = byId.get('weaning').params.hr
-    !== byId.get('lv-failure').params.hr;
-  // The intended WIPO lesson requires spontaneous breathing to raise filling
-  // pressure and/or depress output in a matched failing ventricle. At present it
-  // does neither; keep that negative finding executable until the mechanism is
-  // deliberately corrected.
-  demonstrates.weaning = !shippedHeartRatesDiffer
-    && spontaneous.paop > matchedPositivePressure.paop
-    && spontaneous.co < matchedPositivePressure.co;
-  check('weaning mismatch is honestly recorded rather than calibrated away',
-    !demonstrates.weaning,
-    `HR differs ${byId.get('lv-failure').params.hr} vs ${byId.get('weaning').params.hr}; `
-      + `matched PAOP ${matchedPositivePressure.paop.toFixed(1)} → ${spontaneous.paop.toFixed(1)}`);
+    `mean CO ${low.output.toFixed(2)} → ${high.output.toFixed(2)} L/min, `
+      + `LV ESPtm ${low.esp.toFixed(1)} → ${high.esp.toFixed(1)} mmHg`);
 }
 
 {

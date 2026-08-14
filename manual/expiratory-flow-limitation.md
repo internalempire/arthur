@@ -102,4 +102,4 @@ Time still works. At the shipped PEEP, slowing the rate from 26 to 12 breaths pe
 
 ## See also
 
-[Equation of motion](equation-of-motion.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Pleural pressure](pleural-pressure.md) · [Venous return](venous-return.md) · [COPD with dynamic hyperinflation](scenario-copd.md) · [Numeric tiles](numeric-tiles.md) · [Controls: mechanics](controls-mechanics.md)
+[Equation of motion](equation-of-motion.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Pleural pressure](pleural-pressure.md) · [Venous return](venous-return.md) · [COPD with dynamic hyperinflation](scenarios.md#copd-with-dynamic-hyperinflation) · [Numeric tiles](numeric-tiles.md) · [Controls: mechanics](controls-mechanics.md)

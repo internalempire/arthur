@@ -105,4 +105,4 @@ The difference was not cosmetic. With the earlier opening distribution, the refe
 
 ## See also
 
-[The two-population lung](two-population-lung.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Hysteresis](hysteresis.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Interpretability](interpretability.md) · [ARDS with right ventricular failure](scenario-ards-rv.md) · [Controls: mechanics](controls-mechanics.md)
+[The two-population lung](two-population-lung.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Hysteresis](hysteresis.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Interpretability](interpretability.md) · [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure) · [Controls: mechanics](controls-mechanics.md)

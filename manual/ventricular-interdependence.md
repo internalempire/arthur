@@ -135,4 +135,4 @@ The gains, reference volumes and pericardial constants are **didactic shape coef
 
 ## See also
 
-[Transmural pressure](transmural-pressure.md) · [The right ventricle](the-right-ventricle.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md) · [Pulmonary transit](pulmonary-transit.md) · [The four effects of a breath](the-four-effects-of-a-breath.md) · [ARDS with right ventricular failure](scenario-ards-rv.md) · [Controls: heart](controls-heart.md)
+[Transmural pressure](transmural-pressure.md) · [The right ventricle](the-right-ventricle.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md) · [Pulmonary transit](pulmonary-transit.md) · [The four effects of a breath](the-four-effects-of-a-breath.md) · [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure) · [Controls: heart](controls-heart.md)

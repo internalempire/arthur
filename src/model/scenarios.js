@@ -60,19 +60,15 @@ export const SCENARIOS = [
   {
     id: 'lv-failure',
     name: 'Cardiogenic pulmonary oedema',
-    note: 'A dilated, hypervolaemic left ventricle. Positive pressure now helps: it lowers left ventricular transmural pressure and unloads ejection. Compare how much cardiac output this heart loses to PEEP against how much a normal heart loses.',
+    note: 'Severe, afterload-sensitive left ventricular failure with high filling pressure. Set PEEP to zero, let the model settle, then return it to 10: pleural pressure rises, the transmural pressure the LV must eject against falls, end-systolic volume falls more than end-diastolic volume, and cardiac output rises. This deliberately afterload-dominant phenotype demonstrates a possible response to positive pressure, not a universal response in cardiogenic pulmonary oedema.',
     params: {
       mode: 'vcv', pmus: 0, vt: 450, peep: 10, rr: 18,
-      eesLv: 1.2, lvStiff: 0.034, stressedVolume: 1050, svr: 1.25, hr: 95,
-    },
-  },
-  {
-    id: 'weaning',
-    name: 'Weaning the failing left ventricle',
-    note: 'The same failing ventricle, now breathing on its own. Negative pleural pressure raises left ventricular afterload and venous return at the same time — the physiology behind weaning-induced pulmonary oedema.',
-    params: {
-      mode: 'spont', pmus: 10, peep: 0, rr: 26,
-      eesLv: 1.2, lvStiff: 0.034, stressedVolume: 1050, svr: 1.25, hr: 110,
+      eesLv: 0.6, lvStiff: 0.040, stressedVolume: 1050, svr: 1.25, hr: 95,
+      // A stiff thoracic envelope transmits enough airway pressure to make LV
+      // afterload relief exceed the simultaneous loss of venous return. This is
+      // part of the selected teaching phenotype, not a property of pulmonary
+      // oedema in every patient, and the scenario note says so explicitly.
+      ccw: 75,
     },
   },
   {
