@@ -8,6 +8,36 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-08-14 — Separate spontaneous pressure swing from preload reserve
+
+### Decision
+
+- Rename `swing-no-variation` to `swing-limited-reserve` and remove every claim
+  based on its hidden PPV value.
+- Preserve the vigorous spontaneous effort and full circulation, but use the
+  local slope of the Guyton operating point as the demonstrating readout.
+- Require the preset to generate a pleural swing above 15 cmH2O, remain below
+  the model's 10%/mmHg steep-limb threshold and label PPV unavailable.
+
+### Why
+
+PPV assumes passive, regular ventilation and cannot validate a lesson in a
+patient making strong spontaneous efforts. The previous preset correctly
+withheld PPV in the interface but contradicted that safeguard in its name and
+note by teaching from an unstable internal value. Preload sensitivity is a
+different quantity: it asks how the settled intersection of venous return and
+cardiac function moves with filling pressure, so it remains defined in this
+phenotype. The revised scenario therefore teaches the narrower and defensible
+point that a large transmitted pressure swing does not by itself establish
+preload reserve.
+
+### Deliberate limits
+
+The local slope is a property of the model's Guyton construction, not a
+validated bedside cutoff or a replacement for a fluid challenge. Irregular
+effort, arrhythmia, changing tidal volume and arterial waveform measurement
+error remain outside the scenario.
+
 ## 2026-08-14 — Retire weaning and make LV unloading an explicit matched experiment
 
 ### Decision

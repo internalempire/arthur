@@ -29,7 +29,7 @@ does not tune a preset or change an equation to make a row pass.
 | `healthy-vcv` | supported | Passive inflation reverses the respiratory direction of CVP and flow. |
 | `peep-escalation` | qualified | Higher PEEP raises CVP and mean systemic filling pressure while lowering output; the size is illustrative. |
 | `septic-responder` | qualified | Added stressed volume raises output and removing compensation exposes hypotension; the coefficients are didactic. |
-| `swing-no-variation` | needs correction | The note teaches from PPV during spontaneous breathing, although the model marks PPV unavailable; the hidden value is not reliably “near 4%”. |
+| `swing-limited-reserve` | qualified | A >20 cmH2O pleural swing coexists with a non-steep local preload slope; PPV is correctly withheld during spontaneous effort. |
 | `ards-rv` | qualified | RV pressure overload and the recruitability interaction are present; extreme PEEP and prone responses must not be read quantitatively. |
 | `pulmonary-embolism` | qualified | The baseline pressure-flow-RV phenotype is coherent; vascular obstruction and autonomic compensation remain aggregate inputs. |
 | `lv-failure` | qualified | In a deliberately afterload-dominant phenotype, PEEP lowers LV transmural end-systolic pressure and raises mean output. |
@@ -127,24 +127,22 @@ target or as proof that a given MAP identifies fluid responsiveness.
 venous heterogeneity, ventricular depression phenotypes, organ perfusion and
 fluid kinetics.
 
-## Big pleural swings, no variation (`swing-no-variation`)
+## Large pleural swings, limited preload reserve (`swing-limited-reserve`)
 
-**Teaching question.** Why can a large respiratory pressure swing fail to
-produce a useful dynamic preload signal?
+**Teaching question.** Why does a large respiratory pressure swing not establish
+fluid responsiveness?
 
-**What the model produces.** Pleural pressure swings by about 20 cmH2O and the
-circulation is relatively full. However, the preset is spontaneously breathing,
-so the model correctly labels PPV **unavailable**. The internal waveform
-calculation varies with settling time and is approximately 6–8%, not a stable
-value near 4%.
+**What the model produces.** Pleural pressure swings by about 20 cmH2O while the
+local preload reserve is about 6.5% of output per mmHg of filling pressure,
+below the model's 10%/mmHg steep-limb threshold. The preset is spontaneously
+breathing, so the model correctly labels PPV **unavailable**.
 
-**Assessment — needs correction.** The general lesson is sound, but PPV cannot be
-the demonstrating variable in this patient. The current note crosses the model's
-own interpretability boundary. A corrected preset should either use an
-interpretable quantity such as the operating point/preload slope, or demonstrate
-the same principle under a passive, regular, adequately ventilated comparison.
-The latter would answer a different clinical question and should be designed
-explicitly rather than silently changing the current phenotype.
+**Assessment — qualified.** The demonstrating variable is now the slope of the
+settled Guyton operating point, not an arterial waveform index. That preserves
+the spontaneous-breathing phenotype and makes the intended distinction
+internally coherent: pressure transmission is not preload reserve. The
+6.5%/mmHg value and the 10%/mmHg boundary are model teaching constructs, not a
+validated bedside fluid-responsiveness threshold.
 
 **Not represented.** Irregular effort, tidal-volume variability, reverse
 triggering, arrhythmia, right-heart afterload-mediated variation and real
@@ -284,10 +282,14 @@ time course of abdominal hypertension.
 2. **PEEP, sepsis, ARDS, pulmonary embolism, LV failure, chest-wall stiffness and
    abdominal hypertension are useful qualitative phenotypes**, but their
    numerical size must not be described as a human prediction.
-3. **`swing-no-variation` requires a new demonstrating readout or a redesigned
-   passive experiment.** Its current PPV statement is internally contradictory.
+3. **Large spontaneous pleural swings are now separated from preload reserve.**
+   The scenario uses the Guyton operating-point slope and withholds PPV, rather
+   than teaching from an invalid hidden waveform number.
 4. **The former `weaning` preset has been retired.** The clinically important phenomenon depends on work of breathing, sympathetic activation, ischaemia, dynamic mitral regurgitation, fluid redistribution and time-dependent pulmonary oedema that this compact model does not reproduce with enough fidelity for a useful preset.
-5. **The README pulmonary-embolism PEEP costs are stale:** they are larger than the current model produces and must not be preserved as historical calibration.
+5. **Pulmonary-embolism PEEP costs remain qualitative.** The stale exact
+   percentages have been removed from the README; the preset demonstrates
+   vulnerability to added intrathoracic pressure rather than a calibrated
+   effect size.
 
 ## Evidence used for this audit
 

@@ -30,9 +30,13 @@ export const SCENARIOS = [
     },
   },
   {
-    id: 'swing-no-variation',
-    name: 'Big pleural swings, no variation',
-    note: 'The same patient after resuscitation, now making vigorous efforts against a stiff chest wall. Pleural pressure swings by more than 20 cmH₂O and pulse pressure variation still sits near 4%: a swing in pleural pressure is necessary for variation, but it is the flat part of the Starling curve that decides whether any of it reaches the stroke volume.',
+    id: 'swing-limited-reserve',
+    name: 'Large pleural swings, limited preload reserve',
+    // Spontaneous effort makes PPV uninterpretable, so this preset teaches from
+    // the Guyton operating point instead. Keeping that distinction in the
+    // scenario itself prevents a hidden waveform number from becoming a
+    // surrogate fluid-responsiveness test.
+    note: 'The same patient after resuscitation, now making vigorous efforts against a stiff chest wall. Pleural pressure swings by more than 20 cmH₂O, but the operating point has limited local preload reserve: pressure swing and fluid responsiveness are not the same quantity. PPV is deliberately unavailable because the patient is breathing spontaneously; inspect the Guyton construction instead.',
     params: {
       mode: 'spont', pmus: 22, peep: 6, rr: 24, ccw: 100,
       stressedVolume: 950, svr: 0.75, hr: 100,
