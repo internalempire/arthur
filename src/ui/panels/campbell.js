@@ -1,7 +1,8 @@
 import { Panel, niceTicks } from '../plot.js';
 import {
   PPL_FRC, respiratorySystemCompliance,
-  lungVolumeAtPl, relaxationVolume, openBand, stepOpenFraction,
+  lungVolumeAtPl, relaxationVolume, recruitmentBand, stepRecruitedFraction,
+  openFractionFromRecruitmentState,
 } from '../../model/index.js';
 
 // The Campbell diagram. Pleural pressure follows the chest wall compliance
@@ -87,10 +88,10 @@ export function createCampbell(canvas) {
     // is nearly straight, which is why this looked like a line for so long.
     const vRelax = relaxationVolume(p);
     // The lung's own pressure-volume relation, swept. With hysteresis on it has
-    // two branches — the lung opens along one and empties along the other — and
-    // the area between them is what a slow inflation to high pressure draws at
-    // the bedside, lower inflection and all. Without it the two coincide and one
-    // line is the whole story.
+    // two recruitment branches. They illustrate retained recruitment, but not
+    // the area of a measured respiratory-system P-V loop: tissue and surfactant
+    // hysteresis are deliberately absent. Without recruitment hysteresis the
+    // two branches coincide and one line is the whole construction.
     const branches = p.hysteresis === 'on'
       ? [{ phi: 'up', dash: [2, 4] }, { phi: 'down', dash: [5, 3] }]
       : [{ phi: null, dash: [2, 4] }];
@@ -98,11 +99,18 @@ export function createCampbell(canvas) {
     const drawn = [];
     for (const branch of branches) {
       const curve = [];
-      let phi = branch.phi === 'down' ? openBand(p, 45).lo : null;
+      let recruited = branch.phi === 'down' ? recruitmentBand(p, 45).lo : null;
       for (let i = 0; i <= 60; i++) {
         const pl = branch.phi === 'down' ? 45 - (i * 47) / 60 : -2 + (i * 47) / 60;
-        if (branch.phi) phi = stepOpenFraction(p, phi ?? openBand(p, pl).lo, pl);
-        const vMlHere = (lungVolumeAtPl(p, pl, branch.phi ? phi : null) - vRelax) * 1000;
+        if (branch.phi) {
+          recruited = stepRecruitedFraction(
+            p, recruited ?? recruitmentBand(p, pl).lo, pl,
+          );
+        }
+        const openFraction = branch.phi
+          ? openFractionFromRecruitmentState(p, pl, recruited)
+          : null;
+        const vMlHere = (lungVolumeAtPl(p, pl, openFraction) - vRelax) * 1000;
         if (vMlHere < -60 || vMlHere > vMax * 1.1) continue;
         curve.push(-pl, vMlHere); // back from the alveolus toward the pleural space
         if (branch === branches[0]) {

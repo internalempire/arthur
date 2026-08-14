@@ -47,6 +47,8 @@ A page never restates a source at length. It explains, then links. Files under `
 
 **Call it "the model".** The name `arthur` belongs on the home page, in the title bar and where the application as a product is being discussed. In the body of a physiological explanation the subject is "the model", "the simulator", or nothing at all. A concept page is about the physiology first.
 
+**Write for a clinician before writing for an implementer.** State the bedside meaning in ordinary physiological language first. Give equations only when they prevent ambiguity or reveal an important limitation, and define implementation terms immediately if they cannot be avoided. Phrases such as “distribution midpoint”, “algebraic component”, “stateful fraction” or “play operator” must never carry the explanation by themselves.
+
 **Display-math delimiters sit alone on their own line.** Renderers disagree about `$$formula$$`. One that shared a line closed nothing, and the maths swallowed the paragraph after it. The manual's own renderer accepts both forms; the linter accepts one.
 
 **One line per paragraph.** Hard-wrapped prose keeps the author's line endings in any renderer that treats a newline as a break, and the paragraph stops reflowing. Wrapping is for code, not for pages.

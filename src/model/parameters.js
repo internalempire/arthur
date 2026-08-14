@@ -184,7 +184,7 @@ export const PARAMETERS = [
   {
     id: 'pOpen', group: 'mechanics', label: 'Opening pressure', unit: 'cmH₂O',
     min: 5, max: 40, step: 1, default: 20,
-    help: 'The transpulmonary pressure at which half the internally openable diseased compartment is open. It shapes where recruitment occurs; it is not the airway-opening pressure used to correct a bedside R/I manoeuvre.',
+    help: 'Recruitment occurs over a range, not at one pressure. This is the centre of that opening range for the collapsed but recruitable part of the lung: below it fewer than half of those units are open, above it more than half are. It is a transpulmonary pressure, not the airway-opening pressure used to correct a bedside R/I manoeuvre.',
   },
   {
     id: 'hysteresis', group: 'mechanics', label: 'Recruitment hysteresis',
@@ -200,7 +200,7 @@ export const PARAMETERS = [
     id: 'pClose', group: 'mechanics', label: 'Closing pressure', unit: 'cmH₂O',
     min: 2, max: 40, step: 1, default: 12,
     requires: { id: 'hysteresis', value: 'on' },
-    help: 'The transpulmonary pressure at which units that are open start to shut again. Only has an effect with hysteresis on, and only below the opening pressure — the gap between the two is the width of the hysteresis, and setting it equal to the opening pressure is the same as switching hysteresis off.',
+    help: 'Derecruitment also occurs over a range. This is the centre of the closing range for previously recruited diseased units: half remain open here during falling pressure. Already-aerated lung does not acquire this memory. It only has an effect with hysteresis on and below the opening pressure; setting the two pressures equal switches the memory off.',
   },
   {
     id: 'hpv', group: 'pulmonary', label: 'Hypoxic vasoconstriction', unit: '×',

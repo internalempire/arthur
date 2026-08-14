@@ -13,7 +13,7 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { defaultParams } from '../../src/model/parameters.js';
-import { pvrComponents, lungVolumeAtPl, openBand, stepOpenFraction, NORMAL_FRC } from '../../src/model/lung.js';
+import { pvrComponents, lungVolumeAtPl, NORMAL_FRC } from '../../src/model/lung.js';
 import { RESISTANCE_TO_WOOD } from '../../src/model/units.js';
 import { Simulator } from '../../src/model/simulator.js';
 import { venousReturnCurve, cardiacFunctionCurve, curveIntersection } from '../../src/model/circulation.js';
@@ -217,13 +217,16 @@ const CLASSES = ['total', 'alv', 'extra'];
 // call site.
 const esc = (s) => String(s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]));
 
-function chart({ title, xLabel, yLabel, series, xTick, yTick, notes = [], padRight = PAD.r, dashed = [] }) {
+function chart({
+  title, xLabel, yLabel, series, xTick, yTick, notes = [], padRight = PAD.r,
+  dashed = [], xDomain = null, yDomain = null,
+}) {
   const plotW = W - PAD.l - padRight;
   const all = series.flatMap((s) => s.points);
-  const xLo = Math.min(...all.map((q) => q[0]));
-  const xHi = Math.max(...all.map((q) => q[0]));
-  const yLo = Math.min(0, ...all.map((q) => q[1]));
-  const yHi = Math.max(...all.map((q) => q[1])) * 1.08;
+  const xLo = xDomain?.[0] ?? Math.min(...all.map((q) => q[0]));
+  const xHi = xDomain?.[1] ?? Math.max(...all.map((q) => q[0]));
+  const yLo = yDomain?.[0] ?? Math.min(0, ...all.map((q) => q[1]));
+  const yHi = yDomain?.[1] ?? Math.max(...all.map((q) => q[1])) * 1.08;
 
   const x = (v) => PAD.l + ((v - xLo) / (xHi - xLo)) * plotW;
   const y = (v) => PAD.t + plotH - ((v - yLo) / (yHi - yLo)) * plotH;
@@ -406,19 +409,29 @@ function hysteresisFigure() {
     deflating.push([sim.resp.plSolved, sim.metrics.openFraction * 100]);
   }
 
+  const points = [...inflating, ...deflating];
+  const xValues = points.map(([value]) => value);
+  const yValues = points.map(([, value]) => value);
+  // The generic chart starts percentage plots at zero. Here that hid the
+  // clinically relevant separation in the top third of a mostly empty panel.
+  // Rounded padding keeps every sampled point visible without implying that the
+  // axes themselves are physiological bounds.
+  const xDomain = [Math.floor(Math.min(...xValues)) - 1, Math.ceil(Math.max(...xValues)) + 1];
+  const yDomain = [Math.floor((Math.min(...yValues) - 4) / 5) * 5, 105];
+
   return chart({
-    title: 'The same lung walked up and then down, opening at 22 and closing at 6 cmH\u2082O',
+    title: 'Recruitment retained during an incremental and decremental PEEP trial',
     xLabel: 'End-expiratory transpulmonary pressure (cmH\u2082O)',
     yLabel: 'Lung open (%)',
     series: [
       { label: 'incremental', points: inflating },
       { label: 'decremental', points: deflating },
     ],
-    xTick: 5, yTick: 5, padRight: 200,
+    xTick: 5, yTick: 5, padRight: 200, xDomain, yDomain,
     notes: [
-      'the limbs separate because the',
-      'lung is held above its closing',
-      'pressure on the way down',
+      'only the collapsed but recruitable',
+      'part of the lung retains memory',
+      'on the way down',
     ],
   });
 }

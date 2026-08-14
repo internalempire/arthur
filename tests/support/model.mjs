@@ -17,6 +17,8 @@ import { applyBaroreflex, BARO } from '../../src/model/baroreflex.js';
 import {
   pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
   lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,
+  normalOpenFractionAt, recruitmentBand, stepRecruitedFraction,
+  openFractionFromRecruitmentState,
   staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
   recruitmentToInflation,
 } from '../../src/model/lung.js';
@@ -31,6 +33,8 @@ export {
   applyBaroreflex, BARO,
   pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
   lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,
+  normalOpenFractionAt, recruitmentBand, stepRecruitedFraction,
+  openFractionFromRecruitmentState,
   staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
   recruitmentToInflation, readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
 };

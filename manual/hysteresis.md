@@ -1,92 +1,100 @@
-# Recruitment-state hysteresis
+# Recruitment hysteresis
 
-> Optional. A unit that needed a high pressure to open does not close again until pressure falls much further, so the lung's state depends on where it has been. The model represents recruitment and derecruitment hysteresis only — not the hysteresis of the tissue itself.
+> Optional. Collapsed units may need a high pressure to reopen but a much lower pressure to remain open. The model retains this recruitment history without attempting to reproduce the complete respiratory pressure–volume loop.
 
 ---
 
 ## Physiology
 
-Opening a collapsed lung unit and keeping it open are different problems. Opening one requires overcoming surface forces at a closed air–liquid interface, which takes a substantial pressure. Once open, the interface no longer exists and the unit stays open at a far lower pressure.
+Opening and keeping an injured lung open are not the same mechanical problem. A collapsed unit may reopen only after a relatively high critical pressure is reached, yet remain aerated until pressure falls to a lower closing range. Surfactant behaviour, geometry, parenchymal interdependence and time all contribute to this difference in vivo.
 
-The consequence is that both aerated volume and recruitment state at a given pressure can depend on history. A classical respiratory pressure–volume loop contains this opening-and-closing component together with surfactant, tissue viscoelasticity and time-dependent effects.
+The result is path dependence: at the same transpulmonary pressure, more lung may be aerated after recruitment than before it. This is the rationale for pairing a recruitment manoeuvre with sufficient pressure afterwards. The high pressure opens units; the pressure that follows determines whether the gain is retained.
 
-This is the entire rationale for a recruitment manoeuvre followed by a decremental PEEP trial. The manoeuvre is transient and by itself achieves nothing lasting; what makes it worth doing is that afterwards the lung can be **held** open at a PEEP below the pressure that opened it.
+If pressure subsequently crosses the closing range, the recruited units close again. A manoeuvre may therefore produce a transient mechanical effect without leaving a persistent benefit.
 
-And it follows immediately that the manoeuvre's value is decided by what comes after it. If the pressure the lung is left at falls below the closing pressure, the units shut again and the manoeuvre has bought nothing but a haemodynamic insult.
+A classical respiratory pressure–volume loop contains more than recruitment and derecruitment. It also reflects surfactant dynamics, tissue viscoelasticity, stress relaxation and the duration and flow of the manoeuvre. Those components are not represented here.
 
 ---
 
 ## In the model
 
-Hysteresis is off by default. Enabled, it adds two controls: `pOpen`, the transpulmonary pressure at which units open, and `pClose`, the transpulmonary pressure below which they close again. **Both are transpulmonary pressures, not airway pressures and not PEEP.**
+Hysteresis is off by default. When it is enabled, two controls describe the recruitable part of the collapsed lung:
 
-At any pressure the model computes two open fractions rather than one:
+- `pOpen` locates the **opening range**. Opening is gradual: at this transpulmonary pressure half of the units that can be recruited have opened during rising pressure.
+- `pClose` locates the lower **closing range**. During falling pressure, half of those recruitable units remain open at this pressure.
+
+Both are transpulmonary pressures. They are not airway pressures, PEEP values or sharply defined thresholds at which every unit changes state.
+
+The model treats the lung as two contributions:
+
+1. The already-aerated fraction follows the current transpulmonary pressure. It does not remember a recruitment manoeuvre.
+2. The collapsed but recruitable fraction can retain its previous state between the opening and closing ranges.
+
+This distinction is important. In an earlier implementation, recruitment memory was applied to the whole lung. That made the already-aerated fraction behave as if it had the same opening and closing pressures as injured lung. The current implementation confines memory to the compartment for which `pOpen` and `pClose` are defined.
+
+The calculation can be summarised as:
 
 $$
-\varphi_{lo} = \varphi(P_l \mid P_{open}), \qquad \varphi_{hi} = \varphi(P_l \mid P_{close})
+\varphi(P_l) = \varphi_{aerated}(P_l) + r
 $$
 
-- $\varphi_{lo}$ — the fraction that this pressure can open, using the opening threshold
-- $\varphi_{hi}$ — the fraction this pressure can keep open, using the lower closing threshold
+- $\varphi$ — total open fraction of the lung
+- $\varphi_{aerated}$ — already-aerated fraction open at the present transpulmonary pressure
+- $r$ — fraction of the whole lung currently represented by open, recruitable diseased units
 - $P_l$ — transpulmonary pressure, cmH₂O
 
-These are the edges of a band. The lung's actual open fraction is a **state** carried between time steps, and a play operator clamps it into the band:
+At each simulation step, $r$ is compared with the amount that the present pressure can open and the amount it can keep open. It rises when pressure enters the opening range, falls when pressure enters the closing range, and otherwise remains unchanged. This bounded memory rule is rate-independent: pressure history matters, but the time spent at a pressure does not.
 
-```
-phi = min(max(phi, lo), hi)
-```
-
-It moves only when the state has become incompatible with the present pressure. Rising pressure that exceeds what the state can justify drags it up to the inflation limb; falling pressure that goes below the closing region drags it down to the deflation limb. Between the two the state does not move, and the lung remembers.
-
-Because the open fraction is a state rather than a function of the present pressure, the mechanics and the [pulmonary vascular resistance](pulmonary-vascular-resistance.md) must be read off that state rather than recomputed from pressure. Both code paths accept a known open fraction for exactly this reason.
+The resulting total open fraction is used by lung mechanics, strain and [pulmonary vascular resistance](pulmonary-vascular-resistance.md). A lung with no collapsed compartment now behaves identically with hysteresis on or off.
 
 ### A reproducible experiment
 
-A recruitable ARDS lung, volume control at 250 mL and 20 breaths per minute, `clung` 45, `collapsed` 0.45, R/I 0.6, `pOpen` 22, `pClose` 6. Settle at PEEP 10, raise PEEP to 35 for 30 s, return to PEEP 10:
+Consider a recruitable ARDS phenotype under volume control: tidal volume 250 mL, respiratory rate 20/min, `clung` 45 mL/cmH₂O, `collapsed` 0.45, R/I 0.6, `pOpen` 22 cmH₂O and `pClose` 6 cmH₂O. After equilibration at PEEP 10, PEEP is raised to 35 for 30 seconds and then returned to 10.
 
 | | before | after |
 |---|---|---|
 | lung open | 80.3% | **96.2%** |
 | pulmonary resistance coefficient | 1.41 WU | 1.21 WU |
 
-Nearly sixteen percentage points of lung stay open at the same PEEP the patient started on, and the right ventricle feels it.
+At the same final PEEP, 15.9 percentage points more lung remain open. Within the model, the larger aerated fraction also lowers the pulmonary resistance coefficient.
 
-Walking the same preparation up and back down in PEEP steps, with the state carried continuously, gives two **recruitment-state** limbs:
+Walking the same simulated lung upward and then downward through a PEEP sequence produces two recruitment-state paths:
 
 ![Open fraction during an incremental and decremental PEEP sequence](figure/hysteresis.svg)
 
-| end-expiratory P<sub>l</sub> | incremental | decremental |
+| PEEP | incremental: P<sub>l</sub> / open | decremental: P<sub>l</sub> / open |
 |---|---|---|
-| ~9 cmH₂O | 70.1% | **87.6%** |
-| ~11 | 75.0 | 92.7 |
-| ~12 | 80.3 | 96.2 |
-| ~15 | 90.4 | 99.2 |
-| ~21 | 99.6 | 100.0 |
-| >24 | 100.0 | 100.0 |
+| 6 cmH₂O | 9.2 / 69.9% | 7.9 / **87.5%** |
+| 8 | 10.6 / 75.0% | 9.3 / **92.7%** |
+| 10 | 12.0 / 80.2% | 10.8 / **96.2%** |
+| 14 | 14.7 / 90.4% | 14.0 / **99.2%** |
+| 22 | 20.9 / 99.6% | 20.9 / 100.0% |
 
-The limbs converge at the top, where pressure has opened everything that can open, and separate below it. The figure is plotted against **end-expiratory transpulmonary pressure** and its vertical axis is **open fraction**, not lung volume. It is therefore not the classical inflation–deflation pressure–volume loop. `pClose` is defined as a transpulmonary pressure, and the same PEEP produces different transpulmonary pressures depending on chest wall, lung volume and how much lung is open.
+The two paths meet at high pressure, where almost all recruitable units are open, and separate as pressure falls through the range in which recruitment can be retained. The exact horizontal coordinates differ between the paths because the same PEEP does not produce the same transpulmonary pressure when aerated volume differs.
 
-### When the manoeuvre leaves nothing
+The vertical axis is open fraction, not lung volume. The figure is therefore **not** the classical inflation–deflation pressure–volume loop and should not be interpreted as one. Its narrower vertical scale is a display choice that makes the separation visible; it is not a physiological boundary.
 
-Three conditions, each sufficient on its own, and each clinically real.
+### When the manoeuvre leaves little or nothing
 
-**The pressure afterwards is below the closing pressure.** With `pClose` raised to 14 against an end-expiratory transpulmonary pressure of 12.7, the same manoeuvre retains 0.0 points. The lung passes back through the closing region on every expiration and shuts.
+Three examples are useful at the bedside:
 
-**The breath is already large enough to recruit by itself.** At 400 mL instead of 250, the same manoeuvre retains 2.3 points instead of 15.9. Each ordinary breath already reaches the opening limb, so there is nothing left for a manoeuvre to add — and the tidal opening and closing that implies is itself injurious.
+**Pressure afterwards is too low.** If pressure falls through the closing range, recently opened units close again. In the example above, raising `pClose` to 14 cmH₂O leaves essentially no persistent gain after return to PEEP 10.
 
-**The lung is not recruitable.** With little openable compartment there is nothing to hold, whatever the pressures.
+**Ordinary breaths already reach the opening range.** Increasing tidal volume from 250 to 400 mL leaves only a 2.3-point gain after the manoeuvre because the preceding breaths had already recruited much of the available compartment. This is a model illustration, not a recommendation to use a larger tidal volume.
+
+**The collapsed lung is poorly recruitable.** Pressure cannot retain units that the model has classified as non-openable consolidation.
 
 ---
 
 ## Why this and not something else
 
-**A play operator rather than a recruitment-manoeuvre button.** The alternative design was a button that performed a manoeuvre and set a flag. It was rejected because it makes recruitment an event with a scripted consequence, and the interesting behaviour — that the same manoeuvre helps or does nothing depending on what follows it — would have been written into the script rather than emerging. The three conditions above are not coded anywhere; they fall out of a band and a state.
+**A physiological memory rather than a manoeuvre button.** A button could impose a prewritten improvement after high pressure. Carrying the recruited fraction as a state allows the result to depend on the pressure reached, the tidal excursion and what happens afterwards.
 
-**Off by default.** Path dependence means the model's state depends on its history, so two identical control settings can give different answers. That is physiologically right and pedagogically confusing, so it is opt-in, and `pClose` stays greyed out until it is enabled.
+**Memory only in the recruitable compartment.** The controls describe injured units that can open and close. Applying the same history to already-aerated lung would be mathematically convenient but physiologically incoherent.
 
-**A state band rather than a pressure–volume loop model.** Real respiratory hysteresis is continuous and has an area. This feature uses two shifted recruitment distributions to create a band; it represents the memory relevant to an incremental/decremental trial, not the area or shape of a measured pressure–volume loop.
+**Off by default.** With path dependence, identical current settings can produce different states depending on what happened earlier. That behaviour is useful but can confuse a first reading, so it remains optional.
 
-**Rate-independent.** Opening is instantaneous once the pressure is reached. Recruitment in a real lung depends on how long a pressure is held as well as how high it is. Adding that would need a time constant with nothing to anchor it, and it is not required for the behaviour above.
+**No time constant.** Recruitment in vivo depends on both pressure and duration. A time-dependent implementation would require one or more poorly anchored rates and would add complexity beyond the present teaching aim. The model therefore changes recruitment as soon as the relevant pressure range is crossed.
 
 ---
 
@@ -94,18 +102,31 @@ Three conditions, each sufficient on its own, and each clinically real.
 
 ### Of the construction
 
-- **Only recruitment-state hysteresis.** The [tissue pressure–volume curve](pressure-volume-curve.md) is single-valued, so there is no surfactant dynamics, viscoelasticity, stress relaxation or reproduction of the area of a classical pressure–volume loop. The current figure must not be used as a substitute for that physiological loop.
-- **The gap is applied to both unit populations.** `pOpen` and `pClose` describe the recruitable diseased compartment, but the shift between the two thresholds is applied to the normal units as well. Normal units therefore acquire an ARDS lung's hysteresis and stay open below zero transpulmonary pressure. This is a real structural defect; the fix and its cost are in [planned work](_todo.md).
-- **No time dependence.** No slow recruitment over minutes, no derecruitment from time alone at constant pressure, no dependence on how long a manoeuvre is held.
-- **Two shared branch shifts** rather than independently distributed opening and closing pressures for individual units.
-- **One state for the whole lung**, so there is no regional pattern of opening and closing.
+- **Only recruitment and derecruitment memory are represented.** The tissue pressure–volume relation itself is single-valued. Surfactant dynamics, viscoelasticity, stress relaxation and the area of a measured respiratory pressure–volume loop are absent.
+- **No time dependence.** Holding the same pressure for one second or one minute produces no additional recruitment or derecruitment.
+- **Shared opening and closing distributions.** All recruitable units belong to two smooth pressure ranges with fixed widths; there is no patient-specific distribution of regional thresholds.
+- **One global recruitment state.** Dependent and non-dependent regions cannot open or close differently.
+- `pOpen` and `pClose` are model inputs. The model does not estimate them from a bedside manoeuvre.
 
 ### Of clinical application
 
-- **The model gives no guidance on how to perform a recruitment manoeuvre** and represents almost none of its risks: no barotrauma, no ventilator-induced injury, only the immediate haemodynamic cost.
-- `pOpen` and `pClose` are inputs — the clinician's assertion about the patient. Nothing in the model estimates them, and no manoeuvre here measures them.
-- The percentages above belong to one phenotype at one setting. The transferable content is the three conditions under which a manoeuvre buys nothing.
-- A decremental PEEP trial here cannot be judged on oxygenation, dead space or CO₂, because the model has none of them. Three of the four readings a bedside trial is judged on are unavailable.
+- The model gives no guidance on whether or how to perform a recruitment manoeuvre and represents few of its risks. Acute haemodynamic effects are present; barotrauma and ventilator-induced lung injury are not.
+- The example values belong to one simulated phenotype and should not be transferred to a patient.
+- Oxygenation, dead space and CO₂ are absent. The model can therefore show only mechanical and haemodynamic consequences of a PEEP trial.
+- A decremental path that looks favourable here cannot define an optimal clinical PEEP.
+
+---
+
+## Validation
+
+Executable tests require the following properties:
+
+- a recruitment manoeuvre can leave a recruitable lung more open at the original PEEP;
+- the decremental path remains above the incremental path within the retention range;
+- retained recruitment lowers the model pulmonary resistance coefficient;
+- returning below the closing range removes the gain;
+- a lung with no collapsed compartment has no recruitment hysteresis and gives bit-identical mechanics with the feature on or off;
+- setting `pClose` equal to `pOpen` is equivalent to switching hysteresis off.
 
 ---
 

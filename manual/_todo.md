@@ -16,23 +16,6 @@
 
 **What to check it against.** The model should reproduce the equalisation of right atrial, right ventricular diastolic, pulmonary artery diastolic and wedge pressures, and an inspiratory fall in systolic pressure that is larger with the pericardium constrained than without. Whether the magnitudes can be calibrated is an open question — this would likely be a directional constraint rather than a numerical one.
 
-### Separate the hysteretic state from the normal open fraction
-
-`openFractionAt` applies the same `pOpen` − `pClose` shift to both unit populations. But `pOpen` is defined as the opening pressure of the **recruitable diseased compartment**, so giving the same gap to normal units attributes an ARDS lung's hysteresis to healthy tissue. The visible symptom is that normal units stay open below −8 cmH₂O of transpulmonary pressure, and an inflation–deflation loop converges only at the model's 5% numerical floor.
-
-The clean fix separates the two:
-
-```
-open fraction = normal fraction, single-valued
-              + recruited diseased fraction, stateful
-```
-
-Normal units follow their curve instantaneously near `PL_EASY`; only the recruitable share carries hysteretic state; `pOpen` and `pClose` become the midpoints of that compartment's opening and closing curves; the existing play operator is kept for that state; and `openFraction` remains the sum used by compliance, strain and PVR.
-
-It needs no time constant, adds no control, costs nothing measurable, and makes the parameters mean what the interface says they mean. It should be accompanied by a test asserting that a lung with no collapsed compartment is bit-identical with hysteresis on and off — which is the property currently violated.
-
-Time dependence of recruitment is physiologically real — pressure and duration both matter — but introducing it here would add a poorly anchored constant and is not needed to correct the population error. It remains an explicit limitation.
-
 ### Make the chest-wall reference independent of the lung
 
 The respiratory model recalculates `relaxationVolume(p)` from lung compliance and open fraction, then assigns −5 cmH₂O pleural pressure at that volume. This shifts the chest-wall relation with every lung phenotype. A future implementation should give the chest wall its own relaxation volume or pressure–volume relation and solve the zero-flow equilibrium from the intersection of lung and chest-wall recoil. The change must preserve a legible within-breath equation of motion and be tested across normal, ARDS and emphysema phenotypes.
@@ -63,3 +46,4 @@ Open since the J-curve work. Cappio Borlino's within-group R/I values and Table 
 
 - Full-text search. The viewer currently searches page titles and summaries only; a generated index over page text would make 56 pages navigable.
 - A lint pass for contradictions between pages. The current linter checks that a page renders and that its links resolve; it cannot tell whether two pages disagree, or whether a number has gone stale since the model changed.
+- Fix in-page table-of-contents links. The current hash router treats a URL such as `#/hysteresis#a-reproducible-experiment` as the slug of a new page and renders “Not found” instead of scrolling within the current page. This was reproduced in the local viewer during the hysteresis-page QA.

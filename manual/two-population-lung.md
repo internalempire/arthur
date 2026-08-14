@@ -26,7 +26,7 @@ $$
 \varphi(P_l) = (1-d)\,\sigma\!\left(\frac{P_l - 0}{1.3}\right) + d\,\omega\,\sigma\!\left(\frac{P_l - P_{open}}{2}\right)
 $$
 
-This is the equilibrium relation used when hysteresis is off. With [recruitment-state hysteresis](hysteresis.md) enabled, open fraction is a state carried between steps and constrained between opening and closing branches.
+This is the equilibrium relation used when hysteresis is off. With [recruitment hysteresis](hysteresis.md) enabled, only the collapsed but recruitable contribution retains memory; the already-aerated contribution continues to follow the current pressure. Their sum remains the total open fraction used elsewhere in the model.
 
 - $\varphi$ — open fraction of the lung, clamped to the range 0.05 to 1
 - $\sigma(x) = 1/(1+e^{-x})$ — the logistic

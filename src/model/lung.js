@@ -93,20 +93,33 @@ function openableDiseasedFraction(p) {
 // lung open against the chest wall, and the negative of pleural pressure there.
 export const RECOIL_AT_FRC = 5; // cmH2O
 
-/**
- * How much of the lung is open at a given transpulmonary pressure.
- *
- * `shift` moves both thresholds down, which is what makes the closing branch the
- * closing branch: a unit that needed 20 cmH2O to open will not close again until
- * pressure falls well below that.
- */
-export function openFractionAt(p, pl, shift = 0) {
+/** The already-aerated share follows present pressure and carries no memory. */
+export function normalOpenFractionAt(p, pl) {
   const diseased = clamp(p.collapsed ?? 0, 0, 0.95);
-  const openable = openableDiseasedFraction(p);
-  const normalOpen = (1 - diseased) * logistic((pl - (PL_EASY - shift)) / SPREAD_EASY);
-  const recruited = diseased * openable
+  return (1 - diseased) * logistic((pl - PL_EASY) / SPREAD_EASY);
+}
+
+/**
+ * Share of the whole lung represented by open, recruitable diseased units.
+ *
+ * `shift` applies only to this compartment. It moves the centre of its
+ * threshold distribution from `pOpen` to `pClose` on the closing branch. The
+ * normal compartment must not inherit an ARDS recruitment threshold.
+ */
+export function recruitableOpenFractionAt(p, pl, shift = 0) {
+  const diseased = clamp(p.collapsed ?? 0, 0, 0.95);
+  return diseased * openableDiseasedFraction(p)
     * logistic((pl - ((p.pOpen ?? 20) - shift)) / SPREAD_HARD);
-  return clamp(normalOpen + recruited, 0.05, 1);
+}
+
+/** Total open lung for a known state of the recruitable diseased compartment. */
+export function openFractionFromRecruitmentState(p, pl, recruitedFraction) {
+  return clamp(normalOpenFractionAt(p, pl) + Math.max(0, recruitedFraction), 0.05, 1);
+}
+
+/** How much of the lung is open at a pressure when no history is retained. */
+export function openFractionAt(p, pl, shift = 0) {
+  return openFractionFromRecruitmentState(p, pl, recruitableOpenFractionAt(p, pl, shift));
 }
 
 /** How far below the opening pressure units hang on before they shut again. */
@@ -124,25 +137,48 @@ export function hysteresisGap(p) {
  * than one that has just been deflated to it.
  */
 export function openBand(p, pl) {
+  const normalOpen = normalOpenFractionAt(p, pl);
+  const { lo, hi } = recruitmentBand(p, pl);
+  return {
+    lo: clamp(normalOpen + lo, 0.05, 1),
+    hi: clamp(normalOpen + hi, 0.05, 1),
+  };
+}
+
+/** Opening and closing limits for the recruitable diseased compartment only. */
+export function recruitmentBand(p, pl) {
   const gap = hysteresisGap(p);
   return {
-    lo: openFractionAt(p, pl, 0),      // opens only what this pressure can open
-    hi: openFractionAt(p, pl, gap),    // keeps open everything already open
+    lo: recruitableOpenFractionAt(p, pl, 0),
+    hi: recruitableOpenFractionAt(p, pl, gap),
   };
 }
 
 /**
- * Advance the open fraction one step, given where the lung currently is.
+ * Advance the recruited diseased fraction, given where it currently is.
  *
  * A play operator: the state is dragged along by whichever edge of the band it
  * has run into, and sits still in between. Instantaneous rather than rate-based,
  * because in this model an alveolus opens within a breath and nothing here
  * resolves the milliseconds it takes.
  */
+export function stepRecruitedFraction(p, recruitedFraction, pl) {
+  const { lo, hi } = recruitmentBand(p, pl);
+  if (!(recruitedFraction >= 0)) return lo;
+  return Math.min(Math.max(recruitedFraction, lo), hi);
+}
+
+/**
+ * Compatibility helper for diagrams that only carry total open fraction.
+ *
+ * The simulator does not use this function: a total fraction cannot preserve
+ * the distinction between pressure-responsive normal lung and recruitment
+ * memory. New stateful code should carry `recruitedFraction` and call
+ * `stepRecruitedFraction` instead.
+ */
 export function stepOpenFraction(p, phi, pl) {
-  const { lo, hi } = openBand(p, pl);
-  if (!(phi > 0)) return lo;
-  return Math.min(Math.max(phi, lo), hi);
+  const recruited = Math.max(0, phi - normalOpenFractionAt(p, pl));
+  return openFractionFromRecruitmentState(p, pl, stepRecruitedFraction(p, recruited, pl));
 }
 
 // The open fraction of an undiseased lung at its resting recoil is a constant —
@@ -243,14 +279,17 @@ export function lungVolumeAtPl(p, pl, phi = null) {
   return (phi ?? openFractionAt(p, pl)) * perUnitVolume(p, pl);
 }
 
+/** Volume when recruitment memory is fixed but normal lung still follows pressure. */
+export function lungVolumeAtRecruitmentState(p, pl, recruitedFraction) {
+  return openFractionFromRecruitmentState(p, pl, recruitedFraction) * perUnitVolume(p, pl);
+}
+
 /**
  * The volume the lung settles at when its recoil balances the chest wall.
  *
- * With hysteresis on this is no longer a property of the parameters alone — the
- * same lung rests at two different volumes depending on whether it was last
- * inflated or last emptied — so the caller passes the open fraction it is
- * actually at. Omitting it gives the equilibrium branch, which is what the
- * non-hysteresis model has always used.
+ * Passing a total open fraction is retained for static analyses. The dynamic
+ * hysteresis path instead carries only recruited diseased lung and uses
+ * `lungVolumeAtRecruitmentState`, so normal lung remains pressure-responsive.
  */
 export function relaxationVolume(p, phi = null) {
   return lungVolumeAtPl(p, RECOIL_AT_FRC, phi);
@@ -259,10 +298,9 @@ export function relaxationVolume(p, phi = null) {
 /**
  * Transpulmonary pressure at a volume, with the open fraction held fixed.
  *
- * Closed form, because with the fraction frozen the curve is a straight line:
- * V = phi * (V0 + C*Pl). Within a step the fraction *is* frozen — it is a state
- * that the step then updates — so this is both exact and cheaper than the
- * bisection the equilibrium branch needs.
+ * Closed form because, once the fraction is frozen, only the tissue curve must
+ * be inverted and `perUnitPressure` is its analytic inverse. The tissue curve
+ * itself is saturating above zero pressure; it is not a straight line.
  */
 export function transpulmonaryAtFixed(p, lungVolume, phi) {
   return clamp(perUnitPressure(p, lungVolume / Math.max(phi, 1e-6)), -25, 80);
@@ -309,6 +347,40 @@ export function transpulmonaryAt(p, lungVolume, hint = null) {
 }
 
 /**
+ * Invert lung volume while holding only recruitment memory fixed.
+ *
+ * The normal compartment remains pressure-responsive during the solve. This is
+ * intentionally different from `transpulmonaryAtFixed`, which freezes the
+ * entire open fraction and is retained for static analytic uses.
+ */
+export function transpulmonaryAtRecruitmentState(p, lungVolume, recruitedFraction, hint = null) {
+  const TOL = 1e-6; // L
+  const volumeAt = (pl) => lungVolumeAtRecruitmentState(p, pl, recruitedFraction);
+
+  if (hint !== null && Number.isFinite(hint)) {
+    let pl = hint;
+    for (let i = 0; i < 4; i++) {
+      const f = volumeAt(pl) - lungVolume;
+      if (Math.abs(f) < TOL) return pl;
+      const h = 0.05;
+      const slope = (volumeAt(pl + h) - volumeAt(pl - h)) / (2 * h);
+      if (!(slope > 1e-9)) break;
+      pl -= f / slope;
+      if (!Number.isFinite(pl) || pl < -25 || pl > 80) break;
+    }
+  }
+
+  let lo = -25, hi = 80;
+  if (lungVolume <= volumeAt(lo)) return lo;
+  if (lungVolume >= volumeAt(hi)) return hi;
+  for (let i = 0; i < 34; i++) {
+    const mid = (lo + hi) / 2;
+    if (volumeAt(mid) < lungVolume) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/**
  * The compliance a ventilator would measure: the slope of the curve here, not
  * the tissue property.
  *
@@ -330,6 +402,25 @@ export function staticEndExpiratoryVolume(p, peep, phi = null) {
   const balance = (volume) =>
     -RECOIL_AT_FRC + (volume - vRelax) / ccw
     + (phi === null ? transpulmonaryAt(p, volume) : transpulmonaryAtFixed(p, volume, phi)) - peep;
+
+  let lo = 0.02;
+  let hi = Math.max(12, lungVolumeAtPl(p, 80) * 1.05);
+  for (let i = 0; i < 44; i++) {
+    const mid = (lo + hi) / 2;
+    if (balance(mid) < 0) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+/** Passive EELV for a known recruitment state and pressure-responsive normal lung. */
+export function staticEndExpiratoryVolumeAtRecruitmentState(p, peep, recruitedFraction) {
+  // Keep the same chest-wall reference used by the respiratory integrator.
+  // Recruitment changes absolute volume, not the chest wall's zero-pressure
+  // reference; using a state-specific relaxation volume would count it twice.
+  const vRelax = relaxationVolume(p);
+  const ccw = Math.max(1e-6, (p.ccw ?? 200) / 1000);
+  const balance = (volume) => -RECOIL_AT_FRC + (volume - vRelax) / ccw
+    + transpulmonaryAtRecruitmentState(p, volume, recruitedFraction) - peep;
 
   let lo = 0.02;
   let hi = Math.max(12, lungVolumeAtPl(p, 80) * 1.05);
@@ -521,10 +612,16 @@ export function lungRegions(p, lungVolume, plKnown = null, phiKnown = null) {
   const hard = logistic((pl - (p.pOpen ?? 20)) / SPREAD_HARD);
 
   const normalOpen = (1 - diseased) * easy;
-  const recruited = diseased * openable * hard;
+  const equilibriumRecruited = diseased * openable * hard;
   // With hysteresis running, how much is open is a state rather than a function
   // of the present pressure, and the resistance has to be read off the state.
-  const openFraction = phiKnown ?? clamp(normalOpen + recruited, 0.05, 1);
+  const openFraction = phiKnown ?? clamp(normalOpen + equilibriumRecruited, 0.05, 1);
+  // Under hysteresis the known total contains a pressure-responsive normal share
+  // plus recruitment memory. Report the latter rather than the equilibrium
+  // opening-branch value, otherwise the metrics disagree with the mechanics.
+  const recruited = phiKnown === null
+    ? equilibriumRecruited
+    : clamp(openFraction - normalOpen, 0, diseased * openable);
   const closedFraction = 1 - openFraction;
 
   // Volume per open unit, referenced to what this patient's fully open tissue
