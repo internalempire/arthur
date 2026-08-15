@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" class="arthur-fig" role="img" aria-label="Added fluid moves the state along one venous pressure-volume relation">
+<style>
+  svg.arthur-fig .bg { fill: none }
+  svg.arthur-fig .axis { stroke: var(--fig-axis, #9aa4b2); stroke-width: 1 }
+  svg.arthur-fig .grid { stroke: var(--fig-grid, #d7dce3); stroke-width: 1; stroke-dasharray: 2 4 }
+  svg.arthur-fig .tick { fill: var(--fig-muted, #6b7480); font: 11px system-ui, sans-serif }
+  svg.arthur-fig .label { fill: var(--fig-text, #2b3138); font: 12px system-ui, sans-serif }
+  svg.arthur-fig .title { fill: var(--fig-text, #2b3138); font: 600 13px system-ui, sans-serif }
+  svg.arthur-fig .lm { stroke: var(--fig-grid, #d7dce3); stroke-width: 1 }
+  svg.arthur-fig .lm-text { fill: var(--fig-muted, #6b7480); font: 600 11px system-ui, sans-serif }
+  svg.arthur-fig .total { stroke: var(--fig-total, #1f6feb); stroke-width: 2.5; fill: none }
+  svg.arthur-fig .alv { stroke: var(--fig-alv, #d1495b); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .extra { stroke: var(--fig-extra, #2a9d8f); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .nadir { stroke: var(--fig-total, #1f6feb); stroke-width: 1; stroke-dasharray: 3 3 }
+  svg.arthur-fig .dot { fill: var(--fig-total, #1f6feb); stroke: none }
+  @media (prefers-color-scheme: dark) {
+    svg.arthur-fig .axis { stroke: #5b6472 }
+    svg.arthur-fig .grid, svg.arthur-fig .lm { stroke: #363d47 }
+    svg.arthur-fig .tick, svg.arthur-fig .lm-text { fill: #8b95a3 }
+    svg.arthur-fig .label, svg.arthur-fig .title { fill: #d6dbe2 }
+    svg.arthur-fig .total, svg.arthur-fig .nadir { stroke: #58a6ff }
+    svg.arthur-fig .dot { fill: #58a6ff }
+    svg.arthur-fig .alv { stroke: #f08c9a }
+    svg.arthur-fig .extra { stroke: #4fd1c1 }
+  }
+</style>
+<rect class="bg" width="760" height="430"/>
+<text class="title" x="66" y="16">Added fluid moves the state along one venous pressure-volume relation</text>
+<line class="grid" x1="66" y1="378.0" x2="550" y2="378.0"/><text class="tick" x="57" y="382.0" text-anchor="end">0</text>
+<line class="grid" x1="66" y1="327.7" x2="550" y2="327.7"/><text class="tick" x="57" y="331.7" text-anchor="end">2</text>
+<line class="grid" x1="66" y1="277.4" x2="550" y2="277.4"/><text class="tick" x="57" y="281.4" text-anchor="end">4</text>
+<line class="grid" x1="66" y1="227.1" x2="550" y2="227.1"/><text class="tick" x="57" y="231.1" text-anchor="end">6</text>
+<line class="grid" x1="66" y1="176.9" x2="550" y2="176.9"/><text class="tick" x="57" y="180.9" text-anchor="end">8</text>
+<line class="grid" x1="66" y1="126.6" x2="550" y2="126.6"/><text class="tick" x="57" y="130.6" text-anchor="end">10</text>
+<line class="grid" x1="66" y1="76.3" x2="550" y2="76.3"/><text class="tick" x="57" y="80.3" text-anchor="end">12</text>
+<text class="tick" x="155.6" y="396" text-anchor="middle">3000</text>
+<text class="tick" x="263.2" y="396" text-anchor="middle">3300</text>
+<text class="tick" x="370.7" y="396" text-anchor="middle">3600</text>
+<text class="tick" x="478.3" y="396" text-anchor="middle">3900</text>
+<line class="axis" x1="66" y1="26" x2="66" y2="378"/>
+<line class="axis" x1="66" y1="378.0" x2="550" y2="378.0"/>
+<path class="total" style="stroke-dasharray:none" d="M83.9 378.0 L91.1 373.0 L98.3 367.9 L105.4 362.9 L112.6 357.9 L119.8 352.9 L126.9 347.8 L134.1 342.8 L141.3 337.8 L148.5 332.7 L155.6 327.7 L162.8 322.7 L170.0 317.7 L177.1 312.6 L184.3 307.6 L191.5 302.6 L198.7 297.5 L205.8 292.5 L213.0 287.5 L220.2 282.5 L227.3 277.4 L234.5 272.4 L241.7 267.4 L248.8 262.3 L256.0 257.3 L263.2 252.3 L270.4 247.3 L277.5 242.2 L284.7 237.2 L291.9 232.2 L299.0 227.1 L306.2 222.1 L313.4 217.1 L320.5 212.1 L327.7 207.0 L334.9 202.0 L342.1 197.0 L349.2 191.9 L356.4 186.9 L363.6 181.9 L370.7 176.9 L377.9 171.8 L385.1 166.8 L392.3 161.8 L399.4 156.7 L406.6 151.7 L413.8 146.7 L420.9 141.7 L428.1 136.6 L435.3 131.6 L442.4 126.6 L449.6 121.5 L456.8 116.5 L464.0 111.5 L471.1 106.5 L478.3 101.4 L485.5 96.4 L492.6 91.4 L499.8 86.3 L507.0 81.3 L514.1 76.3 L521.3 71.3 L528.5 66.2 L535.7 61.2 L542.8 56.2 L550.0 51.1"/>
+<circle class="dot" cx="334.9" cy="202.0" r="4"/><text class="label" x="341.9" y="194.0">3,500 mL · 7 mmHg</text>
+<circle class="dot" cx="514.1" cy="76.3" r="4"/><text class="label" x="398.1" y="68.3">+500 mL · 12 mmHg</text>
+<text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Elastic filling pressure (mmHg)</text>
+<text class="label" x="308" y="424" text-anchor="middle">Blood in the systemic venous reservoir (mL)</text>
+<line class="total" style="stroke-dasharray:none" x1="566" y1="48" x2="594" y2="48"/><text class="label" x="600" y="52">neutral-tone relation</text>
+<text class="tick" x="566" y="88">C = 100 mL/mmHg</text>
+<text class="tick" x="566" y="104">slope = 0.01 mmHg/mL</text>
+<text class="tick" x="566" y="120">+500 mL → +5 mmHg</text>
+</svg>

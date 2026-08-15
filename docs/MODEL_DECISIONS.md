@@ -406,7 +406,7 @@ human validation.
 
 In contrast, four inspiratory holds at 300, 500, 700 and 900 mL (airway
 pressures about 8.3–15.3 cmH₂O) produce an extrapolated intercept around
-28 mmHg while the model's actual Pmsf is about 8.8 mmHg. The direction agrees
+24.7 mmHg while the model's actual Pmsf is about 10.0 mmHg. The direction agrees
 with Berger; the magnitude does not. The interface and documentation now say so
 directly rather than naming the intercept as a measurement.
 

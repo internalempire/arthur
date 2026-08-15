@@ -16,7 +16,11 @@ import { defaultParams } from '../../src/model/parameters.js';
 import { pvrComponents, lungVolumeAtPl, NORMAL_FRC } from '../../src/model/lung.js';
 import { RESISTANCE_TO_WOOD } from '../../src/model/units.js';
 import { Simulator } from '../../src/model/simulator.js';
-import { venousReturnCurve, cardiacFunctionCurve, curveIntersection } from '../../src/model/circulation.js';
+import { createBaroreflexState, stepBaroreflex } from '../../src/model/baroreflex.js';
+import {
+  venousReturnCurve, cardiacFunctionCurve, curveIntersection,
+  systemicVenousVolumeState, PRELOAD_STEEP,
+} from '../../src/model/circulation.js';
 
 const OUT = dirname(fileURLToPath(import.meta.url));
 
@@ -219,7 +223,7 @@ const esc = (s) => String(s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;
 
 function chart({
   title, xLabel, yLabel, series, xTick, yTick, notes = [], padRight = PAD.r,
-  dashed = [], xDomain = null, yDomain = null,
+  dashed = [], xDomain = null, yDomain = null, markers = [],
 }) {
   const plotW = W - PAD.l - padRight;
   const all = series.flatMap((s) => s.points);
@@ -252,6 +256,8 @@ function chart({
       + `<text class="label" x="${PAD.l + plotW + 50}" y="${dy + 4}">${esc(s.label)}</text>`;
   }).join('\n');
   const note = notes.map((t, i) => `<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 40 + series.length * 22 + i * 16}">${esc(t)}</text>`).join('\n');
+  const dots = markers.map((m) => `<circle class="dot"${m.color ? ` style="fill:var(--fig-${m.color}, ${m.color === 'alv' ? '#d1495b' : '#1f6feb'})"` : ''} cx="${x(m.x).toFixed(1)}" cy="${y(m.y).toFixed(1)}" r="4"/>`
+    + (m.label ? `<text class="label" x="${(x(m.x) + (m.dx ?? 7)).toFixed(1)}" y="${(y(m.y) + (m.dy ?? -8)).toFixed(1)}">${esc(m.label)}</text>` : '')).join('\n');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" class="${ROOT}" role="img" aria-label="${esc(title)}">
 <style>${STYLE}</style>
@@ -260,13 +266,203 @@ function chart({
 ${grid.join('\n')}
 <line class="axis" x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t + plotH}"/>
 <line class="axis" x1="${PAD.l}" y1="${y(Math.max(yLo, 0)).toFixed(1)}" x2="${PAD.l + plotW}" y2="${y(Math.max(yLo, 0)).toFixed(1)}"/>
-${curves}
+${curves}${dots ? `\n${dots}` : ''}
 <text class="label" transform="translate(18 ${PAD.t + plotH / 2}) rotate(-90)" text-anchor="middle">${esc(yLabel)}</text>
 <text class="label" x="${PAD.l + plotW / 2}" y="${H - 6}" text-anchor="middle">${esc(xLabel)}</text>
 ${key}
 ${note}
 </svg>
 `;
+}
+
+// --- systemic venous volume, pressure and tone -----------------------------
+
+function stressedVolumeFigure() {
+  const p = { ...defaultParams(), csv: 100 };
+  const pressureAt = (vSv, toneVolume = 0) =>
+    systemicVenousVolumeState({ ...p, venousToneVolume: toneVolume }, { vSv }).elasticPressure;
+  const volumes = [];
+  // Start at the model's zero-pressure volume. Extending the algebra below
+  // that intercept would draw negative elastic recoil, while flooring it would
+  // no longer be the equation the running model uses.
+  for (let volume = 2800; volume <= 4100; volume += 20) volumes.push(volume);
+  const relation = volumes.map((volume) => [volume, pressureAt(volume)]);
+  return chart({
+    title: 'Added fluid moves the state along one venous pressure-volume relation',
+    xLabel: 'Blood in the systemic venous reservoir (mL)',
+    yLabel: 'Elastic filling pressure (mmHg)',
+    series: [{ label: 'neutral-tone relation', points: relation }],
+    xTick: 300, yTick: 2, xDomain: [2750, 4100], yDomain: [0, 14], padRight: 210,
+    markers: [
+      { x: 3500, y: pressureAt(3500), label: '3,500 mL · 7 mmHg' },
+      { x: 4000, y: pressureAt(4000), label: '+500 mL · 12 mmHg', dx: -116 },
+    ],
+    notes: ['C = 100 mL/mmHg', 'slope = 0.01 mmHg/mL', '+500 mL → +5 mmHg'],
+  });
+}
+
+function venousToneFigure() {
+  const p = { ...defaultParams(), csv: 100 };
+  const pressureAt = (vSv, toneVolume) =>
+    systemicVenousVolumeState({ ...p, venousToneVolume: toneVolume }, { vSv }).elasticPressure;
+  const neutral = [];
+  const constricted = [];
+  // Each relation starts at its own zero-pressure volume: 2,800 mL at neutral
+  // tone and 2,600 mL after 200 mL has been mobilised.
+  for (let volume = 2800; volume <= 4100; volume += 20) neutral.push([volume, pressureAt(volume, 0)]);
+  for (let volume = 2600; volume <= 4100; volume += 20) constricted.push([volume, pressureAt(volume, 200)]);
+  const fixedVolume = 3500;
+  return chart({
+    title: 'Venous tone raises elastic pressure without adding blood',
+    xLabel: 'Blood in the systemic venous reservoir (mL)',
+    yLabel: 'Elastic filling pressure (mmHg)',
+    series: [
+      { label: 'neutral tone', points: neutral },
+      { label: '200 mL mobilised', points: constricted },
+      { label: 'same 3,500 mL', points: [
+        [fixedVolume, pressureAt(fixedVolume, 0)],
+        [fixedVolume, pressureAt(fixedVolume, 200)],
+      ] },
+    ],
+    xTick: 300, yTick: 2, xDomain: [2550, 4100], yDomain: [0, 16], padRight: 205,
+    markers: [
+      { x: fixedVolume, y: pressureAt(fixedVolume, 0), label: 'neutral · 7 mmHg', dy: 18 },
+      { x: fixedVolume, y: pressureAt(fixedVolume, 200), label: 'with tone · 9 mmHg', color: 'alv' },
+    ],
+    notes: ['blood volume unchanged', 'C = 100 mL/mmHg', 'V₀: 2,800 → 2,600 mL'],
+  });
+}
+
+// --- aggregate baroreflex --------------------------------------------------
+
+function baroreflexFigure() {
+  const pressures = [];
+  for (let map = 50; map <= 130; map += 1) pressures.push(map);
+  const series = [0.5, 1, 2].map((sensitivity) => {
+    const points = pressures.map((map) => {
+      const state = createBaroreflexState();
+      const p = { ...defaultParams(), baroreflex: sensitivity, baroSetPoint: 90 };
+      // Settle the actual first-order operator rather than redrawing its
+      // algebra. At steady state this is the outflow every effector receives.
+      for (let i = 0; i < 3000; i++) stepBaroreflex(p, state, map, 0.02);
+      return [map, state.outflow];
+    });
+    return { label: `sensitivity ${sensitivity}×`, points };
+  });
+  return chart({
+    title: 'The model baroreflex is bounded and asymmetric around its set point',
+    xLabel: 'Low-pass mean arterial pressure (mmHg)',
+    yLabel: 'Aggregate sympathetic outflow',
+    series, xTick: 10, yTick: 0.25, xDomain: [50, 130], yDomain: [-0.3, 1.05],
+    padRight: 210,
+    notes: ['set point 90 mmHg', 'maximum response: 1', 'maximum withdrawal: −0.25'],
+  });
+}
+
+// --- preload reserve -------------------------------------------------------
+
+function preloadReserveFigure() {
+  const sim = settled({ mode: 'vcv', pmus: 0, vt: 560, rr: 14, peep: 5, baroreflex: 0 }, 45);
+  const mean = sim.metrics.operatingPoint;
+  const cf = cardiacFunctionCurve(sim.params, sim.circ, mean).points;
+  const samples = [];
+  for (let pmsf = 4; pmsf <= 16; pmsf += 0.1) {
+    const cross = curveIntersection(venousReturnCurve(sim.params, sim.circ, mean, 90, pmsf).points, cf);
+    if (cross) samples.push([pmsf, cross.y]);
+  }
+  const steep = [], plateau = [];
+  for (let i = 0; i < samples.length; i++) {
+    const a = samples[Math.max(0, i - 1)];
+    const b = samples[Math.min(samples.length - 1, i + 1)];
+    const relative = (b[1] - a[1]) / (b[0] - a[0]) / Math.max(samples[i][1], 0.1);
+    (relative >= PRELOAD_STEEP ? steep : plateau).push(samples[i]);
+  }
+  const at = (pmsf) => samples.reduce((best, point) => Math.abs(point[0] - pmsf) < Math.abs(best[0] - pmsf) ? point : best);
+  const low = at(6.5), high = at(12.5);
+  return chart({
+    title: 'Preload reserve is the local gain in output when filling pressure rises',
+    xLabel: 'Mean systemic filling pressure (mmHg)',
+    yLabel: 'Equilibrium flow (L/min)',
+    series: [
+      { label: 'steep limb', points: steep },
+      { label: 'plateau limb', points: plateau },
+    ],
+    xTick: 2, yTick: 1, xDomain: [4, 16], yDomain: [2, 7.6], padRight: 220,
+    markers: [
+      { x: low[0], y: low[1], label: 'lower filling' },
+      { x: high[0], y: high[1], label: 'higher filling', dx: -90 },
+    ],
+    notes: ['10% of current flow per mmHg', 'is a model classifier,', 'not a bedside cutoff'],
+  });
+}
+
+// --- pulse pressure variation ---------------------------------------------
+
+function ppvFigure() {
+  const sim = settled({
+    mode: 'vcv', pmus: 0, vt: 560, rr: 15, ti: 1.2,
+    peep: 7, stressedVolume: 450, clung: 30,
+  }, 45);
+  // Start exactly at inspiration, then sample one complete model breath. The
+  // plotted pressure is the same systemic arterial compartment used to derive
+  // systolic and diastolic pressure for PPV.
+  for (let i = 0; i < 2000 && sim.resp.phase !== 'exp'; i++) sim.advance(0.005, true);
+  for (let i = 0; i < 2000 && sim.resp.phase !== 'insp'; i++) sim.advance(0.005, true);
+  const points = [];
+  const period = 60 / sim.params.rr;
+  for (let t = 0; t <= period; t += 0.005) {
+    points.push([t, sim.circ.p.sa]);
+    sim.advance(0.005, true);
+  }
+  return chart({
+    title: 'Pulse pressure changes from beat to beat during one passive breath',
+    xLabel: 'Time from onset of inspiration (s)',
+    yLabel: 'Systemic arterial pressure (mmHg)',
+    series: [{ label: 'arterial pressure', points }],
+    xTick: 1, yTick: 10, xDomain: [0, period], yDomain: [60, 110],
+    notes: [`model example: PPV ${sim.metrics.ppv.toFixed(1)}%`, 'inspiration lasts 1.2 s', 'the value is descriptive'],
+  });
+}
+
+// --- Pmsf estimated from inspiratory holds --------------------------------
+
+function pmsfOcclusionFigure() {
+  const sim = settled({}, 20);
+  for (const vt of [300, 500, 700, 900]) {
+    sim.setParam('vt', vt);
+    sim.advance(10, true);
+    sim.startHold('inspiratory', 10);
+    sim.advance(16, true);
+  }
+  const points = sim.measuredPoints;
+  const n = points.length;
+  const sx = points.reduce((sum, p) => sum + p.pra, 0);
+  const sy = points.reduce((sum, p) => sum + p.flow, 0);
+  const sxx = points.reduce((sum, p) => sum + p.pra * p.pra, 0);
+  const sxy = points.reduce((sum, p) => sum + p.pra * p.flow, 0);
+  const denominator = n * sxx - sx * sx;
+  const slope = (n * sxy - sx * sy) / denominator;
+  const intercept = (sy - slope * sx) / n;
+  const estimatedPmsf = -intercept / slope;
+  const trueCurve = venousReturnCurve(sim.params, sim.circ, sim.metrics.operatingPoint).points;
+  const pairs = [];
+  for (let i = 0; i < trueCurve.length; i += 2) pairs.push([trueCurve[i], trueCurve[i + 1]]);
+  return chart({
+    title: 'Inspiratory holds: measured points and extrapolated intercept',
+    xLabel: 'Right atrial pressure (mmHg)',
+    yLabel: 'Venous return (L/min)',
+    series: [
+      { label: 'current model relation', points: pairs },
+      { label: 'line through hold points', points: [[0, intercept], [estimatedPmsf, 0]] },
+    ],
+    dashed: [1], xTick: 5, yTick: 1, xDomain: [0, 28], yDomain: [0, 6.2], padRight: 225,
+    markers: points.map((point) => ({ x: point.pra, y: point.flow })),
+    notes: [
+      `internal Pmsf ${sim.metrics.pmsf.toFixed(1)} mmHg`,
+      `extrapolated intercept ${estimatedPmsf.toFixed(1)}`,
+      'the difference is not calibrated',
+    ],
+  });
 }
 
 // --- the lung pressure-volume curve ----------------------------------------
@@ -442,6 +638,12 @@ const figures = {
   'pv-curve.svg': pvCurveFigure(),
   'stress-index.svg': stressIndexFigure(),
   'hysteresis.svg': hysteresisFigure(),
+  'stressed-volume.svg': stressedVolumeFigure(),
+  'venous-tone.svg': venousToneFigure(),
+  'baroreflex.svg': baroreflexFigure(),
+  'preload-reserve.svg': preloadReserveFigure(),
+  'ppv.svg': ppvFigure(),
+  'pmsf-occlusions.svg': pmsfOcclusionFigure(),
 };
 for (const [name, svg] of Object.entries(figures)) {
   writeFileSync(join(OUT, name), svg);

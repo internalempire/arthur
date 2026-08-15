@@ -525,7 +525,7 @@ The hold experiment is a separate result. Across 37 paired measurements,
 inspiratory-hold extrapolation exceeded balloon-occlusion MSFP by 3.0 (SD 5.1)
 mmHg. The simulator reproduces the direction but not a porcine-sized bias: four
 inspiratory holds at 300, 500, 700 and 900 mL (about 8.3–15.3 cmH₂O)
-extrapolate to roughly 28 mmHg against an actual Pmsf around 8.8. Human
+extrapolate to roughly 24.7 mmHg against an actual Pmsf around 10.0. Human
 hold-derived estimates are themselves often much higher than arrest or model-
 analogue values, so forcing this human
 teaching model to the pig mean would not be a defensible calibration. The app

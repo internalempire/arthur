@@ -191,10 +191,10 @@ zero-flow intercept is not.
 
 The model reproduces the method's known confound rather than hiding it. Four
 inspiratory holds at 300, 500, 700 and 900 mL (plateau pressures around
-8.3–15.3 cmH₂O) give a fitted slope near 0.19 L/min per mmHg where the model's
-resistance to venous return implies roughly 0.73, and an extrapolated intercept
-around 28 mmHg where the model's Pmsf is about 8.8. Both protocols behave the
-same way — varying tidal volume at fixed PEEP, or varying PEEP between holds —
+8.3–15.3 cmH₂O) give a fitted slope near 0.21 L/min per mmHg where the model's
+effective resistance to venous return implies roughly 0.76, and an extrapolated
+intercept around 24.7 mmHg where the model's Pmsf is about 10.0. Both protocols
+behave the same way — varying tidal volume at fixed PEEP, or varying PEEP between holds —
 so it is not merely a plotting artefact.
 
 The mechanism is the abdominal coupling: an occlusion holds the lung inflated,
