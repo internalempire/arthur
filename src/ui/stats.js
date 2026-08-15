@@ -160,6 +160,21 @@ const TILES = [
   },
 ];
 
+const TILE_BY_ID = new Map(TILES.map((tile) => [tile.id, tile]));
+
+/**
+ * Return the primary string exactly as the corresponding numerical tile shows
+ * it, including suppression when the model or the measurement is not valid.
+ * Other UI surfaces use this instead of independently reformatting a clinical
+ * summary and silently drifting away from the tile.
+ */
+export function tilePrimaryValue(id, metrics) {
+  const tile = TILE_BY_ID.get(id);
+  if (!tile || !metrics.valid) return '—';
+  const quality = tile.quality?.(metrics) ?? { level: 'ok' };
+  return quality.level === 'unavailable' ? '—' : tile.get(metrics);
+}
+
 export function createStats(container, { banner } = {}) {
   const nodes = TILES.map((tile) => {
     const el = document.createElement('div');
@@ -197,7 +212,7 @@ export function createStats(container, { banner } = {}) {
       const q = n.tile.quality?.(metrics) ?? { level: 'ok', reasons: [] };
       const suppress = !metrics.valid || q.level === 'unavailable';
 
-      n.number.textContent = suppress ? '—' : n.tile.get(metrics);
+      n.number.textContent = suppress ? '—' : tilePrimaryValue(n.tile.id, metrics);
       n.sub.textContent = suppress ? '' : (n.tile.sub ? n.tile.sub(metrics) : '');
 
       const status = suppress ? null : n.tile.status?.(metrics);

@@ -172,6 +172,7 @@ let statsClock = 0;
 function draw() {
   const colors = theme.colors;
   waveforms.render(sim, colors);
+  waveforms.renderReadouts(sim.metrics, colors);
   guyton.render(sim, colors);
   campbell.render(sim, colors);
   pvLoops.render(sim, colors);
@@ -210,6 +211,7 @@ function frame(now) {
 
     statsClock += dtWall;
     if (statsClock > 0.12 || !running) {
+      waveforms.renderReadouts(sim.metrics, colors);
       stats.render(sim.metrics);
       descriptions.render(sim);
       syncManoeuvreButtons();
