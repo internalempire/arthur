@@ -88,6 +88,8 @@ npm run manual:lint
 
 Snapshot regeneration is intentionally separate: `npm run snapshots`. A changed snapshot must be reviewed as a model change, not automatically accepted as a test fix.
 
+Pull requests use three verification profiles. Documentation-only changes rebuild and lint the manual; application-shell and UI-only changes run syntax plus a small module-and-mount-point smoke suite; any change to the physiological model, scenarios, tests, generated numerical examples or workflow runs the full suite. A weekly scheduled run also executes the full profile. This avoids repeating slow settling experiments for prose-only work without allowing a model change to bypass them.
+
 ## References
 
 - Oberkampf WL, Roy CJ. *Verification and Validation in Scientific Computing*. Cambridge University Press; 2010.

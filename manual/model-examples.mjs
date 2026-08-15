@@ -6,6 +6,7 @@
 
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams } from '../src/model/parameters.js';
+import { SCENARIOS } from '../src/model/scenarios.js';
 import { lungVolumeAtPl, staticEndExpiratoryVolume } from '../src/model/lung.js';
 
 const SETTLING_SECONDS = 45;
@@ -79,6 +80,7 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/venous-return.md', ids: ['venous-return-peep'] },
   { file: 'manual/pressure-volume-curve.md', ids: ['pv-tissue', 'pv-eelv'] },
   { file: 'manual/pulmonary-transit.md', ids: ['pulmonary-transit'] },
+  { file: 'manual/cardiac-tamponade.md', ids: ['cardiac-tamponade'] },
 ];
 
 const fixed = (value, digits) => value.toFixed(digits);
@@ -227,6 +229,29 @@ function pulmonaryTransitBlock() {
   ].join('\n');
 }
 
+function cardiacTamponadeBlock() {
+  const scenario = SCENARIOS.find(({ id }) => id === 'cardiac-tamponade');
+  const states = [
+    ['constrained preset', scenario.params.pericardialCapacity],
+    ['capacity restored', 430],
+  ].map(([label, pericardialCapacity]) => ({
+    label,
+    capacity: pericardialCapacity,
+    metrics: settled({ ...scenario.params, pericardialCapacity }),
+  }));
+  return [
+    '*Executable setup: spontaneous breathing, inspiratory effort 10 cmH₂O, 20 breaths/min, selected heart rate 105/min, stressed volume 1,050 mL and pericardial gain 4×; each state is settled for 45 s. The second row changes pericardial capacity only.*',
+    '',
+    '| state | capacity (mL) | P<sub>peri</sub> (mmHg) | CVP (mmHg) | RV end-diastolic pressure (mmHg) | PA diastolic (mmHg) | wedge surrogate (mmHg) |',
+    '|---|---:|---:|---:|---:|---:|---:|',
+    ...states.map(({ label, capacity, metrics }) => `| ${label} | ${capacity} | ${fixed(metrics.pPeri, 1)} | ${fixed(metrics.cvp, 1)} | ${fixed(metrics.rvEdp, 1)} | ${fixed(metrics.papDia, 1)} | ${fixed(metrics.paop, 1)} |`),
+    '',
+    '| state | RV EDV (mL) | LV EDV (mL) | cardiac output (L/min) | MAP (mmHg) |',
+    '|---|---:|---:|---:|---:|',
+    ...states.map(({ label, metrics }) => `| ${label} | ${Math.round(metrics.rvEdv)} | ${Math.round(metrics.lvEdv)} | ${fixed(metrics.co, 2)} | ${fixed(metrics.map, 1)} |`),
+  ].join('\n');
+}
+
 export function renderDocumentedExampleBlocks() {
   const rows = stressRows();
   const peepRows = peepSweepRows();
@@ -238,5 +263,6 @@ export function renderDocumentedExampleBlocks() {
     ['pv-tissue', pvTissueBlock()],
     ['pv-eelv', pvEelvBlock()],
     ['pulmonary-transit', pulmonaryTransitBlock()],
+    ['cardiac-tamponade', cardiacTamponadeBlock()],
   ]);
 }

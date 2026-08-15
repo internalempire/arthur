@@ -58,6 +58,7 @@ The model is intended for mechanistic questions such as:
 - How do stressed volume, venous tone and resistance to venous return affect the Guyton operating point?
 - Why does a change in RV output reach the LV only after pulmonary transit?
 - How do ventricular interdependence and pericardial constraint couple the two sides of the heart?
+- How does loss of pericardial reserve restrict the lower-pressure right heart, and why does decompression restore output?
 
 The best use is comparative: change one input, allow the circulation to settle, and follow the causal chain across pressure, flow, volume and ventricular response. See **[The four effects of a breath](manual/the-four-effects-of-a-breath.md)** for the central physiological map.
 
@@ -92,10 +93,10 @@ The cardiovascular model includes:
 - stressed and unstressed systemic venous volume;
 - venous tone, venous compliance and resistance to venous return as separate mechanisms;
 - systemic vascular resistance;
-- ventricular septal interaction and shared pericardial constraint;
+- ventricular septal interaction, shared nonlinear pericardial pressure and adjustable pericardial capacity;
 - a bounded aggregate baroreflex acting on heart rate, vascular tone, resistance and contractility.
 
-Detailed pages: **[Venous return](manual/venous-return.md)**, **[Stressed volume](manual/stressed-volume.md)**, **[Venous tone](manual/venous-tone.md)**, **[The right ventricle](manual/the-right-ventricle.md)**, **[Ventricular interdependence](manual/ventricular-interdependence.md)** and **[Baroreflex](manual/baroreflex.md)**.
+Detailed pages: **[Venous return](manual/venous-return.md)**, **[Stressed volume](manual/stressed-volume.md)**, **[Venous tone](manual/venous-tone.md)**, **[The right ventricle](manual/the-right-ventricle.md)**, **[Ventricular interdependence](manual/ventricular-interdependence.md)**, **[Cardiac tamponade](manual/cardiac-tamponade.md)** and **[Baroreflex](manual/baroreflex.md)**.
 
 ### Pulmonary circulation and heart–lung coupling
 
@@ -174,6 +175,7 @@ Scenarios are starting phenotypes built around one teaching question. They are n
 | Large pleural swings, limited preload reserve | Why is a pressure swing not equivalent to fluid responsiveness? |
 | ARDS with right ventricular failure | How does recruitability alter the haemodynamic cost of PEEP? |
 | Acute pulmonary embolism | How does aggregate pulmonary vascular load affect a vulnerable RV? |
+| Cardiac tamponade | How does lost pericardial capacity couple diastolic pressure, RV filling and output? |
 | Cardiogenic pulmonary oedema | When can reduced LV transmural afterload outweigh lost preload? |
 | Stiff chest wall | Why does the same tidal volume transmit more pleural pressure? |
 | COPD with dynamic hyperinflation | How do expiratory time, flow limitation and external PEEP interact? |
@@ -239,6 +241,8 @@ npm run snapshots
 
 A changed snapshot is a model change that requires review, not an automatic test repair. A green suite demonstrates numerical and mechanistic contracts; it does not establish patient-level quantitative validation. See **[Validation](manual/validation.md)**.
 
+Pull-request verification is change-aware: documentation-only changes rebuild and lint the manual, UI-only changes run syntax and mount-point smoke contracts, and any model, scenario, test, generated numerical example or workflow change runs the full suite. A scheduled weekly run exercises the full suite independently of pull requests.
+
 ---
 
 ## Architecture
@@ -297,9 +301,9 @@ The model does **not** include:
 - renal, endocrine, inflammatory or long-term fluid physiology;
 - drug dosing, outcome prediction or patient-specific parameter estimation;
 - a validated fluid-responsiveness threshold or tidal-volume challenge;
-- a clinically adequate model of weaning failure or cardiac tamponade.
+- a clinically adequate model of weaning failure, effusion volume, tamponade diagnosis or pericardiocentesis.
 
-Several controls are aggregate teaching coefficients rather than measurable patient parameters. Named clinical indices may be simplified, qualified or unavailable. Every scenario inherits these omissions.
+The tamponade preset is a directional exception to the last limitation: it can show shared pericardial pressure, preferential RV filling restriction and recovery when available capacity is restored, but it cannot estimate effusion volume, reproduce diagnostic imaging or calibrate pulsus paradoxus. Several controls are aggregate teaching coefficients rather than measurable patient parameters. Named clinical indices may be simplified, qualified or unavailable. Every scenario inherits these omissions.
 
 Read **[Global limits](manual/global-limits.md)** and **[Interpretability](manual/interpretability.md)** before drawing conclusions from absolute values.
 

@@ -42,7 +42,7 @@ The pulmonary-embolism scenario therefore raises one aggregate vascular load. It
 - No valvular stenosis, regurgitation, prolapse or prosthesis.
 - Atria have no selectable pathology; the RV has no independent diastolic-stiffness control.
 - Ventricles are lumped elastance chambers, not spatial myocardium; the RV:LV ratio is a model-volume ratio rather than an imaging ratio.
-- Pericardial constraint lacks pericardial fluid volume and is not a cardiac-tamponade model.
+- Pericardial capacity supports a directional tamponade phenotype, but there is no fluid compartment, accumulation rate, loculation, echocardiographic chamber collapse or clinically calibrated pressure–volume relation.
 - One systemic arterial and one venous reservoir replace organ beds, regional autoregulation, capillary exchange and microcirculation.
 - No renal fluid balance, hormonal control, vascular stress relaxation or long-term remodelling.
 
@@ -68,7 +68,7 @@ Controls do not represent drug dose. Fluid is placed instantaneously in the veno
 
 PPV and SVV are descriptive and deliberately not tied to a diagnostic fluid-responsiveness threshold. There is no tidal-volume challenge because the model is not quantitatively calibrated to its proposed PPV increment. R/I is a teaching analogue of a fixed PEEP manoeuvre and can be bounded by available collapsed lung. Preload reserve is the slope of an analytic model curve, not a validated bedside index.
 
-Every scenario is a phenotype designed around one question. None contains the full disease named in its title. ARDS lacks gas exchange, inflammatory and thrombotic biology; COPD lacks regional obstruction; sepsis lacks endothelial and organ physiology; LV failure lacks fluid kinetics and mitral regurgitation; pulmonary embolism lacks explicit clot. Prone position is a coarse immediate transformation. The weaning scenario was removed because too much of its causal physiology was missing.
+Every scenario is a phenotype designed around one question. None contains the full disease named in its title. ARDS lacks gas exchange, inflammatory and thrombotic biology; COPD lacks regional obstruction; sepsis lacks endothelial and organ physiology; LV failure lacks fluid kinetics and mitral regurgitation; pulmonary embolism lacks explicit clot; tamponade lacks pericardial fluid dynamics and diagnostic imaging. Prone position is a coarse immediate transformation. The weaning scenario was removed because too much of its causal physiology was missing.
 
 ## Validation boundary
 
@@ -89,4 +89,4 @@ Use the model to ask “which mechanism could produce this direction, and in wha
 
 ## See also
 
-[Validation](validation.md) · [Interpretability](interpretability.md) · [Clinical scenarios](scenarios.md) · [Model architecture](model-architecture.md) · [Bibliography](bibliography.md) · [Planned work](_todo.md)
+[Validation](validation.md) · [Interpretability](interpretability.md) · [Clinical scenarios](scenarios.md) · [Cardiac tamponade](cardiac-tamponade.md) · [Model architecture](model-architecture.md) · [Bibliography](bibliography.md) · [Planned work](_todo.md)

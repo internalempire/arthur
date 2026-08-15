@@ -51,6 +51,10 @@
           "The septum and the pericardium as shared constraints"
         ],
         [
+          "cardiac-tamponade",
+          "Loss of pericardial reserve, diastolic constraint, and decompression"
+        ],
+        [
           "ventriculo-arterial-coupling",
           "Time-varying elastance, Ees and Ea"
         ],

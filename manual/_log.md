@@ -1,5 +1,7 @@
 # Log
 
+**2026-08-16 — Pericardial capacity and cardiac tamponade.** The fixed 430 mL pericardial knee became a user control while the existing nonlinear pressure relation and normal default were retained. The new tamponade preset reduces available capacity, generating shared diastolic pressure, preferential loss of RV filling and depressed output; restoring capacity is an executable decompression experiment. A dedicated page and model-generated pressure–volume figure state the deliberate boundary: capacity is not effusion volume, and the model does not claim a calibrated pulsus-paradoxus threshold.
+
 > Append-only record of what was done to the manual and when. Newest last.
 
 **2026-08-14 — Viewer built.** Single-page shell over plain markdown: hash router, sidebar from `manifest.json`, in-page table of contents, previous/next, search over titles and summaries, light and dark schemes. `marked` and KaTeX are vendored into `manual/vendor` (960K, no external requests). zero-md was evaluated and not used: it resolves seven packages from a CDN at runtime, and its shadow DOM would have fought the surrounding layout.

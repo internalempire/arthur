@@ -61,6 +61,14 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Read.** The preset uses one effective aggregate pulmonary load. It does not separate clot obstruction, calibre, viscosity, vasomotor tone or critical closing pressure. Its low downstream pressure also makes the aggregate zone-3 surrogate cautious, even though a real catheter could be deliberately placed in a dependent zone-3 region; this is a limitation of the non-regional model, not a claim that PAWP is unobtainable in pulmonary embolism. The selected tachycardia, systemic resistance and filling describe compensation already present; the model baroreflex senses systemic MAP rather than embolus, PVR or mPAP directly. Positive pressure demonstrates vulnerability, not an individual intubation-risk estimate.
 
+### Cardiac tamponade
+
+**Question.** What happens when the four chambers must compete for a pericardial space that can no longer expand?
+
+**Try.** Inspect pericardial pressure, CVP, RV and LV end-diastolic volume, output and the dashed pericardial ring. Then increase pericardial capacity from 100 to 430 mL and allow the circulation to settle.
+
+**Read.** The constrained state raises a shared external pressure, brings the main diastolic pressures into a broad common range and restricts the lower-pressure RV proportionally more than the LV. Restoring capacity represents decompression: pericardial pressure and CVP fall while both ventricles refill and output rises. The capacity is not an effusion-volume estimate, and the scenario does not provide a calibrated pulsus-paradoxus threshold. See [cardiac tamponade](cardiac-tamponade.md) and [ventricular interdependence](ventricular-interdependence.md).
+
 ### Cardiogenic pulmonary oedema
 
 **Question.** Can positive intrathoracic pressure increase output when a failing left ventricle is more afterload-sensitive than preload-dependent?
@@ -97,7 +105,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 Selecting a scenario replaces the current controls with defaults plus that scenario's explicit overrides. It does not apply a scripted sequence, preserve the previous patient's state or force an outcome after the selection. Touching any control changes the label to *Custom* because the patient no longer matches the preset.
 
-The cardiogenic-pulmonary-oedema comparison is the only preset with an explicit two-state contract beyond its settled snapshot. At PEEP 0 and 10, the same parameters are used; the test averages stroke volume over several breaths and requires mean output to rise by at least 5%, LV transmural end-systolic pressure to fall, and end-systolic volume to fall more than end-diastolic volume. These conditions distinguish afterload relief from a simple preload increase.
+Two presets have an explicit intervention contract beyond their settled snapshot. In cardiogenic pulmonary oedema, the PEEP 0-to-10 comparison requires mean output to rise, LV transmural end-systolic pressure to fall, and end-systolic volume to fall more than end-diastolic volume. In cardiac tamponade, restoring pericardial capacity must lower pericardial pressure and CVP, increase pressure and output, and restore proportionally more RV than LV end-diastolic volume. These conditions distinguish the proposed mechanisms from a plausible-looking resting state.
 
 The former weaning preset was removed. A matched experiment did not reproduce the expected rise in filling pressure or fall in output, and the model lacks work of breathing, myocardial oxygen demand, sympathetic activation, ischaemia, dynamic mitral regurgitation, fluid redistribution and time-dependent pulmonary oedema. The physiology of weaning-induced pulmonary oedema is real; a preset that merely carries its name without generating enough of its mechanism is not useful teaching.
 
@@ -129,6 +137,7 @@ Published manoeuvre constraints live in [the literature ranges](../docs/LITERATU
 - Cappio Borlino S, Hagry J, Lai C, et al. The effect of PEEP on pulmonary vascular resistance depends on lung recruitability in patients with ARDS. *Am J Respir Crit Care Med*. 2024;210:900–907. <https://doi.org/10.1164/rccm.202402-0383OC>
 - Vieillard-Baron A, Charron C, Caille V, et al. Prone positioning unloads the right ventricle in severe ARDS. *Chest*. 2007;132:1440–1446. <https://doi.org/10.1378/chest.07-1013>
 - Ranieri VM, Dambrosio M, Brienza N. Intrinsic PEEP and cardiopulmonary interaction in patients with COPD and acute ventilatory failure. *Eur Respir J*. 1996;9:1283–1292. <https://pubmed.ncbi.nlm.nih.gov/8804950/>
+- Schulz-Menger J, Collini V, Gröschel J, et al. 2025 ESC Guidelines for the management of myocarditis and pericarditis. *Eur Heart J*. 2025;46:3952–4041. <https://doi.org/10.1093/eurheartj/ehaf192>
 
 ## See also
 

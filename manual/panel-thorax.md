@@ -19,6 +19,7 @@ The annotations keep atmospheric and transmural quantities together: airway, alv
 - Compare spontaneous and positive-pressure inspiration: the colour wash reverses with pleural pressure.
 - Raise abdominal pressure: the IVC narrows when surrounding pressure approaches right atrial pressure.
 - Raise pulmonary vascular load: watch RV enlargement, septal displacement and LV filling together.
+- Load the cardiac-tamponade preset: the dashed ring follows pericardial pressure, while restoring pericardial capacity permits both ventricles to refill.
 - Increase PEEP in a recruitable and a non-recruitable lung: the same airway pressure can produce different lung volume and RV load.
 
 ## In the model
@@ -35,7 +36,7 @@ A realistic illustration would imply regional and geometric information the lump
 - Chamber area is a visual encoding of lumped volume, not a diameter or area measured in an imaging plane.
 - Septal curvature is qualitative and must not be interpreted as D-shaping severity.
 - IVC calibre represents one aggregate pressure relation and not ultrasound collapsibility or separate SVC/IVC flow.
-- The pericardial ring does not diagnose tamponade; the model lacks a pericardial-volume control and realistic pressure–volume curve.
+- The pericardial ring follows model pressure, not effusion size, chamber collapse or an echocardiographic diagnosis of tamponade.
 
 ## References
 
@@ -46,4 +47,4 @@ A realistic illustration would imply regional and geometric information the lump
 
 ## See also
 
-[Transmural pressure](transmural-pressure.md) · [Pleural pressure](pleural-pressure.md) · [Ventricular interdependence](ventricular-interdependence.md) · [The right ventricle](the-right-ventricle.md) · [Numerical tiles](numeric-tiles.md)
+[Transmural pressure](transmural-pressure.md) · [Pleural pressure](pleural-pressure.md) · [Ventricular interdependence](ventricular-interdependence.md) · [Cardiac tamponade](cardiac-tamponade.md) · [The right ventricle](the-right-ventricle.md) · [Numerical tiles](numeric-tiles.md)

@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 133 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 139 unique entries.
 
 ---
 
@@ -15,6 +15,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med* 2014;189:520–31.
 - Albert RK. The role of ventilation-induced surfactant dysfunction and atelectasis in causing acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2012;185:702–8.
 - Albert SP, DiRocco J, Allen GB, et al. [The role of time and pressure on alveolar recruitment](https://pubmed.ncbi.nlm.nih.gov/19074576/). *J Appl Physiol* 2009;106:757–65.
+- Appleton CP, Hatle LK, Popp RL. Cardiac tamponade and pericardial effusion: respiratory variation in transvalvular flow velocities studied by Doppler echocardiography. *J Am Coll Cardiol*. 1988;11:1020–1030.
 ## B
 
 - Bates JHT. *Lung Mechanics: An Inverse Modeling Approach*. Cambridge University Press, 2009.
@@ -73,6 +74,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Hairer E, Nørsett SP, Wanner G. *Solving Ordinary Differential Equations I: Nonstiff Problems*. 2nd ed. Springer; 1993.
 - Hakim TS, Michel RP, Chang HK. [Partitioning of pulmonary vascular resistance in dogs by arterial and venous occlusion](https://doi.org/10.1152/jappl.1982.52.3.710). *J Appl Physiol* 1982;52:710–5. Volume-related changes identical under both inflation modes; pressure-related ones not.
 - Hakim TS, Michel RP, Chang HK. Effect of lung inflation on pulmonary vascular resistance by arterial and venous occlusion. *J Appl Physiol*. 1982;53:1110–1115. [doi:10.1152/jappl.1982.53.5.1110](https://doi.org/10.1152/jappl.1982.53.5.1110)
+- Hamzaoui O, Monnet X, Teboul JL. Pulsus paradoxus. *Eur Respir J*. 2013;42:1696–1705. [doi:10.1183/09031936.00138912](https://doi.org/10.1183/09031936.00138912)
 - Hamzaoui O, Shi R, Carelli S, et al. Changes in pulse pressure variation to assess preload responsiveness in mechanically ventilated patients with spontaneous breathing activity. *Br J Anaesth*. 2021;127:532–538. [doi:10.1016/j.bja.2021.05.034](https://doi.org/10.1016/j.bja.2021.05.034)
 - Harris RS. Pressure–volume curves of the respiratory system. *Respir Care*. 2005;50:78–98.
 - Henderson WR, Griesdale DEG, Walley KR, Sheel AW. Clinical review: Guyton — the role of mean circulatory filling pressure and right atrial pressure in controlling cardiac output. *Crit Care* 2010;14:243.
@@ -139,6 +141,8 @@ A citation documents the physiological or methodological claim made on its sourc
 - Ranieri VM, Dambrosio M, Brienza N. Intrinsic PEEP and cardiopulmonary interaction in patients with COPD and acute ventilatory failure. *Eur Respir J*. 1996;9:1283–1292. <https://pubmed.ncbi.nlm.nih.gov/8804950/>
 - Ranieri VM, Giuliani R, Cinnella G, et al. Physiologic effects of positive end-expiratory pressure in patients with chronic obstructive pulmonary disease during acute ventilatory failure and controlled mechanical ventilation. *Am Rev Respir Dis* 1993;147:5–13.
 - Ranieri VM, Zhang H, Mascia L, et al. Pressure–time curve predicts minimally injurious ventilatory strategy in an isolated rat lung model. *Anesthesiology* 2000;93:1320–8.
+- Reddy PS, Curtiss EI, O'Toole JD, et al. Cardiac tamponade: hemodynamic observations in man. *Circulation*. 1978;58:265–272. [PubMed](https://pubmed.ncbi.nlm.nih.gov/668074/)
+- Reddy PS, Curtiss EI, Uretsky BF. Spectrum of hemodynamic changes in cardiac tamponade. *Am J Cardiol*. 1990;66:1487–1491.
 - Repessé X, Charron C, Vieillard-Baron A. Right ventricular failure in acute lung injury and acute respiratory distress syndrome. *Minerva Anestesiol*. 2012;78:941–948.
 - Rimensberger PC, Cox PN, Frndova H, Bryan AC. The open lung during small tidal volume ventilation: concepts of recruitment and "optimal" positive end-expiratory pressure. *Crit Care Med* 1999;27:1946–52.
 - Rothe CF. Venous system: physiology of the capacitance vessels. *Physiol Rev*. 1983;63:1281–1342. [doi:10.1152/physrev.1983.63.4.1281](https://doi.org/10.1152/physrev.1983.63.4.1281)
@@ -146,6 +150,7 @@ A citation documents the physiological or methodological claim made on its sourc
 
 - Sagawa K, Maughan L, Suga H, Sunagawa K. *Cardiac Contraction and the Pressure–Volume Relationship*. Oxford University Press; 1988.
 - Santamore WP, Dell'Italia LJ. Ventricular interdependence: significant left ventricular contributions to right ventricular systolic function. *Prog Cardiovasc Dis* 1998;40:289–308.
+- Schulz-Menger J, Collini V, Gröschel J, et al. 2025 ESC Guidelines for the management of myocarditis and pericarditis. *Eur Heart J*. 2025;46:3952–4041. [doi:10.1093/eurheartj/ehaf192](https://doi.org/10.1093/eurheartj/ehaf192)
 - Seraphim A, Knott KD, Menacho K, et al. Prognostic value of pulmonary transit time and pulmonary blood volume estimation using myocardial perfusion CMR. *JACC Cardiovasc Imaging*. 2021;14:2107–2119. [doi:10.1016/j.jcmg.2021.03.029](https://doi.org/10.1016/j.jcmg.2021.03.029)
 - Simmons DH, Linde LM, Miller JH, O'Reilly RJ. [Relation between lung volume and pulmonary vascular resistance](https://doi.org/10.1161/01.RES.9.2.465). *Circ Res* 1961;9:465–71.
 - Skrapari I, Tentolouris N, Katsilambros N. Baroreflex function: determinants in healthy subjects and disturbances in diabetes, obesity and metabolic syndrome. *Curr Diabetes Rev*. 2006;2:329–338. [doi:10.2174/157339906777950589](https://doi.org/10.2174/157339906777950589)
@@ -165,6 +170,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Thomas LJ, Griffo ZJ, Roos A. [Effect of negative-pressure inflation of the lung on pulmonary vascular resistance](https://doi.org/10.1152/jappl.1961.16.3.451). *J Appl Physiol* 1961;16:451–6. Excised dog lungs; resistance minimal near half maximal volume, rising on either further inflation or deflation.
 - Tobin MJ. *Principles and Practice of Mechanical Ventilation*. 3rd ed. McGraw-Hill; 2013.
 - Tuxen DV, Lane S. The effects of ventilatory pattern on hyperinflation, airway pressures, and circulation in mechanical ventilation of patients with severe air-flow obstruction. *Am Rev Respir Dis* 1987;136:872–9.
+- Tyberg JV, Misbach GA, Glantz SA, Moores WY, Parmley WW. A mechanism for shifts in the diastolic left ventricular pressure–volume curve: the role of the pericardium. *Eur J Cardiol*. 1978;7 Suppl:163–175. [PubMed](https://pubmed.ncbi.nlm.nih.gov/668760/)
 ## V
 
 - van den Berg B, Aerts JGJV, Bogaard JM. Effect of continuous positive airway pressure (CPAP) in patients with chronic obstructive pulmonary disease (COPD) depending on intrinsic PEEP levels. *Eur Respir J* 1991;4:561–7.
