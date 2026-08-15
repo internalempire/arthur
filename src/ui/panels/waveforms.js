@@ -1,10 +1,14 @@
 import { Panel, niceTicks } from '../plot.js';
+import { tilePrimaryValue } from '../stats.js';
 import { TRACE_SECONDS } from '../../model/index.js';
 
 // Three time-aligned strips. Respiratory and haemodynamic pressures are kept on
 // separate strips rather than sharing one plot with two y-axes: cmH2O and mmHg
 // are different scales, and a dual axis would invite reading one against the
-// other.
+// other. Each strip also owns a fixed readout rail: the waveform shows change
+// through time while the rail repeats the slower clinical summary shown in the
+// numerical tiles. Keeping those two time scales explicit prevents a rapidly
+// changing sample from masquerading as a readable bedside measurement.
 
 const WINDOW_SECONDS = TRACE_SECONDS;
 // How long the data must sit comfortably inside the current range before it is
@@ -18,8 +22,14 @@ const STRIPS = [
     unit: 'cmH₂O',
     height: 1.0,
     series: [
-      { channel: 'paw', color: 'airway', label: 'Paw' },
-      { channel: 'ppl', color: 'pleural', label: 'Ppl' },
+      {
+        channel: 'paw', color: 'airway', label: 'Paw · Pplat',
+        summary: (m) => tilePrimaryValue('pplat', m),
+      },
+      {
+        channel: 'ppl', color: 'pleural', label: 'Ppl · swing',
+        summary: (m) => tilePrimaryValue('ppl', m),
+      },
     ],
   },
   {
@@ -28,9 +38,18 @@ const STRIPS = [
     unit: 'mmHg',
     height: 1.35,
     series: [
-      { channel: 'art', color: 'arterial', label: 'Arterial' },
-      { channel: 'pap', color: 'pulmonary', label: 'PA' },
-      { channel: 'cvp', color: 'venous', label: 'CVP' },
+      {
+        channel: 'art', color: 'arterial', label: 'Arterial',
+        summary: (m) => tilePrimaryValue('map', m),
+      },
+      {
+        channel: 'pap', color: 'pulmonary', label: 'PAP',
+        summary: (m) => tilePrimaryValue('pap', m),
+      },
+      {
+        channel: 'cvp', color: 'venous', label: 'CVP',
+        summary: (m) => tilePrimaryValue('cvp', m),
+      },
     ],
   },
   {
@@ -40,7 +59,12 @@ const STRIPS = [
     height: 0.75,
     axis: true,
     series: [
-      { channel: 'volume', color: 'volume', label: 'Volume' },
+      {
+        channel: 'volume', color: 'volume', label: 'Volume · VT',
+        // There is no separate VT tile. The delivered breath-level value is
+        // the stable summary already exposed in the waveform data disclosure.
+        summary: (m) => (m.valid ? m.vtDelivered.toFixed(0) : '—'),
+      },
     ],
   },
 ];
@@ -51,13 +75,43 @@ export function createWaveforms(container) {
     const wrap = document.createElement('div');
     wrap.className = 'strip';
     wrap.style.flexGrow = String(spec.height);
+
+    const plot = document.createElement('div');
+    plot.className = 'waveform-plot';
     const canvas = document.createElement('canvas');
-    wrap.appendChild(canvas);
+    plot.appendChild(canvas);
+
+    const readoutList = document.createElement('dl');
+    readoutList.className = 'waveform-readouts';
+    readoutList.setAttribute('aria-label', `${spec.label}: summary values in ${spec.unit}`);
+    const readouts = new Map();
+    for (const series of spec.series) {
+      const row = document.createElement('div');
+      row.className = 'waveform-readout';
+
+      const label = document.createElement('dt');
+      label.className = 'waveform-readout-label';
+      label.textContent = series.label;
+
+      const value = document.createElement('dd');
+      const output = document.createElement('output');
+      output.className = 'waveform-readout-value';
+      output.setAttribute('aria-label', `${series.label}, summary value in ${spec.unit}`);
+      output.textContent = '—';
+      value.appendChild(output);
+
+      row.append(label, value);
+      readoutList.appendChild(row);
+      readouts.set(series.channel, { row, output });
+    }
+
+    wrap.append(plot, readoutList);
     container.appendChild(wrap);
     return {
       spec,
       canvas,
-      panel: new Panel(canvas, { padding: [16, 62, spec.axis ? 22 : 6, 46] }),
+      readouts,
+      panel: new Panel(canvas, { padding: [16, 14, spec.axis ? 22 : 6, 46] }),
       domain: null,     // the y range currently displayed
       insideSince: -1,  // when the data last started fitting comfortably inside it
     };
@@ -153,18 +207,24 @@ export function createWaveforms(container) {
       }
       panel.unclip();
 
-      // Direct labels at the right edge — identity never rests on hue alone.
-      for (const b of buffers) {
-        if (b.n === 0) continue;
-        const v = b.data[b.n - 1];
-        panel.label(b.label, WINDOW_SECONDS, v, {
-          color: colors.text[b.color], dx: 8, halo: colors.surface,
-        });
-      }
-
       panel.title(spec.label, colors, spec.unit);
     }
   }
 
-  return { render };
+  /**
+   * Update beside the numerical tiles, not beside the animation frame. The
+   * values therefore have the same content and cadence as the boxes the user
+   * is already reading, while the canvases remain smooth.
+   */
+  function renderReadouts(metrics, colors) {
+    for (const strip of strips) {
+      for (const series of strip.spec.series) {
+        const readout = strip.readouts.get(series.channel);
+        readout.row.style.setProperty('--trace-color', colors.text[series.color]);
+        readout.output.textContent = series.summary(metrics);
+      }
+    }
+  }
+
+  return { render, renderReadouts };
 }

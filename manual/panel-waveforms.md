@@ -10,6 +10,8 @@ The top strip shows airway pressure (Paw) and pleural pressure (Ppl) in cmH₂O.
 
 The middle strip shows systemic arterial, pulmonary arterial and central venous pressure in mmHg. The bottom strip shows lung volume above the calculated resting reference in mL. Light vertical bands identify inspiration in all three strips, allowing events to be aligned without mentally matching different time axes.
 
+The rail on the right deliberately does **not** print the latest instantaneous sample. It repeats the slower summaries used in the numerical tiles: plateau pressure beside Paw, pleural-pressure swing beside Ppl, systolic/diastolic systemic pressure, systolic/diastolic PAP, CVP, and delivered tidal volume. The curves therefore remain continuous, while the adjacent numbers retain the same meaning and update cadence as the clinical readouts elsewhere in the interface.
+
 Respiratory and vascular pressures deliberately do not share an axis. Their units and magnitudes differ, and a dual axis would make visual crossings physiologically meaningless.
 
 ## Useful comparisons
