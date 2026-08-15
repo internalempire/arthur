@@ -17,7 +17,7 @@ The first three levels are valuable, but they cannot be promoted into the fourth
 
 ## The executable suite
 
-`npm test` runs 200 dependency-free checks across eight suites.
+`npm test` runs dependency-free checks across the model's numerical, physiological and documentary domains. The exact count is intentionally not embedded here because every new contract would otherwise make the validation page stale.
 
 ### Safety and numerical behaviour
 

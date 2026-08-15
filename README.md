@@ -383,16 +383,21 @@ line however hard a lung was inflated, and the index could not exceed 1 whatever
 was done to the patient — measured at 0.92 with a tidal volume of 1200 mL on a
 normal lung, where it should have been well above 1.
 
-| | stress index |
-|---|---|
-| Normal lung, 450 mL | 1.03 |
-| Normal lung, 1400 mL | 1.07 |
-| Stiff collapsed lung, 900 mL at PEEP 20 | 1.19 |
-| Recruitable lung at PEEP 2 | **0.89** |
-| The same lung at PEEP 14 | **1.05** |
+<!-- BEGIN GENERATED: readme-stress-index -->
+| executable case | stress index |
+|---|---:|
+| normal tissue compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8 | 1.03 |
+| tissue compliance 30 mL/cmH₂O, no collapse; VT 700 mL; PEEP 8 | 1.80 |
+| the same stiff tissue; VT 350 mL; PEEP 8 | 1.23 |
+| tissue compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6 | 0.72 |
+| the same recruitable lung; VT 600 mL; PEEP 14 | 1.48 |
+<!-- END GENERATED: readme-stress-index -->
 
-That last pair is the point: the same patient reads below 1 when the PEEP under
-the breath is too low to hold the lung open, and above 1 once it is not.
+The last pair is the point: the same model lung reads below 1 while substantial
+opening occurs within the breath. At higher PEEP, less compliance is gained from
+intratidal recruitment and falling tissue compliance dominates, taking the
+index above 1. The table is generated from the same executable cases used by
+the manual and its stress-index figure.
 
 It reads the shape of a constant-flow inflation, so it is withheld outside one —
 in pressure control, or with any inspiratory effort, the curve it would be
@@ -1127,7 +1132,7 @@ src/
 node tests/run.mjs
 ```
 
-200 checks, no framework and no dependencies:
+A dependency-free suite, with no test framework:
 
 - **Volume conservation** across every scenario, to 0.01 mL.
 - **Compartment positivity** across every scenario and across a deterministic

@@ -52,24 +52,32 @@ Both anchors are divided by the open fraction at their own pressure, so they des
 
 ### What the model shows
 
-| `clung` | volume at $P_l$ 5 | volume at $P_l$ 35 |
-|---|---|---|
-| 200 mL/cmH₂O | 2.25 L | 6.00 L |
+<!-- BEGIN GENERATED: pv-tissue -->
+*Direct evaluation of the fully open tissue relation (`collapsed = 0`, open fraction fixed to 1).*
+
+| tissue compliance (mL/cmH₂O) | volume at P<sub>l</sub> 5 (L) | volume at P<sub>l</sub> 35 (L) |
+|---:|---:|---:|
+| 200 | 2.25 | 6.00 |
 | 100 | 1.78 | 3.65 |
 | 45 | 1.52 | 2.36 |
+<!-- END GENERATED: pv-tissue -->
 
-For the reference normal parameters, the whole-lung curve reaches the 2.2 L and 6.0 L anchors; the table shows the corresponding fully open tissue volumes, which is why the first resting value is 2.25 L rather than 2.20 L. A `clung` setting of 45 mL/cmH₂O yields 2.36 L at 35 cmH₂O in this tissue relation. Calling that setting “ARDS” is a phenotype choice, not a universal ARDS capacity.
+For the reference normal parameters, the whole-lung curve reaches the 2.2 L and 6.0 L anchors; the table shows the corresponding fully open tissue volumes, so the resting value is slightly above the whole-lung anchor. Calling the lowest-compliance setting “ARDS” would be a phenotype choice, not a universal ARDS capacity.
 
 ### The resting reference is calculated
 
 There is no `frc` control. The model first calculates the lung volume held at 5 cmH₂O of transpulmonary recoil from open fraction and `clung`, then measures chest-wall displacement from that reference. End-expiratory volume at applied PEEP is subsequently solved from the combined respiratory relation:
 
-| | end-expiratory volume at PEEP 5 |
-|---|---|
-| normal | 2.68 L |
-| 30% collapsed | 1.93 L |
-| 50% collapsed | 1.42 L |
-| emphysematous, `clung` 400 | 3.77 L |
+<!-- BEGIN GENERATED: pv-eelv -->
+*Static respiratory-system equilibrium at applied PEEP 5 cmH₂O, with recruitment hysteresis off.*
+
+| phenotype | end-expiratory volume (L) |
+|---|---:|
+| normal | 2.68 |
+| 30% collapsed | 1.93 |
+| 50% collapsed | 1.42 |
+| emphysematous, tissue compliance 400 mL/cmH₂O | 3.77 |
+<!-- END GENERATED: pv-eelv -->
 
 A lung with a higher `clung` setting has a higher calculated reference, while a lung with fewer open units has a lower one. Recruitment can therefore raise end-expiratory volume mechanically rather than being recorded as a separate label. This is not a fully independent lung–chest-wall equilibrium: the chest-wall curve is recentered on the lung-derived reference, as described under [pleural pressure](pleural-pressure.md).
 

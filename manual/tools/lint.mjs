@@ -28,7 +28,7 @@ const structural = (l) =>
   l.trim() === '' || /^\s*\|/.test(l) || /^#{1,6}\s/.test(l)
   || /^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(l) || /^\s*[-*+]\s/.test(l)
   || /^\s*\d+\.\s/.test(l) || /^>/.test(l) || /^\s{4,}\S/.test(l)
-  || /^!\[/.test(l);
+  || /^!\[/.test(l) || /^\s*<!--/.test(l);
 
 const files = readdirSync(ROOT).filter((f) => f.endsWith('.md')).sort();
 

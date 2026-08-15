@@ -57,15 +57,21 @@ Pressures generated in cmH₂O by the respiratory model are converted once, at t
 
 Raising PEEP in a passive patient at 500 mL and 14 breaths per minute:
 
-| PEEP (cmH₂O) | measured CVP | transmural CVP | cardiac output |
-|---|---|---|---|
-| 0 | −0.1 mmHg | 3.2 mmHg | 5.11 L/min |
-| 5 | 1.3 | 2.8 | 4.96 |
-| 10 | 2.6 | 2.5 | 4.82 |
-| 15 | 4.0 | 2.3 | 4.51 |
-| 20 | 5.3 | 2.1 | 4.34 |
+<!-- BEGIN GENERATED: transmural-peep -->
+*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s.*
 
-Measured central venous pressure rises by 5.4 mmHg. The transmural pressure filling the right ventricle falls by 1.1 mmHg, and output falls with it. A clinician reading only the first column would conclude the patient was becoming better filled while the opposite was happening.
+| PEEP (cmH₂O) | measured CVP (mmHg) | transmural CVP (mmHg) | cardiac output (L/min) |
+|---:|---:|---:|---:|
+| 0 | -0.4 | 3.0 | 4.94 |
+| 5 | 1.2 | 2.8 | 4.93 |
+| 10 | 2.4 | 2.4 | 4.75 |
+| 15 | 3.8 | 2.2 | 4.44 |
+| 20 | 5.1 | 2.0 | 4.23 |
+
+Across this sweep, measured CVP rises by 5.5 mmHg while transmural CVP falls by 1.0 mmHg.
+<!-- END GENERATED: transmural-peep -->
+
+A clinician reading only measured CVP would conclude that the patient was becoming better filled while the transmural filling pressure and output were moving in the opposite direction.
 
 The app reports both numbers, side by side, for exactly this reason — see [numeric tiles](numeric-tiles.md).
 

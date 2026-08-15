@@ -17,6 +17,7 @@ const SUITES = [
   './suites/recruitment.test.mjs',
   './suites/scenario-interpretability.test.mjs',
   './suites/contracts.test.mjs',
+  './suites/documentation-examples.test.mjs',
 ];
 
 for (const suite of SUITES) await import(suite);
