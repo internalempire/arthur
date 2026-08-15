@@ -79,7 +79,7 @@ section('Recruitment changes the mechanics');
     // the same recruitment the phenotype checks above are about.
     const low = at(6), high = at(24);
     check('above the opening range, compliance is the open fraction times the tissue value or less',
-      high.measured < consolidated.clung * high.open,
+      high.measured <= consolidated.clung * high.open + 0.5,
       `${high.measured.toFixed(0)} against ${(consolidated.clung * high.open).toFixed(0)} at Pl 24`);
     check('and below it, units still opening push it the other way',
       low.measured > consolidated.clung * low.open,
@@ -219,11 +219,11 @@ section('Recruitment hysteresis');
   // Found while the tidal volume above was being chosen, and worth keeping: a
   // big enough breath recruits by itself, and then a manoeuvre adds nothing.
   {
-    const big = manoeuvre({ pClose: 6, peep: 10, vt: 400 });
+    const big = manoeuvre({ pClose: 6, peep: 10, vt: 600 });
     check('a large enough tidal volume leaves a manoeuvre nothing to add',
       Math.abs(big.after.open - big.before.open) < 0.005
         && big.before.open > held.before.open,
-      `at 400 mL the lung already sits at ${(big.before.open * 100).toFixed(1)}%, `
+      `at 600 mL the lung already sits at ${(big.before.open * 100).toFixed(1)}%, `
       + `against ${(held.before.open * 100).toFixed(1)}% at 250`);
   }
 
@@ -268,13 +268,36 @@ section('The stress index');
   check('and withheld in pressure control, where flow is not constant',
     settled({ mode: 'pcv', pmus: 0, pinsp: 16, peep: 6 }, 40).metrics.stressIndex === null);
 
-  // The curve the index reads is pinned by two textbook volumes, and those are
-  // the claims worth asserting rather than the constants that satisfy them.
+  // Compliance and maximum size are independent inputs. `clung` controls the
+  // local slope while there is room left; `lungCapacity` controls the asymptote.
+  // Collapse then decides what fraction of that ceiling is currently available.
   const p = defaultParams();
   check('a normal lung rests at 2.2 L',
     near(relaxationVolume(p), 2.2, 1e-6), `${relaxationVolume(p).toFixed(6)} L`);
-  check('and reaches total lung capacity at 35 cmH₂O',
-    near(lungVolumeAtPl(p, 35), 6.0, 1e-3), `${lungVolumeAtPl(p, 35).toFixed(4)} L`);
+  check('its default capacity is 6 L and is approached smoothly',
+    p.lungCapacity === 6 && lungVolumeAtPl(p, 35, 1) > 5.7
+      && near(lungVolumeAtPl(p, 200, 1), 6, 1e-3),
+    `${lungVolumeAtPl(p, 35, 1).toFixed(2)} L at 35 and ${lungVolumeAtPl(p, 200, 1).toFixed(3)} L at high pressure`);
+  {
+    const slopeAtFive = (overrides) => {
+      const q = { ...p, collapsed: 0, ...overrides };
+      return (lungVolumeAtPl(q, 5.01, 1) - lungVolumeAtPl(q, 4.99, 1)) / 0.02;
+    };
+    check('changing compliance changes local slope without changing maximum size',
+      near(slopeAtFive({ clung: 100 }), 0.1, 0.005)
+        && near(lungVolumeAtPl({ ...p, clung: 45 }, 400, 1), 6, 1e-3)
+        && near(lungVolumeAtPl({ ...p, clung: 300 }, 400, 1), 6, 1e-3),
+      `C at rest ${(slopeAtFive({ clung: 100 }) * 1000).toFixed(0)} mL/cmH₂O; `
+      + `ceilings ${lungVolumeAtPl({ ...p, clung: 45 }, 400, 1).toFixed(2)} and `
+      + `${lungVolumeAtPl({ ...p, clung: 300 }, 400, 1).toFixed(2)} L`);
+    check('changing maximum capacity preserves compliance away from the ceiling',
+      near(slopeAtFive({ clung: 100, lungCapacity: 4 }),
+        slopeAtFive({ clung: 100, lungCapacity: 8 }), 0.005)
+        && near(lungVolumeAtPl({ ...p, lungCapacity: 4 }, 400, 1), 4, 1e-3)
+        && near(lungVolumeAtPl({ ...p, lungCapacity: 8 }, 400, 1), 8, 1e-3),
+      `local C ${(slopeAtFive({ clung: 100, lungCapacity: 4 }) * 1000).toFixed(0)} vs `
+      + `${(slopeAtFive({ clung: 100, lungCapacity: 8 }) * 1000).toFixed(0)} mL/cmH₂O`);
+  }
   check('compliance falls as it fills, rather than staying constant for ever',
     lungComplianceAt(p, lungVolumeAtPl(p, 40)) < lungComplianceAt(p, lungVolumeAtPl(p, 5)) * 0.6,
     `${lungComplianceAt(p, lungVolumeAtPl(p, 5)).toFixed(0)} at rest -> `

@@ -496,22 +496,24 @@ function pmsfOcclusionFigure() {
 
 function pvCurveFigure() {
   const lungs = [
-    { label: 'normal, 200 mL/cmH\u2082O', clung: 200 },
-    { label: 'moderate, 100', clung: 100 },
-    { label: 'ARDS, 45', clung: 45 },
+    { label: 'C 200, capacity 6 L', clung: 200, lungCapacity: 6 },
+    { label: 'C 100, capacity 6 L', clung: 100, lungCapacity: 6 },
+    { label: 'C 45, capacity 6 L', clung: 45, lungCapacity: 6 },
+    { label: 'C 100, capacity 4 L', clung: 100, lungCapacity: 4 },
+    { label: 'C 100, capacity 8 L', clung: 100, lungCapacity: 8 },
   ];
-  const series = lungs.map(({ label, clung }) => {
-    const p = { ...defaultParams(), clung, collapsed: 0 };
+  const series = lungs.map(({ label, clung, lungCapacity }) => {
+    const p = { ...defaultParams(), clung, lungCapacity, collapsed: 0 };
     const points = [];
     for (let pl = -5; pl <= 40; pl += 0.5) points.push([pl, lungVolumeAtPl(p, pl, 1)]);
     return { label, points };
   });
   return chart({
-    title: 'Lung volume against transpulmonary pressure, fully open tissue',
+    title: 'Compliance changes slope; maximum capacity changes the ceiling',
     xLabel: 'Transpulmonary pressure (cmH\u2082O)',
     yLabel: 'Lung volume (L)',
-    series, xTick: 5, yTick: 1,
-    notes: ['capacity follows compliance:', 'a stiff lung is a small lung'],
+    series, xTick: 5, yTick: 1, padRight: 260,
+    notes: ['model curves over the clinical pressure range', 'collapse scales the accessible share separately'],
   });
 }
 
@@ -544,7 +546,7 @@ function stressIndexFigure() {
   const panelW = (W - padL - padR - gap * 2) / 3;
   const plotH2 = H2 - padT - padB;
 
-  const figureIds = new Set(['normal-500', 'stiff-700', 'recruiting-low']);
+  const figureIds = new Set(['normal-500', 'small-lung-900', 'recruiting-low']);
   const figureCases = STRESS_INDEX_CASES.filter((entry) => figureIds.has(entry.id));
   const panels = figureCases.map(({ title, overrides }) => {
     const sim = settled({ ...STRESS_INDEX_BASE, ...overrides }, 45);

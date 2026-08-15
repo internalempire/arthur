@@ -123,7 +123,8 @@ export class Simulator {
       this.circ.vSv += value - this.params.stressedVolume;
     }
     this.params[id] = value;
-    if (id === 'collapsed' || id === 'clung' || id === 'riRatio' || id === 'pOpen') {
+    if (id === 'collapsed' || id === 'clung' || id === 'lungCapacity'
+      || id === 'riRatio' || id === 'pOpen') {
       // These move the resting volume, which `resp.v` is measured from. The gas
       // in the lung cannot jump, so hold the absolute volume and re-reference it
       // rather than letting the offset carry the change.

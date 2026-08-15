@@ -45,16 +45,16 @@ The 4.5 s envelope is a **didactic shape coefficient**: it preserves the order o
 An obstructed phenotype at 26 breaths per minute:
 
 <!-- BEGIN GENERATED: efl-peep -->
-*Executable setup: passive volume control, VT 500 mL, 26/min, inspiratory time 0.9 s, airway resistance 24 cmH₂O·s/L, tissue compliance 300 mL/cmH₂O, EFL on; each level is settled for 45 s.*
+*Executable setup: passive volume control, VT 500 mL, 26/min, inspiratory time 0.9 s, airway resistance 24 cmH₂O·s/L, aerated-lung compliance 300 mL/cmH₂O, EFL on; each level is settled for 45 s.*
 
 | applied PEEP (cmH₂O) | total PEEP (cmH₂O) | dynamic trapped volume (mL) | end-expiratory volume (L) | cardiac output (L/min) |
 |---:|---:|---:|---:|---:|
-| 0 | 12.1 | 1361 | 4.02 | 4.37 |
-| 5 | 12.1 | 782 | 4.02 | 4.36 |
-| 6 | 12.6 | 724 | 4.08 | 4.35 |
-| 8 | 14.4 | 692 | 4.27 | 4.30 |
-| 10 | 16.4 | 681 | 4.48 | 4.24 |
-| 13 | 19.3 | 666 | 4.79 | 4.11 |
+| 0 | 11.6 | 1361 | 4.03 | 4.39 |
+| 5 | 11.8 | 781 | 4.05 | 4.35 |
+| 6 | 12.5 | 742 | 4.13 | 4.33 |
+| 8 | 14.4 | 715 | 4.34 | 4.28 |
+| 10 | 16.3 | 693 | 4.54 | 4.23 |
+| 13 | 19.2 | 650 | 4.84 | 4.10 |
 <!-- END GENERATED: efl-peep -->
 
 For this phenotype, total PEEP and end-expiratory volume are essentially unchanged from applied PEEP 0 to 5 cmH₂O. The departure becomes detectable just above 5 and is clear by 8–10 cmH₂O: applied pressure is then adding to absolute lung volume rather than merely substituting for part of intrinsic pressure. Dynamic trapped volume can fall while absolute end-expiratory volume rises because it is measured above the passive equilibrium volume at the same applied PEEP.
@@ -63,7 +63,7 @@ The model does not contain a single pressure parameter called the choke pressure
 
 Without the flow cap the same phenotype behaves differently: PEEP 0 → 5 raises total PEEP from about 6.5 to 11.4 cmH₂O and end-expiratory volume from 3.41 to 3.95 L, with output falling. That is the model's response to resistive incomplete emptying without an explicit choke; it is not evidence that every non-flow-limited patient behaves that way.
 
-Time still works. At the shipped PEEP, slowing the rate from 26 to 12 breaths per minute reduces intrinsic PEEP from about 7.1 to 1.3 cmH₂O, dynamic trapping from about 782 to 146 mL, and restores output from about 4.38 to 4.85 L/min.
+Time still works. At the shipped PEEP, slowing the rate from 26 to 12 breaths per minute markedly reduces intrinsic PEEP and dynamic trapping and restores output. These are phenotype-specific model effects, not quantitative COPD targets.
 
 ---
 

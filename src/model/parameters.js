@@ -75,9 +75,14 @@ export const PARAMETERS = [
     help: 'Proning stiffens the chest wall, raises abdominal pressure and recruits dorsal lung — three changes that pull in opposite directions haemodynamically. The controls keep showing the supine mechanics; turning someone over does not change how stiff their lung is.',
   },
   {
-    id: 'clung', group: 'mechanics', label: 'Lung compliance, fully open', unit: 'mL/cmH₂O',
+    id: 'clung', group: 'mechanics', label: 'Aerated-lung compliance', unit: 'mL/cmH₂O',
     min: 20, max: 420, step: 5, default: 200,
-    help: 'The compliance of this lung with all of it open, not the value a ventilator would measure — that is this times the open fraction, which is the baby lung as a readout. High values are lost elastic recoil, so an emphysematous lung rests hyperinflated without being told to.',
+    help: 'The local volume gained per transpulmonary-pressure increment by aerated tissue while it remains away from its capacity ceiling. The live measured compliance can be lower near maximum capacity or higher while units recruit. This control changes stiffness, not maximum lung size.',
+  },
+  {
+    id: 'lungCapacity', group: 'mechanics', label: 'Maximum lung capacity', unit: 'L',
+    min: 2, max: 9, step: 0.1, default: 6,
+    help: 'The volume ceiling of a completely open lung. Collapse reduces the share currently available, while recruitment restores part of it. It is independent of aerated-lung compliance and is a teaching-scale input, not an anthropometric predicted TLC.',
   },
   {
     id: 'ccw', group: 'mechanics', label: 'Chest wall compliance', unit: 'mL/cmH₂O',

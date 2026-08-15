@@ -216,9 +216,14 @@ section('Scenario teaching mechanisms');
   const below = scenarioMetrics('copd', { peep: 5 });
   const above = scenarioMetrics('copd', { peep: 13 });
   demonstrates.copd = fast.autoPeep > slow.autoPeep + 3
-    && fast.trappedVolume > slow.trappedVolume + 0.4
+    && fast.trappedVolume > slow.trappedVolume + 400
     && slow.co > fast.co
-    && Math.abs(below.totalPeep - zero.totalPeep) < 0.3
+    // A low external PEEP substitutes almost one-for-one below the choke. The
+    // comparison is directional rather than an exact identity: the two settled
+    // breaths can differ by a few tenths of cmH2O while EELV remains within
+    // 50 mL. Both conditions prevent a broad tolerance from hiding inflation.
+    && Math.abs(below.totalPeep - zero.totalPeep) < 0.5
+    && Math.abs(below.endExpiratoryVolume - zero.endExpiratoryVolume) < 0.05
     && above.totalPeep > below.totalPeep + 3
     && above.co < below.co;
   check('COPD preset generates rate-dependent trapping and a PEEP waterfall',

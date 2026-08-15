@@ -9,14 +9,17 @@
 | control | range | model meaning |
 |---|---:|---|
 | body position | supine, prone | applies a coarse coordinated change in chest wall, abdomen and recruitment distribution |
-| lung compliance, fully open | 20–420 mL/cmH₂O | tissue compliance if the represented lung were completely open |
+| aerated-lung compliance | 20–420 mL/cmH₂O | local pressure–volume slope of aerated tissue away from its upper-volume limit |
+| maximum lung capacity | 2–9 L | volume ceiling of a completely open lung; default 6 L |
 | chest-wall compliance | 40–300 mL/cmH₂O | linear chest-wall pressure–volume slope |
 | airway resistance | 1–40 cmH₂O/L/s | linear resistance applied during flow |
 | expiratory flow limitation | off/on | activates a collapsible-airway choke during expiration |
 
-`Lung compliance, fully open` is not the compliance a ventilator would report when part of the lung is closed. Measured respiratory-system compliance also depends on open fraction and chest-wall mechanics. This separation lets recruitment enlarge the functional baby lung without pretending that tissue itself became more compliant.
+`Aerated-lung compliance` is not the compliance a ventilator would report when part of the lung is closed. It is the local tissue slope used at the current operating point, before recruitment and chest-wall effects are added. Measured respiratory-system compliance also depends on open fraction, proximity to maximum capacity and chest-wall mechanics.
 
-High fully-open compliance means low elastic recoil. The pressure–volume curve then rests at a higher volume, which permits an emphysema-like hyperinflation phenotype without a separate FRC slider.
+`Maximum lung capacity` is independent of that slope. It is a direct teaching-scale input in litres, not an anthropometric predicted TLC. Collapse reduces the fraction of this ceiling currently accessible; recruitment can restore part of it. This separation prevents low compliance and collapse from shrinking the same baby lung twice.
+
+High aerated-lung compliance means low elastic recoil. The pressure–volume curve then rests at a higher volume, which permits an emphysema-like hyperinflation phenotype without a separate FRC slider. It does not automatically enlarge maximum capacity.
 
 Airway resistance remains linear; EFL adds a separate expiratory choke. This distinction matters because increasing expiratory driving pressure still raises flow through a linear resistor but not once a waterfall is active.
 
@@ -48,6 +51,7 @@ Prone position is deliberately coarse. It combines directional changes intended 
 ## Limits
 
 - One lung and one chest wall replace regional stress, dependent collapse and pleural-pressure gradients.
+- Maximum capacity is entered directly in litres; height-, sex- and age-based prediction is not implemented.
 - Chest-wall compliance is linear and its resting reference cannot be adjusted independently.
 - R/I is mapped to a standard model manoeuvre and is not recalculated from an actual bedside pressure–volume acquisition.
 - Recruitment has one diseased population; opening pressures are distributed but not spatially assigned.

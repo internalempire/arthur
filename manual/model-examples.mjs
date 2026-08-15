@@ -30,33 +30,32 @@ export const STRESS_INDEX_BASE = {
   mode: 'vcv', pmus: 0, rr: 14, ti: 1.2,
 };
 
-// These cases also drive the stress-index SVG. `collapsed: 0` is explicit in
-// the first three because an earlier independent audit attempted to reproduce
-// "stiff lung" with an additional collapsed compartment and obtained a
-// different, internally valid experiment.
+// These cases also drive the stress-index SVG. The first comparison changes
+// maximum capacity without changing tissue compliance, so upper-limb curvature
+// is no longer manufactured by making a low-compliance lung artificially small.
 export const STRESS_INDEX_CASES = [
   {
     id: 'normal-500',
     title: 'Normal',
-    label: 'normal tissue compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8',
+    label: 'normal aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8',
     overrides: { clung: 200, collapsed: 0, vt: 500, peep: 8 },
   },
   {
-    id: 'stiff-700',
+    id: 'small-lung-900',
     title: 'Over-distension',
-    label: 'tissue compliance 30 mL/cmH₂O, no collapse; VT 700 mL; PEEP 8',
-    overrides: { clung: 30, collapsed: 0, vt: 700, peep: 8 },
+    label: 'maximum lung capacity 4.0 L, aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 900 mL; PEEP 8',
+    overrides: { lungCapacity: 4, clung: 200, collapsed: 0, vt: 900, peep: 8 },
   },
   {
-    id: 'stiff-350',
-    title: 'Stiff, lower VT',
-    label: 'the same stiff tissue; VT 350 mL; PEEP 8',
-    overrides: { clung: 30, collapsed: 0, vt: 350, peep: 8 },
+    id: 'small-lung-350',
+    title: 'Same lung, lower VT',
+    label: 'the same 4.0 L maximum-capacity lung; VT 350 mL; PEEP 8',
+    overrides: { lungCapacity: 4, clung: 200, collapsed: 0, vt: 350, peep: 8 },
   },
   {
     id: 'recruiting-low',
     title: 'Tidal recruitment',
-    label: 'tissue compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6',
+    label: 'aerated-lung compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6',
     overrides: {
       clung: 60, collapsed: 0.4, riRatio: 0.7, pOpen: 16, hysteresis: 'off',
       vt: 600, peep: 6,
@@ -91,7 +90,7 @@ function eflBlock() {
     return `| ${peep} | ${fixed(metrics.totalPeep, 1)} | ${Math.round(metrics.trappedVolume)} | ${fixed(metrics.endExpiratoryVolume, 2)} | ${fixed(metrics.co, 2)} |`;
   });
   return [
-    '*Executable setup: passive volume control, VT 500 mL, 26/min, inspiratory time 0.9 s, airway resistance 24 cmH\u2082O\u00b7s/L, tissue compliance 300 mL/cmH\u2082O, EFL on; each level is settled for 45 s.*',
+    '*Executable setup: passive volume control, VT 500 mL, 26/min, inspiratory time 0.9 s, airway resistance 24 cmH\u2082O\u00b7s/L, aerated-lung compliance 300 mL/cmH\u2082O, EFL on; each level is settled for 45 s.*',
     '',
     '| applied PEEP (cmH\u2082O) | total PEEP (cmH\u2082O) | dynamic trapped volume (mL) | end-expiratory volume (L) | cardiac output (L/min) |',
     '|---:|---:|---:|---:|---:|',
@@ -165,20 +164,29 @@ function venousReturnBlock(rows) {
 }
 
 function pvTissueBlock() {
-  const rows = [200, 100, 45].map((clung) => {
-    const parameters = { ...defaultParams(), clung, collapsed: 0 };
+  const cases = [
+    { clung: 200, lungCapacity: 6 },
+    { clung: 100, lungCapacity: 6 },
+    { clung: 45, lungCapacity: 6 },
+    { clung: 100, lungCapacity: 4 },
+    { clung: 100, lungCapacity: 8 },
+  ];
+  const rows = cases.map(({ clung, lungCapacity }) => {
+    const parameters = { ...defaultParams(), clung, lungCapacity, collapsed: 0 };
     return {
       clung,
+      lungCapacity,
       atFive: lungVolumeAtPl(parameters, 5, 1),
       atThirtyFive: lungVolumeAtPl(parameters, 35, 1),
+      atHighPressure: lungVolumeAtPl(parameters, 400, 1),
     };
   });
   return [
     '*Direct evaluation of the fully open tissue relation (`collapsed = 0`, open fraction fixed to 1).*',
     '',
-    '| tissue compliance (mL/cmH₂O) | volume at P<sub>l</sub> 5 (L) | volume at P<sub>l</sub> 35 (L) |',
-    '|---:|---:|---:|',
-    ...rows.map((row) => `| ${row.clung} | ${fixed(row.atFive, 2)} | ${fixed(row.atThirtyFive, 2)} |`),
+    '| aerated-lung compliance (mL/cmH₂O) | maximum capacity (L) | volume at P<sub>l</sub> 5 (L) | volume at P<sub>l</sub> 35 (L) | asymptotic volume (L) |',
+    '|---:|---:|---:|---:|---:|',
+    ...rows.map((row) => `| ${row.clung} | ${fixed(row.lungCapacity, 1)} | ${fixed(row.atFive, 2)} | ${fixed(row.atThirtyFive, 2)} | ${fixed(row.atHighPressure, 2)} |`),
   ].join('\n');
 }
 
@@ -187,7 +195,8 @@ function pvEelvBlock() {
     ['normal', {}],
     ['30% collapsed', { collapsed: 0.3 }],
     ['50% collapsed', { collapsed: 0.5 }],
-    ['emphysematous, tissue compliance 400 mL/cmH₂O', { clung: 400, collapsed: 0 }],
+    ['emphysematous, aerated-lung compliance 400 mL/cmH₂O', { clung: 400, collapsed: 0 }],
+    ['smaller 4.0 L maximum-capacity lung', { lungCapacity: 4, collapsed: 0 }],
   ];
   return [
     '*Static respiratory-system equilibrium at applied PEEP 5 cmH₂O, with recruitment hysteresis off.*',

@@ -55,7 +55,7 @@ Three things about the trace matter for reading it.
 
 **Constant flow is a precondition, not a detail.** In pressure control, flow decays through inspiration by design, so the pressure curve is flat by construction and its shape says nothing about the lung. The same is true of any breath with patient effort. The model withholds the index in both cases rather than printing a number that would be read as though it meant something.
 
-The panels are scaled independently, and that is not a presentational convenience. On a shared absolute axis the distending breath rises by 63 cmH₂O and the recruiting one by 10, so the smaller curvature occupies about a hundredth of the plot and disappears. Measured as deviation from a straight line at mid-inspiration, as a fraction of each breath's own rise, the recruiting case bows **+8.6%** above the line and the distending case **−16.0%** below it. Both are real; one is an order of magnitude easier to see. In absolute terms the recruiting bow is 0.85 cmH₂O on a 9.9 cmH₂O rise, which is a fair statement of how hard an index below 1 is to spot at the bedside.
+The panels are scaled independently because their pressure excursions differ. A shared absolute axis can make the smaller curvature visually disappear even when the fitted exponent is meaningfully below 1. The figure is therefore for comparing **shape**, while the executable table below preserves the absolute plateau and driving pressures.
 
 ### What the model shows
 
@@ -64,14 +64,14 @@ The panels are scaled independently, and that is not a presentational convenienc
 
 | lung and breath | stress index | plateau (cmH₂O) | driving pressure (cmH₂O) | breathwise C<sub>rs</sub> (mL/cmH₂O) |
 |---|---:|---:|---:|---:|
-| normal tissue compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8 | 1.03 | 13.8 | 5.8 | 87 |
-| tissue compliance 30 mL/cmH₂O, no collapse; VT 700 mL; PEEP 8 | 1.80 | 71.4 | 63.4 | 11 |
-| the same stiff tissue; VT 350 mL; PEEP 8 | 1.23 | 29.5 | 21.5 | 16 |
-| tissue compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6 | 0.72 | 16.0 | 10.0 | 60 |
-| the same recruitable lung; VT 600 mL; PEEP 14 | 1.48 | 24.4 | 10.4 | 58 |
+| normal aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8 | 1.01 | 13.2 | 5.2 | 96 |
+| maximum lung capacity 4.0 L, aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 900 mL; PEEP 8 | 1.16 | 18.8 | 10.8 | 83 |
+| the same 4.0 L maximum-capacity lung; VT 350 mL; PEEP 8 | 1.03 | 11.9 | 3.9 | 91 |
+| aerated-lung compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6 | 0.69 | 15.0 | 9.0 | 67 |
+| the same recruitable lung; VT 600 mL; PEEP 14 | 1.10 | 21.1 | 7.1 | 84 |
 <!-- END GENERATED: stress-index -->
 
-The normal lung sits at 1.03 — close to linear, which is what a lung operating in the middle of its curve should give. The stiff lung ventilated at 700 mL reaches 1.80, unambiguous distension. Reducing that same lung to 350 mL brings it to 1.23: better, and still not linear.
+The normal lung is close to linear. With the same aerated-tissue compliance but a smaller 4 L maximum capacity, a 900 mL breath moves farther up the upper limb and raises the index; reducing tidal volume to 350 mL returns the same lung close to linear. This comparison deliberately changes **capacity**, not compliance, so overdistension is not manufactured by using one control for both properties.
 
 The final pair is the other reason the feature was added. The same recruitable lung gives an index below 1 while substantial opening occurs within the breath. At higher PEEP, less compliance is gained from intratidal recruitment and the falling compliance of the already-aerated tissue dominates, taking the index above 1. Before the tissue curve acquired its ceiling and recruitment became mechanical, the model produced a straight line in every condition, and the index could only ever have been 1.
 
@@ -102,7 +102,7 @@ The final pair is the other reason the feature was added. The same recruitable l
 
 ### Of clinical application
 
-- **The model's index is computed from a clean pressure trace.** A bedside trace contains cardiac oscillation, circuit compliance, trigger artefacts and noise; whether a real index of 1.23 is distinguishable from 1.03 in a given patient is a question about the measurement, not about the physiology.
+- **The model's index is computed from a clean pressure trace.** A bedside trace contains cardiac oscillation, circuit compliance, trigger artefacts and noise; whether two nearby values are distinguishable in a given patient is a question about the measurement, not about the physiology.
 - **The index is not a PEEP or tidal volume setting.** It reports the direction of a problem, and the model deliberately does not convert it into an instruction.
 - A value below 1 does not always mean "raise PEEP": in this model it can only arise from intratidal recruitment, whereas at the bedside it can also arise from a leak or from flow that is not truly constant.
 - The validity conditions are enforced here and are not enforced at the bedside. The commonest way to be misled by a stress index is to read one during spontaneous effort, and the model shows nothing in that case.

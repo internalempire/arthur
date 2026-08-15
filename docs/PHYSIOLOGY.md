@@ -60,16 +60,15 @@ numbers. The following all reproduce:
   output from 4.7 to 6.3 L/min. At euvolaemia the same bolus gains about 12%
   and variation is 2%.
 - ARDS with right ventricular failure: at its shipped PEEP the RV:LV
-  end-diastolic ratio is 1.65, the resistance coefficient is 4.26 WU and the
-  catheter-derived value is about 4.83 WU. Across PEEP 0 → 20 the coefficient
-  falls 4.57 → 3.66 while derived PVR rises 4.67 → 5.28 WU and output falls
-  4.10 → 3.82 L/min. Setting `riRatio` to zero separates the response: the
-  coefficient rises 4.57 → 4.62, derived PVR 4.92 → 7.08 and output falls
-  4.03 → 3.60 L/min.
-- COPD with expiratory flow limitation: at external PEEP 5, about 7.1 cmH₂O of
-  intrinsic PEEP and 782 mL of dynamic trapped volume raise CVP while cardiac
+  end-diastolic ratio is about 1.62 and the resistance coefficient is about
+  4.24 WU. Across PEEP 0 → 20 the coefficient falls 4.57 → 3.59 while derived
+  PVR rises 4.73 → 5.04 WU and output falls 4.04 → 3.77 L/min. Setting
+  `riRatio` to zero separates the response: the coefficient rises 4.57 → 4.68,
+  derived PVR 4.84 → 6.74 and output falls 4.01 → 3.58 L/min.
+- COPD with expiratory flow limitation: at external PEEP 5, about 6.8 cmH₂O of
+  intrinsic PEEP and 781 mL of dynamic trapped volume raise CVP while cardiac
   output falls. Slowing respiratory rate from 26 to 12/min reduces those to
-  about 1.3 cmH₂O and 146 mL and restores output. External PEEP 0 → 5 leaves
+  about 1.3 cmH₂O and 150 mL and restores output. External PEEP 0 → 5 leaves
   total PEEP and absolute EELV almost unchanged below the choke; higher PEEP
   becomes true back-pressure. The hyperinflated lung remains on the right limb
   of the J-curve, but its resistance coefficient changes only modestly, around
@@ -166,10 +165,11 @@ low-PEEP respiratory-system compliance, and divides the resulting recruited
 compliance by that low-PEEP compliance. It then solves for the smallest internal
 fraction of diseased units that reproduces the requested R/I.
 
-This prevents three concepts from collapsing into one slider: `collapsed` is how
-much lung is closed, `clung` is the tissue compliance if all of it were open, and
-R/I is how much recruitment the specified pressure step produces relative to
-inflation of the baby lung. The internal openable fraction is capped at one. If
+This prevents four concepts from collapsing into one slider: `collapsed` is how
+much lung is closed, `clung` is the local compliance of aerated tissue,
+`lungCapacity` is the completely open volume ceiling, and R/I is how much
+recruitment the specified pressure step produces relative to inflation of the
+baby lung. The internal openable fraction is capped at one. If
 the requested R/I would require more lung than is collapsed, or the selected
 opening pressure lies outside the manoeuvre, the achieved value is shown with a
 caution instead of silently changing collapse.

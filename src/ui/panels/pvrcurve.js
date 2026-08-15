@@ -10,7 +10,6 @@ import { lungVolumeAtPl, pvrComponents, RESISTANCE_TO_WOOD } from '../../model/i
 // curve: mixing that separate mechanism into this construction obscured the two
 // opposing limbs the panel exists to teach.
 
-const TLC_REFERENCE_PRESSURE = 35; // cmH2O: the fully open lung's model TLC anchor
 const ZOOM_LEVELS = Object.freeze([1, 1.5, 2, 3]);
 
 /**
@@ -111,14 +110,15 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
     vMinSeen = Math.min(vMinSeen, r.lungVolume);
     vMaxSeen = Math.max(vMaxSeen, r.lungVolume);
 
-    // The endpoints are the model's fully open low-volume and TLC anchors for
-    // this lung. Unlike the previous 4.2 L crop, this always includes the whole
-    // right limb. `vascularFrc` is where the two slopes cancel and the total
-    // curve reaches its minimum.
+    // The endpoints are the model's fully open low-volume landmark and the
+    // independently selected maximum capacity. Unlike a pressure-derived crop,
+    // this keeps the whole right limb visible when compliance changes without
+    // silently redefining the lung's maximum size. `vascularFrc` is where the
+    // two slopes cancel and the total curve reaches its minimum.
     const landmarks = {
       rv: lungVolumeAtPl(p, 0, 1),
       frc: pvrComponents(p, r.lungVolume).vascularFrc,
-      tlc: lungVolumeAtPl(p, TLC_REFERENCE_PRESSURE, 1),
+      tlc: p.lungCapacity,
     };
     const xLo = landmarks.rv;
     const xHi = landmarks.tlc;
