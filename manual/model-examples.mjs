@@ -1,0 +1,243 @@
+// Executable source of truth for numerical examples quoted in the manual and
+// README. Documentation tables previously contained values copied from one
+// model revision; they could remain plausible after the model changed. Keep the
+// manoeuvre, its parameters, formatting and prose-facing label together here.
+// The writer and test suite both regenerate these blocks from a fresh Simulator.
+
+import { Simulator } from '../src/model/simulator.js';
+import { defaultParams } from '../src/model/parameters.js';
+import { lungVolumeAtPl, staticEndExpiratoryVolume } from '../src/model/lung.js';
+
+const SETTLING_SECONDS = 45;
+
+function settled(overrides) {
+  const simulator = new Simulator();
+  simulator.params = { ...defaultParams(), ...overrides };
+  simulator.reset();
+  simulator.advance(SETTLING_SECONDS, true);
+  return simulator.metrics;
+}
+
+export const EFL_EXAMPLE = {
+  parameters: {
+    mode: 'vcv', pmus: 0, vt: 500, rr: 26, ti: 0.9,
+    raw: 24, clung: 300, efl: 'on',
+  },
+  peepLevels: [0, 5, 6, 8, 10, 13],
+};
+
+export const STRESS_INDEX_BASE = {
+  mode: 'vcv', pmus: 0, rr: 14, ti: 1.2,
+};
+
+// These cases also drive the stress-index SVG. `collapsed: 0` is explicit in
+// the first three because an earlier independent audit attempted to reproduce
+// "stiff lung" with an additional collapsed compartment and obtained a
+// different, internally valid experiment.
+export const STRESS_INDEX_CASES = [
+  {
+    id: 'normal-500',
+    title: 'Normal',
+    label: 'normal tissue compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8',
+    overrides: { clung: 200, collapsed: 0, vt: 500, peep: 8 },
+  },
+  {
+    id: 'stiff-700',
+    title: 'Over-distension',
+    label: 'tissue compliance 30 mL/cmH₂O, no collapse; VT 700 mL; PEEP 8',
+    overrides: { clung: 30, collapsed: 0, vt: 700, peep: 8 },
+  },
+  {
+    id: 'stiff-350',
+    title: 'Stiff, lower VT',
+    label: 'the same stiff tissue; VT 350 mL; PEEP 8',
+    overrides: { clung: 30, collapsed: 0, vt: 350, peep: 8 },
+  },
+  {
+    id: 'recruiting-low',
+    title: 'Tidal recruitment',
+    label: 'tissue compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6',
+    overrides: {
+      clung: 60, collapsed: 0.4, riRatio: 0.7, pOpen: 16, hysteresis: 'off',
+      vt: 600, peep: 6,
+    },
+  },
+  {
+    id: 'recruiting-high',
+    title: 'The same lung, held open',
+    label: 'the same recruitable lung; VT 600 mL; PEEP 14',
+    overrides: {
+      clung: 60, collapsed: 0.4, riRatio: 0.7, pOpen: 16, hysteresis: 'off',
+      vt: 600, peep: 14,
+    },
+  },
+];
+
+export const DOCUMENTED_EXAMPLE_TARGETS = [
+  { file: 'manual/expiratory-flow-limitation.md', ids: ['efl-peep'] },
+  { file: 'manual/stress-index.md', ids: ['stress-index'] },
+  { file: 'manual/transmural-pressure.md', ids: ['transmural-peep'] },
+  { file: 'manual/venous-return.md', ids: ['venous-return-peep'] },
+  { file: 'manual/pressure-volume-curve.md', ids: ['pv-tissue', 'pv-eelv'] },
+  { file: 'manual/pulmonary-transit.md', ids: ['pulmonary-transit'] },
+  { file: 'README.md', ids: ['readme-stress-index'] },
+];
+
+const fixed = (value, digits) => value.toFixed(digits);
+
+function eflBlock() {
+  const rows = EFL_EXAMPLE.peepLevels.map((peep) => {
+    const metrics = settled({ ...EFL_EXAMPLE.parameters, peep });
+    return `| ${peep} | ${fixed(metrics.totalPeep, 1)} | ${Math.round(metrics.trappedVolume)} | ${fixed(metrics.endExpiratoryVolume, 2)} | ${fixed(metrics.co, 2)} |`;
+  });
+  return [
+    '*Executable setup: passive volume control, VT 500 mL, 26/min, inspiratory time 0.9 s, airway resistance 24 cmH\u2082O\u00b7s/L, tissue compliance 300 mL/cmH\u2082O, EFL on; each level is settled for 45 s.*',
+    '',
+    '| applied PEEP (cmH\u2082O) | total PEEP (cmH\u2082O) | dynamic trapped volume (mL) | end-expiratory volume (L) | cardiac output (L/min) |',
+    '|---:|---:|---:|---:|---:|',
+    ...rows,
+  ].join('\n');
+}
+
+function stressRows() {
+  return STRESS_INDEX_CASES.map((entry) => {
+    const metrics = settled({ ...STRESS_INDEX_BASE, ...entry.overrides });
+    // This is the conventional breathwise respiratory-system compliance shown
+    // in the document, not the simulator's local differential-compliance metric.
+    const breathwiseCrs = entry.overrides.vt / metrics.drivingPressure;
+    return {
+      ...entry,
+      stressIndex: metrics.stressIndex,
+      plateau: metrics.pplat,
+      drivingPressure: metrics.drivingPressure,
+      breathwiseCrs,
+    };
+  });
+}
+
+function stressIndexBlock(rows) {
+  return [
+    '*Executable setup: passive volume control, 14/min, inspiratory time 1.2 s; each case is settled for 45 s. Breathwise C<sub>rs</sub> is VT divided by driving pressure, not the model\'s local differential-compliance metric.*',
+    '',
+    '| lung and breath | stress index | plateau (cmH\u2082O) | driving pressure (cmH\u2082O) | breathwise C<sub>rs</sub> (mL/cmH\u2082O) |',
+    '|---|---:|---:|---:|---:|',
+    ...rows.map((entry) => `| ${entry.label} | ${fixed(entry.stressIndex, 2)} | ${fixed(entry.plateau, 1)} | ${fixed(entry.drivingPressure, 1)} | ${Math.round(entry.breathwiseCrs)} |`),
+  ].join('\n');
+}
+
+function readmeStressIndexBlock(rows) {
+  return [
+    '| executable case | stress index |',
+    '|---|---:|',
+    ...rows.map((entry) => `| ${entry.label} | ${fixed(entry.stressIndex, 2)} |`),
+  ].join('\n');
+}
+
+function peepSweepRows() {
+  const base = { mode: 'vcv', pmus: 0, vt: 500, rr: 14 };
+  return [0, 5, 10, 15, 20].map((peep) => ({ peep, metrics: settled({ ...base, peep }) }));
+}
+
+function transmuralBlock(rows) {
+  const first = rows[0].metrics;
+  const last = rows.at(-1).metrics;
+  const measuredChange = last.cvp - first.cvp;
+  const transmuralChange = first.cvpTransmural - last.cvpTransmural;
+  return [
+    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s.*',
+    '',
+    '| PEEP (cmH₂O) | measured CVP (mmHg) | transmural CVP (mmHg) | cardiac output (L/min) |',
+    '|---:|---:|---:|---:|',
+    ...rows.map(({ peep, metrics }) => `| ${peep} | ${fixed(metrics.cvp, 1)} | ${fixed(metrics.cvpTransmural, 1)} | ${fixed(metrics.co, 2)} |`),
+    '',
+    `Across this sweep, measured CVP rises by ${fixed(measuredChange, 1)} mmHg while transmural CVP falls by ${fixed(transmuralChange, 1)} mmHg.`,
+  ].join('\n');
+}
+
+function venousReturnBlock(rows) {
+  return [
+    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure is the respiratory-cycle mean used by the Guyton construction.*',
+    '',
+    '| PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |',
+    '|---:|---:|---:|---:|',
+    ...rows.map(({ peep, metrics }) => `| ${peep} | ${fixed(metrics.pmsf, 1)} | ${fixed(metrics.operatingPoint.pra, 1)} | ${fixed(metrics.co, 2)} |`),
+  ].join('\n');
+}
+
+function pvTissueBlock() {
+  const rows = [200, 100, 45].map((clung) => {
+    const parameters = { ...defaultParams(), clung, collapsed: 0 };
+    return {
+      clung,
+      atFive: lungVolumeAtPl(parameters, 5, 1),
+      atThirtyFive: lungVolumeAtPl(parameters, 35, 1),
+    };
+  });
+  return [
+    '*Direct evaluation of the fully open tissue relation (`collapsed = 0`, open fraction fixed to 1).*',
+    '',
+    '| tissue compliance (mL/cmH₂O) | volume at P<sub>l</sub> 5 (L) | volume at P<sub>l</sub> 35 (L) |',
+    '|---:|---:|---:|',
+    ...rows.map((row) => `| ${row.clung} | ${fixed(row.atFive, 2)} | ${fixed(row.atThirtyFive, 2)} |`),
+  ].join('\n');
+}
+
+function pvEelvBlock() {
+  const cases = [
+    ['normal', {}],
+    ['30% collapsed', { collapsed: 0.3 }],
+    ['50% collapsed', { collapsed: 0.5 }],
+    ['emphysematous, tissue compliance 400 mL/cmH₂O', { clung: 400, collapsed: 0 }],
+  ];
+  return [
+    '*Static respiratory-system equilibrium at applied PEEP 5 cmH₂O, with recruitment hysteresis off.*',
+    '',
+    '| phenotype | end-expiratory volume (L) |',
+    '|---|---:|',
+    ...cases.map(([label, overrides]) => {
+      const parameters = { ...defaultParams(), ...overrides, hysteresis: 'off' };
+      return `| ${label} | ${fixed(staticEndExpiratoryVolume(parameters, 5), 2)} |`;
+    }),
+  ].join('\n');
+}
+
+function pulmonaryTransitBlock() {
+  const common = {
+    baroreflex: 0, mode: 'vcv', pmus: 0, vt: 450, peep: 5,
+    rr: 18, ti: 1, hr: 75,
+  };
+  const cases = [
+    ['reference circulation', common],
+    ['pulmonary embolism', {
+      ...common, pvrBase: 0.44, eesRv: 0.32, stressedVolume: 1050, svr: 1.25,
+    }],
+    ['congested low-output LV failure', {
+      ...common, eesLv: 0.8, lvStiff: 0.04, stressedVolume: 950, svr: 1.25,
+    }],
+  ];
+  return [
+    '*Executable setup: passive volume control, HR 75/min, RR 18/min, VT 450 mL, inspiratory time 1.0 s and PEEP 5 cmH₂O; baroreflex disabled; each phenotype is settled for 45 s.*',
+    '',
+    '| phenotype | pulmonary blood volume (mL) | estimated PA-to-LA transit (s) | staged buffer (s) |',
+    '|---|---:|---:|---:|',
+    ...cases.map(([label, parameters]) => {
+      const metrics = settled(parameters);
+      return `| ${label} | ${Math.round(metrics.pulmonaryBloodVolume)} | ${fixed(metrics.pulmonaryTransitTime, 1)} | ${fixed(metrics.pulmonaryTransportTime, 1)} |`;
+    }),
+  ].join('\n');
+}
+
+export function renderDocumentedExampleBlocks() {
+  const rows = stressRows();
+  const peepRows = peepSweepRows();
+  return new Map([
+    ['efl-peep', eflBlock()],
+    ['stress-index', stressIndexBlock(rows)],
+    ['transmural-peep', transmuralBlock(peepRows)],
+    ['venous-return-peep', venousReturnBlock(peepRows)],
+    ['pv-tissue', pvTissueBlock()],
+    ['pv-eelv', pvEelvBlock()],
+    ['pulmonary-transit', pulmonaryTransitBlock()],
+    ['readme-stress-index', readmeStressIndexBlock(rows)],
+  ]);
+}

@@ -44,14 +44,22 @@ The 4.5 s envelope is a **didactic shape coefficient**: it preserves the order o
 
 An obstructed phenotype at 26 breaths per minute:
 
-| applied PEEP | total PEEP | dynamic trapped volume | end-expiratory volume | cardiac output |
-|---|---|---|---|---|
-| 0 | 12.8 cmH₂O | 1483 mL | 4.24 L | 4.37 L/min |
-| 5 | 12.8 | 885 | 4.24 | 4.46 |
-| 10 | 12.8 | 312 | 4.24 | 4.43 |
-| 13 | 13.0 | 0 | 4.26 | 4.38 |
+<!-- BEGIN GENERATED: efl-peep -->
+*Executable setup: passive volume control, VT 500 mL, 26/min, inspiratory time 0.9 s, airway resistance 24 cmH₂O·s/L, tissue compliance 300 mL/cmH₂O, EFL on; each level is settled for 45 s.*
 
-For this phenotype, total PEEP and lung volume are **flat** from 0 to 10 cmH₂O of applied PEEP. Applied pressure substitutes for intrinsic pressure rather than adding to absolute volume; above the model's choke, both begin to rise. The table demonstrates the intended qualitative pattern, not a general COPD threshold.
+| applied PEEP (cmH₂O) | total PEEP (cmH₂O) | dynamic trapped volume (mL) | end-expiratory volume (L) | cardiac output (L/min) |
+|---:|---:|---:|---:|---:|
+| 0 | 12.1 | 1361 | 4.02 | 4.37 |
+| 5 | 12.1 | 782 | 4.02 | 4.36 |
+| 6 | 12.6 | 724 | 4.08 | 4.35 |
+| 8 | 14.4 | 692 | 4.27 | 4.30 |
+| 10 | 16.4 | 681 | 4.48 | 4.24 |
+| 13 | 19.3 | 666 | 4.79 | 4.11 |
+<!-- END GENERATED: efl-peep -->
+
+For this phenotype, total PEEP and end-expiratory volume are essentially unchanged from applied PEEP 0 to 5 cmH₂O. The departure becomes detectable just above 5 and is clear by 8–10 cmH₂O: applied pressure is then adding to absolute lung volume rather than merely substituting for part of intrinsic pressure. Dynamic trapped volume can fall while absolute end-expiratory volume rises because it is measured above the passive equilibrium volume at the same applied PEEP.
+
+The model does not contain a single pressure parameter called the choke pressure. Its flow envelope and ordinary resistive emptying compete at every step, so the end of the flat region is the crossover between those mechanisms in this particular experiment. Baseline total PEEP must not be read as that crossover or as a bedside PEEP target.
 
 Without the flow cap the same phenotype behaves differently: PEEP 0 → 5 raises total PEEP from about 6.5 to 11.4 cmH₂O and end-expiratory volume from 3.41 to 3.95 L, with output falling. That is the model's response to resistive incomplete emptying without an explicit choke; it is not evidence that every non-flow-limited patient behaves that way.
 

@@ -70,13 +70,17 @@ Everything on the diagram is a cycle mean. An earlier version plotted instantane
 
 A passive patient at 500 mL, 14 breaths per minute:
 
-| PEEP | P<sub>msf</sub> | mean P<sub>ra</sub> | cardiac output |
-|---|---|---|---|
-| 0 | 7.3 mmHg | — | 5.11 L/min |
-| 5 | 8.7 | 1.0 | 4.96 |
-| 10 | 9.9 | — | 4.82 |
-| 15 | 11.0 | 3.7 | 4.51 |
-| 20 | 12.1 | — | 4.34 |
+<!-- BEGIN GENERATED: venous-return-peep -->
+*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure is the respiratory-cycle mean used by the Guyton construction.*
+
+| PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |
+|---:|---:|---:|---:|
+| 0 | 7.0 | -0.6 | 4.94 |
+| 5 | 8.6 | 0.9 | 4.93 |
+| 10 | 9.7 | 2.2 | 4.75 |
+| 15 | 10.8 | 3.5 | 4.44 |
+| 20 | 11.9 | 4.9 | 4.23 |
+<!-- END GENERATED: venous-return-peep -->
 
 Mean systemic filling pressure *rises* with PEEP — the abdominal contribution and the compression of the reservoir see to that — and output falls anyway, because right atrial pressure rises faster than the head does. The gradient is what matters, not either end of it.
 

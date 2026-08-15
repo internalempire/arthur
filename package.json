@@ -21,7 +21,8 @@
     "serve": "python3 -m http.server 8422",
     "serve:dev": "node tools/serve.mjs",
     "manual:build": "node manual/tools/build.mjs",
-    "manual:lint": "node manual/tools/lint.mjs",
+    "manual:lint": "node manual/tools/examples.mjs --check && node manual/tools/lint.mjs",
+    "manual:examples": "node manual/tools/examples.mjs --write",
     "manual:figures": "node manual/figure/generate.mjs"
   },
   "engines": {

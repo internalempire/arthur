@@ -21,6 +21,7 @@ import {
   venousReturnCurve, cardiacFunctionCurve, curveIntersection,
   systemicVenousVolumeState, PRELOAD_STEEP,
 } from '../../src/model/circulation.js';
+import { STRESS_INDEX_BASE, STRESS_INDEX_CASES } from '../model-examples.mjs';
 
 const OUT = dirname(fileURLToPath(import.meta.url));
 
@@ -533,12 +534,6 @@ function fullCycle(sim, step = 0.01) {
   return { points, inspEnd };
 }
 
-const SI_CASES = [
-  { title: 'Normal', o: { clung: 200, vt: 500, peep: 8 } },
-  { title: 'Over-distension', o: { clung: 30, vt: 700, peep: 8 } },
-  { title: 'Tidal recruitment', o: { clung: 60, vt: 600, collapsed: 0.4, riRatio: 0.7, pOpen: 16, peep: 6 } },
-];
-
 // Three panels side by side, each scaled to its own breath. That scaling is the
 // point: on a shared absolute axis the distending breath rises 63 cmH2O and the
 // recruiting one 10, so the smaller curvature disappears however real it is.
@@ -549,8 +544,10 @@ function stressIndexFigure() {
   const panelW = (W - padL - padR - gap * 2) / 3;
   const plotH2 = H2 - padT - padB;
 
-  const panels = SI_CASES.map(({ title, o }) => {
-    const sim = settled({ mode: 'vcv', pmus: 0, rr: 14, ti: 1.2, ...o }, 45);
+  const figureIds = new Set(['normal-500', 'stiff-700', 'recruiting-low']);
+  const figureCases = STRESS_INDEX_CASES.filter((entry) => figureIds.has(entry.id));
+  const panels = figureCases.map(({ title, overrides }) => {
+    const sim = settled({ ...STRESS_INDEX_BASE, ...overrides }, 45);
     const { points, inspEnd } = fullCycle(sim);
     return { title, points, inspEnd, si: sim.metrics.stressIndex };
   });
