@@ -45,8 +45,9 @@ would make a local model calibration masquerade as an in-vivo measurement.
 
 ## Current phase-8 EFL semantics
 
-`raw` remains a linear resistance and `clung` remains the fully open lung's
-compliance. `efl=on` adds one distinct fact: during expiration, flow cannot
+`raw` remains a linear resistance; `clung` is the local compliance of aerated
+tissue away from the capacity ceiling; and `lungCapacity` independently sets
+that ceiling. `efl=on` adds one distinct fact: during expiration, flow cannot
 exceed a maximal flow–volume envelope, even if the alveolar-to-mouth pressure
 gradient rises further. The envelope is represented by a 4.5 s minimum emptying
 time constant. It is an aggregate severe-obstruction teaching coefficient, not
@@ -67,7 +68,8 @@ not a renamed fraction of units. Following Chen et al., the model subtracts the
 volume predicted by low-PEEP respiratory-system compliance from the EELV change,
 divides that recruited volume by the pressure step, and normalises the resulting
 compliance to low-PEEP compliance. It numerically maps that target to an internal
-openable fraction while keeping `collapsed`, `clung` and `pOpen` independent.
+openable fraction while keeping `collapsed`, `clung`, `lungCapacity` and `pOpen`
+independent.
 
 The mapping is bounded by available lung. If all of the collapsed compartment
 is already openable and the requested R/I is still not reached, the model reports
@@ -193,11 +195,12 @@ three things, and one of them was an error rather than an omission.
 
 **Resting volume stopped being a parameter.** It is now where the lung's recoil
 balances the chest wall, so it rises when pressure opens units — which is what
-lets proning add volume rather than only opening units. `frc` is gone; what
-carries the disease is `collapsed`, the share of the lung that is shut, and
-`clung` now means the compliance of the lung with all of it open. A lung that has
-lost its elastic recoil rests hyperinflated without being told to, which is how
-the COPD preset works now.
+lets proning add volume rather than only opening units. `frc` is gone.
+`collapsed` carries the share of lung that is shut, `clung` the local
+aerated-tissue compliance, and `lungCapacity` the independent completely open
+ceiling. A lung that has lost elastic recoil rests hyperinflated without being
+told to, which is how the COPD preset works, but it no longer acquires a larger
+or smaller maximum capacity as a side effect.
 
 **The extra-alveolar limb was being driven by the wrong quantity.** It followed
 strain — volume per open unit — where radial traction is a stress and follows

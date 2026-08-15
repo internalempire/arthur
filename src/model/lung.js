@@ -33,11 +33,12 @@
 // it is sigmoid because of the unit population rather than because a sigmoid was
 // fitted to it.
 //
-// The consequence for `clung` is worth stating plainly: it is the compliance of
-// this patient's lung *with all of it open*, not the compliance a ventilator
-// would measure. The measured value is the open fraction times that, which is
-// the baby lung as a readout — compliance tracks how much lung is being
-// ventilated rather than how stiff the tissue is.
+// `clung` and lung size are deliberately independent. `clung` is the local
+// compliance of aerated tissue while it is away from its upper-volume limit;
+// `lungCapacity` is that limit for a completely open lung. The open fraction
+// decides how much of the capacity is currently available. This separation is
+// essential: reducing compliance and closing units are different lesions and
+// must not both shrink the same baby lung.
 
 import { clamp } from './units.js';
 
@@ -188,92 +189,74 @@ export function stepOpenFraction(p, phi, pl) {
 // than every other part of the lung model together.
 const OPEN_AT_REST = 1 / (1 + Math.exp(-(RECOIL_AT_FRC - PL_EASY) / SPREAD_EASY));
 
-// The tissue's own pressure-volume curve, pinned by two textbook volumes rather
-// than by constants chosen to look right.
-//
-//   a normal fully open lung rests at NORMAL_FRC when its recoil is 5 cmH2O
-//   the same lung reaches total lung capacity, 6 L, at 35 cmH2O
-//
-// Two anchors, two unknowns: the volume the tissue holds at no distending
-// pressure, and the pressure scale over which it stiffens.
-//
-// The scale is a pressure, and the same pressure for every lung. That is the
-// substance of it. Collagen engages at a strain, and a strain corresponds to a
-// pressure, so a stiff lung should run out of room at the *same pressures* as a
-// soft one — it just holds much less when it gets there. Writing the ceiling as
-// an absolute volume instead, as a first version did, made the scale
-// proportional to 1/compliance and put a stiff lung's stiffening at 195 cmH2O,
-// so the baby lung was the one place the model stayed straight. Which is exactly
-// where the question was asked.
-//
-// Capacity now follows from compliance: V0 + clung * P_SCALE. A normal lung
-// tends to 9.4 L, an ARDS lung at 45 mL/cmH2O to 3.1 L. Small stiff lungs are
-// small.
-const TOTAL_LUNG_CAPACITY = 6.0;   // L, reached at
-const TLC_PRESSURE = 35;           // cmH2O
-const NORMAL_COMPLIANCE = 0.2;     // L/cmH2O, the compliance the anchors assume
+// The tissue relation is a straight compliance line passed through a smooth
+// upper-volume ceiling. This makes the meaning of both user controls literal:
+// away from the ceiling dV/dP is `clung`; at very high pressure volume tends to
+// `lungCapacity`, whatever `clung` is. A soft rather than hard minimum keeps the
+// derivative continuous for the pressure inversions and stress-index fit.
+export const DEFAULT_LUNG_CAPACITY = 6; // L, completely open lung
+const NORMAL_COMPLIANCE = 0.2;          // L/cmH2O
+const CAPACITY_SOFTNESS = 0.18;         // fraction of capacity over which the ceiling engages
 
-/**
- * How much one fully open lung's worth of tissue holds at a transpulmonary
- * pressure, given its compliance at rest.
- *
- * Linear below zero and saturating above it, joined so that both the value and
- * the slope are continuous at the join, so `clung` still means the compliance at
- * rest.
- *
- * Below zero the curve is left linear on purpose. What empties a lung at
- * negative distending pressure is units shutting, and the open fraction already
- * does that; making the tissue term collapse as well would count it twice.
- */
-function saturating(v0, scale, c, pl) {
-  if (pl <= 0) return Math.max(0, v0 + c * pl);
-  return v0 + c * scale * (1 - Math.exp(-pl / scale));
+const capacityOf = (p) => {
+  const selected = Number(p.lungCapacity ?? DEFAULT_LUNG_CAPACITY);
+  return Number.isFinite(selected) ? Math.max(0.5, selected) : DEFAULT_LUNG_CAPACITY;
+};
+const softnessOf = (capacity) => Math.max(1e-4, capacity * CAPACITY_SOFTNESS);
+
+function softMinimum(linearVolume, capacity) {
+  const width = softnessOf(capacity);
+  const lo = Math.min(linearVolume, capacity);
+  const hi = Math.max(linearVolume, capacity);
+  return lo - width * Math.log1p(Math.exp(-(hi - lo) / width));
 }
 
-// Solved rather than written down, so the two anchors are enforced by the code
-// instead of being numbers somebody has to keep true by hand.
-const [UNSTRESSED_VOLUME, PRESSURE_SCALE] = (() => {
-  const openAt = (pl) => 1 / (1 + Math.exp(-(pl - PL_EASY) / SPREAD_EASY));
-  const atRest = NORMAL_FRC / openAt(RECOIL_AT_FRC);
-  const atCapacity = TOTAL_LUNG_CAPACITY / openAt(TLC_PRESSURE);
-  // For any scale, the resting anchor fixes the unstressed volume outright.
-  const unstressedFor = (scale) =>
-    atRest - NORMAL_COMPLIANCE * scale * (1 - Math.exp(-RECOIL_AT_FRC / scale));
-  let lo = 1, hi = 400;
-  for (let i = 0; i < 200; i++) {
-    const scale = (lo + hi) / 2;
-    if (saturating(unstressedFor(scale), scale, NORMAL_COMPLIANCE, TLC_PRESSURE) < atCapacity) {
-      lo = scale;
-    } else {
-      hi = scale;
-    }
-  }
-  const scale = (lo + hi) / 2;
-  return [unstressedFor(scale), scale];
-})();
+/** Linear volume whose soft-capped value is `volume`. */
+function inverseSoftMinimum(volume, capacity) {
+  const width = softnessOf(capacity);
+  const gap = (capacity - volume) / width;
+  if (gap > 50) return volume;
+  if (gap <= 1e-9) return Infinity;
+  return capacity - width * Math.log(Math.expm1(gap));
+}
+
+// Preserve the familiar default resting point without tying every phenotype's
+// capacity to its compliance. The zero-pressure gas volume scales with the
+// optional capacity control as an anatomical size term; the compliance then
+// adds real volume per unit pressure on top of it.
+const NORMAL_PER_UNIT_AT_REST = NORMAL_FRC / OPEN_AT_REST;
+const DEFAULT_LINEAR_AT_REST = inverseSoftMinimum(
+  NORMAL_PER_UNIT_AT_REST, DEFAULT_LUNG_CAPACITY,
+);
+const DEFAULT_UNSTRESSED_VOLUME = DEFAULT_LINEAR_AT_REST
+  - NORMAL_COMPLIANCE * RECOIL_AT_FRC;
+const UNSTRESSED_FRACTION = DEFAULT_UNSTRESSED_VOLUME / DEFAULT_LUNG_CAPACITY;
 
 function perUnitVolume(p, pl) {
-  return saturating(UNSTRESSED_VOLUME, PRESSURE_SCALE, p.clung / 1000, pl);
+  const capacity = capacityOf(p);
+  const v0 = capacity * UNSTRESSED_FRACTION;
+  const linear = v0 + (p.clung / 1000) * pl;
+  return Math.max(0, softMinimum(linear, capacity));
 }
 
-/** The inverse of `saturating`, in closed form. */
+/** Inverse of the soft-capped compliance line, in closed form. */
 function perUnitPressure(p, volume) {
-  const c = p.clung / 1000;
-  if (volume <= UNSTRESSED_VOLUME) return (volume - UNSTRESSED_VOLUME) / c;
-  const room = c * PRESSURE_SCALE;              // all the tissue has left
-  const left = UNSTRESSED_VOLUME + room - volume;
-  if (left <= 1e-6) return 80;                  // at capacity: no pressure gets more in
-  return PRESSURE_SCALE * Math.log(room / left);
+  const capacity = capacityOf(p);
+  const c = Math.max(1e-9, p.clung / 1000);
+  const v0 = capacity * UNSTRESSED_FRACTION;
+  const linear = inverseSoftMinimum(volume, capacity);
+  if (!Number.isFinite(linear)) return 80;
+  return (linear - v0) / c;
 }
 
 /**
  * Lung volume at a given transpulmonary pressure — the pressure–volume curve.
  *
  * Two factors, and the shape comes from their product. How many units are open
- * is a sigmoid in pressure; how much each open unit holds is linear in it. A
- * normal lung sits on the flat top of the first factor, so its curve is nearly
- * straight. A collapsed but recruitable lung sits on the rising part, so its
- * curve has the lower inflection a bedside pressure–volume manoeuvre draws.
+ * is a sigmoid in pressure; how much each open unit holds is locally linear and
+ * then bends smoothly towards its independent capacity ceiling. A collapsed
+ * but recruitable lung can therefore gain slope as units open before losing it
+ * again as the aerated tissue approaches maximum volume.
  */
 export function lungVolumeAtPl(p, pl, phi = null) {
   return (phi ?? openFractionAt(p, pl)) * perUnitVolume(p, pl);
@@ -300,7 +283,7 @@ export function relaxationVolume(p, phi = null) {
  *
  * Closed form because, once the fraction is frozen, only the tissue curve must
  * be inverted and `perUnitPressure` is its analytic inverse. The tissue curve
- * itself is saturating above zero pressure; it is not a straight line.
+ * itself is soft-capped at `lungCapacity`; it is not a straight line.
  */
 export function transpulmonaryAtFixed(p, lungVolume, phi) {
   return clamp(perUnitPressure(p, lungVolume / Math.max(phi, 1e-6)), -25, 80);
@@ -477,7 +460,8 @@ let lastCalibrationKey = null;
 let lastCalibration = null;
 
 const recruitmentKey = (p, fraction = '') => [
-  Number(p.collapsed ?? 0), Number(p.clung ?? 200), Number(p.ccw ?? 200),
+  Number(p.collapsed ?? 0), Number(p.clung ?? 200), Number(p.lungCapacity ?? 6),
+  Number(p.ccw ?? 200),
   Number(p.pOpen ?? 20), Number(p.riRatio ?? 0), fraction,
 ].join('|');
 
@@ -719,7 +703,10 @@ export function pvrComponents(p, lungVolume, plKnown = null, phiKnown = null) {
     openPath,
     closedPath,
     openBed: openPath / r.openFraction,
-    closedBed: r.closedFraction > 0 ? closedPath / r.closedFraction : Infinity,
+    // No closed compartment means the bed is absent, not infinitely resistant.
+    // `null` keeps that semantic explicit and prevents an otherwise valid fully
+    // open state from leaking a non-finite metric into exports and tests.
+    closedBed: r.closedFraction > 0 ? closedPath / r.closedFraction : null,
     openFlowShare: openConductance / totalConductance,
     total: 1 / totalConductance,
     openFraction: r.openFraction,

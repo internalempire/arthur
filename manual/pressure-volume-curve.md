@@ -1,126 +1,156 @@
 # The pressure–volume curve
 
-> How much volume the model's fully open tissue holds at a given transpulmonary pressure. Its upper limb saturates; as a modelling choice, the expandable capacity scales with `clung`, so a lower compliance setting also produces a smaller fully open lung.
+> The model separates two properties that should not share one control: **aerated-lung compliance** determines the local pressure–volume slope, while **maximum lung capacity** determines the upper volume limit. Collapse and recruitment separately determine how much of that capacity is available at a given moment.
 
 ---
 
 ## Physiology
 
-The relation between transpulmonary pressure and lung volume is sigmoid. At low pressure the curve is flat because units are shut and pressure is being spent opening them rather than inflating them. In the middle it is close to straight, and its slope there is what "compliance" ordinarily means. At high pressure it flattens again because the tissue reaches the limit of what it can be stretched to: collagen takes up the load, and further pressure buys almost no volume.
+The relation between transpulmonary pressure and lung volume is sigmoid. Its lower limb is dominated by units opening, its middle region is approximately linear, and its upper limb flattens as further distending pressure produces progressively less volume.
 
-The upper flattening is the one that matters at the bedside. It is why plateau pressure rises disproportionately at the end of a large breath, why the [stress index](stress-index.md) can exceed 1, and why the injury of overdistension is a property of *strain* rather than of pressure.
+These regions answer different clinical questions:
 
-### Aerated capacity is not a fixed number
+- **Compliance** describes how much volume is gained for a pressure increment at the current operating region.
+- **Maximum capacity** describes the volume limit of the completely open lung.
+- **Recruitment** changes how much lung is participating.
 
-A reference healthy lung reaches about 6 L near a transpulmonary pressure of 35 cmH₂O. In ARDS, the aerated baby lung has a smaller available volume even when its specific tissue mechanics are not uniformly abnormal. Whole-lung compliance therefore mixes available aerated size, recruitability and tissue behaviour.
+They are related in a real patient, but they are not interchangeable. A low measured respiratory-system compliance may result from intrinsically less compliant aerated tissue, a small aerated baby lung, a stiff chest wall, or a combination of these. Conversely, a lung can have relatively preserved aerated-tissue compliance and still overdistend if the ventilated fraction is small.
 
-The model links the upper-limb pressure scale to a compliance parameter so that a low-compliance phenotype reaches nonlinear distension within the simulated clinical range. This avoids a previous implementation in which a stiff phenotype retained a normal absolute capacity and remained almost linear until implausibly high pressures. It is a pragmatic representation, not a general physiological identity between low compliance and reduced total lung capacity.
+This distinction matters for heart–lung interaction. Lung volume and strain move the pulmonary circulation along its [PVR curve](pulmonary-vascular-resistance.md), while the pressure needed to produce that volume affects pleural and cardiac transmural pressures.
 
 ---
 
 ## In the model
 
-The tissue relation is linear below zero transpulmonary pressure and saturating above it, joined so that both value and slope are continuous at the join:
+The volume held by one completely open lung's worth of aerated tissue is represented by a compliance line that approaches an independent upper ceiling smoothly:
 
 $$
-V(P_l) = \begin{cases}
-V_0 + C\,P_l & P_l \le 0\\[4pt]
-V_0 + C\,S\left(1 - e^{-P_l/S}\right) & P_l > 0
-\end{cases}
+V_{unit}(P_l) = \max\!\left[0,\;\operatorname{softmin}\left(V_0 + C_LP_l,\;V_{max}\right)\right]
 $$
 
-- $V$ — volume held by one fully open lung's worth of tissue, L
+with
+
+$$
+\operatorname{softmin}(x,M)
+= \min(x,M)-w\ln\!\left(1+e^{-|x-M|/w}\right),
+\qquad w=0.18M
+$$
+
 - $P_l$ — transpulmonary pressure, cmH₂O
-- $V_0$ — unstressed volume, L
-- $C$ — the `clung` tissue-volume scale, L/cmH₂O; it equals the slope at zero transpulmonary pressure, not the measured respiratory-system compliance
-- $S$ — a pressure scale, cmH₂O, over which the tissue saturates
+- $C_L$ — the `clung` setting, converted from mL/cmH₂O to L/cmH₂O
+- $V_{max}$ — the `lungCapacity` setting, L; default 6 L
+- $V_0$ — the zero-pressure volume scale
+- $w$ — the width over which the straight relation bends towards its ceiling
 
-Because the exponent is $P_l/S$ and $S$ is a **pressure**, the asymptotic tissue volume is $V_0 + C\,S$. The expandable component $C\,S$ is therefore proportional to `clung`; the fixed $V_0$ term means total capacity does not scale in exact proportion.
+The formula is easier to interpret than it may appear. Far from the ceiling, an additional 1 cmH₂O changes aerated-tissue volume by approximately `clung`. Near the ceiling, the same pressure increment produces progressively less volume. At very high pressure, volume approaches `lungCapacity` regardless of the selected compliance.
 
-Below zero the curve is deliberately left linear. What empties a lung at negative distending pressure is units shutting, and the [open fraction](two-population-lung.md) already does that; making the tissue term collapse as well would count it twice.
+The smooth transition is a numerical and didactic choice, not a fitted human tissue constant. A hard cap would create a sudden discontinuity in compliance and would make the [stress index](stress-index.md) unstable precisely where it should demonstrate progressive overdistension.
 
-### The two constants are solved, not chosen
+### What `clung` means now
 
-$V_0$ and $S$ are not written down. They are solved at load by nested bisection from two anchors:
+`clung` is the local compliance assigned to **aerated tissue while it is not close to its volume ceiling**. It is used continuously in the pressure–volume relation; it no longer determines maximum lung size.
 
-- 2.2 L at a transpulmonary pressure of 5 cmH₂O — resting recoil in a normal lung;
-- 6.0 L at 35 cmH₂O — total lung capacity.
+The live compliance displayed by the model is not required to equal this setting. It also contains:
 
-Both anchors are divided by the open fraction at their own pressure, so they describe *tissue* rather than a whole lung that is partly shut. Two textbook volumes therefore fix two constants, and the code enforces them rather than a person keeping them true by hand.
+- the fraction of lung currently open;
+- volume gained or lost through recruitment and derecruitment;
+- upper-limb stiffening near maximum capacity;
+- chest-wall mechanics when respiratory-system compliance is reported.
 
-![Lung volume against transpulmonary pressure](figure/pv-curve.svg)
+Thus `clung` is a constitutive tissue input, while live respiratory-system compliance is the current bedside-like output. The distinction is necessary rather than optional: one parameter cannot simultaneously be an instantaneous readout and the anatomical volume ceiling.
+
+### What maximum lung capacity means
+
+`lungCapacity` is the asymptotic volume of a completely open lung. It is adjustable from 2 to 9 L and defaults to 6 L. It is entered directly in litres; the model does not currently predict it from height, sex, age or reference equations.
+
+It is not necessarily the volume the simulated patient can reach:
+
+$$
+V(P_l)=\varphi(P_l)\,V_{unit}(P_l)
+$$
+
+where $\varphi$ is the [open fraction](two-population-lung.md). If only 60% of the lung is open, the instantaneous accessible ceiling is approximately 60% of `lungCapacity`. Recruitment raises that accessible share; permanently non-openable tissue does not.
+
+This is how the model now separates three lesions:
+
+| control | primary meaning | does not automatically mean |
+|---|---|---|
+| `clung` | local stiffness of aerated tissue | a smaller maximum lung |
+| `lungCapacity` | size of the completely open lung | low compliance or collapse |
+| `collapsed` | fraction unavailable at low pressure | intrinsically stiff aerated tissue |
+
+![Pressure–volume curves with independent compliance and capacity](figure/pv-curve.svg)
 
 ### What the model shows
 
 <!-- BEGIN GENERATED: pv-tissue -->
 *Direct evaluation of the fully open tissue relation (`collapsed = 0`, open fraction fixed to 1).*
 
-| tissue compliance (mL/cmH₂O) | volume at P<sub>l</sub> 5 (L) | volume at P<sub>l</sub> 35 (L) |
-|---:|---:|---:|
-| 200 | 2.25 | 6.00 |
-| 100 | 1.78 | 3.65 |
-| 45 | 1.52 | 2.36 |
+| aerated-lung compliance (mL/cmH₂O) | maximum capacity (L) | volume at P<sub>l</sub> 5 (L) | volume at P<sub>l</sub> 35 (L) | asymptotic volume (L) |
+|---:|---:|---:|---:|---:|
+| 200 | 6.0 | 2.25 | 5.88 | 6.00 |
+| 100 | 6.0 | 1.76 | 4.48 | 6.00 |
+| 45 | 6.0 | 1.49 | 2.80 | 6.00 |
+| 100 | 4.0 | 1.34 | 3.66 | 4.00 |
+| 100 | 8.0 | 2.18 | 5.01 | 8.00 |
 <!-- END GENERATED: pv-tissue -->
 
-For the reference normal parameters, the whole-lung curve reaches the 2.2 L and 6.0 L anchors; the table shows the corresponding fully open tissue volumes, so the resting value is slightly above the whole-lung anchor. Calling the lowest-compliance setting “ARDS” would be a phenotype choice, not a universal ARDS capacity.
+The first three rows change compliance while preserving the same 6 L ceiling. They therefore have different slopes and reach different volumes at a finite pressure, but converge to the same maximum. The last two rows preserve compliance and change the ceiling.
 
 ### The resting reference is calculated
 
-There is no `frc` control. The model first calculates the lung volume held at 5 cmH₂O of transpulmonary recoil from open fraction and `clung`, then measures chest-wall displacement from that reference. End-expiratory volume at applied PEEP is subsequently solved from the combined respiratory relation:
+There is no independent FRC control. The model calculates the volume held at 5 cmH₂O of transpulmonary recoil, then references chest-wall displacement to that volume. The default combination — `clung` 200 mL/cmH₂O, `lungCapacity` 6 L and no collapse — is calibrated to a relaxation volume of 2.2 L.
+
+Changing maximum capacity also scales the zero-pressure volume term, because a smaller anatomical lung should not retain the same absolute baseline volume as a larger one. Changing `clung` changes the volume gained above that baseline. Collapse then multiplies the result by the open fraction.
 
 <!-- BEGIN GENERATED: pv-eelv -->
 *Static respiratory-system equilibrium at applied PEEP 5 cmH₂O, with recruitment hysteresis off.*
 
 | phenotype | end-expiratory volume (L) |
 |---|---:|
-| normal | 2.68 |
-| 30% collapsed | 1.93 |
-| 50% collapsed | 1.42 |
-| emphysematous, tissue compliance 400 mL/cmH₂O | 3.77 |
+| normal | 2.71 |
+| 30% collapsed | 1.96 |
+| 50% collapsed | 1.44 |
+| emphysematous, aerated-lung compliance 400 mL/cmH₂O | 3.79 |
+| smaller 4.0 L maximum-capacity lung | 2.28 |
 <!-- END GENERATED: pv-eelv -->
 
-A lung with a higher `clung` setting has a higher calculated reference, while a lung with fewer open units has a lower one. Recruitment can therefore raise end-expiratory volume mechanically rather than being recorded as a separate label. This is not a fully independent lung–chest-wall equilibrium: the chest-wall curve is recentered on the lung-derived reference, as described under [pleural pressure](pleural-pressure.md).
+End-expiratory volume is therefore an outcome of lung recoil, capacity, open fraction, chest-wall compliance and applied PEEP. It is not a renamed capacity input.
 
 ---
 
-## Why this and not something else
+## Why this implementation
 
-**A saturating exponential rather than a full sigmoid in pressure.** The classical fit is a logistic in pressure with four parameters. This model already has a separate mechanism for the lower limb — units opening — so a curve that also bent downward at the bottom would double-count it. The tissue term carries only the upper limb, and the open fraction carries the lower one. That separation is what lets recruitment and distension be told apart in the [stress index](stress-index.md).
+**Separate controls prevent double-counting.** Previously, reducing `clung` reduced both the slope and the expandable volume of the tissue curve. Increasing `collapsed` then removed lung again. An ARDS preset using both controls could therefore make the baby lung small twice without saying so.
 
-**A pressure scale rather than an absolute capacity.** The first version wrote the ceiling as an absolute volume. A lung at 45 mL/cmH₂O then had to be driven to 195 cmH₂O before it stiffened, so the baby lung was the one place the model stayed perfectly linear — exactly where the question about overdistension is asked. The failure was not a wrong constant but a wrong *form*, and it is written up in [the postmortem](../docs/POSTMORTEM-2026-08-09.md).
+**The lower and upper limbs remain separate mechanisms.** Unit opening produces the lower-limb sigmoid through $\varphi(P_l)$. The soft capacity ceiling produces upper-limb flattening. Adding another full logistic tissue curve would duplicate recruitment at low pressure.
 
-**Solving the constants rather than fitting them.** Two anchors determine the two constants for the selected functional form. This removes discretionary tuning inside that form, but it does not validate the form itself or guarantee that it generalises across disease phenotypes.
+**A smooth ceiling is preferable to a hard stop.** Progressive curvature preserves a continuous derivative for pressure inversion and for stress-index fitting. The 18% transition width is a transparent model coefficient selected for a visible but gradual upper limb; it is not presented as a measured universal human value.
+
+**Capacity is entered in litres for now.** Predicted TLC would require anthropometric inputs and reference equations that add little to the present focus on heart–lung interaction. Direct litre scaling is sufficient for teaching, provided it is not interpreted as spirometric prediction.
 
 ---
 
 ## Limits
 
-### Of the construction
-
-- **No hysteresis in the tissue term.** The pressure–volume relation is single-valued; the hysteresis the model has belongs to unit [opening and closing](hysteresis.md), not to the tissue.
-- **No surfactant, no interfacial forces, no viscoelasticity.** There is no stress relaxation, so an inspiratory hold shows no slow decay of pressure and the model cannot produce $P_{peak}$–$P_1$–$P_2$ analysis.
-- **One tissue curve for the whole lung.** No regional differences in compliance or capacity.
-- **Compliance and expandable capacity share one control.** This makes overdistension visible in low-compliance phenotypes but is a modelling assumption, not a physiological law. When `collapsed` is also increased, part of the baby-lung reduction may be represented twice.
-- The anchors are textbook values for an adult of the model's reference weight. There is no height, sex or predicted-capacity scaling.
-- Capacity below zero transpulmonary pressure is linear, which is a simplification of a region the model rarely visits.
-
-### Of clinical application
-
-- **This is not a bedside pressure–volume curve.** It is a static tissue relation, whereas a measured curve is obtained by a low-flow or multiple-occlusion manoeuvre and contains recruitment, resistance and time dependence together.
-- There is no lower or upper inflection point to read off as a PEEP or plateau setting, and the model deliberately offers none.
-- The `clung` control scales the pressure–volume relation of the **fully open** lung. It is not the respiratory-system compliance a ventilator displays, which mixes lung, chest wall and open fraction; the model reports that separately as a measured value.
+- The relation is static and single-valued. Tissue, surfactant and viscoelastic hysteresis are not represented; recruitment hysteresis is a separate mechanism.
+- One curve replaces regional differences in stress, strain and capacity.
+- `lungCapacity` is not predicted TLC and has not been calibrated against individual spirometry.
+- The 18% soft-transition width is a didactic coefficient, not a patient-specific measurement.
+- A measured bedside pressure–volume curve also contains resistance, recruitment and time dependence; this tissue relation should not be interpreted as a directly acquired low-flow P–V loop.
+- The model does not supply lower or upper inflection pressures as ventilator-setting recommendations.
 
 ---
 
 ## References
 
-- Venegas JG, Harris RS, Simon BA. A comprehensive equation for the pulmonary pressure–volume curve. *J Appl Physiol* 1998;84:389–95.
-- Harris RS. Pressure–volume curves of the respiratory system. *Respir Care* 2005;50:78–98.
-- Gattinoni L, Pesenti A. The concept of "baby lung". *Intensive Care Med* 2005;31:776–84.
-- Chiumello D, Carlesso E, Cadringher P, et al. Lung stress and strain during mechanical ventilation for acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2008;178:346–55.
+- Venegas JG, Harris RS, Simon BA. A comprehensive equation for the pulmonary pressure–volume curve. *J Appl Physiol*. 1998;84:389–395.
+- Harris RS. Pressure–volume curves of the respiratory system. *Respir Care*. 2005;50:78–98.
+- Gattinoni L, Pesenti A. The concept of “baby lung”. *Intensive Care Med*. 2005;31:776–784.
+- Chiumello D, Carlesso E, Cadringher P, et al. Lung stress and strain during mechanical ventilation for acute respiratory distress syndrome. *Am J Respir Crit Care Med*. 2008;178:346–355.
 
 ---
 
 ## See also
 
-[Equation of motion](equation-of-motion.md) · [The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Stress index](stress-index.md) · [Hysteresis](hysteresis.md) · [The Campbell panel](panel-campbell.md) · [Controls: mechanics](controls-mechanics.md)
+[Equation of motion](equation-of-motion.md) · [The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Stress index](stress-index.md) · [Hysteresis](hysteresis.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Controls: mechanics](controls-mechanics.md)

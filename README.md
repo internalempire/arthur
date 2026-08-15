@@ -169,7 +169,7 @@ end-expiratory alveolar pressure exceeds the set PEEP. With EFL on, the reported
 emptying time is at least 4.5 s because maximal expiratory flow can become slower
 than the linear resistance predicts.
 
-The COPD preset generates about 7.1 cmH₂O of intrinsic PEEP and 782 mL of
+The COPD preset generates about 6.8 cmH₂O of intrinsic PEEP and 781 mL of
 dynamic trapped volume at external PEEP 5. Trapped volume means actual EELV
 minus the passive equilibrium volume at the same applied PEEP; it therefore does
 not mislabel loss-of-recoil static hyperinflation as dynamic trapping. At low
@@ -297,12 +297,11 @@ however hard it is pushed.
 ```
 f_openable = calibrate(R/I, collapsed, C_lung, C_cw, pOpen; PEEP 5 -> 15)
 open(Pl)  = (1 - collapsed)*sigma((Pl - 0)/1.3) + collapsed*f_openable*sigma((Pl - pOpen)/2)
-room      = CAPACITY - V0
-perUnit   = V0 + room*(1 - exp(-C_lung*Pl/room))     saturating above Pl = 0
-          = max(0, V0 + C_lung*Pl)                   linear below it
+linear    = V0 + C_lung*Pl
+perUnit   = softMinimum(linear, lungCapacity)         smooth independent ceiling
 V(Pl)     = open(Pl) * perUnit(Pl)                   the pressure-volume curve
 V_rest    = V(5)                                     recoil balancing the chest wall
-strain    = V / (2.2 L * open) - 1                   volume per *open* unit
+strain    = V / (perUnit(5) * open) - 1              volume per *open* unit
 ```
 
 `f_openable` is deliberately internal. The user supplies the bedside
@@ -315,17 +314,16 @@ V_recruited = ΔEELV - Crs_low * ΔPEEP
 R/I         = (V_recruited / ΔPEEP) / Crs_low
 ```
 
-Collapse, tissue compliance and R/I therefore remain separate. A high requested
-R/I cannot create units that are not collapsed; if the finite collapsed
-compartment or the selected opening pressure cannot supply it, the model reports
-the lower achieved R/I and marks the readout for caution.
+Collapse, aerated-lung compliance, maximum capacity and R/I therefore remain
+separate. `clung` sets the local slope away from the ceiling; `lungCapacity`
+sets the completely open lung's asymptotic maximum, in litres; `collapsed`
+sets the share currently accessible. A high requested R/I cannot create units
+that are not collapsed, so an unattainable target is reported as such.
 
-`V0` and `CAPACITY` are not chosen, they are solved, from two textbook volumes: a
-normal fully open lung rests at 2.2 L when its recoil is 5 cmH₂O, and reaches
-total lung capacity, 6 L, at 35 cmH₂O. Both are asserted by the test suite to six
-and three decimals. `CAPACITY` comes out near 10 L, which is not a volume any
-lung reaches — it is the scale of the exponential, and the physical claims are
-the two anchors.
+The default `lungCapacity` is 6 L. The default normal lung is calibrated to rest
+at 2.2 L at 5 cmH₂O recoil and is at 5.88 L by 35 cmH₂O, approaching 6 L
+smoothly thereafter. Capacity is a direct teaching-scale input, not an
+anthropometric predicted TLC.
 
 Units are treated as either open at full size or shut - the sponge idealisation.
 `strain` is therefore volume per **open** unit, and it is the quantity a
@@ -336,21 +334,19 @@ baby lung, written as arithmetic.
 ### Recruitment changes the mechanics, not only the resistance
 
 The curve above is a product of two factors, and the shape comes from that
-product: how many units are open is a sigmoid in pressure, how much each open one
-holds is linear in it. Three things follow, none of which a linear lung can do.
+product: how many units are open is a sigmoid in pressure, while the volume of
+each open unit is locally linear and then bends towards its independent ceiling.
+Three things follow, none of which a linear lung can do.
 
-**The pressure-volume curve has a lower inflection.** A recruitable lung is
-stiffest where its baby lung is being stretched alone and gets *less* stiff as
-pressure opens more of it - local slope 38 to 51 mL/cmH2O between transpulmonary
-pressures of 8 and 22. A consolidated one only stiffens, 25 to 23. A normal lung
-sits on the flat top of the recruitment sigmoid, so its curve is nearly straight,
-which is why this looked like a line for as long as it did.
+**The pressure-volume curve has a lower and an upper bend.** A recruitable lung
+can become less stiff while pressure opens units; a consolidated lung cannot.
+Near maximum capacity the aerated tissue becomes progressively stiffer in both.
 
-**Measured compliance tracks aerated lung size, not tissue stiffness.** What a
-ventilator computes is the open fraction times the tissue value, which is the
-baby lung as something that gets printed on a screen. `clung` is therefore the
-compliance of the lung *with all of it open*, not what you would measure. The
-ARDS preset carries `clung=40` and reads 36 mL/cmH2O at the bedside.
+**Measured compliance tracks more than tissue stiffness.** `clung` is the local
+slope assigned to aerated tissue away from its ceiling. The live value also
+contains open fraction, recruitment, upper-limb stiffening and chest-wall
+mechanics. It is therefore recalculated continuously rather than treated as a
+synonym for the input parameter.
 
 **Resting volume is an outcome, so it can move.** It is where the lung's recoil
 balances the chest wall, `V(5)`, and it rises when pressure opens more units -
@@ -379,18 +375,17 @@ underneath is too low.
 
 This needs the tissue to have a ceiling, which is why it did not exist before.
 With a linear pressure–volume relation the airway pressure rose in a straight
-line however hard a lung was inflated, and the index could not exceed 1 whatever
-was done to the patient — measured at 0.92 with a tidal volume of 1200 mL on a
-normal lung, where it should have been well above 1.
+line however hard a lung was inflated. The independent `lungCapacity` control
+now determines where upper-limb curvature appears without redefining `clung`.
 
 <!-- BEGIN GENERATED: readme-stress-index -->
 | executable case | stress index |
 |---|---:|
-| normal tissue compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8 | 1.03 |
-| tissue compliance 30 mL/cmH₂O, no collapse; VT 700 mL; PEEP 8 | 1.80 |
-| the same stiff tissue; VT 350 mL; PEEP 8 | 1.23 |
-| tissue compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6 | 0.72 |
-| the same recruitable lung; VT 600 mL; PEEP 14 | 1.48 |
+| normal aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8 | 1.01 |
+| maximum lung capacity 4.0 L, aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 900 mL; PEEP 8 | 1.16 |
+| the same 4.0 L maximum-capacity lung; VT 350 mL; PEEP 8 | 1.03 |
+| aerated-lung compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6 | 0.69 |
+| the same recruitable lung; VT 600 mL; PEEP 14 | 1.10 |
 <!-- END GENERATED: readme-stress-index -->
 
 The last pair is the point: the same model lung reads below 1 while substantial
@@ -753,7 +748,8 @@ appear in the UI and in every scenario.
 | Symbol | Meaning | Unit | Default | Range |
 |---|---|---|---|---|
 | `position` | Body position | — | `supine` | `supine` / `prone` |
-| `clung` | Lung compliance with all of it open | mL/cmH₂O | 200 | 20 – 420 |
+| `clung` | Aerated-lung compliance away from the capacity ceiling | mL/cmH₂O | 200 | 20 – 420 |
+| `lungCapacity` | Maximum capacity of a completely open lung | L | 6.0 | 2.0 – 9.0 |
 | `ccw` | Chest wall compliance | mL/cmH₂O | 200 | 40 – 300 |
 | `raw` | Airway resistance | cmH₂O/L/s | 5 | 1 – 40 |
 | `efl` | Expiratory flow limitation | off/on | off | — |
@@ -925,8 +921,8 @@ so a preset describes the same patient regardless of which one you opened first.
 Touching any control switches the picker to *Custom*, so a scenario name is
 never attached to a patient it no longer describes.
 
-Twenty-three of the thirty-four parameters are used by at least one scenario.
-The eleven never varied are `pinsp`, `position`, `csv`, `rvr`, `baroreflex`,
+Twenty-three of the thirty-five parameters are used by at least one scenario.
+The twelve never varied are `pinsp`, `position`, `lungCapacity`, `csv`, `rvr`, `baroreflex`,
 `baroSetPoint`, `pericardium`, `septal`, `hysteresis`, `pClose` and `piston` —
 those are left for the user to explore by hand. Hysteresis is deliberately an
 experiment rather than a starting phenotype, and the pericardial and septal
@@ -962,17 +958,17 @@ catheter-derived value is separately labelled in the app.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.37 | 93 | −1.2 | 22/12 | 8 | 1.2 | 0.87 | unavailable |
-| Healthy, passive volume control | 4.85 | 92 | 1.3 | 21/12 | 9 | 1.2 | 0.88 | 2% |
-| PEEP escalation | 4.49 | 90 | 3.7 | 22/13 | 10 | 1.2 | 0.85 | 1% |
-| Septic shock, fluid responsive | 4.39 | 81 | 1.8 | 16/10 | 4 | 1.2 | 0.73 | 3% |
-| Large pleural swings, limited preload reserve | 6.76 | 93 | 1.2 | 24/15 | 9 | 1.2 | 0.90 | unavailable |
-| ARDS with right ventricular failure | 3.92 | 85 | 3.1 | 26/19 | 4 | 4.2 | 1.63 | 1% |
+| Healthy, breathing spontaneously | 5.38 | 93 | −1.2 | 22/12 | 8 | 1.2 | 0.87 | unavailable |
+| Healthy, passive volume control | 4.86 | 92 | 1.4 | 21/12 | 9 | 1.2 | 0.88 | 2% |
+| PEEP escalation | 4.44 | 90 | 4.0 | 22/13 | 10 | 1.3 | 0.85 | 1% |
+| Septic shock, fluid responsive | 4.34 | 81 | 2.0 | 16/10 | 4 | 1.2 | 0.73 | 3% |
+| Large pleural swings, limited preload reserve | 6.71 | 93 | 1.4 | 24/15 | 9 | 1.2 | 0.89 | unavailable |
+| ARDS with right ventricular failure | 3.91 | 85 | 3.2 | 26/19 | 4 | 4.2 | 1.62 | 1% |
 | Acute pulmonary embolism | 4.04 | 93 | 4.7 | 37/31 | 3 | 7.5 | 2.00 | unavailable |
-| Cardiogenic pulmonary oedema | 1.85 | 66 | 6.4 | 50/47 | 44 | 1.2 | 0.76 | 15% |
-| Stiff chest wall | 4.33 | 89 | 3.2 | 18/10 | 9 | 1.2 | 0.82 | 5% |
-| COPD with dynamic hyperinflation | 4.52 | 89 | 4.3 | 20/12 | 10 | 1.3 | 0.84 | 4% |
-| Intra-abdominal hypertension | 3.46 | 86 | 0.7 | 12/6 | 4 | 1.2 | 0.72 | 1% |
+| Cardiogenic pulmonary oedema | 1.85 | 66 | 6.5 | 50/47 | 44 | 1.2 | 0.76 | 14% |
+| Stiff chest wall | 4.29 | 89 | 3.4 | 18/10 | 9 | 1.2 | 0.80 | 5% |
+| COPD with dynamic hyperinflation | 4.53 | 89 | 4.4 | 20/12 | 10 | 1.3 | 0.84 | 5% |
+| Intra-abdominal hypertension | 3.44 | 86 | 0.9 | 13/7 | 4 | 1.2 | 0.72 | 1% |
 
 ### How the presets are built
 
@@ -981,7 +977,7 @@ smallest set that makes that question answerable.
 
 - **The two healthy presets** differ only in the sign of the pressure. Same
   lungs, same heart; the only change is `mode`, and central venous pressure goes
-  from −1.0 to +1.5 while cardiac output falls.
+  from about −1.2 to +1.4 while cardiac output falls.
 - **Septic shock** is low `stressedVolume` and low `svr`, with a large enough
   `vt` and a reduced `ccw` for the pleural swing to reach the circulation. A
   fluid increment raises output because the patient lies on the steep Guyton
@@ -993,22 +989,23 @@ smallest set that makes that question answerable.
   quoted because spontaneous effort makes it uninterpretable; the lesson is
   the separation between transmitted pressure and position on the filling
   curve.
-- **ARDS** is a small, stiff, collapsed lung (`collapsed`, `clung`) with a weak right
+- **ARDS** combines collapsed lung (`collapsed`), reduced aerated-tissue
+  compliance (`clung`) and a weak right
   ventricle, a raised `pvrBase`, and — as shipped — a high-recruiter phenotype
   (`riRatio=0.7`). Across a PEEP titration from 0 to 20 the resistance
-  coefficient falls 4.57 → 3.66 Wood units, but derived PVR rises 4.67 → 5.28 WU
-  and cardiac output falls 4.10 → 3.82 L/min: the preload and
+  coefficient falls 4.57 → 3.59 Wood units, but derived PVR rises 4.73 → 5.04 WU
+  and cardiac output falls 4.04 → 3.77 L/min: the preload and
   waterfall costs outrun the coefficient benefit.
 
   Set `riRatio=0` — the same collapsed lung, now consolidated rather than
   closed — and the titration separates further. The coefficient rises 4.57 →
-  4.62 WU, derived PVR rises 4.92 → 7.08 WU, and output falls 4.03 → 3.60.
+  4.68 WU, derived PVR rises 4.84 → 6.74 WU, and output falls 4.01 → 3.58.
   Nothing else about the patient changed. That is the comparison this preset
   exists for, and it is the one a single-compartment lung could not show.
 
   A PEEP that buys output does exist, but only in a lung that is both highly
   recruitable and well filled: at `riRatio=0.8`, `pOpen=16` and
-  `stressedVolume=1400`, derived PVR stays around 4.1–4.5 WU and output holds a
+  `stressedVolume=1400`, derived PVR stays around 3.8–4.6 WU and output holds a
   broad plateau from PEEP 4–16 before declining. The plateau is shallow — the
   differences along it are comparable to the respiratory swing, so it should be
   read as "PEEP stops costing anything here", not as a peak to titrate to. The
@@ -1031,8 +1028,9 @@ smallest set that makes that question answerable.
   pulmonary oedema clinically reproducible.
 - **Stiff chest wall**, **COPD** and **intra-abdominal hypertension** leave the
   heart entirely at default, so the haemodynamic change can only have come from
-  mechanics. COPD deliberately separates three existing ideas: high `clung`
-  raises the static resting volume, high `raw` slows ordinary emptying, and EFL
+  mechanics. COPD deliberately separates four ideas: high `clung` raises the
+  static resting volume without enlarging maximum capacity, `lungCapacity`
+  remains an independent size term, high `raw` slows ordinary emptying, and EFL
   caps maximal expiratory flow. Short available expiratory time then determines
   how much additional gas is dynamically trapped. Slowing the rate unloads the
   circulation without changing the heart; low external PEEP is absorbed below
@@ -1077,14 +1075,13 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `SEPTAL.systolic` | 0.042 | systolic interdependence gain |
 | `PPL_FRC` | −5 cmH₂O | pleural pressure at the relaxation volume |
 | `EXPIRATORY_FLOW_LIMIT.minimumTimeConstant` | 4.5 s | severe-obstruction maximal-flow envelope when EFL is on; a didactic anchor, not a universal COPD constant |
-| `NORMAL_FRC` | 2.2 L | resting volume of a fully open lung; collapse is measured against it |
+| `NORMAL_FRC` | 2.2 L | default whole-lung relaxation volume at 5 cmH₂O recoil |
 | `PL_EASY`, `SPREAD_EASY` | 0, 1.3 cmH₂O | opening threshold and spread for normal units |
-| `SPREAD_HARD` | 7 cmH₂O | spread of opening pressures for diseased units |
+| `SPREAD_HARD` | 2 cmH₂O | spread of opening pressures for diseased units |
 | `HPV_GAIN` | 1.1 | resistance added per unit of closed lung |
-| `UNSTRESSED_VOLUME` | 1.247 L | gas a fully open lung holds at zero transpulmonary pressure |
+| `UNSTRESSED_FRACTION` | derived | capacity-scaled zero-pressure volume term calibrated from the default 2.2 L relaxation volume |
 | `RECOIL_AT_FRC` | 5 cmH₂O | recoil balancing the chest wall; defines the resting volume |
-| `TOTAL_LUNG_CAPACITY` | 6.0 L | reached at `TLC_PRESSURE`; with the resting volume, pins the tissue curve |
-| `TLC_PRESSURE` | 35 cmH₂O | transpulmonary pressure at total lung capacity |
+| `CAPACITY_SOFTNESS` | 0.18 of `lungCapacity` | width of the smooth upper-volume transition; didactic, not a fitted human constant |
 | `PRELOAD_STEEP` | 0.10 /mmHg | reserve above which filling buys output; calibrated against the model's own response to 500 mL, not published |
 | `K_STRETCH` | 0.58 | exponential high-volume alveolar limb |
 | `K_UNFURL` | ≈0.829, derived | decay of the extra-alveolar unfurling term; chosen to balance slopes at FRC |

@@ -52,7 +52,7 @@ $$
 \varepsilon = \frac{V}{V_{\text{unit}} \cdot \varphi} - 1
 $$
 
-where $V$ is absolute lung volume, $\varphi$ the open fraction, and $V_{\text{unit}}$ the volume this patient's *fully open tissue* would hold at resting recoil. That last reference is the important one. A stiff ARDS lung with 40 mL/cmH₂O of compliance holding 1.6 L can be **distended**, even though 1.6 L is well below a healthy 2.2 L FRC. Referencing strain to a fixed healthy FRC made such a lung appear under-inflated at high plateau pressure, which is the opposite of what it is. See [the two-population lung](two-population-lung.md) for how $\varphi$ and $V_{\text{unit}}$ are obtained.
+where $V$ is absolute lung volume, $\varphi$ the open fraction, and $V_{\text{unit}}$ the volume this patient's aerated tissue would hold at resting recoil. That reference follows both aerated-lung compliance and maximum capacity. A small aerated lung can therefore be **distended** at an absolute volume well below a healthy 2.2 L FRC. Referencing strain to a fixed healthy FRC would make that lung appear under-inflated at high plateau pressure, which is the opposite of what it is. See [the two-population lung](two-population-lung.md) for how $\varphi$ and $V_{\text{unit}}$ are obtained.
 
 ### The two limbs
 
@@ -83,7 +83,7 @@ $$
 
 so the minimum sits at zero strain by construction, not by tuning. The quadratic $G$ term is zero in both value and slope at $\varepsilon = 0$, so it steepens the left limb without moving that minimum or changing the resistance assigned there.
 
-Zero strain means the volume the fully open tissue holds at resting recoil, which for the default lung is 2.25 L against a nominal FRC of 2.2 L — the curve at 2.20 L is 0.2% above its true minimum. The two are not identical because $V_{\text{unit}}$ follows the patient's compliance while the nominal FRC does not; the executable row below allows 0.15 L between them.
+Zero strain means the volume the completely open tissue holds at resting recoil, which for the default lung is 2.25 L against a nominal whole-lung FRC of 2.2 L. The small difference is the residual opening behaviour of normal units at 5 cmH₂O; the executable row below allows 0.15 L between them.
 
 ### Open and closed beds in parallel
 

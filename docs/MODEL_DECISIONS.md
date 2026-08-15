@@ -742,3 +742,40 @@ the simpler clinical two-limb diagram does not show. This app follows the latter
 for clarity and does not use either source as a portable quantitative human
 target. Absolute human PVR and the PEEP response in ARDS remain constrained
 separately by the Cappio Borlino cohort tests.
+
+## 2026-08-15 — Separate aerated-lung compliance from maximum lung capacity
+
+### Decision
+
+- Define `clung` as the local pressure–volume slope of aerated tissue while it is
+  away from its upper-volume limit.
+- Add `lungCapacity` as an independent user control in litres, default 6 L and
+  adjustable from 2 to 9 L.
+- Replace the compliance-scaled exponential capacity with a smooth independent
+  ceiling. The transition width is 18% of capacity so the upper limb bends
+  progressively and remains differentiable.
+- Continue to multiply per-unit tissue volume by open fraction. Collapse
+  therefore reduces accessible capacity and recruitment restores part of it
+  without changing either the tissue slope or the anatomical ceiling.
+
+### Why
+
+The previous `clung` control did two jobs: it changed pressure–volume slope and
+also changed maximum expandable volume. `collapsed` then removed available lung
+a second time. Phenotypes using both controls could therefore make the baby lung
+small twice while presenting the result as two independent abnormalities.
+
+The new construction makes the causal axes explicit. Low `clung` means greater
+pressure is needed for a given volume increment; low `lungCapacity` means the
+upper limb is reached at a smaller absolute volume; high `collapsed` means only
+a fraction of that ceiling is currently ventilated. Live respiratory-system
+compliance remains an output and may differ from `clung` because it also contains
+recruitment, ceiling effects and chest-wall mechanics.
+
+### Deliberate limits
+
+`lungCapacity` is a teaching-scale input, not predicted TLC. No height, sex, age
+or reference equation has been added. The 18% smoothing width is a transparent
+didactic coefficient rather than a human in-vivo calibration. The default lung
+still rests at 2.2 L at 5 cmH₂O recoil and approaches its 6 L ceiling smoothly;
+it is no longer forced to equal 6 L at one finite pressure.

@@ -58,7 +58,7 @@ $$
 
 That ordering is the core of the [equation of motion](equation-of-motion.md): the chest wall is linear and gives the pleural-pressure increment; the lung gives the transpulmonary pressure; the airway sees their sum. Because $P_l(V)$ comes from the [pressure–volume curve](pressure-volume-curve.md), a recruiting or overdistending lung changes airway pressure without directly changing the pleural swing at the same delivered volume.
 
-The reference is not fully independent, however. The model recalculates the relaxation volume from lung compliance and open fraction, then assigns −5 cmH₂O pleural pressure at that volume. Across phenotypes, the chest-wall relation therefore shifts with the lung rather than intersecting an independently fixed chest-wall curve. This limitation affects comparisons of absolute resting volume and pressure more than the within-breath swing.
+The reference is not fully independent, however. The model recalculates the relaxation volume from aerated-lung compliance, maximum capacity and open fraction, then assigns −5 cmH₂O pleural pressure at that volume. Across phenotypes, the chest-wall relation therefore shifts with the lung rather than intersecting an independently fixed chest-wall curve. This limitation affects comparisons of absolute resting volume and pressure more than the within-breath swing.
 
 $P_{mus}$ is a half-sine over the neural inspiratory time, raised to a power slightly above one so the rise is a little slower than the fall.
 

@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 128 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 130 unique entries.
 
 ---
 
@@ -37,7 +37,8 @@ A citation documents the physiological or methodological claim made on its sourc
 - Chase SC, Taylor BJ, Cross TJ, et al. Influence of thoracic fluid compartments on pulmonary congestion in chronic heart failure. *J Card Fail*. 2017;23:690–696. [doi:10.1016/j.cardfail.2017.07.394](https://doi.org/10.1016/j.cardfail.2017.07.394)
 - Chen L, Chen G-Q, Shore K, et al. Implementing a bedside assessment of respiratory mechanics in patients with acute respiratory distress syndrome. *Crit Care* 2017;21:84.
 - Chen L, Del Sorbo L, Grieco DL, et al. Potential for lung recruitment estimated by the recruitment-to-inflation ratio in ARDS. *Am J Respir Crit Care Med*. 2020;201:178–187. [doi:10.1164/rccm.201902-0334OC](https://doi.org/10.1164/rccm.201902-0334OC)
-- Chiumello D, Carlesso E, Cadringher P, et al. Lung stress and strain during mechanical ventilation for acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2008;178:346–55.
+- Chiumello D, Carlesso E, Cadringher P, et al. Lung stress and strain during mechanical ventilation for acute respiratory distress syndrome. *Am J Respir Crit Care Med*. 2008;178:346–355.
+- Chiumello D, Carlesso E, Cadringher P, et al. Lung stress and strain during mechanical ventilation for ARDS. *Am J Respir Crit Care Med* 2008;178:346–55.
 - Cressoni M, Cadringher P, Chiurazzi C, et al. Lung inhomogeneity in patients with acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2014;189:149–58.
 - Crotti S, Mascheroni D, Caironi P, et al. Recruitment and derecruitment during acute respiratory failure: a clinical study. *Am J Respir Crit Care Med* 2001;164:131–40.
 ## D
@@ -58,6 +59,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Gattinoni L, Carlesso E, Cadringher P, et al. Physical and biological triggers of ventilator-induced lung injury and its prevention. *Eur Respir J* 2003;22(Suppl 47):15s–25s.
 - Gattinoni L, Chiumello D, Carlesso E, Valenza F. Bench-to-bedside review: chest wall elastance in acute lung injury/ARDS patients. *Crit Care* 2004;8:350–5.
 - Gattinoni L, Pesenti A. The concept of "baby lung". *Intensive Care Med* 2005;31:776–84.
+- Gattinoni L, Pesenti A. The concept of “baby lung”. *Intensive Care Med*. 2005;31:776–784.
 - Grasso S, Terragni P, Mascia L, et al. Airway pressure–time curve profile (stress index) detects tidal recruitment/hyperinflation in experimental acute lung injury. *Crit Care Med* 2004;32:1018–27.
 - Grinnan DC, Truwit JD. Clinical review: respiratory mechanics in spontaneous and assisted ventilation. *Crit Care* 2005;9:472–84.
 - Guarracino F, Baldassarri R, Pinsky MR. Ventriculo-arterial decoupling in acutely altered hemodynamic states. *Crit Care* 2013;17:213.
@@ -72,7 +74,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Hakim TS, Michel RP, Chang HK. [Partitioning of pulmonary vascular resistance in dogs by arterial and venous occlusion](https://doi.org/10.1152/jappl.1982.52.3.710). *J Appl Physiol* 1982;52:710–5. Volume-related changes identical under both inflation modes; pressure-related ones not.
 - Hakim TS, Michel RP, Chang HK. Effect of lung inflation on pulmonary vascular resistance by arterial and venous occlusion. *J Appl Physiol*. 1982;53:1110–1115. [doi:10.1152/jappl.1982.53.5.1110](https://doi.org/10.1152/jappl.1982.53.5.1110)
 - Hamzaoui O, Shi R, Carelli S, et al. Changes in pulse pressure variation to assess preload responsiveness in mechanically ventilated patients with spontaneous breathing activity. *Br J Anaesth*. 2021;127:532–538. [doi:10.1016/j.bja.2021.05.034](https://doi.org/10.1016/j.bja.2021.05.034)
-- Harris RS. Pressure–volume curves of the respiratory system. *Respir Care* 2005;50:78–98.
+- Harris RS. Pressure–volume curves of the respiratory system. *Respir Care*. 2005;50:78–98.
 - Henderson WR, Griesdale DEG, Walley KR, Sheel AW. Clinical review: Guyton — the role of mean circulatory filling pressure and right atrial pressure in controlling cardiac output. *Crit Care* 2010;14:243.
 - Hickling KG. [Best compliance during a decremental, but not incremental, positive end-expiratory pressure trial is related to open-lung positive end-expiratory pressure](https://pubmed.ncbi.nlm.nih.gov/11208628/). *Am J Respir Crit Care Med* 2001;163:69–78.
 - Humbert M, Kovacs G, Hoeper MM, et al. 2022 ESC/ERS Guidelines for the diagnosis and treatment of pulmonary hypertension. *Eur Heart J*. 2022;43:3618–3731. [doi:10.1093/eurheartj/ehac237](https://doi.org/10.1093/eurheartj/ehac237)
@@ -164,7 +166,7 @@ A citation documents the physiological or methodological claim made on its sourc
 
 - van den Berg B, Aerts JGJV, Bogaard JM. Effect of continuous positive airway pressure (CPAP) in patients with chronic obstructive pulmonary disease (COPD) depending on intrinsic PEEP levels. *Eur Respir J* 1991;4:561–7.
 - van Loon LM, van der Hoeven JG, Veltink PH, Lemson J. The inspiration hold maneuver is a reliable method to assess mean systemic filling pressure but its clinical value remains unclear. *Ann Transl Med*. 2020;8:1390. [doi:10.21037/atm-20-3540](https://doi.org/10.21037/atm-20-3540)
-- Venegas JG, Harris RS, Simon BA. A comprehensive equation for the pulmonary pressure–volume curve. *J Appl Physiol* 1998;84:389–95.
+- Venegas JG, Harris RS, Simon BA. A comprehensive equation for the pulmonary pressure–volume curve. *J Appl Physiol*. 1998;84:389–395.
 - Ventetuolo CE, Klinger JR. Management of acute right ventricular failure in the intensive care unit. *Ann Am Thorac Soc*. 2014;11:811–822. [doi:10.1513/AnnalsATS.201312-446FR](https://doi.org/10.1513/AnnalsATS.201312-446FR)
 - Vieillard-Baron A, Charron C, Caille V, et al. Prone positioning unloads the right ventricle in severe ARDS. *Chest*. 2007;132:1440–1446. <https://doi.org/10.1378/chest.07-1013>
 - Vieillard-Baron A, Chergui K, Augarde R, et al. Cyclic changes in arterial pulse during respiratory support revisited by Doppler echocardiography. *Am J Respir Crit Care Med* 2003;168:671–6.

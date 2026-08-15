@@ -22,7 +22,7 @@ The `+`, `−` and percentage/Fit buttons change only the vertical view. Zoom is
 
 The two reference limbs are calculated with the open fraction fixed at one. Their sum is exactly the open vascular pathway used by the flow equations. The patient point is calculated separately from the parallel open and closed beds. This prevents the earlier visual error in which recruitment and HPV distorted the named alveolar and extra-alveolar curves.
 
-Model RV is the fully open lung volume at zero transpulmonary pressure; model TLC is anchored at 35 cmH₂O transpulmonary pressure. These are graphical model landmarks, not spirometric measurements in the current patient.
+Model RV is the completely open lung volume at zero transpulmonary pressure; model TLC is the selected `lungCapacity`. These are graphical model landmarks, not spirometric measurements in the current patient.
 
 ## Limits
 

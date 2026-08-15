@@ -6,6 +6,8 @@
 
 ## A–C
 
+**Aerated-lung compliance (`clung`).** Local pressure–volume slope assigned to aerated tissue while it remains away from its upper-volume limit. It is independent of maximum capacity and is not the same as live respiratory-system compliance. See [the pressure–volume curve](pressure-volume-curve.md).
+
 **Afterload.** The load opposing ventricular ejection. It is not represented by one pressure alone. For the LV, surrounding pleural pressure changes transmural ejection load; for the RV, pulmonary vascular resistance, critical closing behaviour and pulsatile load all matter, although the model represents only part of them. See [transmural pressure](transmural-pressure.md) and [the right ventricle](the-right-ventricle.md).
 
 **Auto-PEEP / intrinsic PEEP.** Positive alveolar pressure remaining at end-expiration because expiration did not reach the resting equilibrium. See [expiratory flow limitation](expiratory-flow-limitation.md).
@@ -33,6 +35,8 @@
 **Hypoxic pulmonary vasoconstriction (HPV).** Local pulmonary arterial constriction in response to alveolar hypoxia. The model uses a simplified control attached to derecruited lung and does not simulate oxygen tension. See [hypoxic vasoconstriction](hypoxic-vasoconstriction.md).
 
 ## I–P
+
+**Maximum lung capacity (`lungCapacity`).** Asymptotic volume ceiling of a completely open lung, entered directly in litres. Collapse determines what fraction is currently accessible. It is not an anthropometric predicted TLC. See [the pressure–volume curve](pressure-volume-curve.md).
 
 **Mean pulmonary artery pressure (mPAP).** Time-averaged pulmonary arterial pressure, in mmHg.
 

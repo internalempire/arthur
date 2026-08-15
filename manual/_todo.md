@@ -18,15 +18,11 @@
 
 ### Make the chest-wall reference independent of the lung
 
-The respiratory model recalculates `relaxationVolume(p)` from lung compliance and open fraction, then assigns −5 cmH₂O pleural pressure at that volume. This shifts the chest-wall relation with every lung phenotype. A future implementation should give the chest wall its own relaxation volume or pressure–volume relation and solve the zero-flow equilibrium from the intersection of lung and chest-wall recoil. The change must preserve a legible within-breath equation of motion and be tested across normal, ARDS and emphysema phenotypes.
+The respiratory model recalculates `relaxationVolume(p)` from aerated-lung compliance, maximum capacity and open fraction, then assigns −5 cmH₂O pleural pressure at that volume. This shifts the chest-wall relation with every lung phenotype. A future implementation should give the chest wall its own relaxation volume or pressure–volume relation and solve the zero-flow equilibrium from the intersection of lung and chest-wall recoil. The change must preserve a legible within-breath equation of motion and be tested across normal, ARDS and emphysema phenotypes.
 
 ### Distinguish left atrial pressure from a valid wedge-derived PVR
 
 The model computes $(\overline P_{pa}-P_{la})/\dot Q$ even when its zone III index flags left atrial pressure as an invalid wedge surrogate. The immediate safety fix is to propagate that caution to the derived-PVR interpretability state or relabel the quantity as an internal hydraulic estimate. A more complete alternative would model an occlusion pressure, but that requires a separate decision about what a lumped non-regional pulmonary bed can support honestly.
-
-### Define `clung` independently from baby-lung size
-
-`clung` currently scales both the slope and expandable capacity of fully open tissue, while `collapsed` separately removes aerated units. Presets that reduce both can count part of the baby-lung reduction twice. Before changing equations, each scenario should state whether `clung` represents intrinsic tissue mechanics, functional lung size or whole-lung compliance; the control and tissue curve should then be made consistent with one definition.
 
 ### Separate superior and inferior caval closing pressures
 

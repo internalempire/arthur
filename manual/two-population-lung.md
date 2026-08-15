@@ -44,7 +44,7 @@ A unit is open at full size or shut. There is no partially inflated unit. All th
 
 ### Strain
 
-Volume per open unit, referenced to what this patient's fully open tissue would hold at resting recoil:
+Volume per open unit, referenced to what this patient's aerated tissue would hold at resting recoil:
 
 $$
 \varepsilon = \frac{V}{V_{\text{unit}} \cdot \varphi} - 1
@@ -52,7 +52,7 @@ $$
 
 - $\varepsilon$ — strain, dimensionless; zero at resting recoil
 - $V$ — absolute lung volume, L
-- $V_{\text{unit}}$ — volume one fully open lung's worth of this patient's tissue holds at 5 cmH₂O
+- $V_{\text{unit}}$ — volume one completely open lung's worth of this patient's aerated tissue holds at 5 cmH₂O; it depends on both aerated-lung compliance and maximum capacity
 - $\varphi$ — open fraction
 
 Two things follow. Total lung volume alone says nothing about distension: a stiff lung holding 1.6 L can be distended while a normal lung holding 1.6 L is under-inflated. And strain drives the [pulmonary vascular resistance](pulmonary-vascular-resistance.md) limbs, so opening lung reduces vascular load through this term as well as by adding pathway.
@@ -83,7 +83,7 @@ The `collapsed` control is a fraction of a **normal** lung, not of the patient's
 - **The open fraction is floored at 0.05**, a numerical guard rather than a physiological statement.
 - Consolidation is represented only as tissue that never opens. It has no separate compliance, weight or perfusion.
 - The two distribution widths are chosen, not measured.
-- **`clung` and `collapsed` are independent controls.** Reducing fully-open lung compliance while also increasing the collapsed fraction can represent intrinsic tissue stiffness plus loss of aerated lung, but it can also count part of the baby-lung reduction twice. Scenario presets therefore require explicit physiological justification for both settings.
+- **Aerated compliance, maximum capacity and collapse are independent controls.** `clung` changes the local tissue slope, `lungCapacity` changes the completely open ceiling, and `collapsed` changes the share currently available. They can coexist in a phenotype, but none silently substitutes for another.
 
 ### Of clinical application
 

@@ -51,7 +51,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Try.** Compare PEEP levels with the preset R/I, then set R/I to zero while keeping collapse and tissue compliance unchanged. Prone positioning can be explored as a separate, deliberately coarse transformation.
 
-**Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. Follow derived PVR, RV/LV ratio, septal interaction and output together. Extreme PEEP can generate plateau pressures outside a useful quantitative range, and prone response is directional rather than patient-specific. See [recruitment and R/I](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md) and [ventricular interdependence](ventricular-interdependence.md).
+**Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. The preset leaves maximum lung capacity at the 6 L default: collapse makes the accessible baby lung smaller, while reduced `clung` independently makes its aerated tissue less compliant. Follow derived PVR, RV/LV ratio, septal interaction and output together. Extreme PEEP can generate plateau pressures outside a useful quantitative range, and prone response is directional rather than patient-specific. See [recruitment and R/I](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md) and [ventricular interdependence](ventricular-interdependence.md).
 
 ### Acute pulmonary embolism
 
@@ -83,7 +83,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Try.** Slow respiratory rate, shorten inspiratory time, and compare external PEEP below and above the expiratory choke.
 
-**Read.** Slower expiration reduces trapped gas, intrinsic PEEP and circulatory loading. Below the choke, external PEEP mainly substitutes for intrinsic pressure; above it, total PEEP and lung volume rise and output falls. This is a qualitative waterfall demonstration, not a universal fraction-of-auto-PEEP titration rule. See [expiratory flow limitation](expiratory-flow-limitation.md) and [vascular waterfalls](vascular-waterfalls.md).
+**Read.** Slower expiration reduces trapped gas, intrinsic PEEP and circulatory loading. High `clung` raises the relaxation volume through loss of recoil but no longer enlarges maximum capacity, which remains at the 6 L default. Below the choke, external PEEP mainly substitutes for intrinsic pressure; above it, total PEEP and lung volume rise and output falls. This is a qualitative waterfall demonstration, not a universal fraction-of-auto-PEEP titration rule. See [expiratory flow limitation](expiratory-flow-limitation.md) and [vascular waterfalls](vascular-waterfalls.md).
 
 ### Intra-abdominal hypertension
 
