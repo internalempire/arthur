@@ -1,0 +1,45 @@
+# The PVR–lung-volume panel
+
+> The panel reconstructs the classical two-limb pulmonary vascular relation and places the current patient on it without confusing derecruitment with either mechanical limb.
+
+---
+
+## Physiology
+
+As lung volume rises, radial traction opens extra-alveolar vessels and lowers their resistance. At high lung volume, expanding alveoli narrow and lengthen alveolar vessels, increasing their resistance. The two contributions act in series within the perfused open pathway, producing a J-shaped total relation with a minimum near an intermediate volume.
+
+See [pulmonary vascular resistance](pulmonary-vascular-resistance.md) for the full physiology and the distinction between a resistance coefficient and catheter-derived PVR.
+
+## How to read the panel
+
+The horizontal axis spans model residual volume (RV), the vascular minimum near FRC and model TLC. Each landmark carries its current absolute volume in litres. The green extra-alveolar limb falls, the orange dashed alveolar limb rises, and their purple sum is total mechanical open-lung PVR.
+
+The grey vertical band is the lung-volume excursion already traversed during the current breath. The white *Patient* point uses the current open fraction and HPV state, so it may sit above the fully open mechanical curve when derecruited lung adds load.
+
+The `+`, `−` and percentage/Fit buttons change only the vertical view. Zoom is centred on the patient point when possible and never changes model state. The full RV-to-TLC horizontal range is retained so neither limb disappears.
+
+## In the model
+
+The two reference limbs are calculated with the open fraction fixed at one. Their sum is exactly the open vascular pathway used by the flow equations. The patient point is calculated separately from the parallel open and closed beds. This prevents the earlier visual error in which recruitment and HPV distorted the named alveolar and extra-alveolar curves.
+
+Model RV is the fully open lung volume at zero transpulmonary pressure; model TLC is anchored at 35 cmH₂O transpulmonary pressure. These are graphical model landmarks, not spirometric measurements in the current patient.
+
+## Limits
+
+- The component curves are conceptual aggregate resistances; alveolar and extra-alveolar vessels are not independently measured in vivo.
+- The vertical coefficients are tuned for didactic direction and selected human in-vivo constraints, not a universal PVR–volume curve.
+- The patient point includes collapse and HPV but not pulsatile impedance, viscosity, explicit obstruction or regional perfusion.
+- RV, FRC and TLC are model landmarks and cannot be compared directly with bedside lung-volume measurements.
+- Zoom can make small absolute differences look large; read the axis after changing it.
+
+## References
+
+- Whittenberger JL, McGregor M, Berglund E, Borst HG. Influence of state of inflation of the lung on pulmonary vascular resistance. *J Appl Physiol*. 1960;15:878–882. [doi:10.1152/jappl.1960.15.5.878](https://doi.org/10.1152/jappl.1960.15.5.878)
+- Hakim TS, Michel RP, Chang HK. Effect of lung inflation on pulmonary vascular resistance by arterial and venous occlusion. *J Appl Physiol*. 1982;53:1110–1115. [doi:10.1152/jappl.1982.53.5.1110](https://doi.org/10.1152/jappl.1982.53.5.1110)
+- West JB, Dollery CT, Naimark A. Distribution of blood flow in isolated lung; relation to vascular and alveolar pressures. *J Appl Physiol*. 1964;19:713–724. [doi:10.1152/jappl.1964.19.4.713](https://doi.org/10.1152/jappl.1964.19.4.713)
+
+---
+
+## See also
+
+[Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Hypoxic vasoconstriction](hypoxic-vasoconstriction.md) · [Recruitment and R/I](recruitment-and-ri.md) · [The right ventricle](the-right-ventricle.md) · [Pulmonary controls](controls-pulmonary.md)

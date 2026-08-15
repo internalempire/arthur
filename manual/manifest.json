@@ -161,7 +161,7 @@
         ],
         [
           "panel-waveforms",
-          "Pressure, flow and volume against time"
+          "Respiratory pressure, vascular pressure and lung volume against time"
         ],
         [
           "panel-pv-loops",

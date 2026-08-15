@@ -1,0 +1,90 @@
+# Model architecture
+
+> A dependency-free JavaScript model advances respiratory mechanics, autonomic control and a closed circulation at one fixed time step, then exposes a selective read-only surface to the interface.
+
+---
+
+## The path from a control to a result
+
+```text
+parameter registry or scenario
+            │
+            ▼
+position transform ──► aggregate baroreflex
+            │                 │
+            └────────┬────────┘
+                     ▼
+          respiratory mechanics
+                     │ Paw, Ppl, Palv, volume, recruitment
+                     ▼
+             closed circulation
+                     │ chamber volumes, pressures and flows
+                     ▼
+       measurements and interpretability
+                     │
+                     ▼
+       tiles, descriptions and six panels
+```
+
+The order is causal. Position resolves the effective mechanics. The reflex reads filtered systemic pressure and modifies effective parameters. The respiratory step generates the pressures and lung state seen by the circulation. The circulation step moves blood through the chambers. Measurements and panels read the resulting state; they do not write physiological outputs.
+
+## Modules
+
+| file | responsibility |
+|---|---|
+| `src/model/parameters.js` | every user-facing parameter, range, default and help text |
+| `src/model/scenarios.js` | partial parameter overrides defining teaching phenotypes |
+| `src/model/position.js` | supine/prone parameter transformation |
+| `src/model/baroreflex.js` | one bounded, slow aggregate compensator |
+| `src/model/respiratory.js` | equation of motion, breath generator, EFL and holds |
+| `src/model/lung.js` | nonlinear P–V relation, recruitment state and PVR components |
+| `src/model/circulation.js` | chamber elastance, valves, vascular compartments, venous return and pulmonary transit |
+| `src/model/simulator.js` | integration, settlement, traces, measurements and validity rules |
+| `src/model/index.js` | selective public API used by UI modules |
+| `src/ui/` | controls, tiles, descriptions and drawings |
+
+The public API is a deliberate boundary. Browser UI modules import model functions only from `src/model/index.js`; internal files can be reorganised without allowing a panel to become a second source of physiological truth.
+
+## State and integration
+
+The circulation contains eight pressure-bearing compliant compartments—systemic artery and vein, both atria and ventricles, pulmonary artery and pulmonary vein—plus one pressureless pulmonary transport volume represented by eight mixing stages. Blood moves through one closed loop and total represented blood volume is conserved unless the user changes baseline stressed volume.
+
+The ordinary differential equations use forward Euler integration with a fixed 0.25 ms step. The small step is required by low valve resistances. Protective flow limiting prevents a compartment from being drained below its numerical volume floor; reaching that protection marks the result invalid rather than silently treating the clipped state as physiology.
+
+Reset creates respiratory, reflex and circulatory state and advances the model silently for 15 simulated seconds. This gives a usable initial display, although the slowest processes may continue adapting after the first frame.
+
+## Sampling and display
+
+The integrator runs independently of visual frame rate. Traces are sampled at 250 Hz into 12-second ring buffers. Haemodynamic means use exponential or cardiac-cycle windows chosen for their intended display. Panels read these shared measurements or exported analytic functions; model-backed manual figures import the same functions.
+
+The application has no runtime framework and no build step. Native ES modules run in the browser; Node is used only for tests, documentation tooling and figure generation. A static HTTP server is required because browsers do not load the module graph correctly from `file://`.
+
+## Why this architecture
+
+Vanilla JavaScript keeps the physiological model inspectable and portable. A framework would improve neither the differential equations nor their validation, while adding a second lifecycle around a small, continuously animated application. The explicit module boundary and registry provide the organisational benefit that a framework might otherwise supply.
+
+Forward Euler is less sophisticated than adaptive higher-order integration, but it is deterministic, dependency-free and easy to audit. Its acceptability is constrained by time-step-refinement and positivity tests rather than assumed.
+
+## Limits
+
+- One fixed time step can be inefficient and may conceal stiffness outside tested ranges.
+- The 15-second reset settlement is not proof of equilibrium for every extreme parameter combination.
+- Lumped compartments cannot produce spatial gradients, wave propagation or regional heterogeneity.
+- A selective public API prevents accidental coupling but does not prove the exported physiology is correct.
+- Model-generated figures remain faithful to code even if the code embodies an invalid assumption.
+- Browser performance and numerical precision can differ slightly across engines, although deterministic tests constrain supported environments.
+
+## Validation
+
+The suite checks volume conservation, positivity, deterministic replay, time-step refinement and the public API boundary. It also verifies that the analytic curves drawn by panels agree with the equations used by the integrator. See [Validation](validation.md).
+
+## References
+
+- Hairer E, Nørsett SP, Wanner G. *Solving Ordinary Differential Equations I: Nonstiff Problems*. 2nd ed. Springer; 1993.
+- Sagawa K, Maughan L, Suga H, Sunagawa K. *Cardiac Contraction and the Pressure–Volume Relationship*. Oxford University Press; 1988.
+
+---
+
+## See also
+
+[Validation](validation.md) · [Global limits](global-limits.md) · [Conventions](conventions.md) · [Numerical tiles](numeric-tiles.md) · [`MODEL_DECISIONS.md`](../docs/MODEL_DECISIONS.md)

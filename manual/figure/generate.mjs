@@ -333,6 +333,32 @@ function venousToneFigure() {
   });
 }
 
+// --- selective tone in the derecruited pulmonary bed ----------------------
+
+function hpvRedistributionFigure() {
+  // Hold absolute lung volume at the model vascular FRC so the plot isolates
+  // redistribution between the parallel beds. Moving volume at the same time
+  // would also move the mechanical J-curve and obscure what the HPV control
+  // itself does.
+  const openFractions = [];
+  for (let phi = 0.05; phi <= 1.0001; phi += 0.01) openFractions.push(phi);
+  const series = [0, 1, 2].map((hpv) => ({
+    label: `HPV ${hpv}×`,
+    points: openFractions.map((phi) => {
+      const component = pvrComponents({ ...defaultParams(), hpv }, NORMAL_FRC, null, phi);
+      return [phi * 100, component.openFlowShare * 100];
+    }),
+  }));
+  return chart({
+    title: 'Selective tone redirects model flow toward the open pulmonary bed',
+    xLabel: 'Lung open (%)',
+    yLabel: 'Pulmonary flow through the open bed (%)',
+    series, xTick: 10, yTick: 10, xDomain: [0, 100], yDomain: [0, 100],
+    padRight: 205,
+    notes: ['absolute volume held at FRC', 'oxygen tension is not modelled', 'curves show conductance sharing'],
+  });
+}
+
 // --- aggregate baroreflex --------------------------------------------------
 
 function baroreflexFigure() {
@@ -640,6 +666,7 @@ const figures = {
   'hysteresis.svg': hysteresisFigure(),
   'stressed-volume.svg': stressedVolumeFigure(),
   'venous-tone.svg': venousToneFigure(),
+  'hpv-redistribution.svg': hpvRedistributionFigure(),
   'baroreflex.svg': baroreflexFigure(),
   'preload-reserve.svg': preloadReserveFigure(),
   'ppv.svg': ppvFigure(),
