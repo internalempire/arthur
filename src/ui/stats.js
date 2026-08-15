@@ -58,7 +58,7 @@ const TILES = [
   {
     id: 'pap', label: 'Pulmonary artery', unit: 'mmHg', kind: 'measured',
     get: (m) => `${m.papSys.toFixed(0)}/${m.papDia.toFixed(0)}`,
-    sub: (m) => `mean ${m.papMean.toFixed(0)} · wedge ${m.paop.toFixed(0)}`,
+    sub: (m) => `mean ${m.papMean.toFixed(0)} · wedge surrogate ${m.paop.toFixed(0)}`,
     // ESC/ERS 2022: mPAP above 20 mmHg, classified by wedge and PVR.
     status: (m) => (m.phPresent
       ? [m.phClass === 'unclassified' ? 'warning' : 'serious', `pulmonary hypertension, ${m.phClass}`]
@@ -144,9 +144,12 @@ const TILES = [
     sub: (m) => `gradient ${m.gradientVr.toFixed(1)}`,
   },
   {
-    id: 'wedge', label: 'Wedge', unit: 'mmHg', kind: 'derived',
+    id: 'wedge', label: 'Wedge surrogate', unit: 'mmHg', kind: 'derived',
     get: (m) => m.paop.toFixed(1),
-    sub: (m) => `zone 3 fraction ${(m.zone3 * 100).toFixed(0)}%`,
+    // This is a normalised pressure-margin heuristic, not the anatomical share
+    // of a regional lung in zone 3. Calling it a fraction overclaimed what a
+    // one-compartment pulmonary bed can know.
+    sub: (m) => `zone 3 index ${(m.zone3 * 100).toFixed(0)}%`,
     quality: (m) => m.interpretability.wedge,
   },
   {

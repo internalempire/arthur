@@ -38,10 +38,10 @@ This is separate from the model-wide validity flag. The global flag detects nume
 | PPV | spontaneous effort | VT below 8 mL/kg for an assumed 70 kg reference, fewer than 3.6 beats/breath, RV/LV EDV ratio above 1.2, or abdominal pressure above 12 cmH₂O |
 | R/I | no collapsed compartment | the requested ratio exceeds what the selected lung can recruit |
 | plateau pressure | spontaneous effort | — |
-| wedge surrogate | — | less than 95% of the represented pulmonary bed is in zone 3 |
-| derived PVR | no meaningful forward flow | — |
+| wedge surrogate | — | the zone 3 pressure-margin index is below 0.95 |
+| derived PVR | no meaningful forward flow | the wedge surrogate is cautioned |
 
-The list is intentionally inspectable rather than hidden in scenario-specific prose. It also exposes a current gap: derived PVR can remain labelled available while its left-atrial-pressure wedge surrogate carries a zone-3 caution. Until that dependency is propagated, the two badges must be read together; the issue is recorded in [planned work](_todo.md).
+The list is intentionally inspectable rather than hidden in scenario-specific prose. Dependencies are propagated: derived PVR inherits the caution of its [wedge surrogate](pulmonary-artery-wedge-pressure.md), because valid arithmetic cannot repair an uncertain downstream pressure.
 
 ### Similar names that are deliberately separated
 
@@ -69,7 +69,7 @@ The rules are mechanism-specific rather than scenario-specific. A spontaneous pa
 - Several thresholds are pragmatic model rules rather than universal clinical boundaries.
 - A green badge means the model has the required conditions, not that the model is quantitatively validated for that use.
 - The current linter checks rendering and links, not contradictions between the manual, code and literature.
-- Derived PVR does not yet inherit the wedge-surrogate caution automatically.
+- The zone 3 rule is a conservative pressure-margin heuristic in a non-regional lung, not a measured fraction of perfused human lung.
 
 ### Of clinical application
 
@@ -96,4 +96,4 @@ Contract tests require spontaneous breathing to withhold PPV and stress index wh
 
 ## See also
 
-[Pulse pressure variation](pulse-pressure-variation.md) · [Preload reserve](preload-reserve.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Stress index](stress-index.md) · [Global limits](global-limits.md)
+[Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Pulse pressure variation](pulse-pressure-variation.md) · [Preload reserve](preload-reserve.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Stress index](stress-index.md) · [Global limits](global-limits.md)

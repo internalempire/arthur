@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 360" class="arthur-fig" role="img"
+  aria-label="Pulmonary artery occlusion pressure is transmitted to the left atrium through a continuous zone 3 blood column, but alveolar compression interrupts that relation in zone 2">
+<style>
+  svg.arthur-fig .bg { fill: none }
+  svg.arthur-fig .axis { stroke: var(--fig-axis, #9aa4b2); stroke-width: 1 }
+  svg.arthur-fig .grid { stroke: var(--fig-grid, #d7dce3); stroke-width: 1; stroke-dasharray: 2 4 }
+  svg.arthur-fig .tick { fill: var(--fig-muted, #6b7480); font: 11px system-ui, sans-serif }
+  svg.arthur-fig .label { fill: var(--fig-text, #2b3138); font: 12px system-ui, sans-serif }
+  svg.arthur-fig .title { fill: var(--fig-text, #2b3138); font: 600 13px system-ui, sans-serif }
+  svg.arthur-fig .lm { stroke: var(--fig-grid, #d7dce3); stroke-width: 1 }
+  svg.arthur-fig .lm-text { fill: var(--fig-muted, #6b7480); font: 600 11px system-ui, sans-serif }
+  svg.arthur-fig .total { stroke: var(--fig-total, #1f6feb); stroke-width: 2.5; fill: none }
+  svg.arthur-fig .alv { stroke: var(--fig-alv, #d1495b); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .extra { stroke: var(--fig-extra, #2a9d8f); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .nadir { stroke: var(--fig-total, #1f6feb); stroke-width: 1; stroke-dasharray: 3 3 }
+  svg.arthur-fig .dot { fill: var(--fig-total, #1f6feb); stroke: none }
+  @media (prefers-color-scheme: dark) {
+    svg.arthur-fig .axis { stroke: #5b6472 }
+    svg.arthur-fig .grid, svg.arthur-fig .lm { stroke: #363d47 }
+    svg.arthur-fig .tick, svg.arthur-fig .lm-text { fill: #8b95a3 }
+    svg.arthur-fig .label, svg.arthur-fig .title { fill: #d6dbe2 }
+    svg.arthur-fig .total, svg.arthur-fig .nadir { stroke: #58a6ff }
+    svg.arthur-fig .dot { fill: #58a6ff }
+    svg.arthur-fig .alv { stroke: #f08c9a }
+    svg.arthur-fig .extra { stroke: #4fd1c1 }
+  }
+
+  svg.arthur-fig .vessel { stroke: var(--fig-total, #1f6feb); stroke-width: 10; stroke-linecap: round; fill: none }
+  svg.arthur-fig .vessel-thin { stroke: var(--fig-total, #1f6feb); stroke-width: 4; stroke-linecap: round; fill: none }
+  svg.arthur-fig .interrupted { stroke: var(--fig-muted, #6b7480); stroke-width: 4; stroke-dasharray: 5 5; fill: none }
+  svg.arthur-fig .alveolus { stroke: var(--fig-alv, #d1495b); stroke-width: 2; fill: none }
+  svg.arthur-fig .balloon { fill: var(--fig-extra, #2a9d8f); stroke: var(--fig-text, #2b3138); stroke-width: 1.5 }
+  svg.arthur-fig .chamber { fill: none; stroke: var(--fig-text, #2b3138); stroke-width: 1.5 }
+  svg.arthur-fig .panel { fill: none; stroke: var(--fig-grid, #d7dce3); stroke-width: 1 }
+  @media (prefers-color-scheme: dark) {
+    svg.arthur-fig .vessel, svg.arthur-fig .vessel-thin { stroke: #58a6ff }
+    svg.arthur-fig .interrupted { stroke: #8b95a3 }
+    svg.arthur-fig .alveolus { stroke: #f08c9a }
+    svg.arthur-fig .balloon { fill: #4fd1c1; stroke: #d6dbe2 }
+    svg.arthur-fig .chamber { stroke: #d6dbe2 }
+    svg.arthur-fig .panel { stroke: #363d47 }
+  }
+</style>
+<rect class="bg" width="760" height="360"/>
+<text class="title" x="380" y="20" text-anchor="middle">What makes an occlusion pressure a left-atrial surrogate</text>
+
+<rect class="panel" x="30" y="38" width="335" height="290" rx="10"/>
+<text class="title" x="197" y="64" text-anchor="middle">Zone 3: continuous blood column</text>
+<path class="vessel" d="M66 142 H276"/>
+<circle class="balloon" cx="112" cy="142" r="17"/>
+<path class="vessel-thin" d="M66 142 H95"/>
+<rect class="chamber" x="276" y="111" width="60" height="62" rx="24"/>
+<text class="label" x="306" y="147" text-anchor="middle">LA</text>
+<circle class="alveolus" cx="218" cy="232" r="38"/>
+<path class="alveolus" d="M190 207 Q218 180 246 207"/>
+<text class="tick" x="218" y="237" text-anchor="middle">alveolus</text>
+<text class="tick" x="112" y="103" text-anchor="middle">balloon stops flow</text>
+<text class="label" x="197" y="190" text-anchor="middle">P<tspan baseline-shift="sub" font-size="9">pa</tspan> &gt; P<tspan baseline-shift="sub" font-size="9">pv</tspan> &gt; P<tspan baseline-shift="sub" font-size="9">alv</tspan></text>
+<text class="label" x="197" y="291" text-anchor="middle">PAWP ≈ pulmonary venous pressure ≈ P<tspan baseline-shift="sub" font-size="9">LA</tspan></text>
+<text class="tick" x="197" y="311" text-anchor="middle">the static distal column transmits downstream pressure</text>
+
+<rect class="panel" x="395" y="38" width="335" height="290" rx="10"/>
+<text class="title" x="562" y="64" text-anchor="middle">Zone 2: alveolar waterfall</text>
+<path class="vessel" d="M431 142 H574"/>
+<circle class="balloon" cx="477" cy="142" r="17"/>
+<path class="vessel-thin" d="M431 142 H460"/>
+<path class="interrupted" d="M594 142 H641"/>
+<path class="vessel-thin" d="M574 142 Q584 130 594 142"/>
+<path class="vessel-thin" d="M574 142 Q584 154 594 142"/>
+<rect class="chamber" x="641" y="111" width="60" height="62" rx="24"/>
+<text class="label" x="671" y="147" text-anchor="middle">LA</text>
+<circle class="alveolus" cx="584" cy="232" r="38"/>
+<path class="alveolus" d="M556 207 Q584 180 612 207"/>
+<text class="tick" x="584" y="237" text-anchor="middle">alveolus</text>
+<text class="tick" x="477" y="103" text-anchor="middle">balloon stops flow</text>
+<text class="label" x="562" y="190" text-anchor="middle">P<tspan baseline-shift="sub" font-size="9">pa</tspan> &gt; P<tspan baseline-shift="sub" font-size="9">alv</tspan> ≥ P<tspan baseline-shift="sub" font-size="9">pv</tspan></text>
+<text class="label" x="562" y="291" text-anchor="middle">PAWP is no longer a secure P<tspan baseline-shift="sub" font-size="9">LA</tspan> surrogate</text>
+<text class="tick" x="562" y="311" text-anchor="middle">alveolar compression interrupts the pressure column</text>
+</svg>

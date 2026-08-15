@@ -34,7 +34,7 @@ Controls are generated from the model's parameter registry. A grey control is no
 
 ### Numerical readouts
 
-The tiles combine direct model measurements, derived physiological indices and internal coefficients. These are not interchangeable categories. A quality message may mark an index for caution or withhold it when its assumptions are absent. [Numerical tiles](numeric-tiles.md) defines every readout; [Interpretability](interpretability.md) explains the rules behind the badges.
+The tiles combine direct model measurements, derived physiological indices and internal coefficients. These are not interchangeable categories. A quality message may mark an index for caution or withhold it when its assumptions are absent. [Numerical tiles](numeric-tiles.md) follows every readout from state through calculation to interpretation; [Interpretability](interpretability.md) explains the badge rules, and [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) provides the detailed example of why a familiar bedside name can require qualification.
 
 ### The six visual panels
 

@@ -81,7 +81,7 @@ $$
 
 An earlier version put the *entire* pulmonary resistance behind `max(Ppv, Palv)`. A small crossing of those two mean pressures then switched the whole lung from zone III to zone II at once and added several Wood units at high PEEP. Real lungs contain alveolar and extra-alveolar segments in series and regions in different zones simultaneously; the fractional treatment is a deliberately transparent aggregate. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 
-The model also tracks a **zone III index** — how far pulmonary venous pressure sits above alveolar pressure — and uses it to qualify the displayed wedge surrogate rather than to switch the vascular behaviour.
+The model also tracks a **zone III index** — how far pulmonary venous pressure sits above alveolar pressure — and uses it to qualify the displayed [wedge surrogate](pulmonary-artery-wedge-pressure.md) rather than to switch the vascular behaviour. It is a normalised pressure margin, not the anatomical fraction of lung in zone III.
 
 ### What the model shows
 
@@ -133,7 +133,7 @@ That is a statement about what the tests happen to constrain, not about which si
 ### Of clinical application
 
 - The model can show *why* a left-atrial-pressure surrogate becomes unreliable when alveolar pressure governs part of the downstream bed. It cannot determine whether a particular patient's measured wedge is valid, and the zone III index must not be read as a measurement.
-- The current PVR calculation remains available when the wedge surrogate is flagged. Outside the zone III assumption it should be read as the model's $(\overline{P}_{pa}-P_{la})/\dot Q$ hydraulic gradient, not as a catheter-derived PVR.
+- The arithmetic $(\overline{P}_{pa}-P_{la})/\dot Q$ remains computable when the wedge surrogate is flagged, but the derived-PVR tile now inherits the same caution and must be read as an internal hydraulic gradient rather than a catheter-derived PVR.
 - The closing pressure is not a bedside quantity. Nothing here supports estimating a patient's critical closing pressure from an abdominal pressure measurement.
 - The plateau of the venous return curve in a patient is reached through mechanisms the model does not have, including vessel tone and reflex responses that alter caval collapsibility.
 
@@ -151,4 +151,4 @@ That is a statement about what the tests happen to constrain, not about which si
 
 ## See also
 
-[Venous return](venous-return.md) · [Abdominal pressure](abdominal-pressure.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Transmural pressure](transmural-pressure.md) · [Pmsf and occlusions](pmsf-and-occlusions.md) · [Interpretability](interpretability.md) · [The Guyton panel](panel-guyton.md)
+[Venous return](venous-return.md) · [Abdominal pressure](abdominal-pressure.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Transmural pressure](transmural-pressure.md) · [Pmsf and occlusions](pmsf-and-occlusions.md) · [Interpretability](interpretability.md) · [The Guyton panel](panel-guyton.md)

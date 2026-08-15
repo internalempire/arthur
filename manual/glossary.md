@@ -76,7 +76,7 @@
 
 **Venous piston.** Didactic shorthand for lung inflation displacing blood from pulmonary capacitance toward the left atrium.
 
-**Wedge / PAWP.** Pulmonary artery wedge pressure. The model uses left atrial pressure as a surrogate and warns when too little of the represented bed is in West zone 3.
+**Wedge / PAWP.** [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md). Clinically it is the distal pressure measured after occluding a pulmonary arterial branch. The model instead uses smoothed atmospheric left atrial pressure as a surrogate and qualifies it with a zone 3 pressure-margin index.
 
 **West zones.** Relations among alveolar, pulmonary arterial and pulmonary venous pressure that alter pulmonary vascular flow. The model represents zone-2 waterfall behaviour and zone-3 fraction in aggregate.
 

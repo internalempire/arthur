@@ -122,7 +122,9 @@ select { min-width: 150px; }
   display: grid;
   grid-template-columns: 306px minmax(0, 1fr);
   gap: 16px;
-  padding: 0 20px 24px;
+  /* Keep the controls and first readout row visually separate from the sticky
+     header even when the optional scenario note is empty. */
+  padding: 12px 20px 24px;
   align-items: start;
 }
 
@@ -495,7 +497,7 @@ input[type="range"]:disabled { cursor: not-allowed; }
 @media (max-width: 640px) {
   .topbar { padding: 10px 12px; }
   .scenario-note { padding: 8px 12px 10px; }
-  .layout { padding: 0 12px 20px; }
+  .layout { padding: 12px 12px 20px; }
   .pv-pair {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
