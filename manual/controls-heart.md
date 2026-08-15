@@ -31,9 +31,10 @@ The signal adapts over one 15-second time constant and changes heart rate, syste
 | control | range | model meaning |
 |---|---:|---|
 | pericardial constraint | 0–4 × | gain on pressure generated when total cardiac volume exceeds represented pericardial reserve |
+| pericardial capacity | 100–600 mL | aggregate four-chamber volume accommodated before pericardial pressure rises |
 | septal coupling | 0–4 × | gain on diastolic septal competition and systolic LV-to-RV assistance |
 
-These sliders change strength, not anatomy. Zero removes the corresponding interaction; one is the reference didactic setting. Values above one are sensitivity experiments and should not be mapped to disease severity.
+Pericardial constraint changes the gain of the shared pressure, while pericardial capacity moves the knee of its pressure–volume relation. Capacity is an internal aggregate volume, not effusion volume or an echocardiographic measurement. Reducing it represents loss of space available to the chambers without adding or removing circulating blood. Zero constraint removes the pressure route; one is the reference normal gain. Values above one are sensitivity experiments and should not be mapped directly to disease severity. See [cardiac tamponade](cardiac-tamponade.md).
 
 ## Limits
 
@@ -41,7 +42,7 @@ These sliders change strength, not anatomy. Zero removes the corresponding inter
 - No coronary circulation, ischaemia, infarction, arrhythmia, conduction delay or pacing.
 - No valvular stenosis or regurgitation.
 - No independent RV diastolic-stiffness control and no atrial pathology.
-- The pericardial control is not sufficient to model tamponade because pericardial fluid volume and a clinically calibrated pressure–volume relation are absent.
+- The pericardial controls support a directional tamponade phenotype, not a clinically calibrated effusion-volume or drainage model.
 - Reflex controls are dimensionless model gains, not autonomic tests or drug doses.
 
 ## References

@@ -35,7 +35,7 @@ $$
 $$
 
 - $\Delta P_{lv}$, $\Delta P_{rv}$ — pressure added to that ventricle by the shifted septum, mmHg
-- $k_{septal}$ — the `septal` control, 0 to 1
+- $k_{septal}$ — the `septal` control, 0 to 4; 1 is the reference setting
 - $g_{rv \to lv} = 0.085$, $g_{lv \to rv} = 0.014$ — gains, mmHg/mL
 - $V_{rv}$, $V_{lv}$ — instantaneous ventricular volumes, mL; 145 and 135 mL are the volumes beyond which each begins to deform the other
 
@@ -56,40 +56,24 @@ It is separated because it is anatomy rather than septal geometry — shared myo
 **The pericardium** is a single exponential constraint on the *total* volume of all four chambers:
 
 $$
-P_{peri} = k_{peri} \cdot 0.55 \left(e^{(V_{heart} - 430)/62} - 1\right), \qquad V_{heart} > 430\ \text{mL}
+P_{peri} = k_{peri} \cdot 0.55 \left(e^{(V_{heart} - C_{peri})/62} - 1\right), \qquad V_{heart} > C_{peri}
 $$
 
 - $P_{peri}$ — pericardial pressure, mmHg, added to pleural pressure to form the pressure surrounding every chamber
-- $k_{peri}$ — the `pericardium` control, 0 to 1
+- $k_{peri}$ — the `pericardium` control, 0 to 4
 - $V_{heart}$ — summed volume of all four chambers, mL
-- 430 mL is the volume at which the sac begins to constrain, 62 mL the scale over which it stiffens
+- $C_{peri}$ — the `pericardialCapacity` control, 100 to 600 mL; 430 mL by default
+- 62 mL is the scale over which pressure steepens
 
-Its output is added to pleural pressure to form the pressure surrounding every chamber. It therefore does not act on one ventricle: it lifts all four together.
+Its output is added to pleural pressure to form the pressure surrounding every chamber. It therefore does not act on one ventricle: it lifts all four together. Reducing capacity moves the knee leftward and represents lost space inside the sac; it is not a literal effusion volume. See [cardiac tamponade](cardiac-tamponade.md) for the full construction.
 
 ### What the model shows
 
-In the ARDS-with-right-ventricular-failure preset, with the [baroreflex](baroreflex.md) disabled so compensation does not mask the effect:
+With the default 430 mL capacity, the pressure is absent or small in most ordinary states and becomes relevant mainly with marked total cardiac enlargement. That preserves a compliant normal pericardium.
 
-| | LV end-diastolic volume | cardiac output |
-|---|---|---|
-| both couplings on | 104 mL | 3.65 L/min |
-| septum off | 106 | 3.74 |
-| pericardium off | 104 | 3.65 |
-| neither | 106 | 3.74 |
+The tamponade preset changes the capacity rather than requiring an enormous heart to reach a fixed threshold. The resulting shared pressure restricts both ventricles, but the RV loses a larger fraction of its end-diastolic volume because it normally fills at lower pressure. Restoring capacity lowers pericardial pressure and CVP and increases output. The executable values and their pressure-timing caveat are on [cardiac tamponade](cardiac-tamponade.md#what-the-scenario-shows).
 
-The septum costs 2 mL of left ventricular filling and 2.5% of output. The pericardium costs nothing at all here — because total heart volume is 400 mL, below the 430 mL at which the constraint engages.
-
-Loading that same patient with volume brings it into play:
-
-| stressed volume | heart volume | LV EDV, pericardium on / off | output on / off |
-|---|---|---|---|
-| +0 mL | 230 mL | 66 / 66 | 2.09 / 2.09 L/min |
-| +800 | 423 | 108 / 108 | 3.79 / 3.79 |
-| +1200 | 501 | 118 / 119 | 4.16 / 4.24 |
-
-**The pericardium in this model is a soft, late constraint.** It does nothing until the heart is frankly dilated, and even at 501 mL it costs under 2% of output. That is worth knowing before teaching from it: the model will not reproduce tamponade physiology, and a demonstration of pericardial constraint has to be set up deliberately.
-
-The reflex point matters too. With the baroreflex running, removing the septal coupling changed output by almost nothing, because compensation absorbed it. Any experiment isolating one mechanism in this model has to disable the reflex first, or it measures the reflex.
+The reflex point still matters. When the [baroreflex](baroreflex.md) is active, compensation can partly conceal a direct mechanical effect. Disable it when measuring the isolated contribution of septal or pericardial coupling; retain it when exploring the compensated clinical phenotype.
 
 ---
 
@@ -101,6 +85,8 @@ The reflex point matters too. With the baroreflex running, removing the septal c
 
 **One pericardial pressure for four chambers** rather than per-chamber contact pressures. This is what makes the pericardium behave as a shared constraint rather than as four independent stiffenings, which is the physiologically important property.
 
+**Available capacity rather than effusion volume.** A fixed fluid-volume control would imply that the same number causes tamponade in every patient. Moving the available-capacity knee represents the combined effects of fluid, rate of accumulation and sac distensibility with one transparent variable.
+
 The gains, reference volumes and pericardial constants are **didactic shape coefficients**. No measurement uniquely fixes them in an aggregate two-ventricle model; they are set to make the couplings visible over the model's operating range rather than fitted to a preparation.
 
 ---
@@ -110,7 +96,7 @@ The gains, reference volumes and pericardial constants are **didactic shape coef
 ### Of the construction
 
 - **No geometry.** No septal curvature, no D-shaped left ventricle, no eccentricity index — so the model cannot produce the echocardiographic sign that the mechanism is named after.
-- **The pericardium engages only above 430 mL of total heart volume**, and softly. There is no tamponade, no effusion, no constrictive physiology, and no pericardial fluid. A tamponade scenario, and the pericardial volume control it would need, are [planned work](_todo.md).
+- **The pericardium remains one aggregate pressure.** There is no fluid compartment, accumulation rate, loculation, regional contact pressure, chamber-wall collapse or constrictive physiology. The tamponade scenario is directional rather than diagnostically calibrated.
 - **The thresholds are hard corners.** Below the reference volume the coupling is exactly zero, which is not how a septum behaves.
 - No atrial contribution to interdependence, and no interatrial septum.
 - The systolic assistance coefficient is fixed. In reality the degree to which the left ventricle supports the right varies with loading and with disease.
@@ -119,7 +105,7 @@ The gains, reference volumes and pericardial constants are **didactic shape coef
 
 - **This is not a model of acute cor pulmonale as a syndrome.** It produces right ventricular dilatation and its consequence for left ventricular filling; it has no coronary circulation, so the ischaemic limb of the right ventricular spiral — falling systemic pressure reducing right ventricular perfusion — does not exist here. Defending arterial pressure in this model does not help the right ventricle.
 - The magnitudes are illustrative. Do not read "the septum costs 2.5% of output" as a clinical quantity; it is what these coefficients produce in this phenotype.
-- The pericardium's weakness here means the model understates the constraint in a dilated, fluid-loaded heart. If a demonstration depends on pericardial limitation, check that heart volume is actually above the threshold rather than assuming it.
+- Pericardial capacity is an internal model volume, not an effusion measurement. Do not infer how many millilitres of fluid would cause or relieve tamponade in a patient.
 
 ---
 
@@ -135,4 +121,4 @@ The gains, reference volumes and pericardial constants are **didactic shape coef
 
 ## See also
 
-[Transmural pressure](transmural-pressure.md) · [The right ventricle](the-right-ventricle.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md) · [Pulmonary transit](pulmonary-transit.md) · [The four effects of a breath](the-four-effects-of-a-breath.md) · [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure) · [Controls: heart](controls-heart.md)
+[Transmural pressure](transmural-pressure.md) · [Cardiac tamponade](cardiac-tamponade.md) · [The right ventricle](the-right-ventricle.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md) · [Pulmonary transit](pulmonary-transit.md) · [The four effects of a breath](the-four-effects-of-a-breath.md) · [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure) · [Controls: heart](controls-heart.md)

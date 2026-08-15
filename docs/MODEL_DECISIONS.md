@@ -815,3 +815,50 @@ regional human measurement. The model still has no catheter position,
 end-expiratory sampling, a/v-wave selection, mitral disease or pulmonary venous
 obstruction. A genuine occlusion model would require regional topology rather
 than another number in the existing lumped compartment.
+
+## 2026-08-16 — Make pericardial capacity explicit and add a tamponade phenotype
+
+### Decision
+
+- Preserve one pericardial pressure shared by both atria and both ventricles.
+- Replace the fixed 430 mL onset volume with `pericardialCapacity`, adjustable
+  from 100 to 600 mL and defaulting to the previous 430 mL value.
+- Preserve the previous exponential shape and normal gain. Capacity moves the
+  knee of the relation; the `pericardium` control continues to change its gain.
+- Add a spontaneously breathing cardiac-tamponade preset and define
+  decompression as restoring capacity while leaving every other input unchanged.
+- Expose end-diastolic ventricular cavity pressures so the scenario contract can
+  assess diastolic convergence without sampling a random cardiac phase.
+
+### Why
+
+The fixed threshold made the pericardium irrelevant in most states and could
+only be engaged by making the heart extremely large. Tamponade instead represents
+loss of room inside a pressurised sac. Making available capacity explicit lets a
+normal-sized heart encounter the steep part of the same relation and makes the
+intervention falsifiable: pressure and output must improve when capacity is
+restored.
+
+The control is not named effusion volume. Human tamponade depends on accumulation
+rate, pericardial distensibility, chamber filling pressure and fluid distribution;
+the same literal fluid volume is not portable across patients. Available model
+capacity collapses those determinants into one didactic variable without a new
+fluid compartment or a scripted output.
+
+### Executable contract
+
+The constrained preset must generate more than 8 mmHg mean pericardial pressure,
+bring mean RA, RV end-diastolic, PA diastolic and wedge-surrogate pressures into
+an 8 mmHg band, and reduce output. Restoring capacity to 430 mL must reduce
+pericardial pressure below 1 mmHg, lower CVP by more than 5 mmHg, raise cardiac
+output by at least 35% and MAP by more than 15 mmHg, and restore proportionally
+more RV than LV end-diastolic volume.
+
+### Deliberate limits
+
+There is no pericardial fluid state, accumulation rate, loculation, drainage
+flow, chamber-wall collapse, Doppler inflow or coronary circulation. Respiratory
+arterial variation is directional but the model does not reproduce a calibrated
+clinical pulsus-paradoxus measurement and the spontaneous-breathing PPV tile
+remains unavailable. The preset is a qualified mechanical phenotype, not a
+diagnostic or therapeutic simulator.

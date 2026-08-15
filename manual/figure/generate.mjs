@@ -16,10 +16,11 @@ import { defaultParams } from '../../src/model/parameters.js';
 import { pvrComponents, lungVolumeAtPl, NORMAL_FRC } from '../../src/model/lung.js';
 import { RESISTANCE_TO_WOOD } from '../../src/model/units.js';
 import { Simulator } from '../../src/model/simulator.js';
+import { SCENARIOS } from '../../src/model/scenarios.js';
 import { createBaroreflexState, stepBaroreflex } from '../../src/model/baroreflex.js';
 import {
   venousReturnCurve, cardiacFunctionCurve, curveIntersection,
-  systemicVenousVolumeState, PRELOAD_STEEP,
+  systemicVenousVolumeState, pericardialPressure, PRELOAD_STEEP,
 } from '../../src/model/circulation.js';
 import { STRESS_INDEX_BASE, STRESS_INDEX_CASES } from '../model-examples.mjs';
 
@@ -274,6 +275,54 @@ ${key}
 ${note}
 </svg>
 `;
+}
+
+// --- shared pericardial pressure-volume relation --------------------------
+
+function pericardialFigure() {
+  const normal = defaultParams();
+  const scenario = SCENARIOS.find(({ id }) => id === 'cardiac-tamponade');
+  // Hold gain constant so the two curves isolate capacity.  The scenario uses
+  // a gain of 4, therefore both curves use that gain and the settled scenario
+  // marker belongs to the constrained curve rather than to a different model.
+  const reference = { ...normal, pericardium: scenario.params.pericardium };
+  const constrained = {
+    ...reference,
+    pericardialCapacity: scenario.params.pericardialCapacity,
+  };
+  const relation = (parameters) => {
+    const points = [];
+    for (let volume = 80; volume <= 600; volume += 2) {
+      const pressure = pericardialPressure(parameters, volume);
+      // Stop where the plotted teaching range ends. The actual exponential is
+      // not capped; letting an off-scale value set the axis would hide its knee.
+      if (pressure > 25) break;
+      points.push([volume, pressure]);
+    }
+    return points;
+  };
+  const sim = settled(scenario.params, 45);
+  return chart({
+    title: 'Loss of available space moves the pericardial pressure-volume curve leftward',
+    xLabel: 'Aggregate volume of the four model chambers (mL)',
+    yLabel: 'Pericardial pressure (mmHg)',
+    series: [
+      { label: 'capacity 430 mL', points: relation(reference) },
+      { label: 'tamponade capacity 100 mL', points: relation(constrained) },
+    ],
+    xTick: 100, yTick: 5, xDomain: [80, 600], yDomain: [0, 25], padRight: 230,
+    markers: [{
+      x: sim.circ.p.vHeart,
+      y: sim.metrics.pPeri,
+      label: 'settled preset',
+      color: 'alv',
+    }],
+    notes: [
+      'same nonlinear relation and 4× gain',
+      'capacity changes available space',
+      'curves continue steeply above 25 mmHg',
+    ],
+  });
 }
 
 // --- systemic venous volume, pressure and tone -----------------------------
@@ -737,6 +786,7 @@ const figures = {
   'ppv.svg': ppvFigure(),
   'pmsf-occlusions.svg': pmsfOcclusionFigure(),
   'wedge-pressure.svg': wedgeFigure(),
+  'pericardial-pressure.svg': pericardialFigure(),
 };
 for (const [name, svg] of Object.entries(figures)) {
   writeFileSync(join(OUT, name), svg);

@@ -112,7 +112,24 @@ export const CHAMBER = {
   la: { v0: 10, eMin: 0.135, eMax: 0.30 },
 };
 
-const PERI = { v0: 430, scale: 62, k: 0.55 };
+// The pericardium is a shared, nonlinear external constraint rather than four
+// extra chamber stiffnesses. `pericardialCapacity` is the aggregate chamber
+// volume that can be accommodated before the steep part of the relation begins;
+// reducing it is a compact surrogate for space occupied by a pressurised
+// effusion. It is deliberately not called effusion volume: the volume required
+// to cause tamponade depends strongly on accumulation rate and sac compliance.
+// The normal default remains below the knee. Above it, the exponential relation
+// produces the characteristic "last-drop" shape without adding a separate
+// fluid compartment. These shape constants are unchanged from the previous
+// normal pericardium; the new capacity control moves that same curve leftward.
+const PERI = { scale: 62, k: 0.55 };
+
+export function pericardialPressure(p, heartVolume) {
+  const capacity = p.pericardialCapacity ?? 430;
+  if (p.pericardium <= 0 || heartVolume <= capacity) return 0;
+  return p.pericardium * PERI.k
+    * (Math.exp((heartVolume - capacity) / PERI.scale) - 1);
+}
 // Only the splanchnic share of the venous reservoir sits inside the abdomen;
 // limb and cervical veins see atmosphere, so abdominal pressure is transmitted
 // to mean systemic filling pressure at less than unity.
@@ -292,9 +309,7 @@ export function stepCirculation(p, c, resp, dt) {
 
   // --- pericardium: the four chambers share one space ----------------------
   const vHeart = c.vRa + c.vRv + c.vLa + c.vLv;
-  const pPeri = p.pericardium > 0 && vHeart > PERI.v0
-    ? p.pericardium * PERI.k * (Math.exp((vHeart - PERI.v0) / PERI.scale) - 1)
-    : 0;
+  const pPeri = pericardialPressure(p, vHeart);
   const pExtCardiac = ppl + pPeri;
 
   // --- chamber transmural pressures ---------------------------------------
@@ -478,7 +493,14 @@ function closeBeat(c) {
   // clinically meaningful septal shift is a diastolic finding — taking the
   // instantaneous difference instead would just track the cardiac cycle, since
   // left ventricular pressure dominates through the whole of systole.
-  if (c.p) c.septalShift = c.p.rvTm - c.p.lvTm;
+  if (c.p) {
+    c.septalShift = c.p.rvTm - c.p.lvTm;
+    // The sample immediately before the cardiac clock wraps is end diastole.
+    // Keep cavity pressures as well as volumes so a tamponade experiment can
+    // compare the diastolic chambers without reading a random waveform phase.
+    c.rvEdp = c.p.rv;
+    c.lvEdp = c.p.lv;
+  }
 
   // Volume at this instant is end-diastolic: the beat that just finished began
   // from `edvPending` and reached `lvEsvRun`.

@@ -31,7 +31,7 @@ The RV uses time-varying elastance with a lower default end-systolic elastance t
 
 Pulmonary load includes the volume-dependent [PVR J-curve](pulmonary-vascular-resistance.md), parallel open and derecruited vascular pathways, aggregate zone-2 waterfall behaviour and downstream pulmonary venous pressure. The circulation is resistive and compliant; characteristic impedance and reflected waves are absent.
 
-RV dilatation affects the LV through two explicit routes. Diastolic septal coupling raises the LV filling penalty as the RV becomes larger, and pericardial pressure rises when total cardiac volume exceeds the represented reserve. A separate systolic term permits LV contraction to assist RV pressure generation. These coefficients are teaching representations, not echocardiographic measurements.
+RV dilatation affects the LV through two explicit routes. Diastolic septal coupling raises the LV filling penalty as the RV becomes larger, and pericardial pressure rises when total cardiac volume exceeds the selected capacity. The same shared pressure can also restrict the RV preferentially because its normal filling pressure is lower. A separate systolic term permits LV contraction to assist RV pressure generation. These coefficients are teaching representations, not echocardiographic measurements. The [cardiac tamponade](cardiac-tamponade.md) page isolates the pericardial route.
 
 Changing RV output reaches LV preload after [pulmonary transit](pulmonary-transit.md), whereas pleural pressure, the pulmonary venous piston and ventricular interaction act immediately. This distinction explains why the right and left ventricular effects of one breath can appear in different respiratory phases.
 
@@ -49,7 +49,7 @@ Pulsatile pulmonary impedance, wave reflection, RV wall stress, coronary perfusi
 - There is no right coronary circulation, myocardial oxygen balance, ischaemia or infarction.
 - Tricuspid and pulmonic valves cannot stenose or regurgitate, and there is no congenital shunt.
 - RV geometry is a lumped volume and elastance, not a crescentic three-dimensional chamber; the displayed RV:LV ratio is a model volume ratio, not the echocardiographic diameter ratio.
-- Pericardial constraint is weak or inactive until aggregate chamber volume reaches its model threshold; it is not a tamponade model.
+- Pericardial capacity and pressure are aggregate; there is no fluid compartment, regional chamber collapse or calibrated effusion-volume relation.
 - Autonomic compensation senses systemic MAP, not PVR, mPAP, hypoxaemia or RV wall stress directly.
 
 ### Of clinical application
@@ -74,4 +74,4 @@ Executable rows require raised pulmonary vascular load to increase RV pressure a
 
 ## See also
 
-[Venous return](venous-return.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Pulmonary transit](pulmonary-transit.md) · [Ventricular interdependence](ventricular-interdependence.md) · [PV loops](panel-pv-loops.md) · [Clinical scenarios](scenarios.md)
+[Venous return](venous-return.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Pulmonary transit](pulmonary-transit.md) · [Ventricular interdependence](ventricular-interdependence.md) · [Cardiac tamponade](cardiac-tamponade.md) · [PV loops](panel-pv-loops.md) · [Clinical scenarios](scenarios.md)

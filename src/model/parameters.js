@@ -167,7 +167,12 @@ export const PARAMETERS = [
   {
     id: 'pericardium', group: 'heart', label: 'Pericardial constraint', unit: '×',
     min: 0, max: 4, step: 0.1, default: 1.0,
-    help: 'The four chambers share a fixed pericardial space, so filling one stiffens the others. Set to zero to abolish diastolic ventricular interdependence.',
+    help: 'Gain on the pressure generated when the four chambers outgrow the space available inside the pericardium. Set to zero to abolish this route of diastolic ventricular interdependence.',
+  },
+  {
+    id: 'pericardialCapacity', group: 'heart', label: 'Pericardial capacity', unit: 'mL',
+    min: 100, max: 600, step: 10, default: 430,
+    help: 'Aggregate four-chamber volume accommodated before pericardial pressure rises steeply. Reducing it represents loss of available space, as with a pressurised effusion; it is an internal model capacity, not a measured effusion volume.',
   },
   {
     id: 'septal', group: 'heart', label: 'Septal coupling', unit: '×',

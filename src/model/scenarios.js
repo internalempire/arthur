@@ -62,6 +62,16 @@ export const SCENARIOS = [
     },
   },
   {
+    id: 'cardiac-tamponade',
+    name: 'Cardiac tamponade',
+    note: 'A pressurised pericardial space makes all four chambers compete for a nearly fixed total volume, limiting the lower-pressure right heart most. Increase pericardial capacity to simulate decompression: pericardial pressure and CVP fall while ventricular filling, output and arterial pressure recover. Capacity is a model surrogate for available space, not a measured effusion volume. The respiratory arterial variation is directional; the preset is not a calibrated pulsus-paradoxus test.',
+    params: {
+      mode: 'spont', pmus: 10, peep: 0, rr: 20,
+      pericardium: 4, pericardialCapacity: 100,
+      stressedVolume: 1050, hr: 105,
+    },
+  },
+  {
     id: 'lv-failure',
     name: 'Cardiogenic pulmonary oedema',
     note: 'Severe, afterload-sensitive left ventricular failure with high filling pressure. Set PEEP to zero, let the model settle, then return it to 10: pleural pressure rises, the transmural pressure the LV must eject against falls, end-systolic volume falls more than end-diastolic volume, and cardiac output rises. This deliberately afterload-dominant phenotype demonstrates a possible response to positive pressure, not a universal response in cardiogenic pulmonary oedema.',
