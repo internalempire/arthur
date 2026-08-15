@@ -181,6 +181,31 @@ section('Scenario teaching mechanisms');
 }
 
 {
+  const constrained = scenarioMetrics('cardiac-tamponade', {}, 60);
+  const decompressed = scenarioMetrics('cardiac-tamponade', {
+    pericardialCapacity: 430,
+  }, 60);
+  const rvRecovery = decompressed.rvEdv / constrained.rvEdv;
+  const lvRecovery = decompressed.lvEdv / constrained.lvEdv;
+  const diastolic = [
+    constrained.cvp, constrained.rvEdp,
+    constrained.papDia, constrained.paop,
+  ];
+  demonstrates['cardiac-tamponade'] = constrained.pPeri > 8
+    && Math.max(...diastolic) - Math.min(...diastolic) < 8
+    && decompressed.pPeri < 1
+    && decompressed.cvp < constrained.cvp - 5
+    && decompressed.co > constrained.co * 1.35
+    && decompressed.map > constrained.map + 15
+    && rvRecovery > lvRecovery;
+  check('tamponade preset produces shared diastolic constraint relieved by decompression',
+    demonstrates['cardiac-tamponade'],
+    `Pperi ${constrained.pPeri.toFixed(1)} → ${decompressed.pPeri.toFixed(1)} mmHg, `
+      + `CO ${constrained.co.toFixed(2)} → ${decompressed.co.toFixed(2)} L/min, `
+      + `diastolic span ${(Math.max(...diastolic) - Math.min(...diastolic)).toFixed(1)} mmHg`);
+}
+
+{
   const lowPeep = scenarioSimulator('lv-failure', { peep: 0 }, 45);
   const highPeep = scenarioSimulator('lv-failure', { peep: 10 }, 45);
   const low = recentLvBeatMeans(lowPeep);

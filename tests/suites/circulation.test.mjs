@@ -2,8 +2,25 @@
 import {
   venousReturnCurve, cardiacFunctionCurve,
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
-  section, check, settled,
+  pericardialPressure, defaultParams, section, check, settled,
 } from '../support/model.mjs';
+
+section('Shared pericardial constraint');
+{
+  const normal = defaultParams();
+  const tight = { ...normal, pericardialCapacity: 220 };
+  check('pressure is absent below the selected capacity',
+    pericardialPressure(normal, normal.pericardialCapacity) === 0);
+  check('loss of available space moves the same pressure-volume curve leftward',
+    pericardialPressure(tight, 360) > pericardialPressure(normal, 360) + 1);
+  const first = pericardialPressure(tight, 280);
+  const second = pericardialPressure(tight, 340);
+  check('pressure rises nonlinearly once aggregate chamber volume exceeds capacity',
+    first > 0 && second > first * 2,
+    `${first.toFixed(2)} then ${second.toFixed(2)} mmHg`);
+  check('the gain can abolish the pericardial route without changing capacity',
+    pericardialPressure({ ...tight, pericardium: 0 }, 500) === 0);
+}
 
 section('Preload reserve on the Guyton construction');
 {

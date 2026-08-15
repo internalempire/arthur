@@ -8,6 +8,7 @@ export const SNAPSHOTS = {
   'swing-limited-reserve': { co: 6.71, map: 92.9, cvp: 1.43, papMean: 18.1, paop: 9.41, pvr: 1.18 },
   'ards-rv': { co: 3.91, map: 84.5, cvp: 3.23, papMean: 22.9, paop: 3.84, pvr: 4.24 },
   'pulmonary-embolism': { co: 4.04, map: 92.9, cvp: 4.77, papMean: 33.7, paop: 3.04, pvr: 7.45 },
+  'cardiac-tamponade': { co: 4.09, map: 88.9, cvp: 7.72, papMean: 17.0, paop: 11.38, pvr: 1.19 },
   'lv-failure': { co: 1.85, map: 65.9, cvp: 6.51, papMean: 45.5, paop: 43.56, pvr: 1.18 },
   'obesity': { co: 4.29, map: 89.2, cvp: 3.39, papMean: 14.4, paop: 8.82, pvr: 1.18 },
   'copd': { co: 4.53, map: 89.2, cvp: 4.39, papMean: 16.2, paop: 9.99, pvr: 1.26 },

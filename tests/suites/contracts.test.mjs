@@ -17,7 +17,7 @@ section('Public model API');
     'SCENARIOS', 'SCENARIO_BY_ID', 'Simulator', 'TRACE_SECONDS',
     'cardiacFunctionCurve', 'clamp', 'cmH2OtoMmHg', 'curveIntersection',
     'lungRegions', 'lungVolumeAtPl', 'openBand', 'openFractionFromRecruitmentState',
-    'preloadLimbs', 'pvrComponents', 'recruitmentBand', 'relaxationVolume',
+    'pericardialPressure', 'preloadLimbs', 'pvrComponents', 'recruitmentBand', 'relaxationVolume',
     'respiratorySystemCompliance', 'stepOpenFraction', 'stepRecruitedFraction',
     'venousReturnCurve',
   ];

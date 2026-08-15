@@ -260,6 +260,8 @@ export class Simulator {
         dbp: this.diaRun,
         papSys: this.papSysRun,
         papDia: this.papDiaRun,
+        rvEdp: c.rvEdp,
+        lvEdp: c.lvEdp,
       });
       if (this.beatHistory.length > 40) this.beatHistory.shift();
       this.sysRun = -1e9; this.diaRun = 1e9;
@@ -492,6 +494,7 @@ export class Simulator {
       map, sbp: last.sbp ?? c.p.sa, dbp: last.dbp ?? c.p.sa,
       cvp, cvpTransmural: cvp - ema.ppl - ema.peri,
       papSys: last.papSys ?? c.p.pa, papDia: last.papDia ?? c.p.pa, papMean, paop,
+      rvEdp: last.rvEdp ?? c.p.rv, lvEdp: last.lvEdp ?? c.p.lv,
       ppv, svv,
       valid: reasons.length === 0,
       invalidReasons: reasons,
