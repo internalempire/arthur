@@ -30,7 +30,7 @@ Consequently, the model cannot predict oxygenation, ventilatory efficiency, mech
 - Thrombotic obstruction, blood viscosity, haematocrit, vascular remodelling and non-alveolar critical closing pressure are not separately resolved.
 - Pressure/flow-dependent vascular recruitment and distension are simplified into effective coefficients.
 - No characteristic impedance, wave reflection, pulmonary arterial wave velocity or frequency-dependent RV afterload.
-- West-zone behaviour is aggregate; the wedge tile uses left atrial pressure as a surrogate and may be qualified.
+- West-zone behaviour is aggregate; the [wedge tile](pulmonary-artery-wedge-pressure.md) uses smoothed left atrial pressure as a surrogate, not a catheter occlusion, and derived PVR inherits its zone-3 caution.
 - Pulmonary transit uses eight pressureless mixing stages and is not a contrast-bolus or regional capillary model.
 
 The pulmonary-embolism scenario therefore raises one aggregate vascular load. It can show the mechanical RV consequence but cannot identify clot burden or partition resistance from obstruction, calibre, viscosity and tone.

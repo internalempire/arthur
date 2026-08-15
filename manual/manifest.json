@@ -139,6 +139,10 @@
           "Measurement, derived index, internal coefficient - and when a number is withheld"
         ],
         [
+          "pulmonary-artery-wedge-pressure",
+          "What PAWP measures, how the model approximates it, and why surrounding pressure and West zones matter"
+        ],
+        [
           "pulse-pressure-variation",
           "A descriptive output, deliberately not a diagnostic threshold"
         ],

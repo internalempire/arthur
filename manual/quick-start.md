@@ -39,7 +39,7 @@ With recruitable lung, some added pressure opens units and distributes inflation
 ## Minute 8–10: inspect a ventricular response
 
 1. Select *Acute pulmonary embolism*.
-2. Inspect mPAP, wedge, derived PVR, RV:LV volume ratio, the thoracic septum and the RV pressure–volume loop.
+2. Inspect mPAP, the [wedge surrogate](pulmonary-artery-wedge-pressure.md), derived PVR and its quality badge, RV:LV volume ratio, the thoracic septum and the RV pressure–volume loop.
 3. Raise PEEP by a small amount and wait several breaths.
 
 This preset combines high aggregate pulmonary vascular load with a vulnerable right ventricle. The displayed change is not an intubation-risk prediction; it is a way to see how increased RV load can enlarge the RV, reduce left-sided filling through serial coupling and shift the septum. See [the right ventricle](the-right-ventricle.md).

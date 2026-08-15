@@ -99,6 +99,16 @@ section('Pulmonary vascular claims exposed to the user stay qualified');
     readme.includes('[Pulmonary vascular resistance](manual/pulmonary-vascular-resistance.md)')
       && readme.includes('[Global limits](manual/global-limits.md)')
       && !readme.includes('stretch      = exp('));
+
+  const zoneThree = settled({ mode: 'vcv', pmus: 0, peep: 0 }).metrics;
+  const waterfall = settled({ mode: 'vcv', pmus: 0, peep: 10 }).metrics;
+  check('derived PVR is unqualified only with a defensible wedge surrogate',
+    zoneThree.interpretability.wedge.level === 'ok'
+      && zoneThree.interpretability.pvrDerived.level === 'ok');
+  check('derived PVR inherits wedge uncertainty outside zone 3',
+    waterfall.interpretability.wedge.level === 'caution'
+      && waterfall.interpretability.pvrDerived.level === 'caution'
+      && waterfall.interpretability.pvrDerived.reasons[0].includes('wedge surrogate'));
 }
 
 section('The drawn curves agree with the integrator');

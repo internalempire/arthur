@@ -154,8 +154,10 @@ arterial waveform measurement error.
 recruitment benefit and inflation-related RV load?
 
 **What the model produces.** At PEEP 12 cmH2O the preset has mPAP about 23 mmHg,
-low wedge pressure, derived PVR about 4.8 WU and RV/LV end-diastolic volume ratio
-about 1.6. Raising PEEP opens more lung in the high-R/I phenotype, but output
+low left-atrial-pressure wedge surrogate, an internal hydraulic estimate of
+about 4.8 WU and RV/LV end-diastolic volume ratio about 1.6. The wedge and
+derived-PVR tiles are cautioned by the aggregate zone-3 rule. Raising PEEP opens
+more lung in the high-R/I phenotype, but output
 still falls slightly because preload and waterfall costs remain. At high PEEP,
 setting R/I to zero produces greater PVR, worse RV dilatation and lower output.
 Prone positioning modestly reduces PVR and RV/LV ratio in the current model.
@@ -178,15 +180,19 @@ dependent prone recruitment.
 **Teaching question.** What happens when a normal lung is coupled to an abruptly
 high aggregate pulmonary vascular load and a vulnerable RV?
 
-**What the model produces.** The baseline has mPAP about 34 mmHg, wedge about
-3 mmHg, derived PVR about 7.5 WU, CVP about 4.7 mmHg and RV/LV ratio about 2.0.
+**What the model produces.** The baseline has mPAP about 34 mmHg, a left-atrial
+wedge surrogate about 3 mmHg, an internal $(mPAP-P_{LA})/CO$ estimate about
+7.5 WU, CVP about 4.7 mmHg and RV/LV ratio about 2.0. The aggregate zone-3
+index cautions both the wedge surrogate and derived-PVR interpretation.
 Changing to passive volume control and raising PEEP from 0 to 10 cmH2O lowers
 output by roughly 7% and further raises right-sided pressure and RV/LV ratio.
 
 **Assessment — qualified.** The pressure-flow-RV pattern is clinically
 recognisable. `pvrBase` is an effective aggregate afterload: it does not split
 thrombotic obstruction, vascular calibre, critical closing pressure or
-viscosity. Tachycardia, systemic resistance and filling are selected features of
+viscosity. A real catheter can be placed in a dependent zone-3 region; the
+model's caution instead reflects its inability to represent that regional
+choice. Tachycardia, systemic resistance and filling are selected features of
 an already compensated phenotype. The baroreflex responds to systemic MAP, not
 to clot, PVR or mPAP directly. Therefore this preset illustrates vulnerability
 to positive pressure; it does not predict the haemodynamic cost of intubation in

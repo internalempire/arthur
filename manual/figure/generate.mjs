@@ -657,6 +657,72 @@ function hysteresisFigure() {
   });
 }
 
+// --- pulmonary artery occlusion and the zone-3 requirement ----------------
+
+function wedgeFigure() {
+  // This is a mechanism diagram rather than a numerical model result. It makes
+  // the missing regional anatomy explicit: the running model substitutes left
+  // atrial pressure and can only qualify that substitution with a pressure-
+  // margin index. The dashed segment in zone 2 is the interrupted fluid column.
+  const H2 = 360;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H2}" class="${ROOT}" role="img"
+  aria-label="Pulmonary artery occlusion pressure is transmitted to the left atrium through a continuous zone 3 blood column, but alveolar compression interrupts that relation in zone 2">
+<style>${STYLE}
+  svg.${ROOT} .vessel { stroke: var(--fig-total, #1f6feb); stroke-width: 10; stroke-linecap: round; fill: none }
+  svg.${ROOT} .vessel-thin { stroke: var(--fig-total, #1f6feb); stroke-width: 4; stroke-linecap: round; fill: none }
+  svg.${ROOT} .interrupted { stroke: var(--fig-muted, #6b7480); stroke-width: 4; stroke-dasharray: 5 5; fill: none }
+  svg.${ROOT} .alveolus { stroke: var(--fig-alv, #d1495b); stroke-width: 2; fill: none }
+  svg.${ROOT} .balloon { fill: var(--fig-extra, #2a9d8f); stroke: var(--fig-text, #2b3138); stroke-width: 1.5 }
+  svg.${ROOT} .chamber { fill: none; stroke: var(--fig-text, #2b3138); stroke-width: 1.5 }
+  svg.${ROOT} .panel { fill: none; stroke: var(--fig-grid, #d7dce3); stroke-width: 1 }
+  @media (prefers-color-scheme: dark) {
+    svg.${ROOT} .vessel, svg.${ROOT} .vessel-thin { stroke: #58a6ff }
+    svg.${ROOT} .interrupted { stroke: #8b95a3 }
+    svg.${ROOT} .alveolus { stroke: #f08c9a }
+    svg.${ROOT} .balloon { fill: #4fd1c1; stroke: #d6dbe2 }
+    svg.${ROOT} .chamber { stroke: #d6dbe2 }
+    svg.${ROOT} .panel { stroke: #363d47 }
+  }
+</style>
+<rect class="bg" width="${W}" height="${H2}"/>
+<text class="title" x="${W / 2}" y="20" text-anchor="middle">What makes an occlusion pressure a left-atrial surrogate</text>
+
+<rect class="panel" x="30" y="38" width="335" height="290" rx="10"/>
+<text class="title" x="197" y="64" text-anchor="middle">Zone 3: continuous blood column</text>
+<path class="vessel" d="M66 142 H276"/>
+<circle class="balloon" cx="112" cy="142" r="17"/>
+<path class="vessel-thin" d="M66 142 H95"/>
+<rect class="chamber" x="276" y="111" width="60" height="62" rx="24"/>
+<text class="label" x="306" y="147" text-anchor="middle">LA</text>
+<circle class="alveolus" cx="218" cy="232" r="38"/>
+<path class="alveolus" d="M190 207 Q218 180 246 207"/>
+<text class="tick" x="218" y="237" text-anchor="middle">alveolus</text>
+<text class="tick" x="112" y="103" text-anchor="middle">balloon stops flow</text>
+<text class="label" x="197" y="190" text-anchor="middle">P<tspan baseline-shift="sub" font-size="9">pa</tspan> &gt; P<tspan baseline-shift="sub" font-size="9">pv</tspan> &gt; P<tspan baseline-shift="sub" font-size="9">alv</tspan></text>
+<text class="label" x="197" y="291" text-anchor="middle">PAWP ≈ pulmonary venous pressure ≈ P<tspan baseline-shift="sub" font-size="9">LA</tspan></text>
+<text class="tick" x="197" y="311" text-anchor="middle">the static distal column transmits downstream pressure</text>
+
+<rect class="panel" x="395" y="38" width="335" height="290" rx="10"/>
+<text class="title" x="562" y="64" text-anchor="middle">Zone 2: alveolar waterfall</text>
+<path class="vessel" d="M431 142 H574"/>
+<circle class="balloon" cx="477" cy="142" r="17"/>
+<path class="vessel-thin" d="M431 142 H460"/>
+<path class="interrupted" d="M594 142 H641"/>
+<path class="vessel-thin" d="M574 142 Q584 130 594 142"/>
+<path class="vessel-thin" d="M574 142 Q584 154 594 142"/>
+<rect class="chamber" x="641" y="111" width="60" height="62" rx="24"/>
+<text class="label" x="671" y="147" text-anchor="middle">LA</text>
+<circle class="alveolus" cx="584" cy="232" r="38"/>
+<path class="alveolus" d="M556 207 Q584 180 612 207"/>
+<text class="tick" x="584" y="237" text-anchor="middle">alveolus</text>
+<text class="tick" x="477" y="103" text-anchor="middle">balloon stops flow</text>
+<text class="label" x="562" y="190" text-anchor="middle">P<tspan baseline-shift="sub" font-size="9">pa</tspan> &gt; P<tspan baseline-shift="sub" font-size="9">alv</tspan> ≥ P<tspan baseline-shift="sub" font-size="9">pv</tspan></text>
+<text class="label" x="562" y="291" text-anchor="middle">PAWP is no longer a secure P<tspan baseline-shift="sub" font-size="9">LA</tspan> surrogate</text>
+<text class="tick" x="562" y="311" text-anchor="middle">alveolar compression interrupts the pressure column</text>
+</svg>
+`;
+}
+
 const figures = {
   'pvr-j-curve.svg': jCurveFigure(),
   'guyton-peep.svg': guytonFigure(),
@@ -670,6 +736,7 @@ const figures = {
   'preload-reserve.svg': preloadReserveFigure(),
   'ppv.svg': ppvFigure(),
   'pmsf-occlusions.svg': pmsfOcclusionFigure(),
+  'wedge-pressure.svg': wedgeFigure(),
 };
 for (const [name, svg] of Object.entries(figures)) {
   writeFileSync(join(OUT, name), svg);

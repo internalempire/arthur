@@ -20,10 +20,6 @@
 
 The respiratory model recalculates `relaxationVolume(p)` from aerated-lung compliance, maximum capacity and open fraction, then assigns −5 cmH₂O pleural pressure at that volume. This shifts the chest-wall relation with every lung phenotype. A future implementation should give the chest wall its own relaxation volume or pressure–volume relation and solve the zero-flow equilibrium from the intersection of lung and chest-wall recoil. The change must preserve a legible within-breath equation of motion and be tested across normal, ARDS and emphysema phenotypes.
 
-### Distinguish left atrial pressure from a valid wedge-derived PVR
-
-The model computes $(\overline P_{pa}-P_{la})/\dot Q$ even when its zone III index flags left atrial pressure as an invalid wedge surrogate. The immediate safety fix is to propagate that caution to the derived-PVR interpretability state or relabel the quantity as an internal hydraulic estimate. A more complete alternative would model an occlusion pressure, but that requires a separate decision about what a lumped non-regional pulmonary bed can support honestly.
-
 ### Separate superior and inferior caval closing pressures
 
 The superior vena cava is surrounded by pleural pressure and the inferior by abdominal pressure, and the model uses one closing pressure derived from the abdomen alone. The consequences, and why this survived while the analogous pulmonary simplification did not, are set out under [vascular waterfalls](vascular-waterfalls.md).

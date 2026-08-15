@@ -131,7 +131,7 @@ The point labelled “RV” is the model's low-volume reference at zero transpul
 The model reports pulmonary resistance twice, and they are different kinds of quantity. This distinction is the subject of [interpretability](interpretability.md).
 
 - **Pulmonary resistance coefficient** — the model's own internal $R$, the thing the equations divide by. Not measurable in a patient, and not a Poiseuille resistance.
-- **PVR, derived** — $(\overline{P}_{pa} - P_{la})/\dot{Q}$, computed from mean pulmonary arterial pressure, model left atrial pressure and cardiac output. It has the form of catheter PVR only while left atrial pressure is a defensible wedge surrogate.
+- **PVR, derived** — $(\overline{P}_{pa} - P_{la})/\dot{Q}$, computed from mean pulmonary arterial pressure, model left atrial pressure and cardiac output. It has the form of catheter PVR only while left atrial pressure is a defensible [wedge surrogate](pulmonary-artery-wedge-pressure.md), and now inherits that tile's caution automatically.
 
 They can move in opposite directions, because the derived value carries cardiac output in its denominator. In the calibration phenotype, PEEP 4 → 14:
 

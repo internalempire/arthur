@@ -779,3 +779,39 @@ or reference equation has been added. The 18% smoothing width is a transparent
 didactic coefficient rather than a human in-vivo calibration. The default lung
 still rests at 2.2 L at 5 cmH₂O recoil and approaches its 6 L ceiling smoothly;
 it is no longer forced to equal 6 L at one finite pressure.
+
+## 2026-08-15 — Treat wedge as a qualified left-atrial-pressure surrogate
+
+### Decision
+
+- Keep the existing three-second mean of atmospheric left atrial pressure, but
+  label it **Wedge surrogate** rather than implying a simulated catheter
+  occlusion.
+- Rename the accompanying display from “zone 3 fraction” to “zone 3 index”. It
+  is the normalised pulmonary-venous-to-alveolar pressure margin, not an
+  anatomical fraction of perfused lung.
+- Propagate wedge caution to catheter-form derived PVR. The arithmetic remains
+  available, but it cannot be presented as unqualified when its downstream
+  pressure is uncertain.
+- Do not add a scripted balloon or occlusion waveform to the current aggregate
+  pulmonary bed.
+
+### Why
+
+The model knows left atrial volume, time-varying elastance, pleural pressure and
+pericardial pressure, so it can calculate atmospheric left atrial pressure
+exactly inside its own topology. A real PAWP is different: a balloon occludes a
+regional pulmonary arterial branch and a static blood column transmits pressure
+from the pulmonary veins and left atrium only under suitable vascular-zone and
+measurement conditions. Calling the latent model pressure simply “wedge” hid
+that distinction, and leaving derived PVR green beside a cautioned surrogate
+made a dependent calculation look more trustworthy than its input.
+
+### Deliberate limits
+
+The zone 3 index remains a conservative heuristic: `clamp((Ppv_raw - Palv) / 4,
+0, 1)`, with caution below 0.95. Neither the 4 mmHg scale nor that threshold is a
+regional human measurement. The model still has no catheter position,
+end-expiratory sampling, a/v-wave selection, mitral disease or pulmonary venous
+obstruction. A genuine occlusion model would require regional topology rather
+than another number in the existing lumped compartment.

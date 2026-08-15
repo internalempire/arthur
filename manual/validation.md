@@ -33,6 +33,8 @@ The tests change one variable and require a direction: passive PEEP raises measu
 
 These tests demonstrate that the encoded mechanism has not reversed. They do not specify how large the response should be in a patient.
 
+Interpretability is also executable physiology. A zone-3 state must leave the [wedge surrogate](pulmonary-artery-wedge-pressure.md) and derived PVR unqualified; when the pressure-margin heuristic fails, both must carry the same caution. This prevents a valid division from concealing an uncertain downstream pressure.
+
 ### Published literature rows
 
 [`LITERATURE_RANGES.md`](../docs/LITERATURE_RANGES.md) converts selected published findings into executable manoeuvres. Current rows include:
@@ -91,4 +93,4 @@ Snapshot regeneration is intentionally separate: `npm run snapshots`. A changed 
 
 ## See also
 
-[Model architecture](model-architecture.md) · [Global limits](global-limits.md) · [Interpretability](interpretability.md) · [Clinical scenarios](scenarios.md) · [`LITERATURE_RANGES.md`](../docs/LITERATURE_RANGES.md) · [`SCENARIO_VALIDATION.md`](../docs/SCENARIO_VALIDATION.md)
+[Model architecture](model-architecture.md) · [Global limits](global-limits.md) · [Interpretability](interpretability.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Clinical scenarios](scenarios.md) · [`LITERATURE_RANGES.md`](../docs/LITERATURE_RANGES.md) · [`SCENARIO_VALIDATION.md`](../docs/SCENARIO_VALIDATION.md)

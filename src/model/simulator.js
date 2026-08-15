@@ -441,7 +441,17 @@ export class Simulator {
 
     const plateauLevel = spontaneousEffort ? 'unavailable' : 'ok';
     const wedgeLevel = c.p.zone3 >= 0.95 ? 'ok' : 'caution';
-    const pvrDerivedLevel = co > 0.05 ? 'ok' : 'unavailable';
+    // Derived PVR depends on the wedge surrogate as well as forward flow. Its
+    // arithmetic remains available outside zone 3, but its catheter meaning
+    // does not; propagate that dependency instead of displaying an apparently
+    // unqualified PVR beside a cautioned downstream pressure.
+    const pvrDerivedLevel = co <= 0.05 ? 'unavailable'
+      : wedgeLevel === 'caution' ? 'caution' : 'ok';
+    const pvrDerivedReasons = pvrDerivedLevel === 'unavailable'
+      ? ['no forward flow to divide by']
+      : pvrDerivedLevel === 'caution'
+        ? ['the left-atrial-pressure wedge surrogate is uncertain outside West zone 3 conditions']
+        : [];
 
     // ESC/ERS 2022: pulmonary hypertension is mPAP above 20 mmHg; the
     // pre-capillary component additionally requires PVR above 2 Wood units with
@@ -469,7 +479,7 @@ export class Simulator {
         reasons: wedgeLevel === 'ok' ? []
           : ['left atrial pressure is only a wedge surrogate under West zone 3 conditions'],
       },
-      pvrDerived: { level: pvrDerivedLevel, reasons: pvrDerivedLevel === 'ok' ? [] : ['no forward flow to divide by'] },
+      pvrDerived: { level: pvrDerivedLevel, reasons: pvrDerivedReasons },
     };
 
     return {
