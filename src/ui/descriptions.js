@@ -165,7 +165,7 @@ const PANELS = [
         ['Flow through open units', `${n(comp.openFlowShare * 100, 0)}% of pulmonary flow`],
         ['Model resistance coefficient', `${n(m.pvrCoefficientWood, 2)} Wood units`],
         ['Derived (mPAP − wedge) / CO', m.pvrDerivedWood === null ? 'not derivable' : `${n(m.pvrDerivedWood, 2)} Wood units`],
-        ['Zone 3 fraction', `${n(m.zone3 * 100, 0)}%`],
+        ['Zone 3 index', `${n(m.zone3 * 100, 0)}%`],
       ];
     },
   },
