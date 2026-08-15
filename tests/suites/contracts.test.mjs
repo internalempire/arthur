@@ -95,10 +95,10 @@ section('Pulmonary vascular claims exposed to the user stay qualified');
       && pe.note.includes('baroreflex senses only systemic MAP'));
 
   const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8');
-  check('README carries the active two-limb coefficients',
-    readme.includes('stretch      = exp(0.58 * strain)')
-      && readme.includes('F_ALV`, `F_EXTRA` | 0.5, 0.5')
-      && !readme.includes('stretch      = exp(0.515 * strain)'));
+  check('README delegates PVR equations and limits to the manual',
+    readme.includes('[Pulmonary vascular resistance](manual/pulmonary-vascular-resistance.md)')
+      && readme.includes('[Global limits](manual/global-limits.md)')
+      && !readme.includes('stretch      = exp('));
 }
 
 section('The drawn curves agree with the integrator');
@@ -189,30 +189,29 @@ section('Published findings, and whether the document says so honestly');
 
 // ------------------------------------------------------- documentation drift --
 
-// The README quotes what each scenario settles at. Rather than generate that
-// table and lose the prose around it, check it: a number in the documentation
-// that the model no longer produces is a defect, and this is how it gets found.
-section('The README scenario table matches the model');
+// The README is the project's concise landing page, while the manual owns the
+// detailed physiology and executable numerical examples. Keep the overview
+// complete without making it a second, independently drifting manual.
+section('The README remains a complete project overview');
 {
   const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8');
-  const section = readme.split('### What each one settles at')[1] ?? '';
-  const rows = [...section.matchAll(/^\| ([^|]+?) \| ([\d.]+) \| (−?\d+) \| (−?[\d.]+) \|/gm)];
-  check('the table was found and parsed', rows.length === SCENARIOS.length,
-    `${rows.length} rows for ${SCENARIOS.length} scenarios`);
+  const missingScenarios = SCENARIOS
+    .filter(({ name }) => readme.split(`| ${name} |`).length !== 2)
+    .map(({ name }) => name);
+  check('README names every active scenario exactly once', missingScenarios.length === 0,
+    missingScenarios.join(', '));
 
-  for (const row of rows) {
-    const [, name, co, map, cvp] = row;
-    const sc = SCENARIOS.find((x) => x.name === name.trim());
-    if (!sc) { check(`${name.trim()} is a real scenario`, false); continue; }
-    const s = new Simulator();
-    s.applyScenario(sc);
-    s.advance(30, true);
-    const m = s.metrics;
-    const documented = { co: Number(co), map: Number(map), cvp: Number(cvp.replace('−', '-')) };
-    const drift = [];
-    if (!near(m.co, documented.co, 0.06)) drift.push(`CO ${documented.co} vs ${m.co.toFixed(2)}`);
-    if (!near(m.map, documented.map, 1.5)) drift.push(`MAP ${documented.map} vs ${m.map.toFixed(0)}`);
-    if (!near(m.cvp, documented.cvp, 0.3)) drift.push(`CVP ${documented.cvp} vs ${m.cvp.toFixed(1)}`);
-    check(sc.name, drift.length === 0, drift.join(', '));
-  }
+  const manualEntryPoints = [
+    'manual/home.md', 'manual/quick-start.md', 'manual/scenarios.md',
+    'manual/validation.md', 'manual/global-limits.md', 'manual/model-architecture.md',
+  ];
+  const missingEntryPoints = manualEntryPoints.filter((page) => !readme.includes(`(${page})`));
+  check('README routes deeper topics to the manual', missingEntryPoints.length === 0,
+    missingEntryPoints.join(', '));
+
+  check('README does not duplicate equations or numerical scenario snapshots',
+    !readme.includes('### What each one settles at')
+      && !readme.includes('## 12. Fixed constants')
+      && !readme.includes('BEGIN GENERATED: readme-stress-index')
+      && !readme.includes('stretch      = exp('));
 }

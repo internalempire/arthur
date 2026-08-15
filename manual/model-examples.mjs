@@ -1,5 +1,5 @@
-// Executable source of truth for numerical examples quoted in the manual and
-// README. Documentation tables previously contained values copied from one
+// Executable source of truth for numerical examples quoted in the manual.
+// Documentation tables previously contained values copied from one
 // model revision; they could remain plausible after the model changed. Keep the
 // manoeuvre, its parameters, formatting and prose-facing label together here.
 // The writer and test suite both regenerate these blocks from a fresh Simulator.
@@ -79,7 +79,6 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/venous-return.md', ids: ['venous-return-peep'] },
   { file: 'manual/pressure-volume-curve.md', ids: ['pv-tissue', 'pv-eelv'] },
   { file: 'manual/pulmonary-transit.md', ids: ['pulmonary-transit'] },
-  { file: 'README.md', ids: ['readme-stress-index'] },
 ];
 
 const fixed = (value, digits) => value.toFixed(digits);
@@ -121,14 +120,6 @@ function stressIndexBlock(rows) {
     '| lung and breath | stress index | plateau (cmH\u2082O) | driving pressure (cmH\u2082O) | breathwise C<sub>rs</sub> (mL/cmH\u2082O) |',
     '|---|---:|---:|---:|---:|',
     ...rows.map((entry) => `| ${entry.label} | ${fixed(entry.stressIndex, 2)} | ${fixed(entry.plateau, 1)} | ${fixed(entry.drivingPressure, 1)} | ${Math.round(entry.breathwiseCrs)} |`),
-  ].join('\n');
-}
-
-function readmeStressIndexBlock(rows) {
-  return [
-    '| executable case | stress index |',
-    '|---|---:|',
-    ...rows.map((entry) => `| ${entry.label} | ${fixed(entry.stressIndex, 2)} |`),
   ].join('\n');
 }
 
@@ -247,6 +238,5 @@ export function renderDocumentedExampleBlocks() {
     ['pv-tissue', pvTissueBlock()],
     ['pv-eelv', pvEelvBlock()],
     ['pulmonary-transit', pulmonaryTransitBlock()],
-    ['readme-stress-index', readmeStressIndexBlock(rows)],
   ]);
 }
