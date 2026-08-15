@@ -4,7 +4,9 @@ import { TRACE_SECONDS } from '../../model/index.js';
 // Three time-aligned strips. Respiratory and haemodynamic pressures are kept on
 // separate strips rather than sharing one plot with two y-axes: cmH2O and mmHg
 // are different scales, and a dual axis would invite reading one against the
-// other.
+// other. Each strip also owns a fixed readout rail: the waveform shows change
+// through time while the rail exposes the instantaneous value without making
+// the user chase a moving label.
 
 const WINDOW_SECONDS = TRACE_SECONDS;
 // How long the data must sit comfortably inside the current range before it is
@@ -18,8 +20,8 @@ const STRIPS = [
     unit: 'cmH₂O',
     height: 1.0,
     series: [
-      { channel: 'paw', color: 'airway', label: 'Paw' },
-      { channel: 'ppl', color: 'pleural', label: 'Ppl' },
+      { channel: 'paw', color: 'airway', label: 'Paw', digits: 1 },
+      { channel: 'ppl', color: 'pleural', label: 'Ppl', digits: 1 },
     ],
   },
   {
@@ -28,9 +30,9 @@ const STRIPS = [
     unit: 'mmHg',
     height: 1.35,
     series: [
-      { channel: 'art', color: 'arterial', label: 'Arterial' },
-      { channel: 'pap', color: 'pulmonary', label: 'PA' },
-      { channel: 'cvp', color: 'venous', label: 'CVP' },
+      { channel: 'art', color: 'arterial', label: 'Arterial', digits: 1 },
+      { channel: 'pap', color: 'pulmonary', label: 'PA', digits: 1 },
+      { channel: 'cvp', color: 'venous', label: 'CVP', digits: 1 },
     ],
   },
   {
@@ -40,7 +42,7 @@ const STRIPS = [
     height: 0.75,
     axis: true,
     series: [
-      { channel: 'volume', color: 'volume', label: 'Volume' },
+      { channel: 'volume', color: 'volume', label: 'Volume', digits: 0 },
     ],
   },
 ];
@@ -51,17 +53,53 @@ export function createWaveforms(container) {
     const wrap = document.createElement('div');
     wrap.className = 'strip';
     wrap.style.flexGrow = String(spec.height);
+
+    const plot = document.createElement('div');
+    plot.className = 'waveform-plot';
     const canvas = document.createElement('canvas');
-    wrap.appendChild(canvas);
+    plot.appendChild(canvas);
+
+    const readoutList = document.createElement('dl');
+    readoutList.className = 'waveform-readouts';
+    readoutList.setAttribute('aria-label', `${spec.label}: current values in ${spec.unit}`);
+    const readouts = new Map();
+    for (const series of spec.series) {
+      const row = document.createElement('div');
+      row.className = 'waveform-readout';
+
+      const label = document.createElement('dt');
+      label.className = 'waveform-readout-label';
+      label.textContent = series.label;
+
+      const value = document.createElement('dd');
+      const output = document.createElement('output');
+      output.className = 'waveform-readout-value';
+      output.setAttribute('aria-label', `${series.label}, current value in ${spec.unit}`);
+      output.textContent = '—';
+      value.appendChild(output);
+
+      row.append(label, value);
+      readoutList.appendChild(row);
+      readouts.set(series.channel, { row, output });
+    }
+
+    wrap.append(plot, readoutList);
     container.appendChild(wrap);
     return {
       spec,
       canvas,
-      panel: new Panel(canvas, { padding: [16, 62, spec.axis ? 22 : 6, 46] }),
+      readouts,
+      panel: new Panel(canvas, { padding: [16, 14, spec.axis ? 22 : 6, 46] }),
       domain: null,     // the y range currently displayed
       insideSince: -1,  // when the data last started fitting comfortably inside it
     };
   });
+
+  function formatValue(value, digits) {
+    if (!Number.isFinite(value)) return '—';
+    const zeroThreshold = 0.5 * 10 ** -digits;
+    return (Math.abs(value) < zeroThreshold ? 0 : value).toFixed(digits);
+  }
 
   /**
    * Rounds a range outwards to a readable step, so the axis labels do not churn
@@ -89,7 +127,7 @@ export function createWaveforms(container) {
       const buffers = [];
       for (const s of spec.series) {
         const { data, n } = sim.trace(s.channel);
-        buffers.push({ ...s, data, n });
+        buffers.push({ ...s, data, n, readout: strip.readouts.get(s.channel) });
         for (let i = 0; i < n; i++) { if (data[i] < lo) lo = data[i]; if (data[i] > hi) hi = data[i]; }
       }
       if (!isFinite(lo)) { lo = 0; hi = 1; }
@@ -153,13 +191,13 @@ export function createWaveforms(container) {
       }
       panel.unclip();
 
-      // Direct labels at the right edge — identity never rests on hue alone.
+      // Keep the values in a stable rail rather than attaching longer labels to
+      // moving endpoints. The coloured marker plus text means identity never
+      // rests on hue alone, while tabular numerals prevent horizontal jitter.
       for (const b of buffers) {
-        if (b.n === 0) continue;
-        const v = b.data[b.n - 1];
-        panel.label(b.label, WINDOW_SECONDS, v, {
-          color: colors.text[b.color], dx: 8, halo: colors.surface,
-        });
+        b.readout.row.style.setProperty('--trace-color', colors.text[b.color]);
+        const value = b.n === 0 ? NaN : b.data[b.n - 1];
+        b.readout.output.textContent = formatValue(value, b.digits);
       }
 
       panel.title(spec.label, colors, spec.unit);
