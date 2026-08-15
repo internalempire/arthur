@@ -288,4 +288,35 @@ export const LITERATURE = {
         + `LV beats ${beats.map((b) => b.lv.toFixed(1)).join(' → ')} mL`,
     };
   },
+
+  'pulmonary-transit-central-volume': () => {
+    // Match the ventilator and both clocks so the comparison is about pulmonary
+    // vascular volume and forward flow, not respiratory or chronotropic phase.
+    const common = {
+      baroreflex: 0, mode: 'vcv', pmus: 0, vt: 450, peep: 5,
+      rr: 18, ti: 1, hr: 75,
+    };
+    const reference = settle(common, 45);
+    const embolism = settle({
+      ...common, pvrBase: 0.44, eesRv: 0.32,
+      stressedVolume: 1050, svr: 1.25,
+    }, 45);
+    const congestion = settle({
+      ...common, eesLv: 0.8, lvStiff: 0.04,
+      stressedVolume: 950, svr: 1.25,
+    }, 45);
+    return {
+      pass: reference.pulmonaryTransitTime > 3
+        && embolism.pulmonaryTransitTime > reference.pulmonaryTransitTime + 2
+        && congestion.pulmonaryTransitTime > embolism.pulmonaryTransitTime + 5
+        && embolism.pulmonaryBloodVolume > reference.pulmonaryBloodVolume
+        && congestion.pulmonaryBloodVolume > embolism.pulmonaryBloodVolume,
+      detail: `reference ${reference.pulmonaryTransitTime.toFixed(1)} s / `
+        + `${reference.pulmonaryBloodVolume.toFixed(0)} mL, embolism `
+        + `${embolism.pulmonaryTransitTime.toFixed(1)} s / `
+        + `${embolism.pulmonaryBloodVolume.toFixed(0)} mL, congestion `
+        + `${congestion.pulmonaryTransitTime.toFixed(1)} s / `
+        + `${congestion.pulmonaryBloodVolume.toFixed(0)} mL`,
+    };
+  },
 };

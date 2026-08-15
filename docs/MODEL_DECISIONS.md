@@ -8,6 +8,64 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-08-14 — Make pulmonary transit depend on blood volume and flow
+
+### Decision
+
+- Replace the fixed 2.0 s pulmonary buffer time with the central-volume
+  relation: estimated PA-to-LA mean transit time is represented pulmonary blood
+  volume divided by mean right-ventricular output.
+- Define represented pulmonary blood volume as the blood physically held in
+  the pulmonary arterial compartment, the pressureless staged pathway and the
+  pulmonary venous compartment. No new blood or disease-specific correction is
+  added.
+- Keep the eight-stage pathway. It supplies only the fraction of total transit
+  corresponding to its original 160 mL allocation; PA and PV already contribute
+  their own pressure-bearing storage dynamics.
+- Let the target transit adapt over 2 s so sustained low or high flow changes
+  transport velocity without allowing respiratory alternation between
+  individual RV beats to alias the phase of the LV response.
+- Bound the staged part to 0.8–6.0 s. The unbounded central-volume estimate
+  remains visible; the bound prevents extreme low flow from creating an
+  arbitrarily long numerical memory.
+- Expose pulmonary vascular blood volume, the estimated whole-circuit mean time
+  and the active staged-buffer time as separate readouts.
+
+### Why
+
+The previous fixed delay preserved the clinically important ordering described
+by Pinsky — an RV-output change reaches LV preload after two to three beats —
+but made a low-output congested circulation and a high-output circulation move
+blood through the lung at the same speed. Indicator-dilution physiology gives a
+simple relation that fixes this without adding a regional lung model:
+
+`pulmonary blood volume = cardiac output × mean transit time`.
+
+The model already contains both terms needed to invert that relation. Using the
+last complete RV beat avoids the zero instantaneous pulmonic flow of diastole.
+Using all three pulmonary vascular volumes avoids making transit depend on the
+arbitrary current filling of the pressureless subcompartment alone; that first
+prototype could shorten the delay in pulmonary embolism as the staged volume
+drained, which was physiologically backwards.
+
+In a matched passive experiment at HR 75/min, RR 18/min, VT 450 mL and PEEP 5,
+the current model estimates approximately 5.4 s and 419 mL in the reference
+circulation, 9.6 s and 525 mL in pulmonary embolism, and 21.5 s and 756 mL in
+congested low-output LV failure. These values demonstrate the required ordering.
+They are not fits to those disease populations; the severe LV phenotype reaches
+the staged 6 s numerical ceiling.
+
+### Deliberate limits
+
+The estimate is a model PA-to-LA central-volume calculation, not a simulated
+contrast bolus and not interchangeable with RV-to-LV CMR timing. The pulmonary
+bed remains one aggregate path with no regional perfusion, capillary recruitment
+distribution, bronchial flow, shunt or recirculation. The 160/375 staged share,
+2 s adaptation and 0.8–6 s bounds are transparent implementation choices, not
+human reference ranges. Absolute transit in the named scenarios must therefore
+be read as model state; the defensible result is that more pulmonary blood and
+less forward flow prolong delivery to the left heart.
+
 ## 2026-08-14 — Separate spontaneous pressure swing from preload reserve
 
 ### Decision
@@ -362,6 +420,10 @@ didactic model and still would not establish a human target. Quantitative use of
 the extrapolated intercept therefore remains out of scope.
 
 ## 2026-08-11 — Add a volume-conserving pulmonary transit pathway
+
+> Historical implementation record. Its fixed-time decision was superseded on
+> 2026-08-14 by the flow- and pulmonary-volume-dependent relation above; the
+> eight-stage, pressureless, volume-conserving architecture was retained.
 
 ### Decision
 

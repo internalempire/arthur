@@ -68,6 +68,9 @@ found, and it was found by serving with no-store.
 Nothing in the display is scripted. The circulation is a closed loop of eight
 pressure-bearing compliant compartments plus one pressureless eight-stage
 pulmonary transport pathway, with conserved volume and integration at 0.25 ms.
+The pathway's residence time is no longer fixed: represented pulmonary blood
+volume divided by mean RV output sets a PA-to-LA transit estimate, while the
+eight stages use the share attributable to their explicit 160 mL volume.
 The single design decision that produces every classical teaching point is that **each
 compartment is referenced to the pressure that actually surrounds it**:
 
@@ -191,6 +194,12 @@ This single term produces both of the effects described in §4.
 one eight-stage pulmonary flow-transport pathway, volume conserved,
 integrated with forward Euler at dt = 0.25 ms — small relative to the shortest
 time constant in the system, the valve resistances at ≈7.5 ms.
+
+Pulmonary transit follows the central-volume relation. The model sums blood in
+PA, transport pathway and PV, divides it by mean RV output, and lets the staged
+buffer use its 160/375 share of that estimate. The target adapts over 2 s and
+the staged part is bounded to 0.8–6 s; these are numerical guardrails, not human
+reference limits.
 
 ### Chamber pressures
 
@@ -948,17 +957,17 @@ catheter-derived value is separately labelled in the app.
 
 | Scenario | CO | MAP | CVP | PA | Wedge | PVR | RV:LV | PPV |
 |---|---|---|---|---|---|---|---|---|
-| Healthy, breathing spontaneously | 5.29 | 95 | −1.0 | 21/9 | 9 | 1.2 | 0.93 | 6% |
-| Healthy, passive volume control | 4.91 | 93 | 1.4 | 21/12 | 10 | 1.2 | 0.88 | 2% |
-| PEEP escalation | 4.54 | 90 | 3.8 | 22/13 | 10 | 1.3 | 0.87 | 1% |
-| Septic shock, fluid responsive | 4.36 | 81 | 1.8 | 16/9 | 4 | 1.2 | 0.72 | 1% |
-| Large pleural swings, limited preload reserve | 6.77 | 92 | 1.1 | 24/15 | 9 | 1.2 | 0.88 | unavailable |
-| ARDS with right ventricular failure | 3.98 | 85 | 3.6 | 27/19 | 4 | 4.3 | 1.64 | 1% |
-| Acute pulmonary embolism | 4.06 | 94 | 5.8 | 39/32 | 4 | 7.5 | 2.03 | 9% |
-| Cardiogenic pulmonary oedema | 1.61 | 68 | 7.4 | 52/47 | 46 | 1.2 | 0.77 | 22% |
-| Stiff chest wall | 4.37 | 90 | 3.3 | 18/10 | 9 | 1.2 | 0.82 | 4% |
-| COPD with dynamic hyperinflation | 4.54 | 91 | 4.5 | 20/12 | 10 | 1.3 | 0.84 | 4% |
-| Intra-abdominal hypertension | 3.55 | 87 | 0.8 | 13/7 | 5 | 1.2 | 0.74 | 1% |
+| Healthy, breathing spontaneously | 5.37 | 93 | −1.2 | 22/12 | 8 | 1.2 | 0.87 | unavailable |
+| Healthy, passive volume control | 4.85 | 92 | 1.3 | 21/12 | 9 | 1.2 | 0.88 | 2% |
+| PEEP escalation | 4.49 | 90 | 3.7 | 22/13 | 10 | 1.2 | 0.85 | 1% |
+| Septic shock, fluid responsive | 4.39 | 81 | 1.8 | 16/10 | 4 | 1.2 | 0.73 | 3% |
+| Large pleural swings, limited preload reserve | 6.76 | 93 | 1.2 | 24/15 | 9 | 1.2 | 0.90 | unavailable |
+| ARDS with right ventricular failure | 3.92 | 85 | 3.1 | 26/19 | 4 | 4.2 | 1.63 | 1% |
+| Acute pulmonary embolism | 4.04 | 93 | 4.7 | 37/31 | 3 | 7.5 | 2.00 | unavailable |
+| Cardiogenic pulmonary oedema | 1.85 | 66 | 6.4 | 50/47 | 44 | 1.2 | 0.76 | 15% |
+| Stiff chest wall | 4.33 | 89 | 3.2 | 18/10 | 9 | 1.2 | 0.82 | 5% |
+| COPD with dynamic hyperinflation | 4.52 | 89 | 4.3 | 20/12 | 10 | 1.3 | 0.84 | 4% |
+| Intra-abdominal hypertension | 3.46 | 86 | 0.7 | 12/6 | 4 | 1.2 | 0.72 | 1% |
 
 ### How the presets are built
 
@@ -1010,7 +1019,7 @@ smallest set that makes that question answerable.
   systolic and diastolic failure, high filling pressure and a stiff thoracic
   envelope. In the same settled patient, PEEP 0 → 10 lowers LV transmural
   end-systolic pressure and end-systolic volume more than it lowers end-diastolic
-  volume; respiratory-cycle-averaged output rises about 7%. The selected
+  volume; respiratory-cycle-averaged output rises about 9%. The selected
   phenotype makes one possible positive-pressure response visible and is not a
   prediction for every failing ventricle. The former weaning preset was removed
   because the model lacks enough of the mechanisms that make weaning-induced
@@ -1038,7 +1047,7 @@ Not user-facing, but part of the model. In `src/model/circulation.js` and
 | `vuSa`, `cSa` | 700 mL, 1.35 mL/mmHg | systemic arterial unstressed volume and compliance |
 | `vuSv` | 2800 mL | systemic venous unstressed volume at neutral tone |
 | `vuPa`, `cPa` | 50 mL, 4.2 mL/mmHg | pulmonary arterial; resting stressed volume unchanged |
-| `PULMONARY_TRANSIT` | 160 mL, 2.0 s, 8 stages | pressureless pathway with a fixed mean flow-transport time |
+| `PULMONARY_TRANSIT` | 160 mL, 2.0 s reference, 8 stages | pressureless pathway; active staged time follows PBV/RV output, adapts over 2 s and is bounded to 0.8–6 s |
 | `vuPv`, `cPv` | 60 mL, 8.5 mL/mmHg | pulmonary venous; resting stressed volume unchanged |
 | `rPulVen` | 0.008 mmHg·s/mL | pulmonary venous resistance |
 | Valve resistances | 0.004 – 0.006 mmHg·s/mL | tricuspid, pulmonic, mitral, aortic |
@@ -1239,14 +1248,14 @@ The full list, with the measurements behind it, is in
 - **No tidal-volume challenge.** The model's PPV amplitude and pulmonary transit
   are not quantitatively validated for a 3.5-point diagnostic threshold;
   presenting the manoeuvre would risk teaching a model-specific false result.
-- **Simplified pulmonary transit.** Eight pressureless mixing stages with a
-  fixed 2.0 s mean transport time delay flow but not pressure. They reproduce
-  the 2–3-beat ordering of RV and LV changes and place the LV nadir in expiration
-  without imposing a rigid echo. They are not regional capillary paths, do not
-  adapt their mean time to cardiac output or disease, and are not equivalent to
-  contrast transit time. At very high PVR the pulmonary artery diastolic pressure
-  can still run higher than it should because the arterial vascular time
-  constant exceeds the cardiac cycle.
+- **Simplified pulmonary transit.** Eight pressureless mixing stages delay flow
+  but not pressure. Their active mean time now follows represented pulmonary
+  blood volume and RV output, reproducing the 2–3-beat reference ordering while
+  lengthening in obstruction and congested low output. They are not regional
+  capillary paths or a simulated contrast bolus; the 160/375 staged share, 2 s
+  adaptation and 0.8–6 s bounds are model choices. At very high PVR the pulmonary
+  artery diastolic pressure can still run higher than it should because the
+  arterial vascular time constant exceeds the cardiac cycle.
 - **Ejection fraction runs low** by roughly 5–10 points; stroke volume, cardiac
   output and loop shape are right, the ratio is pessimistic.
 - **Forward Euler**, with flows limited so no compartment can be drained past a

@@ -178,8 +178,8 @@ dependent prone recruitment.
 **Teaching question.** What happens when a normal lung is coupled to an abruptly
 high aggregate pulmonary vascular load and a vulnerable RV?
 
-**What the model produces.** The baseline has mPAP about 35 mmHg, wedge about
-4 mmHg, derived PVR about 7.5 WU, CVP about 6 mmHg and RV/LV ratio about 2.0.
+**What the model produces.** The baseline has mPAP about 34 mmHg, wedge about
+3 mmHg, derived PVR about 7.5 WU, CVP about 4.7 mmHg and RV/LV ratio about 2.0.
 Changing to passive volume control and raising PEEP from 0 to 10 cmH2O lowers
 output by roughly 7% and further raises right-sided pressure and RV/LV ratio.
 
@@ -201,7 +201,7 @@ dysfunction and treatment response.
 **Teaching question.** Why can positive intrathoracic pressure unload a failing
 left ventricle even while it impairs venous return?
 
-**What the model produces.** This is now an intentionally severe, afterload-sensitive phenotype: low LV end-systolic elastance, high diastolic stiffness, high filling pressure and a stiff thoracic envelope that transmits airway pressure to the pleural space. In a settled, respiratory-cycle-averaged comparison, PEEP 0 → 10 cmH2O raises output by about 7%. LV end-diastolic volume falls slightly, but end-systolic volume falls more, while transmural end-systolic pressure falls by about 4–5 mmHg. The higher stroke volume therefore emerges despite less filling, which is the signature that the demonstration is intended to expose.
+**What the model produces.** This is now an intentionally severe, afterload-sensitive phenotype: low LV end-systolic elastance, high diastolic stiffness, high filling pressure and a stiff thoracic envelope that transmits airway pressure to the pleural space. In a settled, respiratory-cycle-averaged comparison, PEEP 0 → 10 cmH2O raises output by about 9%. LV end-diastolic volume falls slightly, but end-systolic volume falls more, while transmural end-systolic pressure falls by about 4–5 mmHg. The higher stroke volume therefore emerges despite less filling, which is the signature that the demonstration is intended to expose.
 
 **Assessment — qualified.** The reduction in LV transmural ejection pressure is encoded and the causal direction is physiologically sound. The phenotype was deliberately selected so afterload relief exceeds the simultaneous loss of venous return; it must not be presented as the expected response of every patient with cardiogenic pulmonary oedema. A less afterload-sensitive or more preload-dependent failing ventricle can show no output gain or a fall. Clinical improvement also comes from reduced work of breathing and improved oxygenation, neither of which is an outcome in the model.
 

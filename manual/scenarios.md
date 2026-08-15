@@ -67,7 +67,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Try.** Start from the preset at PEEP 10, set PEEP to zero and allow the model to settle, then return PEEP to 10. Compare several respiratory cycles rather than one beat. Follow the LV pressure–volume loop, end-diastolic and end-systolic volume, pleural pressure and output.
 
-**Read.** This is a deliberately severe, afterload-dominant phenotype with low LV contractility, high diastolic stiffness, high filling pressure and a stiff thoracic envelope. PEEP raises pleural pressure, reducing the [transmural pressure](transmural-pressure.md) required for LV ejection. End-diastolic volume falls slightly, but end-systolic volume falls more and respiratory-cycle-averaged output rises by about 7%. This demonstrates one possible response; a more preload-dependent patient can show no gain or a fall.
+**Read.** This is a deliberately severe, afterload-dominant phenotype with low LV contractility, high diastolic stiffness, high filling pressure and a stiff thoracic envelope. PEEP raises pleural pressure, reducing the [transmural pressure](transmural-pressure.md) required for LV ejection. End-diastolic volume falls slightly, but end-systolic volume falls more and respiratory-cycle-averaged output rises by about 9%. This demonstrates one possible response; a more preload-dependent patient can show no gain or a fall.
 
 ### Stiff chest wall
 

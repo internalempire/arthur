@@ -11,7 +11,8 @@ import { PARAMETERS, defaultParams } from '../../src/model/parameters.js';
 import {
   venousReturnCurve, cardiacFunctionCurve, venousReturnFlow,
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
-  systemicVenousVolumeState, PULMONARY_TRANSIT,
+  systemicVenousVolumeState, pulmonaryTransitEstimate,
+  pulmonaryTransitMeanTime, PULMONARY_TRANSIT,
 } from '../../src/model/circulation.js';
 import { applyBaroreflex, BARO } from '../../src/model/baroreflex.js';
 import {
@@ -29,7 +30,8 @@ export {
   Simulator, DEFAULT_DT, SCENARIOS, PARAMETERS, defaultParams,
   venousReturnCurve, cardiacFunctionCurve, venousReturnFlow,
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
-  systemicVenousVolumeState, PULMONARY_TRANSIT,
+  systemicVenousVolumeState, pulmonaryTransitEstimate,
+  pulmonaryTransitMeanTime, PULMONARY_TRANSIT,
   applyBaroreflex, BARO,
   pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
   lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,
