@@ -15,6 +15,12 @@
 
 The first three levels are valuable, but they cannot be promoted into the fourth by increasing the number of tests.
 
+## Development review and validation
+
+The model, code, tests, interface and manual were generated primarily with GPT-5.6-Sol using the high reasoning setting, under human-in-the-loop direction and revision. Other LLMs cross-reviewed internal consistency, physiological claims against the available literature and agreement between implementation and documentation. Human clinical review selected the scope and literature, challenged results, tested the interface and approved substantive changes.
+
+These layers can expose contradictions, stale documentation and implausible directions, but they are not independent scientific validation. LLM reviewers may share assumptions and failure modes, while human review of a teaching model is not a blinded comparison with external patient data. The evidence level therefore depends on the executable and experimental anchors described below, not on the number or identity of reviewers.
+
 ## The executable suite
 
 `npm test` runs dependency-free checks across the model's numerical, physiological and documentary domains. The exact count is intentionally not embedded here because every new contract would otherwise make the validation page stale.
