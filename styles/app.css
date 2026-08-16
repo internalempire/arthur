@@ -885,3 +885,17 @@ input[type="range"]:disabled { cursor: not-allowed; }
   color: var(--ink-muted);
   text-transform: lowercase;
 }
+
+/* "Show all readouts" action and separator. */
+.tile-picker-showall {
+  font-weight: 700;
+  color: var(--venous);
+}
+
+.tile-picker-showall:hover { background: var(--wash); }
+
+.tile-picker-sep {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--grid);
+}

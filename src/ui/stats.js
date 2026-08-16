@@ -360,6 +360,27 @@ export function createStats(container, { banner } = {}) {
     picker.className = 'tile-picker';
     picker.innerHTML = '<div class="tile-picker-title">Add a readout</div>';
 
+    // "Show all" action — restores every tile at once.
+    if (hidden.length < TILES.length) {
+      const showAll = document.createElement('button');
+      showAll.type = 'button';
+      showAll.className = 'tile-picker-item tile-picker-showall';
+      showAll.innerHTML = '<span class="tile-picker-label">Show all readouts</span>';
+      showAll.addEventListener('click', (e) => {
+        e.stopPropagation();
+        visibleIds = TILES.map((t) => t.id);
+        saveLayout(visibleIds);
+        rebuild();
+        picker.remove();
+      });
+      picker.appendChild(showAll);
+
+      // Separator between the "show all" action and the individual tiles.
+      const sep = document.createElement('div');
+      sep.className = 'tile-picker-sep';
+      picker.appendChild(sep);
+    }
+
     for (const tile of hidden) {
       const item = document.createElement('button');
       item.type = 'button';
