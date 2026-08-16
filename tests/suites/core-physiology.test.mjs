@@ -3,6 +3,27 @@ import {
   staticEndExpiratoryVolume, section, check, near, settled,
 } from '../support/model.mjs';
 
+section('Ventilatory mode transitions');
+{
+  const sim = settled({ mode: 'spont', pmus: 10, peep: 0 }, 1);
+
+  sim.setParam('mode', 'vcv');
+  check('entering volume control clears effort inherited from a spontaneous scenario',
+    sim.params.mode === 'vcv' && sim.params.pmus === 0);
+
+  sim.setParam('pmus', 6);
+  check('effort can be deliberately reintroduced after entering volume control',
+    sim.params.mode === 'vcv' && sim.params.pmus === 6);
+
+  sim.setParam('mode', 'psv');
+  check('entering pressure support preserves patient effort',
+    sim.params.mode === 'psv' && sim.params.pmus === 6);
+
+  sim.setParam('mode', 'pcv');
+  check('entering pressure control also starts from a passive patient',
+    sim.params.mode === 'pcv' && sim.params.pmus === 0);
+}
+
 section('Physiological relations');
 {
   const peep0 = settled({ peep: 0 });

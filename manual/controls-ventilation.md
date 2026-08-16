@@ -20,6 +20,8 @@
 
 In spontaneous mode, inspiratory muscle pressure lowers pleural and alveolar pressure and draws flow inward. In volume control, the ventilator delivers constant inspiratory flow sufficient to reach the selected VT over the selected inspiratory time. Pressure control holds the selected pressure above PEEP during inspiration. Pressure support combines positive airway pressure with patient effort.
 
+Changing from any scenario to volume control or pressure control sets inspiratory effort to zero. The transition therefore starts with a genuinely passive patient rather than carrying hidden muscle pressure across from spontaneous breathing. This is only the initial condition: the effort slider remains available and can be raised afterwards to explore a controlled breath with superimposed patient activity. Pressure support does not clear effort because patient activity is part of that mode's represented mechanism.
+
 The sign of pleural-pressure change is central, but it is not fixed by the mode label alone. In assisted breathing, respiratory effort, chest-wall mechanics and applied pressure combine; inspect the waveform rather than assuming transmission.
 
 ### Rate and inspiratory time
@@ -36,7 +38,7 @@ PEEP raises mean airway pressure and usually end-expiratory lung volume. Its hae
 
 ### Inspiratory effort
 
-Effort is represented as one smooth muscle-pressure waveform. Non-zero effort during positive-pressure support makes PPV unavailable because the controlled-breath assumptions are absent. The model does not simulate dyssynchrony, variable neural timing or work of breathing.
+Effort is represented as one smooth muscle-pressure waveform. Non-zero effort during positive-pressure ventilation makes PPV unavailable because the passive controlled-breath assumptions are absent. The model does not simulate dyssynchrony, variable neural timing or work of breathing.
 
 ## Why these controls
 

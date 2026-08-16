@@ -123,6 +123,14 @@ export class Simulator {
       this.circ.vSv += value - this.params.stressedVolume;
     }
     this.params[id] = value;
+    // Volume and pressure control are entered as genuinely passive modes.
+    // Scenarios with spontaneous effort must not carry that muscle pressure
+    // invisibly across the mode transition. This is a transition default, not
+    // a permanent lock: a later explicit change to `pmus` can reintroduce
+    // effort to explore assisted breaths or patient–ventilator interaction.
+    if (id === 'mode' && (value === 'vcv' || value === 'pcv')) {
+      this.params.pmus = 0;
+    }
     if (id === 'collapsed' || id === 'clung' || id === 'lungCapacity'
       || id === 'riRatio' || id === 'pOpen') {
       // These move the resting volume, which `resp.v` is measured from. The gas
