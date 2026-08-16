@@ -235,6 +235,6 @@ window.heartLung = {
   step(seconds = 1) { sim.advance(seconds); draw(); return sim.metrics; },
 };
 
-scenarioSelect.value = 'healthy-vcv';
-applyScenario('healthy-vcv');
+scenarioSelect.value = 'healthy-spont';
+applyScenario('healthy-spont');
 requestAnimationFrame(frame);
