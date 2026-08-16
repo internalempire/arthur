@@ -78,7 +78,9 @@ The decision was therefore: correct the structural faults, and place the nadir w
 
 The nadir is not fitted to FRC. It is constructed there. The extra-alveolar decay constant is derived, not chosen:
 
-$$K_{\text{unfurl}} = \frac{f_a \cdot k_{\text{stretch}}}{f_e \cdot (1 - c)} = \frac{0.5 \times 0.58}{0.5 \times 0.70} = 0.829$$
+$$
+K_{\text{unfurl}} = \frac{f_a \cdot k_{\text{stretch}}}{f_e \cdot (1 - c)} = \frac{0.5 \times 0.58}{0.5 \times 0.70} = 0.829
+$$
 
 This formula imposes that the derivative of total resistance with respect to strain is zero at zero strain — i.e. the minimum sits exactly at the volume the fully open tissue holds at resting recoil (2.25 L). The quadratic low-volume traction term is zero in both value and slope at that point, so it steepens the left limb without moving the minimum.
 

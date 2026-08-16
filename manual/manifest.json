@@ -105,6 +105,14 @@
           "Two vessel populations, the J-curve, and why the right ventricle cares"
         ],
         [
+          "pvr-volume-vs-pressure",
+          "Why PVR follows lung volume, not transpulmonary pressure"
+        ],
+        [
+          "pvr-nadir-at-frc",
+          "Why the J-curve minimum is at FRC by construction, not by measurement"
+        ],
+        [
           "hypoxic-vasoconstriction",
           "Diverting flow away from lung that is not open"
         ],
