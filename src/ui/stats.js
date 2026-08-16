@@ -341,7 +341,7 @@ export function createStats(container, { banner } = {}) {
 
   function togglePicker(parentEl) {
     // Close any existing picker.
-    const existing = container.querySelector('.tile-picker');
+    const existing = document.querySelector('.tile-picker');
     if (existing) { existing.remove(); return; }
 
     const hidden = TILES.filter(t => !visibleIds.includes(t.id));
@@ -350,7 +350,8 @@ export function createStats(container, { banner } = {}) {
       const picker = document.createElement('div');
       picker.className = 'tile-picker';
       picker.textContent = 'All readouts are already shown.';
-      parentEl.appendChild(picker);
+      document.body.appendChild(picker);
+      positionPicker(picker, parentEl);
       setTimeout(() => picker.remove(), 2000);
       return;
     }
@@ -375,7 +376,7 @@ export function createStats(container, { banner } = {}) {
     // Close picker on outside click.
     setTimeout(() => {
       function onAway(e) {
-        if (!picker.contains(e.target)) {
+        if (!picker.contains(e.target) && !parentEl.contains(e.target)) {
           picker.remove();
           document.removeEventListener('click', onAway, true);
         }
@@ -383,7 +384,22 @@ export function createStats(container, { banner } = {}) {
       document.addEventListener('click', onAway, true);
     }, 0);
 
-    parentEl.appendChild(picker);
+    // Append to <body> so it escapes any stacking context created by the
+    // tile grid or panel containers. A fixed z-index keeps it above everything.
+    document.body.appendChild(picker);
+    positionPicker(picker, parentEl);
+  }
+
+  /** Position the picker just below the + button, clipped to the viewport. */
+  function positionPicker(picker, anchor) {
+    const r = anchor.getBoundingClientRect();
+    const pw = picker.offsetWidth || 220;
+    let left = r.right - pw;
+    if (left < 8) left = 8;
+    if (left + pw > window.innerWidth - 8) left = window.innerWidth - 8 - pw;
+    picker.style.position = 'fixed';
+    picker.style.top = (r.bottom + 6) + 'px';
+    picker.style.left = left + 'px';
   }
 
   // --- Tile visibility operations --------------------------------------------

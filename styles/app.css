@@ -835,20 +835,17 @@ input[type="range"]:disabled { cursor: not-allowed; }
   color: var(--ink);
 }
 
-/* Picker dropdown. */
+/* Picker dropdown — appended to <body> as a portal to escape stacking contexts. */
 .tile-picker {
-  position: absolute;
-  z-index: 50;
-  top: 100%;
-  right: 0;
-  margin-top: 6px;
+  position: fixed;
+  z-index: 9999;
   min-width: 220px;
   max-height: 320px;
   overflow-y: auto;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.18);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.22);
   padding: 6px;
   font-size: 12px;
 }
