@@ -29,9 +29,8 @@ A citation documents the physiological or methodological claim made on its sourc
 ## C
 
 - Campbell EJM. The respiratory muscles and the mechanics of breathing. Lloyd-Luke; 1958.
+- Cappio Borlino S, et al. [The effect of positive end-expiratory pressure on pulmonary vascular resistance depends on lung recruitability in patients with acute respiratory distress syndrome](https://doi.org/10.1164/rccm.202402-0383OC). *Am J Respir Crit Care Med* 2024;210:900–7. The source of the four absolute values this page is calibrated against.
 - Cappio Borlino S, et al. Pulmonary vascular effects of PEEP and recruitability in ARDS. *Am J Respir Crit Care Med* 2024;210(7).
-- Cappio Borlino S, et al. Pulmonary vascular effects of PEEP and recruitability in ARDS. *Am J Respir Crit Care Med* 2024;210(7). The source of the four absolute values this page is calibrated against.
-- Cappio Borlino S, Hagry J, Lai C, et al. The effect of PEEP on pulmonary vascular resistance depends on lung recruitability in patients with ARDS. *Am J Respir Crit Care Med*. 2024;210:900–907. [doi:10.1164/rccm.202402-0383OC](https://doi.org/10.1164/rccm.202402-0383OC)
 - Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3) — Fig. 1C is the clinical two-limb synthesis this page follows.
 - Chantler PD, Lakatta EG, Najjar SS. Arterial–ventricular coupling: mechanistic insights into cardiovascular performance at rest and during exercise. *J Appl Physiol* 2008;105:1342–51.
 - Chapleau MW, Abboud FM. Determinants of sensitization of carotid baroreceptors by pulsatile pressure in dogs. *Circ Res*. 1989;65:566–577. [doi:10.1161/01.RES.65.3.566](https://doi.org/10.1161/01.RES.65.3.566)
@@ -72,8 +71,8 @@ A citation documents the physiological or methodological claim made on its sourc
 
 - Haddad F, Doyle R, Murphy DJ, Hunt SA. Right ventricular function in cardiovascular disease, part II. *Circulation*. 2008;117:1717–1731. [doi:10.1161/CIRCULATIONAHA.107.653584](https://doi.org/10.1161/CIRCULATIONAHA.107.653584)
 - Hairer E, Nørsett SP, Wanner G. *Solving Ordinary Differential Equations I: Nonstiff Problems*. 2nd ed. Springer; 1993.
-- Hakim TS, Michel RP, Chang HK. [Partitioning of pulmonary vascular resistance in dogs by arterial and venous occlusion](https://doi.org/10.1152/jappl.1982.52.3.710). *J Appl Physiol* 1982;52:710–5. Volume-related changes identical under both inflation modes; pressure-related ones not.
-- Hakim TS, Michel RP, Chang HK. Effect of lung inflation on pulmonary vascular resistance by arterial and venous occlusion. *J Appl Physiol*. 1982;53:1110–1115. [doi:10.1152/jappl.1982.53.5.1110](https://doi.org/10.1152/jappl.1982.53.5.1110)
+- Hakim TS, Michel RP, Chang HK. [Effect of lung inflation on pulmonary vascular resistance by arterial and venous occlusion](https://doi.org/10.1152/jappl.1982.53.5.1110). *J Appl Physiol* 1982;53:1110–5. Positive- and negative-pressure inflation separated volume-related from pressure-reference effects.
+- Hakim TS, Michel RP, Chang HK. [Partitioning of pulmonary vascular resistance in dogs by arterial and venous occlusion](https://doi.org/10.1152/jappl.1982.52.3.710). *J Appl Physiol* 1982;52:710–5. Methodological basis for the segmental pressure-drop partition.
 - Hamzaoui O, Monnet X, Teboul JL. Pulsus paradoxus. *Eur Respir J*. 2013;42:1696–1705. [doi:10.1183/09031936.00138912](https://doi.org/10.1183/09031936.00138912)
 - Hamzaoui O, Shi R, Carelli S, et al. Changes in pulse pressure variation to assess preload responsiveness in mechanically ventilated patients with spontaneous breathing activity. *Br J Anaesth*. 2021;127:532–538. [doi:10.1016/j.bja.2021.05.034](https://doi.org/10.1016/j.bja.2021.05.034)
 - Harris RS. Pressure–volume curves of the respiratory system. *Respir Care*. 2005;50:78–98.
@@ -129,6 +128,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Permutt S, Riley RL. [Hemodynamics of collapsible vessels with tone: the vascular waterfall](https://doi.org/10.1152/jappl.1963.18.5.924). *J Appl Physiol* 1963;18:924–32.
 - Persichini R, Lai C, Teboul JL, et al. Venous return and mean systemic filling pressure: physiology and clinical applications. *Crit Care*. 2022;26:150. [doi:10.1186/s13054-022-04024-x](https://doi.org/10.1186/s13054-022-04024-x)
 - Persichini R, Silva S, Teboul JL, et al. Effects of norepinephrine on mean systemic pressure and venous return in human septic shock. *Crit Care Med*. 2012;40:3146–3153. [doi:10.1097/CCM.0b013e318260c6c3](https://doi.org/10.1097/CCM.0b013e318260c6c3)
+- Peták F, Albu G, Lele E, et al. Lung mechanical and vascular changes during positive- and negative-pressure lung inflations: importance of reference pressures in the pulmonary vasculature. *J Appl Physiol*. 2009;106:935–942. [doi:10.1152/japplphysiol.00831.2007](https://doi.org/10.1152/japplphysiol.00831.2007)
 - Pinsky MR, Payen D. Functional hemodynamic monitoring. *Crit Care*. 2005;9:566–572. [doi:10.1186/cc3927](https://doi.org/10.1186/cc3927)
 - Pinsky MR, Vincent JL, De Smet JM. Estimating left ventricular filling pressure during positive end-expiratory pressure in humans. *Am Rev Respir Dis*. 1991;143:25–31. [doi:10.1164/ajrccm/143.1.25](https://doi.org/10.1164/ajrccm/143.1.25)
 - Pinsky MR. Cardiopulmonary interactions: physiologic basis and clinical applications. *Ann Am Thorac Soc* 2018;15(Suppl 1):S45–S48.
