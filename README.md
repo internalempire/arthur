@@ -10,6 +10,13 @@ The project is named in honour of Arthur Guyton and his contribution to the phys
 
 For detailed physiology, implementation choices, figures, literature and limitations, use the **[web manual](manual/index.html)** or browse its **[Markdown home page](manual/home.md)**.
 
+The current published version is available on GitHub Pages:
+
+- **[Open the application](https://internalempire.github.io/arthur/)**
+- **[Read the web manual](https://internalempire.github.io/arthur/manual/)**
+
+The source repository is **[internalempire/arthur](https://github.com/internalempire/arthur)**.
+
 ---
 
 ## Development provenance
