@@ -766,3 +766,136 @@ input[type="range"]:disabled { cursor: not-allowed; }
   opacity: 0.55;
   border-color: var(--text-warning);
 }
+
+/* --------------------------------------------------- customisable tiles */
+
+/* Close button — hidden by default, visible on hover. */
+.tile-remove {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-muted);
+  font: 600 16px/1 system-ui, sans-serif;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 120ms ease;
+  z-index: 2;
+}
+
+.tile:hover .tile-remove { opacity: 0.65; }
+.tile-remove:hover { opacity: 1; color: var(--ink); background: var(--wash); }
+
+/* Make room for the close button without shifting content. */
+.tile { position: relative; }
+
+/* Drag-and-drop visual feedback. */
+.tile-dragging { opacity: 0.4; }
+.tile-drop-target {
+  outline: 2px dashed var(--venous);
+  outline-offset: -2px;
+}
+
+/* The "+" add-tile button. */
+.tile-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  border-color: var(--border);
+  opacity: 0.55;
+  cursor: pointer;
+  /* Override the .tile overflow:hidden rule — the picker dropdown
+     is positioned absolutely below this tile and must not be clipped. */
+  overflow: visible;
+}
+
+.tile-add:hover { opacity: 0.9; border-color: var(--ink-muted); }
+
+.tile-add-btn {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--raised);
+  color: var(--ink-muted);
+  font: 600 20px/1 system-ui, sans-serif;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.tile-add-btn:hover {
+  background: var(--wash);
+  color: var(--ink);
+}
+
+/* Picker dropdown — appended to <body> as a portal to escape stacking contexts. */
+.tile-picker {
+  position: fixed;
+  z-index: 9999;
+  min-width: 220px;
+  max-height: 320px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.22);
+  padding: 6px;
+  font-size: 12px;
+}
+
+.tile-picker-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-muted);
+  padding: 4px 8px 6px;
+  border-bottom: 1px solid var(--grid);
+  margin-bottom: 4px;
+}
+
+.tile-picker-item {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tile-picker-item:hover { background: var(--wash); }
+
+.tile-picker-label { font-weight: 600; }
+.tile-picker-kind {
+  font-size: 10px;
+  color: var(--ink-muted);
+  text-transform: lowercase;
+}
+
+/* "Show all readouts" action and separator. */
+.tile-picker-showall {
+  font-weight: 700;
+  color: var(--venous);
+}
+
+.tile-picker-showall:hover { background: var(--wash); }
+
+.tile-picker-sep {
+  height: 1px;
+  margin: 4px 2px;
+  background: var(--grid);
+}

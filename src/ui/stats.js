@@ -10,6 +10,11 @@
 //
 // A value whose quality is `unavailable` is not shown at all. Printing a number
 // next to the words "not interpretable" still invites reading it.
+//
+// Tiles are user-customisable: they can be reordered by drag-and-drop, hidden
+// individually via a close button, and added back from a picker. The set of
+// visible tiles and their order are persisted to localStorage so they survive
+// reloads. Paw (airway pressure) is shown by default.
 
 const KIND_LABEL = {
   measured: 'model measurement',
@@ -33,6 +38,11 @@ const TILES = [
     id: 'cvp', label: 'CVP', unit: 'mmHg', kind: 'measured',
     get: (m) => m.cvp.toFixed(1),
     sub: (m) => `transmural ${m.cvpTransmural.toFixed(1)}`,
+  },
+  {
+    id: 'paw', label: 'Airway pressure', unit: 'cmH₂O', kind: 'measured',
+    get: (m) => m.paw.toFixed(1),
+    sub: (m) => `peak ${m.ppeak.toFixed(1)}`,
   },
   {
     id: 'ppv', label: 'Pulse pressure var.', unit: '%', kind: 'derived',
@@ -162,6 +172,25 @@ const TILES = [
 
 const TILE_BY_ID = new Map(TILES.map((tile) => [tile.id, tile]));
 
+// Default visible tiles — paw is included from the start.
+const DEFAULT_VISIBLE = TILES.map((t) => t.id);
+
+const STORAGE_KEY = 'arthur.tileLayout';
+
+function loadLayout() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (Array.isArray(saved) && saved.length > 0) return saved;
+  } catch { /* ignore */ }
+  return [...DEFAULT_VISIBLE];
+}
+
+function saveLayout(visibleIds) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(visibleIds));
+  } catch { /* ignore */ }
+}
+
 /**
  * Return the primary string exactly as the corresponding numerical tile shows
  * it, including suppression when the model or the measurement is not valid.
@@ -176,10 +205,21 @@ export function tilePrimaryValue(id, metrics) {
 }
 
 export function createStats(container, { banner } = {}) {
-  const nodes = TILES.map((tile) => {
+  let visibleIds = loadLayout();
+  const nodeMap = new Map(); // id → { tile, el, number, sub, flag, quality }
+  // Start with null metrics — the first render() call from the main loop will
+  // populate the values. Calling renderTile with an empty object crashes the
+  // tile getters (m.co.toFixed → undefined.toFixed).
+  let currentMetrics = null;
+
+  // --- Build a single tile element -------------------------------------------
+  function buildTile(tile) {
     const el = document.createElement('div');
     el.className = 'tile';
+    el.dataset.tileId = tile.id;
+    el.draggable = true;
     el.innerHTML = `
+      <button class="tile-remove" type="button" aria-label="Hide ${tile.label}" title="Hide">×</button>
       <div class="tile-label"></div>
       <div class="tile-value"><span class="tile-number"></span><span class="tile-unit"></span></div>
       <div class="tile-sub"></div>
@@ -189,7 +229,43 @@ export function createStats(container, { banner } = {}) {
     el.querySelector('.tile-unit').textContent = tile.unit;
     el.dataset.kind = tile.kind;
     el.title = KIND_LABEL[tile.kind];
-    container.appendChild(el);
+
+    el.querySelector('.tile-remove').addEventListener('click', (e) => {
+      e.stopPropagation();
+      hideTile(tile.id);
+    });
+
+    // --- drag-and-drop --------------------------------------------------------
+    el.addEventListener('dragstart', () => {
+      el.classList.add('tile-dragging');
+      // On some browsers we need a minimal transfer to allow the drop.
+      e => e.dataTransfer?.setData('text/plain', tile.id);
+    });
+    el.addEventListener('dragend', () => {
+      el.classList.remove('tile-dragging');
+      container.querySelectorAll('.tile-drop-before').forEach(n => n.classList.remove('tile-drop-before'));
+      container.querySelectorAll('.tile-drop-after').forEach(n => n.classList.remove('tile-drop-after'));
+    });
+    el.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      el.classList.add('tile-drop-target');
+    });
+    el.addEventListener('dragleave', () => {
+      el.classList.remove('tile-drop-target');
+    });
+    el.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      el.classList.remove('tile-drop-target');
+      const draggedId = el.previousElementSibling?.classList.contains('tile-dragging')
+        ? null : null; // not used; we use event delegation below
+      // We track the dragged id on the container.
+      const draggedTileId = container._draggedTileId;
+      if (!draggedTileId || draggedTileId === tile.id) return;
+      reorderTile(draggedTileId, tile.id);
+    });
+
     return {
       tile,
       el,
@@ -198,9 +274,185 @@ export function createStats(container, { banner } = {}) {
       flag: el.querySelector('.tile-flag'),
       quality: el.querySelector('.tile-quality'),
     };
+  }
+
+  // We use container-level drag tracking because dragstart fires on the
+  // source element and drop on the target.
+  container.addEventListener('dragstart', (e) => {
+    const tileEl = e.target.closest('.tile');
+    if (!tileEl) return;
+    container._draggedTileId = tileEl.dataset.tileId;
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', tileEl.dataset.tileId);
   });
 
+  // --- Render a single tile's values ------------------------------------------
+  function renderTile(n, metrics) {
+    if (!metrics) return; // not yet available — tiles show placeholders
+    const q = n.tile.quality?.(metrics) ?? { level: 'ok', reasons: [] };
+    const suppress = !metrics.valid || q.level === 'unavailable';
+
+    n.number.textContent = suppress ? '—' : tilePrimaryValue(n.tile.id, metrics);
+    n.sub.textContent = suppress ? '' : (n.tile.sub ? n.tile.sub(metrics) : '');
+
+    const status = suppress ? null : n.tile.status?.(metrics);
+    n.el.dataset.status = status ? status[0] : '';
+    n.flag.textContent = status ? status[1] : '';
+
+    n.el.dataset.quality = metrics.valid ? q.level : 'unavailable';
+    n.quality.textContent = q.level === 'ok' ? ''
+      : q.level === 'unavailable' ? `not interpretable — ${q.reasons[0] ?? ''}`
+        : `interpret with caution — ${q.reasons[0] ?? ''}`;
+    if (q.reasons.length > 1) n.quality.title = q.reasons.join('; ');
+  }
+
+  // --- Rebuild the DOM from the current visibleIds ---------------------------
+  function rebuild() {
+    // Remove all tile elements and the add button; re-create everything.
+    container.innerHTML = '';
+    nodeMap.clear();
+
+    for (const id of visibleIds) {
+      const tile = TILE_BY_ID.get(id);
+      if (!tile) continue;
+      const n = buildTile(tile);
+      nodeMap.set(id, n);
+      container.appendChild(n.el);
+      if (currentMetrics) renderTile(n, currentMetrics);
+    }
+
+    // Add the "+" button at the end.
+    addAddButton();
+  }
+
+  // --- The "+" button and picker ----------------------------------------------
+  function addAddButton() {
+    const addBtn = document.createElement('div');
+    addBtn.className = 'tile tile-add';
+    addBtn.innerHTML = `<button type="button" class="tile-add-btn" aria-label="Add a readout" title="Add a readout">+</button>`;
+
+    addBtn.querySelector('.tile-add-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePicker(addBtn);
+    });
+
+    container.appendChild(addBtn);
+  }
+
+  function togglePicker(parentEl) {
+    // Close any existing picker.
+    const existing = document.querySelector('.tile-picker');
+    if (existing) { existing.remove(); return; }
+
+    const hidden = TILES.filter(t => !visibleIds.includes(t.id));
+    if (hidden.length === 0) {
+      // Nothing to add — all tiles visible. Show a brief message.
+      const picker = document.createElement('div');
+      picker.className = 'tile-picker';
+      picker.textContent = 'All readouts are already shown.';
+      document.body.appendChild(picker);
+      positionPicker(picker, parentEl);
+      setTimeout(() => picker.remove(), 2000);
+      return;
+    }
+
+    const picker = document.createElement('div');
+    picker.className = 'tile-picker';
+    picker.innerHTML = '<div class="tile-picker-title">Add a readout</div>';
+
+    // "Show all" action — restores every tile at once.
+    if (hidden.length < TILES.length) {
+      const showAll = document.createElement('button');
+      showAll.type = 'button';
+      showAll.className = 'tile-picker-item tile-picker-showall';
+      showAll.innerHTML = '<span class="tile-picker-label">Show all readouts</span>';
+      showAll.addEventListener('click', (e) => {
+        e.stopPropagation();
+        visibleIds = TILES.map((t) => t.id);
+        saveLayout(visibleIds);
+        rebuild();
+        picker.remove();
+      });
+      picker.appendChild(showAll);
+
+      // Separator between the "show all" action and the individual tiles.
+      const sep = document.createElement('div');
+      sep.className = 'tile-picker-sep';
+      picker.appendChild(sep);
+    }
+
+    for (const tile of hidden) {
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'tile-picker-item';
+      item.innerHTML = `<span class="tile-picker-label">${tile.label}</span><span class="tile-picker-kind">${KIND_LABEL[tile.kind]}</span>`;
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        addTile(tile.id);
+        picker.remove();
+      });
+      picker.appendChild(item);
+    }
+
+    // Close picker on outside click.
+    setTimeout(() => {
+      function onAway(e) {
+        if (!picker.contains(e.target) && !parentEl.contains(e.target)) {
+          picker.remove();
+          document.removeEventListener('click', onAway, true);
+        }
+      }
+      document.addEventListener('click', onAway, true);
+    }, 0);
+
+    // Append to <body> so it escapes any stacking context created by the
+    // tile grid or panel containers. A fixed z-index keeps it above everything.
+    document.body.appendChild(picker);
+    positionPicker(picker, parentEl);
+  }
+
+  /** Position the picker just below the + button, clipped to the viewport. */
+  function positionPicker(picker, anchor) {
+    const r = anchor.getBoundingClientRect();
+    const pw = picker.offsetWidth || 220;
+    let left = r.right - pw;
+    if (left < 8) left = 8;
+    if (left + pw > window.innerWidth - 8) left = window.innerWidth - 8 - pw;
+    picker.style.position = 'fixed';
+    picker.style.top = (r.bottom + 6) + 'px';
+    picker.style.left = left + 'px';
+  }
+
+  // --- Tile visibility operations --------------------------------------------
+  function hideTile(id) {
+    if (visibleIds.length <= 1) return; // keep at least one visible
+    visibleIds = visibleIds.filter(v => v !== id);
+    saveLayout(visibleIds);
+    rebuild();
+  }
+
+  function addTile(id) {
+    if (visibleIds.includes(id)) return;
+    visibleIds.push(id);
+    saveLayout(visibleIds);
+    rebuild();
+  }
+
+  function reorderTile(draggedId, targetId) {
+    if (draggedId === targetId) return;
+    const fromIdx = visibleIds.indexOf(draggedId);
+    if (fromIdx < 0) return;
+    visibleIds.splice(fromIdx, 1);
+    const toIdx = visibleIds.indexOf(targetId);
+    // Insert before the target so the dragged tile takes its position.
+    visibleIds.splice(toIdx, 0, draggedId);
+    saveLayout(visibleIds);
+    rebuild();
+  }
+
+  // --- Public render ---------------------------------------------------------
   function render(metrics) {
+    currentMetrics = metrics;
     if (banner) {
       banner.textContent = metrics.valid ? ''
         : `These readouts are suspended: ${metrics.invalidReasons.join('; ')}. `
@@ -208,24 +460,12 @@ export function createStats(container, { banner } = {}) {
       banner.hidden = metrics.valid;
     }
 
-    for (const n of nodes) {
-      const q = n.tile.quality?.(metrics) ?? { level: 'ok', reasons: [] };
-      const suppress = !metrics.valid || q.level === 'unavailable';
-
-      n.number.textContent = suppress ? '—' : tilePrimaryValue(n.tile.id, metrics);
-      n.sub.textContent = suppress ? '' : (n.tile.sub ? n.tile.sub(metrics) : '');
-
-      const status = suppress ? null : n.tile.status?.(metrics);
-      n.el.dataset.status = status ? status[0] : '';
-      n.flag.textContent = status ? status[1] : '';
-
-      n.el.dataset.quality = metrics.valid ? q.level : 'unavailable';
-      n.quality.textContent = q.level === 'ok' ? ''
-        : q.level === 'unavailable' ? `not interpretable — ${q.reasons[0] ?? ''}`
-          : `interpret with caution — ${q.reasons[0] ?? ''}`;
-      if (q.reasons.length > 1) n.quality.title = q.reasons.join('; ');
+    for (const n of nodeMap.values()) {
+      renderTile(n, metrics);
     }
   }
+
+  rebuild();
 
   return { render };
 }
