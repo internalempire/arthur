@@ -207,7 +207,10 @@ export function tilePrimaryValue(id, metrics) {
 export function createStats(container, { banner } = {}) {
   let visibleIds = loadLayout();
   const nodeMap = new Map(); // id → { tile, el, number, sub, flag, quality }
-  let currentMetrics = { valid: true };
+  // Start with null metrics — the first render() call from the main loop will
+  // populate the values. Calling renderTile with an empty object crashes the
+  // tile getters (m.co.toFixed → undefined.toFixed).
+  let currentMetrics = null;
 
   // --- Build a single tile element -------------------------------------------
   function buildTile(tile) {
@@ -285,6 +288,7 @@ export function createStats(container, { banner } = {}) {
 
   // --- Render a single tile's values ------------------------------------------
   function renderTile(n, metrics) {
+    if (!metrics) return; // not yet available — tiles show placeholders
     const q = n.tile.quality?.(metrics) ?? { level: 'ok', reasons: [] };
     const suppress = !metrics.valid || q.level === 'unavailable';
 
@@ -314,7 +318,7 @@ export function createStats(container, { banner } = {}) {
       const n = buildTile(tile);
       nodeMap.set(id, n);
       container.appendChild(n.el);
-      renderTile(n, currentMetrics);
+      if (currentMetrics) renderTile(n, currentMetrics);
     }
 
     // Add the "+" button at the end.
