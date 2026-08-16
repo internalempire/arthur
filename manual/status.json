@@ -35,6 +35,8 @@
     "pulmonary-transit",
     "pulmonary-vascular-resistance",
     "pulse-pressure-variation",
+    "pvr-nadir-at-frc",
+    "pvr-volume-vs-pressure",
     "quick-start",
     "recruitment-and-ri",
     "scenarios",
