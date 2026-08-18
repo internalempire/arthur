@@ -92,12 +92,14 @@ section('Scenario teaching mechanisms');
 
 {
   const phase = phaseMeans('healthy-vcv');
+  const passive = recentLvBeatMeans(scenarioSimulator('healthy-vcv'));
+  const spontaneous = recentLvBeatMeans(scenarioSimulator('healthy-spont'));
   demonstrates['healthy-vcv'] = phase.cvpIn > phase.cvpOut + 0.3
-    && phase.flowIn < phase.flowOut - 0.05;
-  check('passive inflation reverses the immediate CVP and flow directions',
+    && passive.output < spontaneous.output - 0.1;
+  check('passive inflation reverses CVP direction and lowers settled output',
     demonstrates['healthy-vcv'],
     `CVP ${phase.cvpOut.toFixed(1)} → ${phase.cvpIn.toFixed(1)}, `
-      + `flow ${phase.flowOut.toFixed(1)} → ${phase.flowIn.toFixed(1)} L/min`);
+      + `CO ${spontaneous.output.toFixed(2)} → ${passive.output.toFixed(2)} L/min`);
 }
 
 {
@@ -117,7 +119,7 @@ section('Scenario teaching mechanisms');
 {
   const baseline = scenarioMetrics('septic-responder');
   const fluid = scenarioMetrics('septic-responder', { stressedVolume: 830 });
-  const noReflex = scenarioMetrics('septic-responder', { baroreflex: 0 });
+  const noReflex = scenarioMetrics('septic-responder', { baroreflexEnabled: false });
   demonstrates['septic-responder'] = fluid.co > baseline.co * 1.2
     && noReflex.map < baseline.map - 10
     && noReflex.co < baseline.co;

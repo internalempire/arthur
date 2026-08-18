@@ -141,7 +141,11 @@ export const PARAMETERS = [
   },
 
   // ----------------------------------------------------------------------- heart
-  { id: 'hr', group: 'heart', label: 'Heart rate', unit: '/min', min: 40, max: 170, step: 1, default: 75 },
+  {
+    id: 'hr', group: 'heart', label: 'Baseline heart rate', unit: '/min',
+    min: 40, max: 170, step: 1, default: 75,
+    help: 'The intrinsic rate selected for the patient. When the baroreflex is on, the effective rate used by the circulation also includes the reflex contribution shown in the Heart rate tile.',
+  },
   {
     id: 'eesLv', group: 'heart', label: 'LV contractility (Ees)', unit: 'mmHg/mL',
     min: 0.3, max: 6.0, step: 0.1, default: 3.0,
@@ -156,13 +160,20 @@ export const PARAMETERS = [
     min: 0.010, max: 0.080, step: 0.002, default: 0.028,
   },
   {
+    id: 'baroreflexEnabled', group: 'heart', label: 'Baroreflex',
+    type: 'checkbox', default: false,
+    help: 'Off exposes the uncompensated mechanical heart–lung interaction. On adds one slow aggregate pressure-defence response that changes effective heart rate, systemic resistance, venous tone and contractility together.',
+  },
+  {
     id: 'baroreflex', group: 'heart', label: 'Baroreflex sensitivity', unit: '×',
     min: 0, max: 2, step: 0.1, default: 1.0,
-    help: 'Sensitivity of one bounded, slow sympathetic compensator driving heart rate, resistance, venous tone and contractility together. It uses one 15 s time constant and is not a beat-to-beat human baroreflex model. Set to zero to show the same circulation without compensation.',
+    requires: { id: 'baroreflexEnabled', value: true },
+    help: 'Gain of the bounded pressure-error response when the baroreflex is on. It uses one 15 s time constant and is not a beat-to-beat human baroreflex model. Changing the gain does not change the maximum response.',
   },
   {
     id: 'baroSetPoint', group: 'heart', label: 'Baroreflex set point', unit: 'mmHg',
     min: 55, max: 110, step: 1, default: 90,
+    requires: { id: 'baroreflexEnabled', value: true },
   },
   {
     id: 'pericardium', group: 'heart', label: 'Pericardial constraint', unit: '×',

@@ -53,7 +53,10 @@ export function createBaroreflexState() {
  */
 export function stepBaroreflex(p, state, map, dt) {
   const sensitivity = p.baroreflex ?? 0;
-  if (sensitivity <= 0) { state.outflow = 0; return 0; }
+  // Activation and gain are deliberately separate. The checkbox lets a learner
+  // compare the same selected patient with and without compensation; switching
+  // it off must erase residual outflow rather than let the 15 s state decay.
+  if (!p.baroreflexEnabled || sensitivity <= 0) { state.outflow = 0; return 0; }
 
   const error = p.baroSetPoint - map;
   const raw = Math.tanh(sensitivity * error / BARO.errorScale);

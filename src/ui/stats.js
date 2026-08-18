@@ -22,6 +22,11 @@ const KIND_LABEL = {
   coefficient: 'internal model coefficient',
 };
 
+const signed = (value, decimals = 0) => {
+  const rounded = Math.abs(value) < 0.5 * (10 ** -decimals) ? 0 : value;
+  return `${rounded > 0 ? '+' : ''}${rounded.toFixed(decimals)}`;
+};
+
 const TILES = [
   {
     id: 'co', label: 'Cardiac output', unit: 'L/min', kind: 'measured',
@@ -29,10 +34,29 @@ const TILES = [
     status: (m) => (m.co < 3.2 ? ['critical', 'low output'] : m.co < 4.0 ? ['warning', 'borderline'] : null),
   },
   {
+    id: 'hr', label: 'Heart rate', unit: '/min', kind: 'measured',
+    get: (m) => m.effectiveHr.toFixed(0),
+    sub: (m) => {
+      const baseline = m.selectedHr.toFixed(0);
+      if (!m.baroreflexEnabled) return `baseline ${baseline} · reflex off`;
+      return `baseline ${baseline} · reflex ${signed(m.effectiveHr - m.selectedHr)}/min`;
+    },
+  },
+  {
     id: 'map', label: 'Arterial pressure', unit: 'mmHg', kind: 'measured',
     get: (m) => `${m.sbp.toFixed(0)}/${m.dbp.toFixed(0)}`,
     sub: (m) => `mean ${m.map.toFixed(0)}`,
     status: (m) => (m.map < 60 ? ['critical', 'hypotensive'] : m.map < 68 ? ['warning', 'low'] : null),
+  },
+  {
+    id: 'svr', label: 'Systemic vascular resistance', unit: 'dyn·s·cm⁻⁵', kind: 'coefficient',
+    get: (m) => m.svrDyn.toFixed(0),
+    sub: (m) => {
+      const baseline = m.selectedSvrDyn.toFixed(0);
+      if (!m.baroreflexEnabled) return `baseline ${baseline} · reflex off`;
+      const delta = (m.svrDyn / m.selectedSvrDyn - 1) * 100;
+      return `baseline ${baseline} · reflex ${signed(delta)}%`;
+    },
   },
   {
     id: 'cvp', label: 'CVP', unit: 'mmHg', kind: 'measured',
@@ -176,11 +200,30 @@ const TILE_BY_ID = new Map(TILES.map((tile) => [tile.id, tile]));
 const DEFAULT_VISIBLE = TILES.map((t) => t.id);
 
 const STORAGE_KEY = 'arthur.tileLayout';
+const READOUT_MIGRATION_KEY = 'arthur.tileLayout.effective-rate-and-svr';
+
+function insertAfter(ids, anchor, id) {
+  if (ids.includes(id)) return;
+  const index = ids.indexOf(anchor);
+  ids.splice(index < 0 ? ids.length : index + 1, 0, id);
+}
 
 function loadLayout() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (Array.isArray(saved) && saved.length > 0) return saved;
+    if (Array.isArray(saved) && saved.length > 0) {
+      if (localStorage.getItem(READOUT_MIGRATION_KEY) !== 'done') {
+        // These readouts did not exist when older layouts were saved. Add them
+        // once beside the quantities they explain, then respect any later hide
+        // or reorder action exactly like every other user-customisable tile.
+        insertAfter(saved, 'co', 'hr');
+        insertAfter(saved, 'map', 'svr');
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+        localStorage.setItem(READOUT_MIGRATION_KEY, 'done');
+      }
+      return saved;
+    }
+    localStorage.setItem(READOUT_MIGRATION_KEY, 'done');
   } catch { /* ignore */ }
   return [...DEFAULT_VISIBLE];
 }

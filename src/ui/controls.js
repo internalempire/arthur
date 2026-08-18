@@ -56,6 +56,10 @@ export function createControls(container, sim, onChange) {
         o.textContent = opt.label;
         input.appendChild(o);
       }
+    } else if (spec.type === 'checkbox') {
+      input = document.createElement('input');
+      input.type = 'checkbox';
+      row.classList.add('ctrl-checkbox');
     } else {
       input = document.createElement('input');
       input.type = 'range';
@@ -66,7 +70,9 @@ export function createControls(container, sim, onChange) {
     input.id = `ctrl-${spec.id}`;
     input.className = 'ctrl-input';
     input.addEventListener('input', () => {
-      const v = spec.type === 'choice' ? input.value : parseFloat(input.value);
+      const v = spec.type === 'choice' ? input.value
+        : spec.type === 'checkbox' ? input.checked
+          : parseFloat(input.value);
       sim.setParam(spec.id, v);
       paint(spec, input, value);
       // One control can decide whether another applies at all, so relevance is
@@ -93,6 +99,8 @@ export function createControls(container, sim, onChange) {
     const v = sim.params[spec.id];
     if (spec.type === 'choice') {
       value.textContent = spec.options.find((o) => o.value === v)?.label ?? v;
+    } else if (spec.type === 'checkbox') {
+      value.textContent = v ? 'On' : 'Off';
     } else {
       const decimals = spec.step < 0.01 ? 3 : spec.step < 1 ? 2 : 0;
       value.textContent = `${Number(v).toFixed(decimals)}${spec.unit ? ' ' + spec.unit : ''}`;
@@ -123,7 +131,8 @@ export function createControls(container, sim, onChange) {
   /** Reflect the simulator's parameters back into the inputs. */
   function sync() {
     for (const { spec, input, value } of rows.values()) {
-      input.value = sim.params[spec.id];
+      if (spec.type === 'checkbox') input.checked = Boolean(sim.params[spec.id]);
+      else input.value = sim.params[spec.id];
       paint(spec, input, value);
     }
     refreshRelevance();

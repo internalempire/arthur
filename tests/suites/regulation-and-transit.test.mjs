@@ -127,8 +127,8 @@ section('Baroreflex');
   // Use the septic preset's underfilled, vasodilated phenotype. The invariant
   // below is mechanistic preload reserve, not a PPV cutoff.
   const septic = { stressedVolume: 330, svr: 0.85, vt: 560, ccw: 150, hr: 105, peep: 8, rr: 18 };
-  const off = settled({ ...septic, baroreflex: 0 }, 45);
-  const on = settled({ ...septic, baroreflex: 1 }, 45);
+  const off = settled({ ...septic, baroreflexEnabled: false, baroreflex: 1 }, 45);
+  const on = settled({ ...septic, baroreflexEnabled: true, baroreflex: 1 }, 45);
   check('the reflex defends arterial pressure', on.metrics.map > off.metrics.map + 8,
     `${off.metrics.map.toFixed(0)} -> ${on.metrics.map.toFixed(0)} mmHg`);
   check('it does so by raising heart rate', on.metrics.effectiveHr > off.metrics.effectiveHr + 5,
@@ -144,20 +144,25 @@ section('Baroreflex');
     + `${(on.metrics.preload.relative * 100).toFixed(1)}%/mmHg on`);
 
   // Above the set point the reflex withdraws, but only weakly.
-  const high = settled({ svr: 1.6, baroreflex: 1 }, 45);
+  const high = settled({ svr: 1.6, baroreflexEnabled: true, baroreflex: 1 }, 45);
   check('above the set point the reflex withdraws rather than reversing',
     high.metrics.baroOutflow < 0 && high.metrics.baroOutflow > -0.3,
     `outflow ${high.metrics.baroOutflow.toFixed(3)} at MAP ${high.metrics.map.toFixed(0)}`);
 
-  check('zero sensitivity restores the uncompensated model',
-    settled({ baroreflex: 0 }, 45).metrics.baroOutflow === 0);
+  check('the aggregate reflex is disabled by default',
+    defaultParams().baroreflexEnabled === false && settled({}, 45).metrics.baroOutflow === 0);
+  check('the off switch overrides a retained non-zero sensitivity',
+    settled({ ...septic, baroreflexEnabled: false, baroreflex: 2 }, 45).metrics.baroOutflow === 0);
+  check('zero sensitivity also restores the uncompensated model when enabled',
+    settled({ ...septic, baroreflexEnabled: true, baroreflex: 0 }, 45).metrics.baroOutflow === 0);
 
   // Sensitivity changes where the aggregate reflex saturates, not the size of
   // a biologically undefined super-response. This guardrail matters because a
   // high selected baseline HR already represents part of the patient's
   // phenotype and must not be multiplied by the compensation a second time.
   const extreme = settled({
-    stressedVolume: 200, svr: 0.25, hr: 170, baroreflex: 2, baroSetPoint: 110,
+    stressedVolume: 200, svr: 0.25, hr: 170, baroreflexEnabled: true,
+    baroreflex: 2, baroSetPoint: 110,
   }, 60);
   check('high sensitivity cannot exceed full sympathetic outflow',
     extreme.metrics.baroOutflow <= 1 && extreme.effective.venousToneVolume <= BARO.venousRecruitment,
@@ -176,7 +181,10 @@ section('Baroreflex');
 
   // The loop must not oscillate.
   const s = new Simulator();
-  s.params = { ...defaultParams(), stressedVolume: 260, svr: 0.5, baroreflex: 2 };
+  s.params = {
+    ...defaultParams(), stressedVolume: 260, svr: 0.5,
+    baroreflexEnabled: true, baroreflex: 2,
+  };
   s.reset();
   s.advance(40, true);
   let lo = Infinity, hi = -Infinity;

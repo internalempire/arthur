@@ -26,7 +26,7 @@ does not tune a preset or change an equation to make a row pass.
 | Preset | Status | Main finding |
 |---|---|---|
 | `healthy-spont` | supported | Inspiration lowers measured CVP while forward flow rises; PPV is correctly withheld. |
-| `healthy-vcv` | supported | Passive inflation reverses the respiratory direction of CVP and flow. |
+| `healthy-vcv` | supported | Passive inflation reverses the respiratory direction of CVP and lowers settled output relative to spontaneous breathing. |
 | `peep-escalation` | qualified | Higher PEEP raises CVP and mean systemic filling pressure while lowering output; the size is illustrative. |
 | `septic-responder` | qualified | Added stressed volume raises output and removing compensation exposes hypotension; the coefficients are didactic. |
 | `swing-limited-reserve` | qualified | A >20 cmH2O pleural swing coexists with a non-steep local preload slope; PPV is correctly withheld during spontaneous effort. |
@@ -69,16 +69,17 @@ muscle blood flow and neural respiratory-circulatory coupling.
 **Teaching question.** How does passive positive-pressure inflation reverse the
 immediate right-heart effect of a spontaneous breath?
 
-**What the model produces.** During inflation, CVP rises to approximately 1.8
-from 1.1 mmHg and forward flow falls to approximately 4.6 from 4.8 L/min. The
-settled output is also lower than in the spontaneous healthy preset, although
-the two presets do not deliver the same tidal volume and therefore are not a
-quantitative matched experiment.
+**What the model produces.** During inflation, CVP rises to approximately 1.7
+from 1.1 mmHg. Mean output over recent complete beats is about 5.0 L/min rather
+than 5.1 L/min in the spontaneous healthy preset, although the two presets do not deliver the same
+tidal volume and therefore are not a quantitative matched experiment.
 
 **Assessment — supported.** The respiratory-phase direction is correct: rising
 pleural pressure raises measured intrathoracic vascular pressure and opposes
-systemic venous return. The later left-heart response is buffered by the model's
-pulmonary transit pathway.
+systemic venous return. Aortic flow need not fall during the same phase because
+pulmonary blood displacement can transiently augment left-heart filling; the
+later right-to-left consequence is separated by the model's pulmonary transit
+pathway.
 
 **Not represented.** Ventilator triggering and synchrony, regional lung
 inflation, changes in pulmonary blood volume with lung volume, and autonomic
@@ -90,8 +91,8 @@ responses at human beat-to-beat fidelity.
 pressure yet still reduce venous return and cardiac output?
 
 **What the model produces.** Raising PEEP from 5 to 14 cmH2O raises CVP by about
-2.4 mmHg and model mean systemic filling pressure by about 2.1 mmHg. Cardiac
-output falls by about 8%, the effective venous-return gradient narrows, and
+2.6 mmHg and model mean systemic filling pressure by about 2.1 mmHg. Cardiac
+output falls by about 12%, the effective venous-return gradient narrows, and
 catheter-derived PVR rises modestly.
 
 **Assessment — qualified.** The competing-pressure lesson is present. The rise
@@ -110,9 +111,9 @@ vascular stress relaxation.
 **Teaching question.** Can compensatory pressure conceal low effective filling,
 and can stressed volume change independently of venous compliance?
 
-**What the model produces.** The baseline settles near CO 4.4 L/min and MAP
-82 mmHg. Increasing stressed volume by 500 mL raises output to about 5.9 L/min.
-With the aggregate baroreflex disabled, MAP falls to about 63 mmHg and output to
+**What the model produces.** The baseline settles near CO 4.3 L/min and MAP
+81 mmHg. Increasing stressed volume by 500 mL raises output to about 6.1 L/min.
+With the aggregate baroreflex disabled, MAP falls to about 62 mmHg and output to
 about 3.9 L/min. The fluid control adds blood to the venous reservoir; the
 baroreflex instead shifts volume from unstressed to stressed without changing
 total blood volume.
@@ -154,9 +155,9 @@ arterial waveform measurement error.
 **Teaching question.** How does recruitability alter the balance between
 recruitment benefit and inflation-related RV load?
 
-**What the model produces.** At PEEP 12 cmH2O the preset has mPAP about 23 mmHg,
+**What the model produces.** At PEEP 12 cmH2O the preset has mPAP about 21 mmHg,
 low left-atrial-pressure wedge surrogate, an internal hydraulic estimate of
-about 4.8 WU and RV/LV end-diastolic volume ratio about 1.6. The wedge and
+about 4.9 WU and RV/LV end-diastolic volume ratio about 1.7. The wedge and
 derived-PVR tiles are cautioned by the aggregate zone-3 rule. Raising PEEP opens
 more lung in the high-R/I phenotype, but output
 still falls slightly because preload and waterfall costs remain. At high PEEP,
@@ -186,7 +187,7 @@ wedge surrogate about 3 mmHg, an internal $(mPAP-P_{LA})/CO$ estimate about
 7.5 WU, CVP about 4.7 mmHg and RV/LV ratio about 2.0. The aggregate zone-3
 index cautions both the wedge surrogate and derived-PVR interpretation.
 Changing to passive volume control and raising PEEP from 0 to 10 cmH2O lowers
-output by roughly 7% and further raises right-sided pressure and RV/LV ratio.
+output by roughly 9% and further raises right-sided pressure and RV/LV ratio.
 
 **Assessment — qualified.** The pressure-flow-RV pattern is clinically
 recognisable. `pvrBase` is an effective aggregate afterload: it does not split
@@ -215,7 +216,7 @@ wedge surrogate occupy a band about 6 mmHg wide. Cardiac output is about
 4.1 L/min. Restoring capacity to 430 mL while changing nothing else nearly
 abolishes pericardial pressure, lowers CVP by about 8 mmHg, restores RV
 end-diastolic volume proportionally more than LV end-diastolic volume, and
-raises output to about 6.4 L/min.
+raises output to about 6.7 L/min.
 
 **Assessment — qualified.** The pressure-volume mechanism, preferential RV
 restriction and decompression direction are coherent. Capacity is an aggregate
@@ -249,7 +250,7 @@ pleural-pressure swing when the chest wall is stiff?
 
 **What the model produces.** Against a normal-wall comparator at the same tidal
 volume and PEEP, the preset raises pleural swing from about 2.5 to 6.7 cmH2O,
-raises measured CVP and lowers output by about 8%. This is the intended pressure-
+raises measured CVP and lowers output by about 10%. This is the intended pressure-
 transmission effect.
 
 **Assessment — qualified.** The direction is sound, but the preset combines low
@@ -270,8 +271,8 @@ disease.
 external PEEP interact with intrinsic PEEP and circulation?
 
 **What the model produces.** At 26/min, auto-PEEP is about 7 cmH2O and trapped
-volume about 0.8 L; slowing to 12/min reduces them to approximately 1.2 cmH2O
-and 0.14 L while output rises. External PEEP from 0 to 5 cmH2O largely substitutes
+volume about 0.8 L; slowing to 12/min reduces them to approximately 1.3 cmH2O
+and 0.15 L while output rises. External PEEP from 0 to 5 cmH2O largely substitutes
 for intrinsic pressure, leaving total PEEP and end-expiratory volume nearly
 unchanged. Above the model choke, total PEEP and lung volume rise and output
 falls.

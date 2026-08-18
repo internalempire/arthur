@@ -23,10 +23,10 @@ export const SCENARIOS = [
   {
     id: 'septic-responder',
     name: 'Septic shock, fluid responsive',
-    note: 'Low stressed volume, vasodilated, and compensating hard — the aggregate baroreflex raises the rate from its selected 105 to about 122 and holds mean pressure near 82, which is the trap. The pressure looks survivable while the operating point remains on the steep part of the cardiac-function curve and fluid still raises output. Increase stressed volume and watch that reserve fall as output climbs. Then set baroreflex sensitivity to zero and see the same circulation without compensation.',
+    note: 'Low stressed volume, vasodilated, and compensating hard — the aggregate baroreflex raises the rate from its selected 105 to about 122 and holds mean pressure near 82, which is the trap. The pressure looks survivable while the operating point remains on the steep part of the cardiac-function curve and fluid still raises output. Increase stressed volume and watch that reserve fall as output climbs. Then turn the baroreflex off and see the same circulation without compensation.',
     params: {
       mode: 'vcv', pmus: 0, vt: 560, peep: 8, rr: 18, ccw: 150,
-      stressedVolume: 330, svr: 0.85, hr: 105,
+      stressedVolume: 330, svr: 0.85, hr: 105, baroreflexEnabled: true,
     },
   },
   {

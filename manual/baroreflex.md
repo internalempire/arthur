@@ -16,7 +16,9 @@ Real baroreflex physiology is not one signal. Cardiac vagal responses can occur 
 
 ## In the model
 
-The afferent signal is a low-pass mean arterial pressure, not pulsatile vessel-wall stretch. The difference between the selected set point and that mean pressure enters a saturating response. The `Baroreflex sensitivity` control changes how much pressure error is needed to approach the bound; it does not increase the maximum response.
+The `Baroreflex` checkbox is **off by default**. In that state the outflow is forced to zero, so a ventilatory intervention exposes the uncompensated mechanical interaction. This is a teaching reference state, not a claim that a healthy patient lacks autonomic regulation. Turning the checkbox on adds the model's aggregate pressure defence without changing the selected patient inputs.
+
+The afferent signal is a low-pass mean arterial pressure, not pulsatile vessel-wall stretch. The difference between the selected set point and that mean pressure enters a saturating response. The retained `Baroreflex sensitivity` control changes how much pressure error is needed to approach the bound; it does not increase the maximum response. Sensitivity and set point remain visible but inactive while the checkbox is off, so an off/on comparison preserves their selected values.
 
 ![Steady aggregate baroreflex response at three selected sensitivities](figure/baroreflex.svg)
 
@@ -33,13 +35,21 @@ At full positive outflow, all four model effectors change together:
 
 These are didactic aggregate coefficients. They preserve a readable compensatory response across the control space; they are not fitted human gains and should not be compared with an autonomic function test.
 
-The septic preset illustrates the difference. With the compensator disabled, settled output is about 3.90 L/min and MAP 63 mmHg. With it active, output is 4.39 L/min and MAP 82 mmHg. The model remains preload responsive in both states: pressure defence does not manufacture volume or remove the underlying circulation problem.
+The heart-rate control is the **baseline rate** selected for the phenotype. When the reflex is active, the circulation uses
+
+$$
+HR_{effective}=HR_{baseline}+42\times outflow
+$$
+
+The Heart rate tile displays this effective rate and states the baseline and reflex contribution underneath. The systemic-resistance tile follows the same rule: its main number is the effective SVR used by the circulation, while its subtitle separates the selected baseline from the reflex percentage change. The controls therefore remain inputs; they are not rewritten every time the compensator moves.
+
+The septic preset illustrates the difference. With the compensator disabled, settled output is about 3.8 L/min and MAP 62 mmHg. With it active, output is about 4.3 L/min and MAP 81 mmHg. The model remains preload responsive in both states: pressure defence does not manufacture volume or remove the underlying circulation problem.
 
 ---
 
 ## Why this and not something else
 
-With no compensation, every respiratory intervention is applied to an autonomically denervated preparation and the model exaggerates its systemic cost. A complete autonomic model would require separate vagal and sympathetic pathways, afferent pulsatility, central integration, effector-specific delays, reset during chronic pressure changes and interactions with chemoreflexes and drugs.
+With no compensation, every respiratory intervention is applied to an idealised autonomically unopposed preparation and its mechanical effect is easier to see. That is why off is the interface default. It can exaggerate the systemic cost relative to an intact patient, so turning the reflex on is the second step when asking how much of the disturbance remains after aggregate pressure defence. A complete autonomic model would require separate vagal and sympathetic pathways, afferent pulsatility, central integration, effector-specific delays, reset during chronic pressure changes and interactions with chemoreflexes and drugs.
 
 One bounded state was chosen because the relevant teaching question is narrower: how much of an immediate mechanical disturbance remains visible after a plausible aggregate pressure defence? A shared state also keeps it clear that the readout is compensation, not a diagnosis of autonomic activity.
 
@@ -69,7 +79,7 @@ An additive heart-rate reserve is used instead of multiplying the selected basel
 
 ## Validation
 
-Executable checks require the reflex to defend MAP by increasing heart rate and systemic resistance, mobilise volume without adding blood, withdraw rather than reverse above the set point, remain bounded at high sensitivity, avoid multiplying an already high selected heart rate, and settle without oscillation. Setting sensitivity to zero must restore the uncompensated model exactly.
+Executable checks require the reflex to be off by default, defend MAP by increasing effective heart rate and systemic resistance when enabled, mobilise volume without adding blood, withdraw rather than reverse above the set point, remain bounded at high sensitivity, avoid multiplying an already high selected heart rate, and settle without oscillation. The off switch must override a retained non-zero sensitivity immediately; zero sensitivity must also restore the uncompensated model when the switch is on.
 
 ---
 

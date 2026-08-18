@@ -17,9 +17,9 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Question.** What reverses when the ventilator, rather than the respiratory muscles, generates inspiration?
 
-**Try.** Compare the direction of CVP and forward flow during inflation with the spontaneous preset.
+**Try.** Compare the direction of CVP during inflation, then compare settled cardiac output with the spontaneous preset.
 
-**Read.** Positive pleural pressure raises measured intrathoracic vascular pressure and transiently opposes venous return. The later left-heart response is separated from the right-heart response by [pulmonary transit](pulmonary-transit.md).
+**Read.** Positive pleural pressure raises measured intrathoracic vascular pressure and transiently opposes venous return. Aortic flow can briefly rise as inflation displaces pulmonary blood, while the later left-heart consequence of reduced right-heart output is separated by [pulmonary transit](pulmonary-transit.md).
 
 ### PEEP escalation
 
@@ -33,7 +33,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Question.** Can an apparently survivable arterial pressure conceal low effective filling?
 
-**Try.** Increase stressed volume, then return to the preset and set baroreflex sensitivity to zero.
+**Try.** Increase stressed volume, then return to the preset and switch the baroreflex off.
 
 **Read.** Added [stressed volume](stressed-volume.md) raises Pmsf and output because the operating point has preload reserve. Removing the aggregate [baroreflex](baroreflex.md) exposes the pressure and flow that the selected circulation would generate without compensation. The fluid step and reflex coefficients are teaching choices, not resuscitation targets.
 

@@ -86,7 +86,9 @@ section('Compartment positivity across a control-space sweep');
     for (const spec of PARAMETERS) {
       p[spec.id] = spec.type === 'choice'
         ? spec.options[Math.floor(rnd() * spec.options.length)].value
-        : spec.min + rnd() * (spec.max - spec.min);
+        : spec.type === 'checkbox'
+          ? rnd() >= 0.5
+          : spec.min + rnd() * (spec.max - spec.min);
     }
     const s = new Simulator();
     s.params = p;

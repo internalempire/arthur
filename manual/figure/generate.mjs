@@ -417,7 +417,10 @@ function baroreflexFigure() {
   const series = [0.5, 1, 2].map((sensitivity) => {
     const points = pressures.map((map) => {
       const state = createBaroreflexState();
-      const p = { ...defaultParams(), baroreflex: sensitivity, baroSetPoint: 90 };
+      const p = {
+        ...defaultParams(), baroreflexEnabled: true,
+        baroreflex: sensitivity, baroSetPoint: 90,
+      };
       // Settle the actual first-order operator rather than redrawing its
       // algebra. At steady state this is the outflow every effector receives.
       for (let i = 0; i < 3000; i++) stepBaroreflex(p, state, map, 0.02);

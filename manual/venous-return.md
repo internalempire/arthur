@@ -75,11 +75,11 @@ A passive patient at 500 mL, 14 breaths per minute:
 
 | PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |
 |---:|---:|---:|---:|
-| 0 | 7.0 | -0.6 | 4.94 |
-| 5 | 8.7 | 1.0 | 4.91 |
-| 10 | 9.9 | 2.4 | 4.72 |
-| 15 | 11.1 | 3.9 | 4.38 |
-| 20 | 12.4 | 5.5 | 4.20 |
+| 0 | 7.1 | -0.6 | 5.02 |
+| 5 | 8.7 | 1.0 | 4.97 |
+| 10 | 9.9 | 2.4 | 4.74 |
+| 15 | 11.1 | 3.9 | 4.34 |
+| 20 | 12.2 | 5.5 | 4.08 |
 <!-- END GENERATED: venous-return-peep -->
 
 Mean systemic filling pressure *rises* with PEEP — the abdominal contribution and the compression of the reservoir see to that — and output falls anyway, because right atrial pressure rises faster than the head does. The gradient is what matters, not either end of it.

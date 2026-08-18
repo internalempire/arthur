@@ -57,9 +57,16 @@ check('the application shell retains every UI mount point',
 check('the browser entry point remains an ES module',
   /<script\s+type=["']module["']\s+src=["']src\/main\.js["']><\/script>/.test(html));
 
+const controls = readFileSync(new URL('../src/ui/controls.js', import.meta.url), 'utf8');
+const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8');
+check('binary parameter controls retain native checkbox semantics',
+  /spec\.type === 'checkbox'/.test(controls) && /input\.checked/.test(controls));
+check('effective heart rate and systemic resistance remain available as tiles',
+  /id: 'hr'/.test(stats) && /id: 'svr'/.test(stats));
+
 if (failures.length) {
   console.error(`\n${failures.length} UI smoke failure(s):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n4 UI smoke contracts passed`);
+console.log(`\n6 UI smoke contracts passed`);
