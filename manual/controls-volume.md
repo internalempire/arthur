@@ -27,7 +27,7 @@ This control changes how much flow a given Pmsf–right-atrial-pressure gradient
 
 ### Systemic vascular resistance
 
-SVR changes LV arterial load and systemic pressure. The active [baroreflex](baroreflex.md) can partly oppose a manual change by adjusting its own resistance, rate, tone and contractility together. Set baroreflex sensitivity to zero when the aim is to isolate SVR.
+SVR changes LV arterial load and systemic pressure. The active [baroreflex](baroreflex.md) can partly oppose a manual change by adjusting its own resistance, rate, tone and contractility together. Switch the baroreflex off when the aim is to isolate the selected SVR. The Systemic vascular resistance tile shows the effective value used by the circulation and identifies any reflex contribution.
 
 ## Why these are independent
 

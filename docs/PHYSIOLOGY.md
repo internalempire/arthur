@@ -34,31 +34,31 @@ Baseline (70 kg adult, passive volume control, VT 450 mL, PEEP 5, RR 14):
 
 | | Model | Expected |
 |---|---|---|
-| Cardiac output | 4.9 L/min | 4.5–6.0 |
-| Arterial pressure | 111/75, mean 93 | — |
-| Heart rate (after reflex) | 73 | — |
-| CVP | 1.5 mmHg | 0–6 |
-| Pulmonary artery | 22/13, mean 17 | 15–25 / 8–15 |
-| Wedge | 10 mmHg | 6–12 |
-| Mean systemic filling pressure | 8.8 mmHg | 8–12 |
-| PVR | 1.3 Wood units | 0.3–2.0 |
-| LV ejection fraction | 50% | 55–70 (see limitations) |
-| Plateau pressure | 9.5 cmH₂O | — |
+| Cardiac output | 5.0 L/min | 4.5–6.0 |
+| Arterial pressure | 112/77, mean 95 | — |
+| Heart rate (baseline = effective, reflex off) | 75 | — |
+| CVP | 1.2 mmHg | 0–6 |
+| Pulmonary artery | 21/11, mean 16 | 15–25 / 8–15 |
+| Wedge surrogate | 9 mmHg | 6–12 |
+| Mean systemic filling pressure | 8.7 mmHg | 8–12 |
+| PVR coefficient | 1.2 Wood units | 0.3–2.0 |
+| LV ejection fraction | 49% | 55–70 (see limitations) |
+| Plateau pressure | 9.6 cmH₂O | — |
 
-The baroreflex sits slightly withdrawn at rest, because the baseline pressure is
-a little above its set point — which is why heart rate reads 73 rather than the
-75 on the control.
+The aggregate baroreflex is off in this reference state. The selected baseline
+rate and the effective rate are therefore both 75/min. This deliberately exposes
+the unopposed mechanical model before autonomic compensation is added.
 
 Behaviour was checked against the sources rather than only against resting
 numbers. The following all reproduce:
 
-- PEEP 0 → 20: cardiac output 5.2 → 3.7 L/min, CVP 0.5 → 4.5, Pmsf 7.6 → 12.5.
+- PEEP 0 → 20: cardiac output 5.0 → 4.1 L/min, CVP −0.4 → 5.7, Pmsf 7.1 → 12.2.
   The gradient for venous return is partly defended by the abdomen, as Fessler
   and van den Berg describe.
 - Spontaneous inspiration lowers CVP below zero while cardiac output rises.
-- Hypovolaemia: pulse pressure variation 15%, and a 500 mL bolus raises cardiac
-  output from 4.7 to 6.3 L/min. At euvolaemia the same bolus gains about 12%
-  and variation is 2%.
+- Hypovolaemia: a 500 mL stressed-volume step raises cardiac output more from an
+  underfilled starting point than from the plateau of the cardiac-function curve.
+  PPV is displayed descriptively but is not used as the validation target.
 - ARDS with right ventricular failure: at its shipped PEEP the RV:LV
   end-diastolic ratio is about 1.62 and the resistance coefficient is about
   4.24 WU. Across PEEP 0 → 20 the coefficient falls 4.57 → 3.59 while derived
@@ -87,9 +87,10 @@ venous zero-pressure volume. Moving the control by 500 mL adds or removes 500 mL
 of actual blood from that reservoir. It is an instantaneous teaching manoeuvre,
 not a model of infusion kinetics or transcapillary redistribution.
 
-The baroreflex does something different. Each unit of positive sympathetic
+When enabled, the baroreflex does something different. Each unit of positive sympathetic
 outflow lowers the unstressed volume by 200 mL and therefore mobilises the same
-amount as stressed volume. The user-facing sensitivity changes how rapidly a
+amount as stressed volume. The checkbox is off by default; the retained
+user-facing sensitivity changes how rapidly a
 pressure error approaches full response, but the outflow is bounded and cannot
 mobilise more than 200 mL. Total blood and the selected compliance remain
 unchanged.
@@ -216,15 +217,16 @@ patient's Pmsf.
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 
-- **One reflex arc, no chemoreflex.** The arterial baroreflex is present as a
+- **One reflex arc, no chemoreflex.** The optional arterial baroreflex is present as a
   bounded, single sympathetic outflow with one 15 s time constant; the real
   vagal and sympathetic arcs to heart rate, resistance, venous tone and
   contractility have different latencies, and there is no chemoreflex at all.
   Heart rate receives an additive reserve rather than a percentage of the
   selected baseline, but this only removes an extreme double count: it is not a
   patient-specific chronotropic model. Venous tone has one fixed recruitment
-  coefficient rather than a drug-specific dose response. Set sensitivity to
-  zero to see the uncompensated model, and do not use the transient to infer a
+  coefficient rather than a drug-specific dose response. It is off by default;
+  use the checkbox to compare uncompensated mechanics with aggregate pressure
+  defence, and do not use the transient to infer a
   human baroreflex latency. The afferent signal is low-pass mean pressure rather
   than pulsatile arterial-wall stretch. It does not sense PVR, mPAP, right-heart
   distension or hypoxaemia directly: an increased pulmonary load recruits the

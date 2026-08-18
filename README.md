@@ -101,7 +101,7 @@ The cardiovascular model includes:
 - venous tone, venous compliance and resistance to venous return as separate mechanisms;
 - systemic vascular resistance;
 - ventricular septal interaction, shared nonlinear pericardial pressure and adjustable pericardial capacity;
-- a bounded aggregate baroreflex acting on heart rate, vascular tone, resistance and contractility.
+- an optional, bounded aggregate baroreflex acting on effective heart rate, vascular tone, resistance and contractility; it is off by default so the initial view exposes uncompensated mechanical interaction.
 
 Detailed pages: **[Venous return](manual/venous-return.md)**, **[Stressed volume](manual/stressed-volume.md)**, **[Venous tone](manual/venous-tone.md)**, **[The right ventricle](manual/the-right-ventricle.md)**, **[Ventricular interdependence](manual/ventricular-interdependence.md)**, **[Cardiac tamponade](manual/cardiac-tamponade.md)** and **[Baroreflex](manual/baroreflex.md)**.
 
@@ -127,11 +127,11 @@ The interface reports pressures, flows, chamber volumes and derived physiologica
 These include:
 
 - measured and transmural CVP;
-- cardiac output, stroke volume and ventricular volumes;
+- cardiac output, effective and baseline heart rate, stroke volume and ventricular volumes;
 - airway, alveolar, pleural and abdominal pressures;
 - total PEEP, intrinsic PEEP and trapped volume;
 - plateau pressure, driving pressure and respiratory compliance;
-- mPAP, wedge surrogate, resistance coefficient and derived PVR;
+- effective systemic resistance coefficient, mPAP, wedge surrogate, pulmonary resistance coefficient and derived PVR;
 - stress index, pulse pressure variation and stroke volume variation;
 - mean systemic filling pressure and model preload reserve;
 - open fraction, R/I and pulmonary transit estimates.

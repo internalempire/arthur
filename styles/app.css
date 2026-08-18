@@ -467,6 +467,17 @@ select { min-width: 150px; }
 
 .ctrl-input { width: 100%; }
 
+.ctrl-checkbox .ctrl-input {
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: 4px 0 0;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+
+.ctrl-checkbox .ctrl-input:disabled { cursor: not-allowed; }
+
 select.ctrl-input {
   min-width: 0;
   padding: 4px 8px;

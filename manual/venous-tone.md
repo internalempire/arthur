@@ -32,7 +32,7 @@ $$
 
 Total blood volume and selected venous compliance remain unchanged. At full positive outflow, 200 mL is reclassified as stressed; at maximum withdrawal, 50 mL moves in the opposite direction.
 
-In the shipped septic phenotype, disabling the reflex gives output about 3.90 L/min, MAP 63 mmHg and Pmsf 7.9 mmHg. With the reflex active, outflow settles near 0.40, about 81 mL is mobilised, output rises to 4.39 L/min, MAP to 82 mmHg and Pmsf to 8.5 mmHg. These changes are the composite result of simultaneous chronotropy, arterial constriction, venous mobilisation and inotropy; they do not isolate the venous contribution.
+In the shipped septic phenotype, disabling the reflex gives output about 3.8 L/min, MAP 62 mmHg and Pmsf about 7.9 mmHg. With the reflex active, outflow settles near 0.41, about 82 mL is mobilised, output rises to about 4.3 L/min, MAP to 81 mmHg and Pmsf to about 8.5 mmHg. These changes are the composite result of simultaneous chronotropy, arterial constriction, venous mobilisation and inotropy; they do not isolate the venous contribution.
 
 ---
 

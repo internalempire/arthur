@@ -41,17 +41,17 @@
 <text class="tick" x="484.8" y="396" text-anchor="middle">25</text>
 <line class="axis" x1="66" y1="26" x2="66" y2="378"/>
 <line class="axis" x1="66" y1="378.0" x2="535" y2="378.0"/>
-<path class="total" style="stroke-dasharray:none" d="M-34.5 16.8 L-31.1 16.8 L-27.6 16.8 L-24.2 16.9 L-20.8 16.9 L-17.4 16.9 L-13.9 17.0 L-10.5 17.0 L-7.1 17.1 L-3.6 17.2 L-0.2 17.3 L3.2 17.4 L6.6 17.6 L10.1 17.8 L13.5 18.0 L16.9 18.3 L20.4 18.6 L23.8 19.0 L27.2 19.4 L30.6 19.9 L34.1 20.6 L37.5 21.3 L40.9 22.2 L44.4 23.3 L47.8 24.5 L51.2 26.0 L54.6 27.7 L58.1 29.7 L61.5 31.9 L64.9 34.5 L68.4 37.4 L71.8 40.8 L75.2 44.5 L78.6 48.6 L82.1 53.1 L85.5 58.0 L88.9 63.3 L92.4 69.0 L95.8 75.1 L99.2 81.5 L102.6 88.2 L106.1 95.2 L109.5 102.4 L112.9 109.9 L116.4 117.5 L119.8 125.4 L123.2 133.3 L126.6 141.4 L130.1 149.6 L133.5 157.9 L136.9 166.3 L140.4 174.8 L143.8 183.2 L147.2 191.8 L150.6 200.4 L154.1 209.0 L157.5 217.6 L160.9 226.3 L164.4 235.0 L167.8 243.7 L171.2 252.4 L174.6 261.1 L178.1 269.9 L181.5 278.6 L184.9 287.3 L188.4 296.1 L191.8 304.9 L195.2 313.6 L198.6 322.4 L202.1 331.1 L205.5 339.9 L208.9 348.7 L212.4 357.5 L215.8 366.2 L219.2 375.0 L222.6 378.0 L226.1 378.0 L229.5 378.0 L232.9 378.0 L236.4 378.0 L239.8 378.0 L243.2 378.0 L246.6 378.0 L250.1 378.0 L253.5 378.0 L256.9 378.0 L260.4 378.0 L263.8 378.0 L267.2 378.0 L270.6 378.0"/>
-<path class="alv" style="stroke-dasharray:5 4" d="M66.0 86.0 L491.4 378.0"/>
-<circle class="dot" cx="96.9" cy="107.2" r="4"/>
-<circle class="dot" cx="106.8" cy="114.0" r="4"/>
-<circle class="dot" cx="117.0" cy="121.2" r="4"/>
-<circle class="dot" cx="127.3" cy="128.0" r="4"/>
+<path class="total" style="stroke-dasharray:none" d="M-34.5 17.6 L-31.1 17.6 L-27.7 17.7 L-24.2 17.7 L-20.8 17.7 L-17.4 17.8 L-14.0 17.8 L-10.5 17.9 L-7.1 18.0 L-3.7 18.0 L-0.3 18.2 L3.2 18.3 L6.6 18.4 L10.0 18.6 L13.4 18.8 L16.9 19.1 L20.3 19.4 L23.7 19.8 L27.1 20.2 L30.6 20.8 L34.0 21.4 L37.4 22.2 L40.8 23.0 L44.2 24.1 L47.7 25.3 L51.1 26.8 L54.5 28.5 L57.9 30.4 L61.4 32.7 L64.8 35.2 L68.2 38.2 L71.6 41.5 L75.1 45.1 L78.5 49.2 L81.9 53.7 L85.3 58.6 L88.8 63.9 L92.2 69.6 L95.6 75.6 L99.0 82.0 L102.5 88.7 L105.9 95.7 L109.3 102.9 L112.7 110.3 L116.1 118.0 L119.6 125.8 L123.0 133.7 L126.4 141.8 L129.8 150.0 L133.3 158.3 L136.7 166.7 L140.1 175.1 L143.5 183.6 L147.0 192.1 L150.4 200.7 L153.8 209.3 L157.2 217.9 L160.7 226.6 L164.1 235.3 L167.5 244.0 L170.9 252.7 L174.4 261.4 L177.8 270.1 L181.2 278.8 L184.6 287.6 L188.0 296.3 L191.5 305.1 L194.9 313.8 L198.3 322.6 L201.7 331.4 L205.2 340.1 L208.6 348.9 L212.0 357.7 L215.4 366.4 L218.9 375.2 L222.3 378.0 L225.7 378.0 L229.1 378.0 L232.6 378.0 L236.0 378.0 L239.4 378.0 L242.8 378.0 L246.3 378.0 L249.7 378.0 L253.1 378.0 L256.5 378.0 L260.0 378.0 L263.4 378.0 L266.8 378.0 L270.2 378.0"/>
+<path class="alv" style="stroke-dasharray:5 4" d="M66.0 80.8 L463.4 378.0"/>
+<circle class="dot" cx="96.4" cy="103.6" r="4"/>
+<circle class="dot" cx="106.3" cy="110.9" r="4"/>
+<circle class="dot" cx="116.5" cy="118.6" r="4"/>
+<circle class="dot" cx="127.1" cy="126.6" r="4"/>
 <text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Venous return (L/min)</text>
 <text class="label" x="300.5" y="424" text-anchor="middle">Right atrial pressure (mmHg)</text>
 <line class="total" style="stroke-dasharray:none" x1="551" y1="48" x2="579" y2="48"/><text class="label" x="585" y="52">current model relation</text>
 <line class="alv" style="stroke-dasharray:5 4" x1="551" y1="70" x2="579" y2="70"/><text class="label" x="585" y="74">line through hold points</text>
 <text class="tick" x="551" y="110">internal Pmsf 10.1 mmHg</text>
-<text class="tick" x="551" y="126">extrapolated intercept 25.4</text>
+<text class="tick" x="551" y="126">extrapolated intercept 23.7</text>
 <text class="tick" x="551" y="142">the difference is not calibrated</text>
 </svg>

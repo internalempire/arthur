@@ -8,23 +8,24 @@
 
 | control | range | model meaning |
 |---|---:|---|
-| heart rate | 40–170/min | cycle frequency independent of intrinsic contractility |
+| baseline heart rate | 40–170/min | selected cycle frequency before any baroreflex contribution |
 | LV contractility ($E_{es}$) | 0.3–6.0 mmHg/mL | LV end-systolic elastance |
 | RV contractility ($E_{es}$) | 0.08–1.60 mmHg/mL | RV end-systolic elastance |
 | LV diastolic stiffness | 0.010–0.080 /mL | exponent of the LV end-diastolic pressure–volume relation |
 
 Contractility changes the slope of the end-systolic relation, not arterial resistance. Diastolic stiffness changes how rapidly LV filling pressure rises with volume. Ejection fraction remains load-dependent, so it should not be used as a direct readout of the selected $E_{es}$.
 
-The model has no force–frequency relation: changing heart rate does not automatically change contractility. Very high rate shortens filling time but does not reproduce ischaemia or rate-dependent relaxation.
+The model has no force–frequency relation: changing baseline heart rate does not automatically change contractility. Very high rate shortens filling time but does not reproduce ischaemia or rate-dependent relaxation. When the baroreflex is on, the Heart rate tile shows the effective rate used by the circulation; the control itself continues to show the selected baseline.
 
 ## Autonomic control
 
 | control | range | model meaning |
 |---|---:|---|
+| baroreflex | off/on; default off | removes or applies the aggregate pressure-defence response |
 | baroreflex sensitivity | 0–2 × | gain of one bounded sympathetic signal |
 | baroreflex set point | 55–110 mmHg | MAP around which that signal is driven |
 
-The signal adapts over one 15-second time constant and changes heart rate, systemic resistance, venous tone and both ventricular contractilities together. It senses systemic MAP only. Set sensitivity to zero when isolating a direct mechanical intervention; otherwise compensation can conceal it. See [baroreflex](baroreflex.md).
+The signal adapts over one 15-second time constant and changes effective heart rate, systemic resistance, venous tone and both ventricular contractilities together. It senses systemic MAP only. The switch is off by default so a direct mechanical intervention is initially unopposed; turn it on to explore how aggregate compensation conceals or attenuates that response. Sensitivity and set point are retained but disabled while the switch is off. See [baroreflex](baroreflex.md).
 
 ## Ventricular interaction
 

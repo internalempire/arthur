@@ -35,11 +35,27 @@ The tile multiplies the latest completed left ventricular stroke volume by effec
 
 Related pages: [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md) · [Baroreflex](baroreflex.md) · [Pulmonary transit](pulmonary-transit.md)
 
+### Heart rate
+
+The main number is the **effective** heart rate used to time the cardiac cycle and calculate output. Its subtitle separates the baseline rate selected by the user from the additive baroreflex contribution. With the reflex off the two are identical; with it on they can diverge without moving the baseline control.
+
+This distinction prevents a compensated output from being mistaken for the phenotype originally selected. The baroreflex contribution is a bounded model effector, not a prediction of an individual patient's chronotropic reserve.
+
+Related pages: [Heart controls](controls-heart.md) · [Baroreflex](baroreflex.md)
+
 ### Arterial pressure
 
 Systolic and diastolic values are extrema from the latest completed beat; mean arterial pressure is a smoothed pressure of the systemic arterial compartment. Pressure depends on flow, arterial storage and systemic resistance. It cannot by itself distinguish preserved output from vasoconstrictor compensation.
 
 Related pages: [Baroreflex](baroreflex.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md)
+
+### Systemic vascular resistance
+
+The main number is the effective resistance coefficient used in the systemic outflow equation, reported in dyn·s·cm⁻⁵. The subtitle shows the selected baseline resistance and, when the baroreflex is active, its percentage contribution. The tile therefore belongs beside arterial pressure: a defended MAP may reflect higher resistance rather than preserved flow. Its dotted category marker identifies it as an internal model coefficient.
+
+This is an aggregate model resistance, not a thermodilution-derived bedside measurement and not a regional distribution of vascular tone. It does not represent a vasopressor dose.
+
+Related pages: [Volume and vascular controls](controls-volume.md) · [Baroreflex](baroreflex.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md)
 
 ### CVP
 

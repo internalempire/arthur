@@ -34,6 +34,10 @@ const change = (before, after) => (after / before - 1) * 100;
 const HUMAN_ARDS = {
   clung: 40, vt: 350, rr: 24, pvrBase: 0.09, hpv: 1.6,
   collapsed: 0.42, pOpen: 18,
+  // The in-vivo cohort retained autonomic compensation. Keep that choice
+  // explicit now that the teaching application's uncompensated default is off;
+  // this does not identify a human baroreflex gain from the study.
+  baroreflexEnabled: true,
 };
 
 export const LITERATURE = {

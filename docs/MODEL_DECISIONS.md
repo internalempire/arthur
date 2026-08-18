@@ -862,3 +862,37 @@ arterial variation is directional but the model does not reproduce a calibrated
 clinical pulsus-paradoxus measurement and the spontaneous-breathing PPV tile
 remains unavailable. The preset is a qualified mechanical phenotype, not a
 diagnostic or therapeutic simulator.
+
+## 2026-08-18 — Separate baroreflex activation from sensitivity
+
+### Decision
+
+- Add a dedicated `baroreflexEnabled` checkbox and leave it off in the default
+  parameter set. Keep the sensitivity at 1.0 so an off/on comparison does not
+  erase the selected gain.
+- Force aggregate outflow to zero immediately while disabled. Sensitivity and
+  set point remain visible but inactive in the interface.
+- Keep the septic responder preset explicitly compensated because its teaching
+  question is whether pressure defence can conceal inadequate filling. Other
+  presets inherit the uncompensated default and may already encode prior
+  clinical compensation in their selected rate, resistance and volume.
+- Rename the heart-rate input as baseline rate. Add effective heart-rate and
+  effective systemic-resistance tiles that show the selected input and reflex
+  contribution separately.
+
+### Why
+
+Using zero sensitivity as both an off switch and a gain setting hid the
+experimental comparison. The control appeared to remain at the user-selected
+heart rate even though the integrator used an effective rate modified by the
+reflex. A separate activation state makes the intended sequence explicit:
+observe unopposed mechanical heart–lung interaction first, then add aggregate
+pressure defence without changing the patient inputs.
+
+### Deliberate limits
+
+Off is an idealised teaching reference, not a healthy human phenotype. On still
+uses one 15 s state for chronotropy, systemic resistance, venous recruitment and
+contractility, despite their different human pathways and latencies. The two new
+tiles expose internal effective values; they are not independent bedside
+measurements of autonomic activity.

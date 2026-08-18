@@ -30,7 +30,7 @@ Play/Pause stops or resumes simulated time. The speed selector changes how quick
 | cardiac function | rate, biventricular contractility, LV diastolic stiffness, baroreflex and ventricular interaction | [Heart controls](controls-heart.md) |
 | pulmonary circulation | open-lung vascular resistance, hypoxic vasoconstriction and pulmonary capacitance coupling | [Pulmonary controls](controls-pulmonary.md) |
 
-Controls are generated from the model's parameter registry. A grey control is not applicable in the current state—for example, tidal volume in pressure control or closing pressure while recruitment hysteresis is off.
+Controls are generated from the model's parameter registry. A grey control is not applicable in the current state—for example, tidal volume in pressure control, closing pressure while recruitment hysteresis is off, or baroreflex sensitivity while the reflex is disabled. The baroreflex is off by default so the first view exposes uncompensated mechanical interaction; enabling it adds the model's aggregate pressure defence.
 
 ### Numerical readouts
 
