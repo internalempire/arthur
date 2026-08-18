@@ -214,14 +214,14 @@ export const LITERATURE = {
   },
 
   'ph-classification': () => {
-    const post = settle({ eesLv: 1.2, lvStiff: 0.034, stressedVolume: 1050, svr: 1.25, hr: 95, peep: 10 });
+    const post = settle({ eesLv: 1.2, lvStiff: 0.034, stressedVolume: 1050, svr: 1.25, hr: 95, peep: 10 }, 45);
     // Use a sufficiently filled pre-capillary phenotype at zero PEEP so the
     // aggregate zone-3 pressure-margin heuristic admits its wedge surrogate.
     // A threshold test based on a cautioned downstream pressure would only
     // verify arithmetic, not the clinical classification it claims to encode.
     const pre = settle({
-      ...HUMAN_ARDS, peep: 0, stressedVolume: 1300, pvrBase: 0.44, eesRv: 0.32,
-    });
+      ...HUMAN_ARDS, peep: 0, stressedVolume: 1700, pvrBase: 0.44, eesRv: 0.32,
+    }, 45);
     return {
       pass: post.phClass === 'post-capillary' && pre.phClass === 'pre-capillary'
         && post.interpretability.wedge.level === 'ok'

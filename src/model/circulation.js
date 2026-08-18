@@ -32,7 +32,12 @@ const ALVEOLAR_WATERFALL_FRACTION = 0.45;
 // Unstressed volumes (mL) and compliances (mL/mmHg) that are not user-facing.
 export const VASC = {
   vuSa: 700, cSa: 1.35,
-  vuSv: 2800,
+  // The inferior vena cava (IVC) is now a separate compliant conduit between the
+  // splanchnic reservoir and the right atrium. Its unstressed volume (50 mL) was
+  // reallocated from the former vuSv (2800 → 2750), keeping total venous
+  // unstressed volume unchanged. The IVC compliance (~15–40 mL/mmHg) is anchored
+  // to literature on caval distensibility; 20 mL/mmHg is a compact teaching value.
+  vuSv: 2750,
   // Part of the former PA/PV zero-pressure volume now lives in the transport
   // pathway below. Their stressed volumes — and therefore resting pressures —
   // are unchanged: (100 - 50) == (140 - 90), and (115 - 60) == (235 - 180).
@@ -40,6 +45,24 @@ export const VASC = {
   vuPv: 60, cPv: 8.5,
   rPulVen: 0.008,
 };
+
+// Inferior vena cava: a thin-walled conduit between the splanchnic reservoir
+// and the right atrium, with its own compliance and unstressed volume. Its
+// diameter on the thorax panel now reflects its own blood volume rather than
+// the instantaneous right atrial pressure, so it stays full (plethoric) in
+// tamponade and collapses during strong inspiratory draw.
+export const IVC = {
+  vu: 50,          // mL, reallocated from VASC.vuSv
+  c: 20,           // mL/mmHg, within the literature range of 15–40
+};
+
+// The resistance to venous return is split into two series segments. The
+// upstream segment (splanchnic reservoir → IVC) carries no collapse: the
+// abdominal venous bed does not flutter shut. The downstream segment (IVC →
+// RA) carries the Starling resistor: the IVC collapses when its pressure
+// approaches the abdominal critical closing pressure. The 0.33/0.67 split
+// is a didactic choice; total rvr is unchanged.
+const RVR_UP_FRACTION = 0.33;
 
 // A pressure wave crosses the pulmonary circuit much faster than blood volume.
 // The PA-to-PV pressure gradient therefore remains algebraic, while this
@@ -140,6 +163,7 @@ export function createCirculationState(p) {
   return {
     vSa: 830,
     vSv: VASC.vuSv + p.stressedVolume,
+    vIVC: IVC.vu, // initialised unstressed; fills to equilibrium during settlement
     vRa: 55,
     vRv: 130,
     vPa: 100,
@@ -225,8 +249,12 @@ function pulmonaryTransitState(c) {
 // Which compartment each flow drains, and which it fills, when the flow is
 // positive. Two of them (systemic capillary and pulmonary venous) can reverse,
 // so the source is decided by sign at the time.
+// The venous return is split: splanchnic reservoir → IVC (no collapse), then
+// IVC → RA (Starling resistor with caval collapse at pCrit).
 const FLOW_EDGES = [
-  ['av', 'vLv', 'vSa'], ['sys', 'vSa', 'vSv'], ['vr', 'vSv', 'vRa'], ['tv', 'vRa', 'vRv'],
+  ['av', 'vLv', 'vSa'], ['sys', 'vSa', 'vSv'],
+  ['svToIvc', 'vSv', 'vIVC'], ['vr', 'vIVC', 'vRa'],
+  ['tv', 'vRa', 'vRv'],
   ['pv', 'vRv', 'vPa'], ['pul', 'vPa', 'vPt'], ['pulTransit', 'vPt', 'vPv'],
   ['pulVen', 'vPv', 'vLa'], ['mv', 'vLa', 'vLv'],
 ];
@@ -359,12 +387,32 @@ export function stepCirculation(p, c, resp, dt) {
   const pPv = (c.vPv - vuPvEff) / VASC.cPv + ppl;
 
   // --- flows ---------------------------------------------------------------
-  // Venous return with a Starling resistor: once right atrial pressure falls
-  // below the pressure surrounding the great veins, the vessel flutters shut and
-  // flow stops rising. This is the plateau of the venous return curve. The IVC
-  // tolerates roughly 5 cmH2O of transmural compression before it collapses.
+  // The resistance to venous return is split: upstream (splanchnic reservoir →
+  // IVC) carries no collapse — the abdominal reservoir does not flutter shut.
+  // Downstream (IVC → RA) carries the Starling resistor: the IVC collapses when
+  // its pressure falls toward the abdominal closing pressure (pCrit). The IVC
+  // tolerates roughly 5 cmH₂O of transmural compression before it collapses.
   const pCrit = pab - cmH2OtoMmHg(5);
-  const qVr = venousReturnFlow(pmsf, pRa, pCrit, rvrEff);
+  const rvrUp = rvrEff * RVR_UP_FRACTION;
+  const rvrDown = rvrEff - rvrUp;
+
+  // The IVC is a thin-walled intra-abdominal conduit. Its atmospheric pressure
+  // is transmural pressure (from its own compliance volume) plus the abdominal
+  // pressure surrounding it. The upstream gradient (pmsf → pIvcAtm) drives flow
+  // into the IVC without a Starling resistor; the downstream gradient (pIvcAtm
+  // → RA backpressure) includes the caval collapse on the segment entering the
+  // thorax.
+  const pIvcTm = (c.vIVC - IVC.vu) / IVC.c;
+  const pIvcAtm = Math.max(0.01, pIvcTm + pab);
+
+  // Splanchnic reservoir → IVC: no collapse, purely resistive.
+  const qSvToIvc = Math.max(0, (pmsf - pIvcAtm) / rvrUp);
+
+  // IVC → RA: the Starling resistor lives here. The collapse law uses pIvcAtm
+  // as the upstream pressure (where the IVC enters the thorax) against the same
+  // softplus backpressure the Guyton diagram draws.
+  const qVr = Math.max(0, (pIvcAtm - venousReturnBackPressure(pRa, pCrit)) / rvrDown);
+
   const qSys = (pSa - pmsf) / p.svr;
 
   const pvr = pvrAt(p, resp.lungVolume, resp.plSolved, resp.openFraction);
@@ -408,7 +456,7 @@ export function stepCirculation(p, c, resp, dt) {
   // reached −128 mL. Scaling both ends of a flow by the same factor keeps total
   // volume conserved exactly.
   const q = {
-    av: qAv, sys: qSys, vr: qVr, tv: qTv, pv: qPv,
+    av: qAv, sys: qSys, svToIvc: qSvToIvc, vr: qVr, tv: qTv, pv: qPv,
     pul: qPul, pulTransit: qPulTransit, pulVen: qPulVen, mv: qMv,
   };
   const limited = limitFlows(c, q, dt);
@@ -427,7 +475,8 @@ export function stepCirculation(p, c, resp, dt) {
 
   // --- integrate -----------------------------------------------------------
   c.vSa += (q.av - q.sys) * dt;
-  c.vSv += (q.sys - q.vr) * dt;
+  c.vSv += (q.sys - q.svToIvc) * dt;
+  c.vIVC += (q.svToIvc - q.vr) * dt;
   c.vRa += (q.vr - q.tv) * dt;
   c.vRv += (q.tv - q.pv) * dt;
   c.vPa += (q.pv - q.pul) * dt;
@@ -439,6 +488,7 @@ export function stepCirculation(p, c, resp, dt) {
   c.p = {
     ra: pRa, rv: pRv, la: pLa, lv: pLv, sa: pSa, pa: pPa, pv: pPv,
     pmsf, pCrit, pPeri, ppl, palv, pab, rvrEff, abdZone,
+    pIvcAtm, pIvcTm, vIVC: c.vIVC,
     pulmonaryTransitVolume: c.vPt,
     pulmonaryTransportTime: transitMeanTime,
     // Keep the displayed central-volume estimate algebraically transparent.

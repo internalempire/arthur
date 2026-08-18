@@ -13,7 +13,7 @@ section('Public model API');
   // must draw the same already-aerated/recruitable separation as the integrator
   // without bypassing this model boundary and importing lung.js directly.
   const expected = [
-    'CHAMBER', 'GROUPS', 'PARAMETERS', 'PPL_FRC', 'RESISTANCE_TO_WOOD',
+    'CHAMBER', 'GROUPS', 'IVC', 'PARAMETERS', 'PPL_FRC', 'RESISTANCE_TO_WOOD',
     'SCENARIOS', 'SCENARIO_BY_ID', 'Simulator', 'TRACE_SECONDS',
     'cardiacFunctionCurve', 'clamp', 'cmH2OtoMmHg', 'curveIntersection',
     'lungRegions', 'lungVolumeAtPl', 'openBand', 'openFractionFromRecruitmentState',

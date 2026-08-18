@@ -37,7 +37,7 @@ The two are the same physics in different vessels, which is why they are one pag
 
 ### On the venous side
 
-The closing pressure is abdominal pressure less the compression the cava tolerates before it shuts:
+The closing pressure is abdominal pressure less the compression the cava tolerates before it shuts. The waterfall now lives on the downstream segment only — the [inferior vena cava](inferior-vena-cava.md) is a separate compliant compartment, and it is this conduit, not the splanchnic reservoir, that collapses as its pressure approaches the closing pressure:
 
 $$
 P_{crit} = P_{ab,\mathrm{mmHg}} - \left(0.7356\ \frac{\mathrm{mmHg}}{\mathrm{cmH_2O}}\right)\left(5\ \mathrm{cmH_2O}\right)
@@ -89,14 +89,14 @@ Raising baseline abdominal pressure in a passive patient at PEEP 5:
 
 | `pab0` | P<sub>crit</sub> | mean P<sub>ra</sub> | P<sub>msf</sub> | cardiac output |
 |---|---|---|---|---|
-| 0 | −1.95 mmHg | 1.1 mmHg | 7.5 mmHg | 5.01 L/min |
-| 5 | 1.73 | 0.9 | 9.2 | 4.91 |
-| 12 | 6.88 | 0.2 | 13.3 | 4.38 |
-| 20 | 12.76 | −0.3 | 18.2 | 3.85 |
+| 0 | −1.95 mmHg | 1.1 mmHg | 7.1 mmHg | 4.89 L/min |
+| 5 | 1.73 | 1.0 | 9.0 | 4.82 |
+| 12 | 6.88 | 0.4 | 13.1 | 4.19 |
+| 20 | 12.76 | −0.1 | 17.9 | 3.56 |
 
 By `pab0` 12 the closing pressure has risen above right atrial pressure: the veins are collapsed and the circulation is sitting on the plateau. Output falls even though the filling pressure has risen by 6 mmHg, because the head is being measured against a floor that rose faster.
 
-On the pulmonary side, the zone III index falls from 0.70 at PEEP 5 to 0.00 at PEEP 15 in the same patient. At that point the model marks the wedge surrogate with a caution: left atrial pressure can stand in for an occlusion pressure only under the zone III assumption, and that assumption no longer holds.
+On the pulmonary side, the zone III index falls from 0.53 at PEEP 5 to 0.00 at PEEP 15 in the same patient. At that point the model marks the wedge surrogate with a caution: left atrial pressure can stand in for an occlusion pressure only under the zone III assumption, and that assumption no longer holds.
 
 ---
 
@@ -151,4 +151,4 @@ That is a statement about what the tests happen to constrain, not about which si
 
 ## See also
 
-[Venous return](venous-return.md) · [Abdominal pressure](abdominal-pressure.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Transmural pressure](transmural-pressure.md) · [Pmsf and occlusions](pmsf-and-occlusions.md) · [Interpretability](interpretability.md) · [The Guyton panel](panel-guyton.md)
+[Venous return](venous-return.md) · [Abdominal pressure](abdominal-pressure.md) · [Inferior vena cava](inferior-vena-cava.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Transmural pressure](transmural-pressure.md) · [Pmsf and occlusions](pmsf-and-occlusions.md) · [Interpretability](interpretability.md) · [The Guyton panel](panel-guyton.md)

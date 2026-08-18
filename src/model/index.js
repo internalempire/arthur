@@ -14,7 +14,7 @@ export { PARAMETERS, GROUPS } from './parameters.js';
 // Read-only analyses used to draw the model's physiological constructions.
 export {
   venousReturnCurve, cardiacFunctionCurve, curveIntersection, preloadLimbs,
-  CHAMBER, pericardialPressure,
+  CHAMBER, pericardialPressure, IVC,
 } from './circulation.js';
 export {
   lungVolumeAtPl, relaxationVolume, openBand, stepOpenFraction,
