@@ -21,10 +21,13 @@ for (const sc of SCENARIOS) {
 section('Stressed volume, venous tone and compliance');
 {
   const base = defaultParams();
-  const reservoir = { vSv: 3500 };
+  // The splanchnic reservoir alone now carries 2750 mL of unstressed volume;
+  // the remaining 50 mL was reallocated to the newly separate IVC conduit.
+  // Total systemic venous unstressed volume (vSv + vIVC) is unchanged at 2800.
+  const reservoir = { vSv: 3450 };
   const resting = systemicVenousVolumeState(base, reservoir);
   check('baseline partition uses the fixed systemic venous zero-pressure volume',
-    resting.unstressedVolume === 2800 && resting.stressedVolume === 700
+    resting.unstressedVolume === 2750 && resting.stressedVolume === 700
       && near(resting.elasticPressure, 7, 1e-12));
 
   const effective = { ...base };
@@ -32,9 +35,9 @@ section('Stressed volume, venous tone and compliance');
   const constricted = systemicVenousVolumeState(effective, reservoir);
   check('venous tone mobilises volume from unstressed to stressed',
     constricted.toneVolume === BARO.venousRecruitment * 0.5
-      && constricted.unstressedVolume === 2700 && constricted.stressedVolume === 800);
+      && constricted.unstressedVolume === 2650 && constricted.stressedVolume === 800);
   check('venous tone preserves reservoir volume and compliance',
-    reservoir.vSv === 3500 && effective.csv === base.csv);
+    reservoir.vSv === 3450 && effective.csv === base.csv);
 
   const stiffer = systemicVenousVolumeState({ ...base, csv: 50 }, reservoir);
   check('changing compliance changes pressure, not the volume partition',

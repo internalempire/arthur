@@ -85,7 +85,7 @@ export function settled(overrides = {}, seconds = 30, opts = {}) {
 }
 
 export const COMPARTMENTS = [
-  'vSa', 'vSv', 'vRa', 'vRv', 'vPa', 'vPt', 'vPv', 'vLa', 'vLv',
+  'vSa', 'vSv', 'vIVC', 'vRa', 'vRv', 'vPa', 'vPt', 'vPv', 'vLa', 'vLv',
 ];
 
 export const totalVolume = (circulation) =>

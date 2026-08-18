@@ -51,13 +51,13 @@ The **Cardiac tamponade** preset represents a compensated, spontaneously breathi
 
 | state | capacity (mL) | P<sub>peri</sub> (mmHg) | CVP (mmHg) | RV end-diastolic pressure (mmHg) | PA diastolic (mmHg) | wedge surrogate (mmHg) |
 |---|---:|---:|---:|---:|---:|---:|
-| constrained preset | 100 | 10.6 | 7.8 | 9.8 | 13.7 | 11.4 |
-| capacity restored | 430 | 0.1 | -0.7 | 0.5 | 16.7 | 11.6 |
+| constrained preset | 100 | 9.7 | 6.8 | 8.5 | 12.5 | 10.2 |
+| capacity restored | 430 | 0.0 | -0.9 | 0.1 | 15.8 | 10.7 |
 
 | state | RV EDV (mL) | LV EDV (mL) | cardiac output (L/min) | MAP (mmHg) |
 |---|---:|---:|---:|---:|
-| constrained preset | 74 | 98 | 4.11 | 84.6 |
-| capacity restored | 132 | 149 | 6.70 | 128.2 |
+| constrained preset | 71 | 96 | 4.03 | 82.1 |
+| capacity restored | 127 | 147 | 6.58 | 126.0 |
 <!-- END GENERATED: cardiac-tamponade -->
 
 The constrained state brings the four clinically compared diastolic pressures into the same broad range, markedly reduces both ventricular end-diastolic volumes and depresses flow. Restoring capacity lowers pericardial pressure and CVP while RV filling recovers proportionally more than LV filling. This preferential RV effect emerges from the shared pressure acting on a lower-pressure chamber; it is not scripted into the scenario.
@@ -76,8 +76,8 @@ The scenario is also not forced to meet a numerical diagnostic threshold. It mus
 
 - **Pulsus paradoxus is not quantitatively calibrated.** Respiratory arterial variation increases in the constrained state, but the preset is not required to cross the clinical 10 mmHg threshold. The existing PPV tile is unavailable during spontaneous breathing and must not be repurposed as a pulsus-paradoxus measurement.
 - There is no pericardial fluid compartment, accumulation rate, drainage flow or loculated effusion. Capacity is an aggregate surrogate, not an echocardiographic volume.
-- Right atrial and right ventricular wall collapse are not represented geometrically. The thorax panel shows pressure and chamber volume, not diagnostic echocardiographic signs.
-- There is no inferior-vena-cava plethora measurement, Doppler inflow variation, electrical alternans or ECG.
+- There is no right-atrial or right-ventricular wall collapse represented geometrically. The thorax panel shows pressure and chamber volume, not diagnostic echocardiographic signs.
+- The inferior vena cava is modelled as a compliant compartment whose volume reflects fullness; see [inferior vena cava](inferior-vena-cava.md). The visual diameter in the thorax panel is a model state, not an ultrasound collapsibility measurement.
 - Coronary perfusion, myocardial ischaemia and the effect of falling arterial pressure on RV performance are absent.
 - The model does not represent low-pressure tamponade, regional postoperative tamponade, severe pulmonary hypertension masking right-sided collapse, constrictive or effusive–constrictive pericarditis.
 - Autonomic compensation senses filtered systemic MAP only. It does not respond directly to pericardial pressure, chamber stretch or venous congestion.
@@ -97,4 +97,4 @@ The preset can therefore teach why a shared external pressure restricts filling 
 
 ## See also
 
-[Ventricular interdependence](ventricular-interdependence.md) · [Transmural pressure](transmural-pressure.md) · [The right ventricle](the-right-ventricle.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Clinical scenarios](scenarios.md) · [Heart controls](controls-heart.md) · [Global limits](global-limits.md)
+[Ventricular interdependence](ventricular-interdependence.md) · [Transmural pressure](transmural-pressure.md) · [The right ventricle](the-right-ventricle.md) · [Inferior vena cava](inferior-vena-cava.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Clinical scenarios](scenarios.md) · [Heart controls](controls-heart.md) · [Global limits](global-limits.md)

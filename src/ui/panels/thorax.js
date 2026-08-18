@@ -1,4 +1,4 @@
-import { cmH2OtoMmHg, clamp } from '../../model/index.js';
+import { cmH2OtoMmHg, clamp, IVC } from '../../model/index.js';
 
 // A schematic of the pressure chamber within a pressure chamber. Everything
 // drawn here is bound to a model variable: the thorax expands with lung volume,
@@ -186,10 +186,15 @@ export function createThorax(canvas) {
     ctx.restore();
 
     // ---- inferior vena cava ----------------------------------------------
-    // Caliber tracks the transmural pressure of the vein: right atrial pressure
-    // minus the abdominal pressure surrounding it.
-    const ivcTm = c.p.ra - c.p.pCrit;
-    const ivcW = clamp(4 + ivcTm * 2.4, 1.2, 20) * scale;
+    // Calibre follows the IVC's own blood volume rather than instantaneous right
+    // atrial pressure. Fullness normalised to the volume 5 mmHg of transmural
+    // distension would hold: at ~5 mmHg the IVC is fully recruited. Below its
+    // unstressed volume it collapses to a slender line; above ~5 mmHg of
+    // distension it reaches its maximum displayed width.
+    const ivcFullness = clamp(
+      (c.vIVC - IVC.vu) / (IVC.c * 5), 0, 1,
+    );
+    const ivcW = (1.5 + ivcFullness * 18.5) * scale;
     const ivcTop = cy + R * 0.7;
     const ivcBottom = h - 26 * scale;
     ctx.save();
@@ -200,7 +205,7 @@ export function createThorax(canvas) {
     ctx.lineTo(cx - 6 * scale + ivcW / 2, ivcTop);
     ctx.closePath();
     ctx.fillStyle = colors.venous;
-    ctx.globalAlpha = 0.35;
+    ctx.globalAlpha = 0.20 + ivcFullness * 0.15;
     ctx.fill();
     ctx.globalAlpha = 0.9;
     ctx.strokeStyle = colors.venous;

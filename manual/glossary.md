@@ -36,6 +36,8 @@
 
 ## I–P
 
+**Inferior vena cava (IVC).** [Inferior vena cava](inferior-vena-cava.md). The compliant conduit between the splanchnic reservoir and the right atrium. The model represents it as a separate compartment whose own blood volume drives its displayed diameter, so it stays full in tamponade and collapses during strong inspiratory draw.
+
 **Maximum lung capacity (`lungCapacity`).** Asymptotic volume ceiling of a completely open lung, entered directly in litres. Collapse determines what fraction is currently accessible. It is not an anthropometric predicted TLC. See [the pressure–volume curve](pressure-volume-curve.md).
 
 **Mean pulmonary artery pressure (mPAP).** Time-averaged pulmonary arterial pressure, in mmHg.
@@ -58,7 +60,7 @@
 
 **Recruitment-to-inflation ratio (R/I).** Compliance of recruited volume divided by respiratory-system compliance at low PEEP for a specified PEEP step. It compares recruitment with inflation of already open lung. See [recruitment and R/I](recruitment-and-ri.md).
 
-**Resistance to venous return.** The denominator relating the pressure available for venous return to flow, in mmHg·s/mL. It includes an aggregate abdominal/caval contribution in the model.
+**Resistance to venous return.** The denominator relating the pressure available for venous return to flow, in mmHg·s/mL. In the model it is split between the splanchnic reservoir and the [inferior vena cava](inferior-vena-cava.md) conduit (33% upstream, 67% downstream), with the downstream segment carrying the caval waterfall.
 
 **Stress index.** Exponent describing curvature of airway pressure during constant-flow inflation. Values below, near or above one suggest continuing recruitment, near-linear mechanics or increasing elastance respectively, under its measurement assumptions.
 
