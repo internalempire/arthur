@@ -775,6 +775,83 @@ function wedgeFigure() {
 `;
 }
 
+// --- the causal path from a control to a result ---------------------------
+
+function architectureFigure() {
+  // A mechanism diagram, not a numerical model result: the same pipeline the
+  // running app executes once per frame, drawn as boxes and arrows so the order
+  // of operations is visible at a glance rather than buried in prose.
+  const H2 = 660;
+  const cx = W / 2;
+
+  const node = (label, x, y, w = 264, h = 48) =>
+    `<rect class="node" x="${(x - w / 2).toFixed(1)}" y="${(y - h / 2).toFixed(1)}" width="${w}" height="${h}" rx="12"/>`
+    + `<text class="node-label" x="${x}" y="${(y + 5).toFixed(1)}" text-anchor="middle">${esc(label)}</text>`;
+
+  // An edge is a polyline with one arrowhead at its end. The merge from the
+  // two parallel transforms into respiratory mechanics is two edges meeting at
+  // the top of the downstream node rather than a single forked arrow.
+  const edge = (points) =>
+    `<polyline class="arrow" marker-end="url(#arthur-arrow)" points="${points.map(([x, y]) => `${x},${y}`).join(' ')}"/>`;
+
+  const note = (label, x, y) =>
+    `<text class="edge-note" x="${x}" y="${y}">${esc(label)}</text>`;
+
+  const boxes = [
+    node('parameter registry or scenario', cx, 62),
+    node('position transform', 220, 178),
+    node('aggregate baroreflex', 540, 178),
+    node('respiratory mechanics', cx, 296),
+    node('closed circulation', cx, 402),
+    node('measurements and interpretability', cx, 508),
+    node('tiles, descriptions and six panels', cx, 614),
+  ].join('\n');
+
+  const edges = [
+    edge([[360, 86], [250, 154]]),          // registry → position
+    edge([[352, 178], [408, 178]]),         // position → baroreflex
+    edge([[255, 202], [332, 272]]),         // position → respiratory
+    edge([[505, 202], [428, 272]]),         // baroreflex → respiratory
+    edge([[cx, 320], [cx, 378]]),           // respiratory → circulation
+    edge([[cx, 426], [cx, 484]]),           // circulation → measurements
+    edge([[cx, 532], [cx, 590]]),           // measurements → panels
+  ].join('\n');
+
+  const notes = [
+    note('Paw, Ppl, Palv, volume, recruitment', 536, 352),
+    note('chamber volumes, pressures and flows', 536, 458),
+  ].join('\n');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H2}" class="${ROOT}" role="img"
+  aria-label="Causal pipeline of the model: a parameter registry or scenario feeds a position transform and an aggregate baroreflex, which feed respiratory mechanics, then the closed circulation, then measurements and interpretability, and finally the tiles, descriptions and six panels.">
+<style>${STYLE}
+  svg.${ROOT} .node { fill: var(--fig-node, #f4f7fb); stroke: var(--fig-text, #2b3138); stroke-width: 1.5 }
+  svg.${ROOT} .node-label { fill: var(--fig-text, #2b3138); font: 600 13px system-ui, sans-serif }
+  svg.${ROOT} .arrow { stroke: var(--fig-muted, #6b7480); stroke-width: 1.6; fill: none }
+  svg.${ROOT} .edge-note { fill: var(--fig-muted, #6b7480); font: italic 11px system-ui, sans-serif }
+  svg.${ROOT} .arrowhead { fill: var(--fig-muted, #6b7480) }
+  @media (prefers-color-scheme: dark) {
+    svg.${ROOT} .node { fill: #1c222b; stroke: #d6dbe2 }
+    svg.${ROOT} .node-label { fill: #d6dbe2 }
+    svg.${ROOT} .arrow { stroke: #8b95a3 }
+    svg.${ROOT} .arrowhead { fill: #8b95a3 }
+    svg.${ROOT} .edge-note { fill: #8b95a3 }
+  }
+</style>
+<defs>
+  <marker id="arthur-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="arrowhead" d="M 0 0 L 10 5 L 0 10 z"/>
+  </marker>
+</defs>
+<rect class="bg" width="${W}" height="${H2}"/>
+<text class="title" x="${W / 2}" y="18" text-anchor="middle">The path from a control to a result</text>
+${boxes}
+${edges}
+${notes}
+</svg>
+`;
+}
+
 const figures = {
   'pvr-j-curve.svg': jCurveFigure(),
   'guyton-peep.svg': guytonFigure(),
@@ -790,6 +867,7 @@ const figures = {
   'pmsf-occlusions.svg': pmsfOcclusionFigure(),
   'wedge-pressure.svg': wedgeFigure(),
   'pericardial-pressure.svg': pericardialFigure(),
+  'architecture.svg': architectureFigure(),
 };
 for (const [name, svg] of Object.entries(figures)) {
   writeFileSync(join(OUT, name), svg);

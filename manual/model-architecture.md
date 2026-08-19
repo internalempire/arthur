@@ -6,25 +6,7 @@
 
 ## The path from a control to a result
 
-```text
-parameter registry or scenario
-            │
-            ▼
-position transform ──► aggregate baroreflex
-            │                 │
-            └────────┬────────┘
-                     ▼
-          respiratory mechanics
-                     │ Paw, Ppl, Palv, volume, recruitment
-                     ▼
-             closed circulation
-                     │ chamber volumes, pressures and flows
-                     ▼
-       measurements and interpretability
-                     │
-                     ▼
-       tiles, descriptions and six panels
-```
+![The causal pipeline from a control to a result, drawn as boxes and arrows](figure/architecture.svg)
 
 The order is causal. Position resolves the effective mechanics. The reflex reads filtered systemic pressure and modifies effective parameters. The respiratory step generates the pressures and lung state seen by the circulation. The circulation step moves blood through the chambers. Measurements and panels read the resulting state; they do not write physiological outputs.
 
