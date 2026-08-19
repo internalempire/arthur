@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 660" class="arthur-fig" role="img"
+  aria-label="Causal pipeline of the model: a parameter registry or scenario feeds a position transform and an aggregate baroreflex, which feed respiratory mechanics, then the closed circulation, then measurements and interpretability, and finally the tiles, descriptions and six panels.">
+<style>
+  svg.arthur-fig .bg { fill: none }
+  svg.arthur-fig .axis { stroke: var(--fig-axis, #9aa4b2); stroke-width: 1 }
+  svg.arthur-fig .grid { stroke: var(--fig-grid, #d7dce3); stroke-width: 1; stroke-dasharray: 2 4 }
+  svg.arthur-fig .tick { fill: var(--fig-muted, #6b7480); font: 11px system-ui, sans-serif }
+  svg.arthur-fig .label { fill: var(--fig-text, #2b3138); font: 12px system-ui, sans-serif }
+  svg.arthur-fig .title { fill: var(--fig-text, #2b3138); font: 600 13px system-ui, sans-serif }
+  svg.arthur-fig .lm { stroke: var(--fig-grid, #d7dce3); stroke-width: 1 }
+  svg.arthur-fig .lm-text { fill: var(--fig-muted, #6b7480); font: 600 11px system-ui, sans-serif }
+  svg.arthur-fig .total { stroke: var(--fig-total, #1f6feb); stroke-width: 2.5; fill: none }
+  svg.arthur-fig .alv { stroke: var(--fig-alv, #d1495b); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .extra { stroke: var(--fig-extra, #2a9d8f); stroke-width: 1.6; fill: none; stroke-dasharray: 6 3 }
+  svg.arthur-fig .nadir { stroke: var(--fig-total, #1f6feb); stroke-width: 1; stroke-dasharray: 3 3 }
+  svg.arthur-fig .dot { fill: var(--fig-total, #1f6feb); stroke: none }
+  @media (prefers-color-scheme: dark) {
+    svg.arthur-fig .axis { stroke: #5b6472 }
+    svg.arthur-fig .grid, svg.arthur-fig .lm { stroke: #363d47 }
+    svg.arthur-fig .tick, svg.arthur-fig .lm-text { fill: #8b95a3 }
+    svg.arthur-fig .label, svg.arthur-fig .title { fill: #d6dbe2 }
+    svg.arthur-fig .total, svg.arthur-fig .nadir { stroke: #58a6ff }
+    svg.arthur-fig .dot { fill: #58a6ff }
+    svg.arthur-fig .alv { stroke: #f08c9a }
+    svg.arthur-fig .extra { stroke: #4fd1c1 }
+  }
+
+  svg.arthur-fig .node { fill: var(--fig-node, #f4f7fb); stroke: var(--fig-text, #2b3138); stroke-width: 1.5 }
+  svg.arthur-fig .node-label { fill: var(--fig-text, #2b3138); font: 600 13px system-ui, sans-serif }
+  svg.arthur-fig .arrow { stroke: var(--fig-muted, #6b7480); stroke-width: 1.6; fill: none }
+  svg.arthur-fig .edge-note { fill: var(--fig-muted, #6b7480); font: italic 11px system-ui, sans-serif }
+  svg.arthur-fig .arrowhead { fill: var(--fig-muted, #6b7480) }
+  @media (prefers-color-scheme: dark) {
+    svg.arthur-fig .node { fill: #1c222b; stroke: #d6dbe2 }
+    svg.arthur-fig .node-label { fill: #d6dbe2 }
+    svg.arthur-fig .arrow { stroke: #8b95a3 }
+    svg.arthur-fig .arrowhead { fill: #8b95a3 }
+    svg.arthur-fig .edge-note { fill: #8b95a3 }
+  }
+</style>
+<defs>
+  <marker id="arthur-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path class="arrowhead" d="M 0 0 L 10 5 L 0 10 z"/>
+  </marker>
+</defs>
+<rect class="bg" width="760" height="660"/>
+<text class="title" x="380" y="18" text-anchor="middle">The path from a control to a result</text>
+<rect class="node" x="248.0" y="38.0" width="264" height="48" rx="12"/><text class="node-label" x="380" y="67.0" text-anchor="middle">parameter registry or scenario</text>
+<rect class="node" x="88.0" y="154.0" width="264" height="48" rx="12"/><text class="node-label" x="220" y="183.0" text-anchor="middle">position transform</text>
+<rect class="node" x="408.0" y="154.0" width="264" height="48" rx="12"/><text class="node-label" x="540" y="183.0" text-anchor="middle">aggregate baroreflex</text>
+<rect class="node" x="248.0" y="272.0" width="264" height="48" rx="12"/><text class="node-label" x="380" y="301.0" text-anchor="middle">respiratory mechanics</text>
+<rect class="node" x="248.0" y="378.0" width="264" height="48" rx="12"/><text class="node-label" x="380" y="407.0" text-anchor="middle">closed circulation</text>
+<rect class="node" x="248.0" y="484.0" width="264" height="48" rx="12"/><text class="node-label" x="380" y="513.0" text-anchor="middle">measurements and interpretability</text>
+<rect class="node" x="248.0" y="590.0" width="264" height="48" rx="12"/><text class="node-label" x="380" y="619.0" text-anchor="middle">tiles, descriptions and six panels</text>
+<polyline class="arrow" marker-end="url(#arthur-arrow)" points="360,86 250,154"/>
+<polyline class="arrow" marker-end="url(#arthur-arrow)" points="352,178 408,178"/>
+<polyline class="arrow" marker-end="url(#arthur-arrow)" points="255,202 332,272"/>
+<polyline class="arrow" marker-end="url(#arthur-arrow)" points="505,202 428,272"/>
+<polyline class="arrow" marker-end="url(#arthur-arrow)" points="380,320 380,378"/>
+<polyline class="arrow" marker-end="url(#arthur-arrow)" points="380,426 380,484"/>
+<polyline class="arrow" marker-end="url(#arthur-arrow)" points="380,532 380,590"/>
+<text class="edge-note" x="536" y="352">Paw, Ppl, Palv, volume, recruitment</text>
+<text class="edge-note" x="536" y="458">chamber volumes, pressures and flows</text>
+</svg>
