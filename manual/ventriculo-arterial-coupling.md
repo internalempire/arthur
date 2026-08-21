@@ -56,6 +56,22 @@ Both ventricles use a time-varying elastance driven by a double-hill activation 
 
 The atria are simpler: a linear elastance swinging between a minimum and a maximum on an atrial activation waveform.
 
+For the ventricles, the duration of activation is not kept at a fixed fraction of every beat. If $T=60/HR$ is the cardiac-cycle duration, the model first defines
+
+$$
+T_{max}=0.2+0.15T, \qquad \tau=\frac{t}{T_{max}}
+$$
+
+and then uses the standard normalised double-Hill waveform
+
+$$
+A(\tau)=1.55
+\left[\frac{(\tau/0.7)^{1.9}}{1+(\tau/0.7)^{1.9}}\right]
+\left[\frac{1}{1+(\tau/1.17)^{21.9}}\right].
+$$
+
+Its peak is approximately one, so the selected $E_{es}$ is the peak active elastance actually reached by the chamber. The $T_{max}$ relation also allows systole to occupy a larger fraction of a short tachycardic cycle instead of shrinking in direct proportion to the whole beat.
+
 Valves are represented as one-way resistances. Flow is computed from the pressure difference and forced to zero when the gradient reverses, so isovolumic phases arise from the pressure relations rather than from explicit cardiac-cycle states.
 
 The right ventricle carries two extra terms from [ventricular interdependence](ventricular-interdependence.md): a diastolic septal shift and a systolic contribution from the left ventricle.
@@ -64,18 +80,18 @@ The right ventricle carries two extra terms from [ventricular interdependence](v
 
 ### A directional load surrogate
 
-A passive patient at 500 mL and PEEP 5, using mean arterial pressure divided by stroke volume as a **load surrogate**. It is labelled $MAP/SV$ rather than $E_a$ because effective arterial elastance is conventionally $P_{es}/SV$:
+A passive patient at 500 mL and PEEP 5, using mean arterial pressure divided by stroke volume as a **load surrogate**. The failing states use $E_{es}=0.55$ mmHg/mL and the vasoplegic states use a systemic resistance of 0.75 mmHg·s/mL. The result is labelled $MAP/SV$ rather than $E_a$ because effective arterial elastance is conventionally $P_{es}/SV$:
 
 | | ejection fraction | stroke volume | MAP | $MAP/SV$ | $E_{es}/(MAP/SV)$ |
 |---|---|---|---|---|---|
-| normal | 49.7% | 68 mL | 93 mmHg | 1.37 | 1.61 |
-| failing left ventricle | 18.5% | 32 mL | 77 | 2.43 | 0.33 |
-| vasoplegia | 54.5% | 69 mL | 82 | 1.18 | 1.86 |
-| both | 24.1% | 40 mL | 68 | 1.70 | 0.47 |
+| normal | 56.2% | 70 mL | 102 mmHg | 1.47 | 2.05 |
+| failing left ventricle | 22.4% | 37 mL | 52 | 1.41 | 0.39 |
+| vasoplegia | 61.2% | 73 mL | 80 | 1.09 | 2.76 |
+| both | 26.8% | 43 mL | 46 | 1.05 | 0.52 |
 
-The normal row yields 1.61 for this surrogate ratio. It must not be interpreted as a validated normal coupling measurement: replacing end-systolic pressure with MAP changes the quantity, and the model does not reproduce the measurement assumptions used to estimate clinical $E_a$.
+The normal row yields 2.05 for this surrogate ratio. It must not be interpreted as a validated normal coupling measurement: replacing end-systolic pressure with MAP changes the quantity, and the model does not reproduce the measurement assumptions used to estimate clinical $E_a$.
 
-The interesting row is the last. Adding vasoplegia to a failing ventricle *raises* stroke volume from 32 to 40 mL while mean pressure falls from 77 to 68 mmHg. Contractility is unchanged; the model ventricle ejects against a lower load, and the $E_{es}/(MAP/SV)$ surrogate rises from 0.33 to 0.47.
+The interesting row is the last. Adding vasoplegia to a failing ventricle *raises* stroke volume from 37 to 43 mL while mean pressure falls from 52 to 46 mmHg. Contractility is unchanged; the model ventricle ejects against a lower load, and the $E_{es}/(MAP/SV)$ surrogate rises from 0.39 to 0.52.
 
 ---
 
@@ -102,7 +118,7 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 
 ### Of clinical application
 
-- The ejection fractions the model produces are properties of its elastances and its loading. They are not calibrated against echocardiographic measurement, and should not be compared with a patient's number.
+- The normal reference now produces an ejection fraction in the expected resting range because the activation waveform reaches the selected elastance. Individual values remain properties of the model's elastances and loading; they are not calibrated against echocardiographic measurement and should not be compared directly with a patient's number.
 - The ratios in the table use $MAP/SV$, not effective arterial elastance. They show a direction — vasodilatation raising stroke volume in a failing ventricle — and must not be quoted as coupling measurements.
 - Nothing here supports a decision about inotropes versus vasodilators in a particular patient. The model has no myocardial oxygen balance, which is the constraint that decision usually turns on.
 
@@ -111,6 +127,8 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 ## References
 
 - Suga H, Sagawa K. [Instantaneous pressure–volume relationships and their ratio in the excised, supported canine left ventricle](https://doi.org/10.1161/01.res.35.1.117). *Circ Res* 1974;35:117–26.
+- Stergiopulos N, Meister JJ, Westerhof N. [Determinants of stroke volume and systolic and diastolic aortic pressure](https://doi.org/10.1152/ajpheart.1996.270.6.H2050). *Am J Physiol* 1996;270:H2050–9.
+- Senzaki H, Chen CH, Kass DA. [Single-beat estimation of end-systolic pressure–volume relation in humans](https://doi.org/10.1161/01.CIR.94.10.2497). *Circulation* 1996;94:2497–2506.
 - Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. *Am J Physiol* 1983;245:H773–80.
 - Burkhoff D, Sagawa K. Ventricular efficiency predicted by an analytical model. *Am J Physiol* 1986;250:R1021–7.
 - Guarracino F, Baldassarri R, Pinsky MR. Ventriculo-arterial decoupling in acutely altered hemodynamic states. *Crit Care* 2013;17:213.

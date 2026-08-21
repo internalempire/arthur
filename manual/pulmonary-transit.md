@@ -65,9 +65,9 @@ With passive ventilation, HR 75/min, RR 18/min, VT 450 mL and PEEP 5 cmH2O held 
 
 | phenotype | pulmonary blood volume (mL) | estimated PA-to-LA transit (s) | staged buffer (s) |
 |---|---:|---:|---:|
-| reference circulation | 407 | 5.2 | 2.3 |
-| pulmonary embolism | 512 | 9.4 | 4.1 |
-| congested low-output LV failure | 749 | 22.0 | 6.0 |
+| reference circulation | 389 | 4.6 | 2.0 |
+| pulmonary embolism | 542 | 8.3 | 3.6 |
+| congested low-output LV failure | 795 | 20.4 | 6.0 |
 <!-- END GENERATED: pulmonary-transit -->
 
 The ordering is the lesson. The embolism and LV-failure numbers are outputs of selected model phenotypes, not expected clinical values or diagnostic thresholds. The LV phenotype reaches the staged numerical ceiling, while the unbounded whole-circuit estimate remains visible.

@@ -206,12 +206,17 @@ export function systemicVenousVolumeState(p, c) {
   };
 }
 
-// Double-hill ventricular activation, normalised to a peak of 1.
-function ventricularActivation(tn) {
-  const a1 = 0.28, n1 = 1.9, a2 = 0.46, n2 = 18;
-  const g1 = Math.pow(tn / a1, n1);
-  const g2 = Math.pow(tn / a2, n2);
-  return (g1 / (1 + g1)) * (1 / (1 + g2)) / 0.885;
+// Canonical double-Hill ventricular activation. The previous phase-based
+// approximation claimed a unit peak but only reached 0.702, so every selected
+// Ees was silently reduced by about 30%. Normalising time to Tmax preserves the
+// established heart-rate dependence of systolic duration, while the 1.55 scale
+// makes the waveform peak at approximately one.
+export function ventricularActivation(time, period) {
+  const tMax = 0.2 + 0.15 * period;
+  const tn = time / tMax;
+  const g1 = Math.pow(tn / 0.7, 1.9);
+  const g2 = Math.pow(tn / 1.17, 21.9);
+  return 1.55 * (g1 / (1 + g1)) * (1 / (1 + g2));
 }
 
 // Atrial systole occupies the last fifth of the cardiac cycle.
@@ -325,7 +330,7 @@ export function stepCirculation(p, c, resp, dt) {
     closeBeat(c);
   }
   const tn = c.tCardiac / period;
-  const actV = ventricularActivation(tn);
+  const actV = ventricularActivation(c.tCardiac, period);
   const actA = atrialActivation(tn);
 
   const ppl = cmH2OtoMmHg(resp.ppl);
@@ -674,7 +679,7 @@ export function cardiacFunctionCurve(p, c, mean, nPoints = 90) {
  * assumption a bedside fluid challenge is testing, so building it into the
  * prediction would beg the question.
  */
-export const PRELOAD_STEEP = 0.10; // fraction of output per mmHg, see the note below
+export const PRELOAD_STEEP = 0.08; // fraction of output per mmHg, see the note below
 
 export function preloadSensitivity(p, c, mean, delta = 0.5) {
   const base = mean?.pmsf ?? c.p.pmsf;
@@ -743,7 +748,7 @@ export function preloadLimbs(p, c, mean, span = 14, nPoints = 48) {
 // that was measured rather than assumed: across 60 deterministic configurations
 // varying stressed volume, systemic resistance, heart rate, right ventricular
 // contractility, venous compliance, PEEP, resistance to venous return and
-// abdominal pressure, a threshold of 0.10 classifies 83% of them the same way
+// abdominal pressure, a threshold of 0.08 classifies 87% of them the same way
 // the model's own response to 500 mL does.
 //
 // The cases it gets wrong are the interesting ones and they fall into two

@@ -149,11 +149,12 @@ export const PARAMETERS = [
   {
     id: 'eesLv', group: 'heart', label: 'LV contractility (Ees)', unit: 'mmHg/mL',
     min: 0.3, max: 6.0, step: 0.1, default: 3.0,
+    help: 'Peak active slope of the LV end-systolic pressure–volume relation. The ventricular activation waveform is normalised to reach this selected value; ejection fraction remains load-dependent.',
   },
   {
     id: 'eesRv', group: 'heart', label: 'RV contractility (Ees)', unit: 'mmHg/mL',
     min: 0.08, max: 1.6, step: 0.02, default: 0.58,
-    help: 'The RV is a flow generator, not a pressure generator. Its low Ees is why an abrupt rise in afterload dilates it rather than being overcome.',
+    help: 'Peak active slope of the RV end-systolic pressure–volume relation. The RV is a flow generator, not a pressure generator; its low Ees is why an abrupt rise in afterload dilates it rather than being overcome.',
   },
   {
     id: 'lvStiff', group: 'heart', label: 'LV diastolic stiffness', unit: '1/mL',

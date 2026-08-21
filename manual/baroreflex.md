@@ -43,7 +43,7 @@ $$
 
 The Heart rate tile displays this effective rate and states the baseline and reflex contribution underneath. The systemic-resistance tile follows the same rule: its main number is the effective SVR used by the circulation, while its subtitle separates the selected baseline from the reflex percentage change. The controls therefore remain inputs; they are not rewritten every time the compensator moves.
 
-The septic preset illustrates the difference. With the compensator disabled, settled output is about 3.8 L/min and MAP 62 mmHg. With it active, output is about 4.3 L/min and MAP 81 mmHg. The model remains preload responsive in both states: pressure defence does not manufacture volume or remove the underlying circulation problem.
+The septic preset illustrates the difference. With the compensator disabled, settled output is about 3.8 L/min and MAP 62 mmHg. With it active, output is about 4.2 L/min and MAP 80 mmHg. The model remains preload responsive in both states: pressure defence does not manufacture volume or remove the underlying circulation problem.
 
 ---
 

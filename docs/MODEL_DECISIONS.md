@@ -896,3 +896,45 @@ uses one 15 s state for chronotropy, systemic resistance, venous recruitment and
 contractility, despite their different human pathways and latencies. The two new
 tiles expose internal effective values; they are not independent bedside
 measurements of autonomic activity.
+
+## 2026-08-21 — Restore unit-normalised, heart-rate-aware ventricular activation
+
+### Decision
+
+- Replace the phase-based approximation of ventricular activation with the
+  canonical normalised double-Hill form.
+- Define normalised time from `Tmax = 0.2 + 0.15 × cycle duration` rather than
+  forcing systole to occupy the same fraction of every cardiac cycle.
+- Apply the correction to both ventricles. An LV or RV Ees control now denotes
+  the peak active elastance actually reached by that chamber.
+- Recalibrate the internal preload-reserve classifier from 10% to 8% of output
+  per mmHg after repeating its deterministic 60-state comparison with a 500 mL
+  model volume challenge.
+
+### Why
+
+The old function was documented as normalised to one but its actual peak was
+0.702. Every selected end-systolic elastance was therefore reduced silently by
+about 30%; at the normal reference, LV Ees 3 mmHg/mL behaved as approximately
+2.1 mmHg/mL. This was the main cause of the long-declared 5–10 point deficit in
+baseline ejection fraction. Adding an offset to the displayed EF or increasing
+the default Ees would have hidden the inconsistency while leaving the control's
+units false.
+
+The corrected waveform peaks at approximately one from 45 to 140/min and gives
+a reference EF of about 56% from the model's measured EDV and ESV. It also
+preserves the established relation between heart rate and systolic duration:
+systole occupies a larger fraction of a short tachycardic cycle.
+
+The preload classifier is a construction internal to this model, not a clinical
+cutoff. With the corrected pump, an 8%/mmHg boundary agrees with the model's own
+15% response to 500 mL in 52 of 60 deterministic configurations (87%), compared
+with 47 of 60 at the former boundary.
+
+### Deliberate limits
+
+Normalising activation does not make model EF an echocardiographic measurement.
+The ventricle remains one lumped chamber without geometry, regional wall motion,
+valvular regurgitation, coronary perfusion or force-frequency coupling. The
+double-Hill timing is a population-level waveform, not patient-specific
+electromechanical activation or relaxation.

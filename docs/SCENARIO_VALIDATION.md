@@ -48,8 +48,8 @@ ranges.
 inspiration while right-heart filling increases?
 
 **What the model produces.** During inspiration, mean CVP is approximately
-−3.5 rather than −0.3 mmHg in expiration, while instantaneous forward flow is
-approximately 5.7 rather than 4.7 L/min. The mean displayed CVP is −1.0 mmHg,
+−4.0 rather than −0.9 mmHg in expiration, while instantaneous forward flow is
+approximately 5.9 rather than 5.5 L/min. The mean displayed CVP is −1.5 mmHg,
 but transmural CVP is positive. This is the intended distinction between a
 pressure measured relative to atmosphere and the distending pressure across the
 atrial wall.
@@ -69,9 +69,9 @@ muscle blood flow and neural respiratory-circulatory coupling.
 **Teaching question.** How does passive positive-pressure inflation reverse the
 immediate right-heart effect of a spontaneous breath?
 
-**What the model produces.** During inflation, CVP rises to approximately 1.7
-from 1.1 mmHg. Mean output over recent complete beats is about 5.0 L/min rather
-than 5.1 L/min in the spontaneous healthy preset, although the two presets do not deliver the same
+**What the model produces.** During inflation, CVP rises to approximately 1.4
+from 0.8 mmHg. Mean output over recent complete beats is about 5.3 L/min rather
+than 5.6 L/min in the spontaneous healthy preset, although the two presets do not deliver the same
 tidal volume and therefore are not a quantitative matched experiment.
 
 **Assessment — supported.** The respiratory-phase direction is correct: rising
@@ -91,8 +91,8 @@ responses at human beat-to-beat fidelity.
 pressure yet still reduce venous return and cardiac output?
 
 **What the model produces.** Raising PEEP from 5 to 14 cmH2O raises CVP by about
-2.6 mmHg and model mean systemic filling pressure by about 2.1 mmHg. Cardiac
-output falls by about 12%, the effective venous-return gradient narrows, and
+2.8 mmHg and model mean systemic filling pressure by about 2.1 mmHg. Cardiac
+output falls by about 11%, the effective venous-return gradient narrows, and
 catheter-derived PVR rises modestly.
 
 **Assessment — qualified.** The competing-pressure lesson is present. The rise
@@ -111,8 +111,8 @@ vascular stress relaxation.
 **Teaching question.** Can compensatory pressure conceal low effective filling,
 and can stressed volume change independently of venous compliance?
 
-**What the model produces.** The baseline settles near CO 4.3 L/min and MAP
-81 mmHg. Increasing stressed volume by 500 mL raises output to about 6.1 L/min.
+**What the model produces.** The baseline settles near CO 4.2 L/min and MAP
+80 mmHg. Increasing stressed volume by 500 mL raises output to about 5.9 L/min.
 With the aggregate baroreflex disabled, MAP falls to about 62 mmHg and output to
 about 3.9 L/min. The fluid control adds blood to the venous reservoir; the
 baroreflex instead shifts volume from unstressed to stressed without changing
@@ -135,15 +135,15 @@ fluid kinetics.
 fluid responsiveness?
 
 **What the model produces.** Pleural pressure swings by about 20 cmH2O while the
-local preload reserve is about 6.5% of output per mmHg of filling pressure,
-below the model's 10%/mmHg steep-limb threshold. The preset is spontaneously
+local preload reserve is about 6.8% of output per mmHg of filling pressure,
+below the model's 8%/mmHg steep-limb threshold. The preset is spontaneously
 breathing, so the model correctly labels PPV **unavailable**.
 
 **Assessment — qualified.** The demonstrating variable is now the slope of the
 settled Guyton operating point, not an arterial waveform index. That preserves
 the spontaneous-breathing phenotype and makes the intended distinction
 internally coherent: pressure transmission is not preload reserve. The
-6.5%/mmHg value and the 10%/mmHg boundary are model teaching constructs, not a
+6.8%/mmHg value and the 8%/mmHg boundary are model teaching constructs, not a
 validated bedside fluid-responsiveness threshold.
 
 **Not represented.** Irregular effort, tidal-volume variability, reverse
@@ -155,9 +155,9 @@ arterial waveform measurement error.
 **Teaching question.** How does recruitability alter the balance between
 recruitment benefit and inflation-related RV load?
 
-**What the model produces.** At PEEP 12 cmH2O the preset has mPAP about 21 mmHg,
+**What the model produces.** At PEEP 12 cmH2O the preset has mPAP about 23 mmHg,
 low left-atrial-pressure wedge surrogate, an internal hydraulic estimate of
-about 4.9 WU and RV/LV end-diastolic volume ratio about 1.7. The wedge and
+about 5.0 WU and RV/LV end-diastolic volume ratio about 1.6. The wedge and
 derived-PVR tiles are cautioned by the aggregate zone-3 rule. Raising PEEP opens
 more lung in the high-R/I phenotype, but output
 still falls slightly because preload and waterfall costs remain. At high PEEP,
@@ -182,12 +182,12 @@ dependent prone recruitment.
 **Teaching question.** What happens when a normal lung is coupled to an abruptly
 high aggregate pulmonary vascular load and a vulnerable RV?
 
-**What the model produces.** The baseline has mPAP about 34 mmHg, a left-atrial
+**What the model produces.** The baseline has mPAP about 39 mmHg, a left-atrial
 wedge surrogate about 3 mmHg, an internal $(mPAP-P_{LA})/CO$ estimate about
-7.5 WU, CVP about 4.7 mmHg and RV/LV ratio about 2.0. The aggregate zone-3
+7.6 WU, CVP about 2.5 mmHg and RV/LV ratio about 1.9. The aggregate zone-3
 index cautions both the wedge surrogate and derived-PVR interpretation.
 Changing to passive volume control and raising PEEP from 0 to 10 cmH2O lowers
-output by roughly 9% and further raises right-sided pressure and RV/LV ratio.
+output by roughly 10% and further raises right-sided pressure and RV/LV ratio.
 
 **Assessment — qualified.** The pressure-flow-RV pattern is clinically
 recognisable. `pvrBase` is an effective aggregate afterload: it does not split
@@ -211,12 +211,12 @@ diastolic constraint that affects the lower-pressure right heart especially,
 and does restoring that space reverse the haemodynamic phenotype?
 
 **What the model produces.** With capacity 100 mL, mean pericardial pressure is
-about 10.5 mmHg and CVP, RV end-diastolic pressure, PA diastolic pressure and the
+about 8.6 mmHg and CVP, RV end-diastolic pressure, PA diastolic pressure and the
 wedge surrogate occupy a band about 6 mmHg wide. Cardiac output is about
-4.1 L/min. Restoring capacity to 430 mL while changing nothing else nearly
-abolishes pericardial pressure, lowers CVP by about 8 mmHg, restores RV
+4.5 L/min. Restoring capacity to 430 mL while changing nothing else nearly
+abolishes pericardial pressure, lowers CVP by about 7 mmHg, restores RV
 end-diastolic volume proportionally more than LV end-diastolic volume, and
-raises output to about 6.7 L/min.
+raises output to about 7.1 L/min.
 
 **Assessment — qualified.** The pressure-volume mechanism, preferential RV
 restriction and decompression direction are coherent. Capacity is an aggregate
@@ -235,7 +235,7 @@ electrical alternans, coronary perfusion and constrictive physiology.
 **Teaching question.** Why can positive intrathoracic pressure unload a failing
 left ventricle even while it impairs venous return?
 
-**What the model produces.** This is now an intentionally severe, afterload-sensitive phenotype: low LV end-systolic elastance, high diastolic stiffness, high filling pressure and a stiff thoracic envelope that transmits airway pressure to the pleural space. In a settled, respiratory-cycle-averaged comparison, PEEP 0 → 10 cmH2O raises output by about 9%. LV end-diastolic volume falls slightly, but end-systolic volume falls more, while transmural end-systolic pressure falls by about 4–5 mmHg. The higher stroke volume therefore emerges despite less filling, which is the signature that the demonstration is intended to expose.
+**What the model produces.** This is now an intentionally severe, afterload-sensitive phenotype: low LV end-systolic elastance, high diastolic stiffness, high filling pressure and a stiff thoracic envelope that transmits airway pressure to the pleural space. In a settled, respiratory-cycle-averaged comparison, PEEP 0 → 10 cmH2O raises output by about 17%. LV end-diastolic volume falls slightly, but end-systolic volume falls more, while transmural end-systolic pressure falls by about 7.5 mmHg. The higher stroke volume therefore emerges despite less filling, which is the signature that the demonstration is intended to expose.
 
 **Assessment — qualified.** The reduction in LV transmural ejection pressure is encoded and the causal direction is physiologically sound. The phenotype was deliberately selected so afterload relief exceeds the simultaneous loss of venous return; it must not be presented as the expected response of every patient with cardiogenic pulmonary oedema. A less afterload-sensitive or more preload-dependent failing ventricle can show no output gain or a fall. Clinical improvement also comes from reduced work of breathing and improved oxygenation, neither of which is an outcome in the model.
 
@@ -301,11 +301,11 @@ makes the collapse-limited state worse.
 **Assessment — qualified.** The two opposing mechanisms are explicit and the
 dependence on filling is instructive. The absolute mean systemic filling pressure
 near 21 mmHg is a model pressure generated by a strong aggregate abdominal
-coupling and should not be presented as a typical patient value. The preset also
-does not distinguish IVC from SVC return, so the collapse threshold is more
-global than the clinical anatomy.
+coupling and should not be presented as a typical patient value. The inferior
+vena cava is now an explicit compliant conduit, but superior caval return is
+not represented separately and the splanchnic reservoir remains aggregate.
 
-**Not represented.** Separate caval territories, organ and renal perfusion,
+**Not represented.** A separate SVC territory, organ and renal perfusion,
 abdominal vascular compliance, diaphragm shape, fluid shifts and the cause or
 time course of abdominal hypertension.
 

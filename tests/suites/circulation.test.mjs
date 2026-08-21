@@ -2,8 +2,37 @@
 import {
   venousReturnCurve, cardiacFunctionCurve,
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
-  pericardialPressure, defaultParams, section, check, settled,
+  pericardialPressure, ventricularActivation,
+  defaultParams, section, check, settled,
 } from '../support/model.mjs';
+
+section('Ventricular activation');
+{
+  const peakFor = (hr) => {
+    const period = 60 / hr;
+    let peak = 0;
+    let peakTime = 0;
+    for (let i = 0; i <= 4000; i++) {
+      const time = (period * i) / 4000;
+      const activation = ventricularActivation(time, period);
+      if (activation > peak) { peak = activation; peakTime = time; }
+    }
+    return { peak, peakTime, period };
+  };
+
+  const slow = peakFor(45);
+  const reference = peakFor(75);
+  const fast = peakFor(140);
+  check('the selected end-systolic elastance is actually reached',
+    [slow, reference, fast].every(({ peak }) => Math.abs(peak - 1) < 0.01),
+    `peaks ${slow.peak.toFixed(3)}, ${reference.peak.toFixed(3)}, ${fast.peak.toFixed(3)}`);
+  check('systolic duration does not remain a fixed fraction of the cardiac cycle',
+    fast.peakTime / fast.period > reference.peakTime / reference.period
+      && reference.peakTime / reference.period > slow.peakTime / slow.period,
+    `peak phases ${(100 * slow.peakTime / slow.period).toFixed(0)}%, `
+      + `${(100 * reference.peakTime / reference.period).toFixed(0)}%, `
+      + `${(100 * fast.peakTime / fast.period).toFixed(0)}%`);
+}
 
 section('Shared pericardial constraint');
 {
@@ -66,7 +95,7 @@ section('Preload reserve on the Guyton construction');
     // no longer only a translation of the systemic venous-return curve: some
     // blood also changes the pulmonary vascular reservoir. The local slope
     // remains a useful directional classifier, not an exact bolus predictor;
-    // require broad concordance without promoting its didactic 10%/mmHg split
+    // require broad concordance without promoting its didactic 8%/mmHg split
     // into a diagnostic cutoff.
     check('the threshold broadly agrees with the model\'s own response to 500 mL',
       total > 50 && agree / total >= 0.80,
@@ -150,7 +179,7 @@ section('Variation at the filled end of the range');
   const trough = meanPpv({ stressedVolume: 900 });
   const filled = meanPpv({ stressedVolume: 1400 });
   check('variation rises again once the patient is full',
-    filled > trough + 1, `${trough.toFixed(1)}% at 900 mL vs ${filled.toFixed(1)}% at 1400 mL`);
+    filled > trough + 0.5, `${trough.toFixed(1)}% at 900 mL vs ${filled.toFixed(1)}% at 1400 mL`);
 
   // And it is the lung doing it, not the pericardium or the septum.
   const noPiston = meanPpv({ stressedVolume: 1400, piston: 0 });

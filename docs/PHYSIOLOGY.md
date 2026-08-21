@@ -34,15 +34,15 @@ Baseline (70 kg adult, passive volume control, VT 450 mL, PEEP 5, RR 14):
 
 | | Model | Expected |
 |---|---|---|
-| Cardiac output | 5.0 L/min | 4.5–6.0 |
-| Arterial pressure | 112/77, mean 95 | — |
+| Cardiac output | 5.2 L/min | 4.5–6.0 |
+| Arterial pressure | 118/82, mean 102 | — |
 | Heart rate (baseline = effective, reflex off) | 75 | — |
-| CVP | 1.2 mmHg | 0–6 |
-| Pulmonary artery | 21/11, mean 16 | 15–25 / 8–15 |
-| Wedge surrogate | 9 mmHg | 6–12 |
-| Mean systemic filling pressure | 8.7 mmHg | 8–12 |
+| CVP | 1.1 mmHg | 0–6 |
+| Pulmonary artery | 20/10, mean 15 | 15–25 / 8–15 |
+| Wedge surrogate | 7 mmHg | 6–12 |
+| Mean systemic filling pressure | 9.1 mmHg | 8–12 |
 | PVR coefficient | 1.2 Wood units | 0.3–2.0 |
-| LV ejection fraction | 49% | 55–70 (see limitations) |
+| LV ejection fraction | 56% | 55–70 (see limitations) |
 | Plateau pressure | 9.6 cmH₂O | — |
 
 The aggregate baroreflex is off in this reference state. The selected baseline
@@ -52,7 +52,7 @@ the unopposed mechanical model before autonomic compensation is added.
 Behaviour was checked against the sources rather than only against resting
 numbers. The following all reproduce:
 
-- PEEP 0 → 20: cardiac output 5.0 → 4.1 L/min, CVP −0.4 → 5.7, Pmsf 7.1 → 12.2.
+- PEEP 0 → 20: cardiac output 5.8 → 4.3 L/min, CVP −0.5 → 5.8, Pmsf 7.5 → 12.5.
   The gradient for venous return is partly defended by the abdomen, as Fessler
   and van den Berg describe.
 - Spontaneous inspiration lowers CVP below zero while cardiac output rises.
@@ -254,13 +254,13 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   There is one, and it has a mechanism. Above about 900 mL of stressed volume the
   West zone III fraction reaches 96–100%, and with the capillaries open along
   their whole length the lung can squeeze blood forward into the left atrium with
-  each breath — the `piston` term. Variation then rises again, from 1.5% at 900 mL
-  to 3.8% at 1400 mL, in patients who gain nothing from a bolus. Setting `piston`
-  to zero collapses it to 1.0%, which is how the mechanism was identified. This is
+  each breath — the `piston` term. Variation then rises again, from 2.3% at 900 mL
+  to 3.0% at 1400 mL, in patients who gain little from a bolus. Setting `piston`
+  to zero collapses it to 0.7%, which is how the mechanism was identified. This is
   the direct-filling component of the classical Δup, and it appears exactly where
   it should: only when the patient is full enough for zone III to be everywhere.
 
-  It is a weak false positive — 3.8% would not mislead anyone, where the real
+  It is a weak false positive — 3.0% would not mislead anyone, where the real
   thing reaches double figures. And the other classical sources are still absent:
   irregular, variable-depth efforts and arrhythmia, neither of which this model
   has, since effort is a reproducible half-sine and the rhythm is metronomic.
@@ -276,10 +276,12 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   model calibration. That use has been retired because it is not generalisable
   enough for this didactic model. Low tidal volume remains an applicability
   caution; it is not “corrected” by a tidal-volume challenge.
-- **Ejection fraction runs low** (≈50% at baseline). Ejection ends when cavity
-  pressure falls below aortic pressure, and with a double-hill activation that
-  happens a little early. Stroke volume, cardiac output and the loop shape are
-  right; the ratio is pessimistic by roughly 5–10 points.
+- **Ejection fraction is not an echocardiographic calibration.** The canonical
+  double-Hill activation now reaches a true unit peak, so the selected Ees is the
+  peak active elastance and baseline EF is about 56%. The number still belongs
+  to a lumped chamber with no ventricular geometry, regional wall motion,
+  valvular regurgitation or imaging method, and must not be compared directly
+  with an individual patient's EF.
 - **Pulmonary transit is an eight-stage aggregate approximation.** Its mean time
   now changes with represented pulmonary blood volume and RV output, but it
   still has no regional perfusion, shunt, bronchial flow or contrast kinetics.
