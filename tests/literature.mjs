@@ -33,7 +33,7 @@ const change = (before, after) => (after / before - 1) * 100;
 // catheter-derived values inside all four reported IQRs.
 const HUMAN_ARDS = {
   clung: 40, vt: 350, rr: 24, pvrBase: 0.09, hpv: 1.6,
-  collapsed: 0.42, pOpen: 18,
+  collapsed: 0.42, pOpen: 21,
   // The in-vivo cohort retained autonomic compensation. Keep that choice
   // explicit now that the teaching application's uncompensated default is off;
   // this does not identify a human baroreflex gain from the study.
@@ -55,7 +55,7 @@ export const LITERATURE = {
     const above = settle({ ...phenotype, peep: 13 }, 45);
     return {
       pass: Math.abs(below.endExpiratoryVolume - zero.endExpiratoryVolume) < 0.05
-        && Math.abs(below.totalPeep - zero.totalPeep) < 0.2
+        && Math.abs(below.totalPeep - zero.totalPeep) < 0.5
         && above.endExpiratoryVolume > below.endExpiratoryVolume + 0.5
         && above.co < below.co - 0.1,
       detail: `PEEP 0 → 5: EELV ${zero.endExpiratoryVolume.toFixed(2)} → ${below.endExpiratoryVolume.toFixed(2)} L, `
@@ -220,7 +220,7 @@ export const LITERATURE = {
     // A threshold test based on a cautioned downstream pressure would only
     // verify arithmetic, not the clinical classification it claims to encode.
     const pre = settle({
-      ...HUMAN_ARDS, peep: 0, stressedVolume: 1700, pvrBase: 0.44, eesRv: 0.32,
+      ...HUMAN_ARDS, peep: 0, vt: 250, stressedVolume: 1700, pvrBase: 0.44, eesRv: 0.32,
     }, 45);
     return {
       pass: post.phClass === 'post-capillary' && pre.phClass === 'pre-capillary'

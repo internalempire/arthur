@@ -1,109 +1,109 @@
 # The equation of motion
 
-> How the model turns a breath into pressures. The chest wall gives pleural pressure, the lung gives transpulmonary pressure, and the airway sees their sum — in that order, which is what lets the two be told apart.
+> The lung and chest wall share one volume but have separate pressure–volume relations. Their pressures add at the alveolus; airway resistance adds a further pressure only while gas is flowing.
 
 ---
 
 ## Physiology
 
-The respiratory system is two elastic structures in series, sharing one volume. The airway pressure needed to hold that volume is the sum of what each requires:
+The respiratory system contains two elastic structures in series. At any instant, the pressure needed to hold a given volume is the sum of lung recoil and chest-wall recoil:
 
 $$
-P_{aw} = \underbrace{P_{pl}}_{\text{chest wall}} + \underbrace{P_{l}}_{\text{lung}} + \underbrace{\dot{V} R_{aw}}_{\text{airway}}
+P_{alv}=P_l+P_{cw}-P_{mus}
 $$
 
-- $P_{aw}$ — airway pressure, cmH₂O
-- $P_{pl}$ — pleural pressure, cmH₂O: what the chest wall requires
-- $P_{l}$ — transpulmonary pressure, cmH₂O: what the lung tissue requires
-- $\dot{V}$ — flow, L/s
-- $R_{aw}$ — airway resistance, cmH₂O·s/L
+During flow, the airway also pays a resistive pressure:
 
-During a hold, flow is zero and the resistive term vanishes, which is why a plateau pressure is an elastic measurement and a peak pressure is not.
+$$
+P_{aw}=P_{alv}+\dot V R_{aw}
+$$
 
-The clinically important consequence is that airway pressure cannot tell you where the pressure went. A plateau of 30 cmH₂O may be almost all lung — a stiff lung in a normal chest wall, where the mediastinum sees little of it — or largely chest wall, where the [pleural space](pleural-pressure.md) sees most of it and the circulation pays. Only a measurement that separates the two, such as an oesophageal balloon, distinguishes them; and it is the lung's share that stresses the tissue, while it is the chest wall's share that reaches the heart.
+- $P_l$ is transpulmonary pressure: the pressure distending the lung.
+- $P_{cw}$ is the relaxed chest-wall recoil pressure at the current absolute volume. It is negative when the wall tends to spring outward and positive when it tends inward.
+- $P_{mus}$ is inspiratory muscle pressure. It lowers pleural pressure when the patient makes an inspiratory effort.
+- $\dot V R_{aw}$ is the pressure lost across airway resistance.
+
+Pleural pressure in this one-compartment construction is therefore:
+
+$$
+P_{pl}=P_{cw}-P_{mus}
+$$
+
+This partition is clinically important. The lung component determines lung stress; the chest-wall component is transmitted around the heart and intrathoracic vessels. The same airway pressure can therefore have different pulmonary and haemodynamic meanings in two patients.
+
+When flow stops during a hold, the resistive term disappears. This is why peak airway pressure contains resistance whereas plateau pressure represents the combined elastic load.
 
 ---
 
 ## In the model
 
-The three terms are evaluated in a fixed order at every time step:
+Both elastic elements are evaluated from the same **absolute lung volume**, but neither is defined from the other:
 
 $$
-P_{pl} = P_{pl,FRC} + \frac{V}{C_{cw}} - P_{mus}
+P_l=F_l(V,\varphi), \qquad P_{cw}=F_{cw}(V;C_{cw})+L_{cw}
 $$
 
-$$
-P_{l} = P_{l}(V_{\text{absolute}})
-$$
+$F_l$ is the nonlinear lung relation described on the [pressure–volume curve](pressure-volume-curve.md) page. It contains aerated-tissue compliance, maximum capacity and the fraction of lung that is open.
+
+$F_{cw}$ is an independent sigmoid relaxation curve. Around ordinary tidal breathing it is close to a straight line, so the `Chest wall compliance` control remains an intuitive local slope. At large departures from that region the curve progressively stiffens instead of allowing a constant compliance to continue indefinitely. $L_{cw}$ is the separate `Chest wall load`: it shifts the curve without changing its reference slope.
+
+### Passive equilibrium
+
+At zero applied airway pressure and with relaxed respiratory muscles, the resting volume is not assigned to either element. It is solved from:
 
 $$
-P_{alv} = P_{pl} + P_{l}
+P_l(V_{relax})+P_{cw}(V_{relax})=0
 $$
 
-- $V$ — volume above the model's lung-derived relaxation reference, mL
-- $V_{\text{absolute}}$ — absolute lung volume, L, which is what the tissue actually feels
-- $C_{cw}$ — chest wall compliance, mL/cmH₂O
-- $P_{mus}$ — inspiratory muscle pressure, cmH₂O
-- $P_{alv}$ — alveolar pressure, cmH₂O
+At a static PEEP:
 
-Airway pressure is then alveolar pressure plus the resistive drop, in whichever direction gas is moving.
+$$
+P_l(V_{EE})+P_{cw}(V_{EE})=PEEP
+$$
 
-The asymmetry between the two elastic elements is deliberate and is the structural claim of the model:
+This is the key structural change. A collapsed, stiff lung now meets the unchanged wall at a lower volume and a higher transpulmonary recoil. A lung with lost recoil meets the same wall at a higher volume. Changing the lung no longer silently moves the chest-wall reference.
 
-| element | form | why |
-|---|---|---|
-| chest wall | **linear**, one compliance | close to linear over the tidal range; keeps it out of the way |
-| lung | **sigmoid with a saturating ceiling** | recruitment at the bottom, tissue limit at the top |
+### Dynamic breaths
 
-Because the chest wall is linear, every departure from a straight line in the airway pressure trace belongs to the lung. That is what makes the [stress index](stress-index.md) interpretable. If both elements bent, the curvature could not be attributed.
+Volume control imposes inspiratory flow and lets pressure emerge. Pressure control applies airway pressure and lets flow decay as alveolar pressure approaches it. Spontaneous and assisted breaths subtract the muscle-pressure waveform from the relaxed wall pressure.
 
-And because $P_l$ is a function of *absolute* lung volume rather than of tidal excursion, a lung that recruits during the breath moves along a different part of its own curve — so [recruitment changes the mechanics](recruitment-and-ri.md) rather than being a separate bookkeeping entry.
-
-### Modes
-
-Volume control delivers a constant inspiratory flow, so volume is the driven variable and pressure is the outcome. Pressure control applies a fixed airway pressure and lets flow decay as the alveolar pressure approaches it. Spontaneous and assisted breaths add $P_{mus}$, a half-sine over the neural inspiratory time raised to a power slightly above one, so the rise is a little slower than the fall. A patient who generates enough effort during expiration triggers the ventilator.
+The simulator stores respiratory volume as displacement from the current passive equilibrium for numerical convenience, but lung and wall pressure are always calculated from absolute volume. When an elastic control changes, the gas already in the lung is preserved and only this internal reference is updated.
 
 ---
 
-## Why this and not something else
+## Why this implementation
 
-**One compartment, not many.** A multi-compartment lung with parallel time constants would produce pendelluft, regional overdistension and the slow-compartment behaviour of obstructive disease. The model has one compartment because the questions it exists to answer are about the *circulation*, and every additional respiratory compartment would have to be given a vascular bed to be worth having. The one place where a single compartment failed badly — the inability to represent recruitability — was fixed by splitting the lung into two *populations of units* sharing one volume, which is a different thing from two compartments; see [the two-population lung](two-population-lung.md).
+**One aggregate wall is enough for the teaching aim.** A separate rib cage, diaphragm and abdomen would better reproduce posture, obesity and regional pleural gradients, but each would add poorly identifiable parameters. One independent nonlinear wall corrects the important causal error without turning the app into a respiratory-mechanics simulator.
 
-**Resistance is linear and constant.** Real airway resistance is flow-dependent and differs between inspiration and expiration. The one behaviour that mattered enough to add explicitly is expiratory flow limitation, which is not a resistance at all but a [choke](expiratory-flow-limitation.md).
+**Stiffness and load are different controls.** Low compliance makes the pleural-pressure swing larger for a given delivered volume. A positive load shifts resting pleural pressure and passive volume even before a breath is delivered. Obesity or intra-abdominal hypertension can contain both effects; treating them as synonyms would hide the distinction.
 
-**Forward Euler at 0.25 ms.** Explicit and small rather than implicit and large. The model must be legible line by line to be teachable, and an implicit solver is not. The cost is that discontinuities in derivatives have to be avoided deliberately — the reason the venous [collapse law](vascular-waterfalls.md) is smoothed rather than a hard `max()`.
+**A sigmoid is used as a physiological shape, not a patient fit.** Human relaxation curves are near-linear in their middle range and stiffen toward the volume extremes. The model calibrates the normal operating point and local compliance, but it does not claim that the curve's remote asymptotes are measured RV or TLC.
+
+**Airway-pressure curvature is no longer exclusively pulmonary.** In the ordinary tidal range, chest-wall curvature is small and the [stress index](stress-index.md) remains mainly a readout of changing lung compliance. At extreme volume or wall mechanics, however, the wall can contribute to the airway-pressure shape. This is physiologically more honest than forcing the wall to remain linear merely to make the index easier to interpret.
 
 ---
 
 ## Limits
 
-### Of the construction
-
-- **No gas.** No oxygen, no carbon dioxide, no dead space, no V/Q. Ventilation moves volume, not gas exchange, so nothing in the model can answer a question about oxygenation.
-- **One alveolar compartment**, so no pendelluft, no regional time constants, no distinction between fast and slow units.
-- **The chest wall is linear at all volumes**, including where a real one is not.
-- **The chest-wall reference is recentered on each lung phenotype.** The model assigns −5 cmH₂O pleural pressure at the lung-derived relaxation volume instead of solving the intersection of independent lung and chest-wall curves. See [pleural pressure](pleural-pressure.md).
-- **No inspiratory threshold load, no expiratory muscle activity, no dyssynchrony, no fatigue.** Effort is one waveform with one amplitude.
-- Airway resistance does not vary with flow, volume or direction.
-- The ventilator is idealised: no trigger delay, no rise-time setting, no leak, no circuit compliance.
-
-### Of clinical application
-
-- **The model's partition between lung and chest wall is exact**; a clinician's is an oesophageal estimate with its own artefacts. Use the model to understand why the partition matters, not to justify a number.
-- Airway pressures the model produces are properties of its own compliances. A plateau of 36.9 cmH₂O in the table on the [pleural pressure](pleural-pressure.md) page is what these settings give, not a prediction.
-- Nothing here supports a ventilator setting for a patient.
+- One global lung and one global chest wall replace regional mechanics and pleural-pressure gradients.
+- The wall curve is a calibrated teaching relation, not a patient-specific oesophageal pressure–volume fit.
+- Rib cage, diaphragm and abdominal wall are not separate compartments.
+- The `Chest wall load` is an aggregate pressure offset; it is not calculated from body mass, ascites volume or a fixed fraction of abdominal pressure.
+- There is no expiratory muscle activity, inspiratory threshold load, dyssynchrony or respiratory-muscle fatigue.
+- Airway resistance is linear except for the separate [expiratory flow-limitation](expiratory-flow-limitation.md) choke.
+- The ventilator has no circuit compliance, leak, trigger delay or rise-time control.
 
 ---
 
 ## References
 
-- Bates JHT. *Lung Mechanics: An Inverse Modeling Approach*. Cambridge University Press, 2009.
-- Gattinoni L, Carlesso E, Cadringher P, et al. Physical and biological triggers of ventilator-induced lung injury and its prevention. *Eur Respir J* 2003;22(Suppl 47):15s–25s.
-- Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med* 2014;189:520–31.
-- Grinnan DC, Truwit JD. Clinical review: respiratory mechanics in spontaneous and assisted ventilation. *Crit Care* 2005;9:472–84.
+- Rahn H, Otis AB, Chadwick LE, Fenn WO. The pressure-volume diagram of the thorax and lung. *Am J Physiol*. 1946;146:161–178. [doi:10.1152/ajplegacy.1946.146.2.161](https://doi.org/10.1152/ajplegacy.1946.146.2.161)
+- Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
+- Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
+- Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med*. 2014;189:520–531. [doi:10.1164/rccm.201312-2193CI](https://doi.org/10.1164/rccm.201312-2193CI)
 
 ---
 
 ## See also
 
-[Pleural pressure](pleural-pressure.md) · [Pressure–volume curve](pressure-volume-curve.md) · [The two-population lung](two-population-lung.md) · [Stress index](stress-index.md) · [Expiratory flow limitation](expiratory-flow-limitation.md) · [Model architecture](model-architecture.md) · [Controls: ventilation](controls-ventilation.md)
+[Pleural pressure](pleural-pressure.md) · [Pressure–volume curve](pressure-volume-curve.md) · [The two-population lung](two-population-lung.md) · [Stress index](stress-index.md) · [The Campbell diagram](panel-campbell.md) · [Controls: mechanics](controls-mechanics.md)

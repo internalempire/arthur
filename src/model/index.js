@@ -19,7 +19,8 @@ export {
 export {
   lungVolumeAtPl, relaxationVolume, openBand, stepOpenFraction,
   recruitmentBand, stepRecruitedFraction, openFractionFromRecruitmentState,
-  pvrComponents, lungRegions,
+  pvrComponents, lungRegions, chestWallPressure, chestWallComplianceAt,
+  chestWallNeutralVolume,
 } from './lung.js';
 export { PPL_FRC, respiratorySystemCompliance } from './respiratory.js';
 

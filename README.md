@@ -84,6 +84,7 @@ The lung model includes:
 - a bedside-inspired recruitment-to-inflation ratio;
 - optional recruitment hysteresis with separate opening and closing ranges;
 - expiratory flow limitation and dynamic hyperinflation;
+- an independent nonlinear chest-wall relaxation curve, with stiffness separated from external loading;
 - chest-wall and abdominal pressure transmission;
 - a deliberately coarse prone-position transformation.
 
@@ -149,7 +150,7 @@ Five control groups are generated from a single parameter registry:
 | group | scope | manual |
 |---|---|---|
 | ventilation | mode, rate, tidal volume or pressure, PEEP, timing and effort | [Ventilation controls](manual/controls-ventilation.md) |
-| respiratory mechanics | compliance, capacity, chest wall, resistance, collapse, recruitment, EFL and abdomen | [Mechanics controls](manual/controls-mechanics.md) |
+| respiratory mechanics | lung compliance and capacity, chest-wall compliance and load, resistance, collapse, recruitment, EFL and abdomen | [Mechanics controls](manual/controls-mechanics.md) |
 | volume and vascular tone | stressed volume, venous compliance, venous-return resistance and SVR | [Volume controls](manual/controls-volume.md) |
 | cardiac function | heart rate, contractility, LV stiffness, baroreflex and ventricular interaction | [Heart controls](manual/controls-heart.md) |
 | pulmonary circulation | vascular resistance, hypoxic vasoconstriction and pulmonary capacitance coupling | [Pulmonary controls](manual/controls-pulmonary.md) |
@@ -184,7 +185,7 @@ Scenarios are starting phenotypes built around one teaching question. They are n
 | Acute pulmonary embolism | How does aggregate pulmonary vascular load affect a vulnerable RV? |
 | Cardiac tamponade | How does lost pericardial capacity couple diastolic pressure, RV filling and output? |
 | Cardiogenic pulmonary oedema | When can reduced LV transmural afterload outweigh lost preload? |
-| Stiff chest wall | Why does the same tidal volume transmit more pleural pressure? |
+| Stiff chest wall | How do wall stiffness and an external thoracic load differ? |
 | COPD with dynamic hyperinflation | How do expiratory time, flow limitation and external PEEP interact? |
 | Intra-abdominal hypertension | How can abdominal pressure both mobilise and obstruct venous return? |
 

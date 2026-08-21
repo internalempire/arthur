@@ -71,8 +71,9 @@ const PANELS = [
     summary: (sim) => {
       const m = sim.metrics, p = sim.params;
       return `At ${n((m.lungVolume - sim.resp.relaxVolume) * 1000, 0)} mL above resting volume, pleural pressure is ${n(m.ppl)} and `
-        + `airway pressure ${n(m.paw)} cmH₂O. Chest wall compliance ${p.ccw} and aerated-lung compliance ${p.clung} `
-        + `mL/cmH₂O, with a ${n(p.lungCapacity, 1)} L maximum capacity, give a live respiratory-system compliance of ${n(m.crs, 0)}.`;
+        + `airway pressure ${n(m.paw)} cmH₂O. The chest-wall curve has a reference slope of ${p.ccw} mL/cmH₂O `
+        + `and a ${n(p.cwLoad)} cmH₂O load; aerated-lung compliance is ${p.clung} mL/cmH₂O. `
+        + `Together they give a live respiratory-system compliance of ${n(m.crs, 0)} mL/cmH₂O.`;
     },
     rows: (sim) => {
       const m = sim.metrics, p = sim.params;
@@ -83,7 +84,8 @@ const PANELS = [
         ['Airway pressure', `${n(m.paw)} cmH₂O`],
         ['Alveolar pressure', `${n(m.palv)} cmH₂O`],
         ['Transpulmonary pressure', `${n(m.pl)} cmH₂O`],
-        ['Chest wall compliance', `${p.ccw} mL/cmH₂O`],
+        ['Chest wall compliance near the reference volume', `${p.ccw} mL/cmH₂O`],
+        ['Chest wall load', `${n(p.cwLoad)} cmH₂O`],
         ['Aerated-lung compliance setting', `${p.clung} mL/cmH₂O`],
         ['Maximum lung capacity', `${n(p.lungCapacity, 1)} L`],
         ['Live respiratory-system compliance', `${n(m.crs, 0)} mL/cmH₂O`],

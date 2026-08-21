@@ -53,6 +53,8 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. The preset leaves maximum lung capacity at the 6 L default: collapse makes the accessible baby lung smaller, while reduced `clung` independently makes its aerated tissue less compliant. Follow derived PVR, its wedge-dependent quality badge, RV/LV ratio, septal interaction and output together. Extreme PEEP can generate plateau pressures outside a useful quantitative range and can invalidate the catheter interpretation of the wedge surrogate; prone response is directional rather than patient-specific. See [recruitment and R/I](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md), [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) and [ventricular interdependence](ventricular-interdependence.md).
 
+The preset's opening-range centre is 21 cmH₂O. This is not a proposed clinical threshold: after the chest wall became independent, the collapsed stiff lung reached a higher resting transpulmonary pressure, so the internal opening distribution was retuned to preserve the selected R/I and the human in-vivo PVR–recruitability constraint.
+
 ### Acute pulmonary embolism
 
 **Question.** What happens when a normal mechanical lung is coupled to a high pulmonary vascular load and a vulnerable right ventricle?
@@ -81,9 +83,9 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Question.** Why can the same delivered tidal volume create a much larger intrathoracic-pressure swing?
 
-**Try.** Compare the preset with a more compliant chest wall while holding tidal volume and PEEP constant.
+**Try.** First raise `Chest wall compliance` while holding tidal volume and PEEP constant. Then return to the preset and set `Chest wall load` to zero. These are different interventions.
 
-**Read.** A stiff wall allocates more airway pressure to the chest wall and pleural space, raising measured CVP and the haemodynamic cost of ventilation. The preset also includes raised abdominal pressure and is a mechanical phenotype rather than a complete model of obesity. PPV is under caution in this setup.
+**Read.** Low compliance makes the pleural-pressure swing larger for the same delivered volume. The positive wall load shifts resting pressure around the heart even before inspiration. The preset also includes raised abdominal pressure; it is a combined mechanical phenotype rather than a complete model of obesity. PPV is under caution in this setup. See [pleural pressure](pleural-pressure.md) and [the equation of motion](equation-of-motion.md).
 
 ### COPD with dynamic hyperinflation
 
@@ -99,7 +101,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Try.** Change stressed volume at high abdominal pressure, then compare with normal abdominal pressure.
 
-**Read.** A filled abdominal venous reservoir can transmit pressure into Pmsf, while the same abdominal pressure raises the critical pressure for caval collapse. Filling determines which effect dominates. The model uses one aggregate venous-return pathway and does not separate SVC from IVC flow. See [abdominal pressure](abdominal-pressure.md) and [venous return](venous-return.md).
+**Read.** A filled abdominal venous reservoir can transmit pressure into Pmsf, while the same abdominal pressure raises the critical pressure for caval collapse. The preset also applies a separate positive chest-wall load to represent diaphragmatic transmission into the thorax. Filling determines which circulatory effect dominates. The pressure transfer is selected, not calculated from anatomy, and the model uses one aggregate venous-return pathway without separate SVC and IVC flow. See [abdominal pressure](abdominal-pressure.md), [pleural pressure](pleural-pressure.md) and [venous return](venous-return.md).
 
 ## In the model
 

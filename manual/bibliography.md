@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 146 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 144 unique entries.
 
 ---
 
@@ -11,15 +11,16 @@ A citation documents the physiological or methodological claim made on its sourc
 ## A
 
 - Adda I, Lai C, Teboul JL, et al. Norepinephrine potentiates the efficacy of volume expansion on mean systemic pressure in septic shock. *Crit Care*. 2021;25:302. [doi:10.1186/s13054-021-03711-5](https://doi.org/10.1186/s13054-021-03711-5)
+- Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
 - Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. American Physiological Society; 1986.
-- Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med* 2014;189:520–31.
+- Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med*. 2014;189:520–531. [doi:10.1164/rccm.201312-2193CI](https://doi.org/10.1164/rccm.201312-2193CI)
 - Albert RK. The role of ventilation-induced surfactant dysfunction and atelectasis in causing acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2012;185:702–8.
 - Albert SP, DiRocco J, Allen GB, et al. [The role of time and pressure on alveolar recruitment](https://pubmed.ncbi.nlm.nih.gov/19074576/). *J Appl Physiol* 2009;106:757–65.
 - Appleton CP, Hatle LK, Popp RL. Cardiac tamponade and pericardial effusion: respiratory variation in transvalvular flow velocities studied by Doppler echocardiography. *J Am Coll Cardiol*. 1988;11:1020–1030.
 ## B
 
 - Barbier C, Loubieres Y, Schmit C, et al. Respiratory changes in inferior vena cava diameter are helpful in predicting fluid responsiveness in ventilated septic patients. *Intensive Care Med*. 2004;30:1740–1746. [doi:10.1007/s00134-004-2259-8](https://doi.org/10.1007/s00134-004-2259-8)
-- Bates JHT. *Lung Mechanics: An Inverse Modeling Approach*. Cambridge University Press, 2009.
+- Behazin N, Jones SB, Cohen RI, Loring SH. Respiratory restriction and elevated pleural and esophageal pressures in morbid obesity. *J Appl Physiol*. 2010;108:212–218. [doi:10.1152/japplphysiol.91356.2008](https://doi.org/10.1152/japplphysiol.91356.2008)
 - Belenkie I, Dani R, Smith ER, Tyberg JV. Effects of volume loading during experimental acute pulmonary embolism. *Circulation* 1989;80:178–88.
 - Berger D, Moller PW, Weber A, et al. Effect of PEEP and inspiratory hold on mean systemic filling pressure. *Am J Physiol Heart Circ Physiol* 2016;311:H794–H806.
 - Berger D, Moller PW, Weber A, et al. Effect of PEEP, blood volume, and inspiratory hold maneuvers on venous return. *Am J Physiol Heart Circ Physiol*. 2016;311:H794–H806. [doi:10.1152/ajpheart.00931.2015](https://doi.org/10.1152/ajpheart.00931.2015)
@@ -57,15 +58,11 @@ A citation documents the physiological or methodological claim made on its sourc
 ## G
 
 - Gattinoni L, Caironi P, Cressoni M, et al. Lung recruitment in patients with the acute respiratory distress syndrome. *N Engl J Med* 2006;354:1775–86.
-- Gattinoni L, Carlesso E, Cadringher P, et al. Physical and biological triggers of ventilator-induced lung injury and its prevention. *Eur Respir J* 2003;22(Suppl 47):15s–25s.
-- Gattinoni L, Chiumello D, Carlesso E, Valenza F. Bench-to-bedside review: chest wall elastance in acute lung injury/ARDS patients. *Crit Care* 2004;8:350–5.
 - Gattinoni L, Pesenti A. The concept of "baby lung". *Intensive Care Med* 2005;31:776–84.
 - Gattinoni L, Pesenti A. The concept of “baby lung”. *Intensive Care Med*. 2005;31:776–784.
 - Grasso S, Terragni P, Mascia L, et al. Airway pressure–time curve profile (stress index) detects tidal recruitment/hyperinflation in experimental acute lung injury. *Crit Care Med* 2004;32:1018–27.
 - Greenway CV, Lautt WW. Blood volume, the venous system, preload, and cardiac output. *Can J Physiol Pharmacol*. 1986;64:383–387. [doi:10.1139/y86-062](https://doi.org/10.1139/y86-062)
-- Grinnan DC, Truwit JD. Clinical review: respiratory mechanics in spontaneous and assisted ventilation. *Crit Care* 2005;9:472–84.
 - Guarracino F, Baldassarri R, Pinsky MR. Ventriculo-arterial decoupling in acutely altered hemodynamic states. *Crit Care* 2013;17:213.
-- Guérin C, Reignier J, Richard J-C, et al. Prone positioning in severe acute respiratory distress syndrome. *N Engl J Med* 2013;368:2159–68.
 - Guyton AC, Lindsey AW, Abernathy B, Richardson T. Venous return at various right atrial pressures and the normal venous return curve. *Am J Physiol* 1957;189:609–15.
 - Guyton AC, Lindsey AW, Kaufmann BN. Effect of mean circulatory filling pressure and other peripheral circulatory factors on cardiac output. *Am J Physiol* 1955;180:463–8.
 - Guyton AC, Lindsey AW, Kaufmann BN. Effect of mean circulatory filling pressure and other peripheral circulatory factors on cardiac output. *Am J Physiol*. 1955;180:463–468.
@@ -88,7 +85,6 @@ A citation documents the physiological or methodological claim made on its sourc
 
 - Jardin F, Farcot JC, Boisante L, et al. Influence of positive end-expiratory pressure on left ventricular performance. *N Engl J Med* 1981;304:387–92.
 - Jardin F, Vieillard-Baron A. Right ventricular function and positive pressure ventilation in clinical practice. *Crit Care*. 2003;7:217–223.
-- Jozwiak M, Teboul J-L, Anguel N, et al. Beneficial hemodynamic effects of prone positioning in patients with acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2013;188:1428–33.
 ## K
 
 - Kenny J-ÉS. *An Approach to Mechanical Heart–Lung Interaction*, 2020.
@@ -127,6 +123,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Paternot A, Repessé X, Vieillard-Baron A. Rationale and description of right ventricle-protective ventilation in ARDS. *Respir Care*. 2016;61:1391–1396. [doi:10.4187/respcare.04943](https://doi.org/10.4187/respcare.04943)
 - Pelosi P, D'Andrea L, Vitale G, et al. Vertical gradient of regional lung inflation in adult respiratory distress syndrome. *Am J Respir Crit Care Med*. 1994;149:8–13.
 - Pepe PE, Marini JJ. Occult positive end-expiratory pressure in mechanically ventilated patients with airflow obstruction: the auto-PEEP effect. *Am Rev Respir Dis* 1982;126:166–70.
+- Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Permutt S, Bromberger-Barnea B, Bane HN. Alveolar pressure, pulmonary venous pressure and the vascular waterfall. *Med Thorac* 1962;19:239–60.
 - Permutt S, Riley RL. Hemodynamics of collapsible vessels with tone: the vascular waterfall. *J Appl Physiol*. 1963;18:924–932. [doi:10.1152/jappl.1963.18.5.924](https://doi.org/10.1152/jappl.1963.18.5.924)
 - Persichini R, Lai C, Teboul JL, et al. Venous return and mean systemic filling pressure: physiology and clinical applications. *Crit Care*. 2022;26:150. [doi:10.1186/s13054-022-04024-x](https://doi.org/10.1186/s13054-022-04024-x)
@@ -142,6 +139,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Pinsky MR. The effects of mechanical ventilation on the cardiovascular system. *Crit Care Clin*. 1990;6:663–678. [doi:10.1016/S0749-0704(18)30360-9](https://doi.org/10.1016/S0749-0704(18)30360-9)
 ## R
 
+- Rahn H, Otis AB, Chadwick LE, Fenn WO. The pressure-volume diagram of the thorax and lung. *Am J Physiol*. 1946;146:161–178. [doi:10.1152/ajplegacy.1946.146.2.161](https://doi.org/10.1152/ajplegacy.1946.146.2.161)
 - Ranieri VM, Dambrosio M, Brienza N. Intrinsic PEEP and cardiopulmonary interaction in patients with COPD and acute ventilatory failure. *Eur Respir J*. 1996;9:1283–1292. <https://pubmed.ncbi.nlm.nih.gov/8804950/>
 - Ranieri VM, Giuliani R, Cinnella G, et al. Physiologic effects of positive end-expiratory pressure in patients with chronic obstructive pulmonary disease during acute ventilatory failure and controlled mechanical ventilation. *Am Rev Respir Dis* 1993;147:5–13.
 - Ranieri VM, Zhang H, Mascia L, et al. Pressure–time curve predicts minimally injurious ventilatory strategy in an isolated rat lung model. *Anesthesiology* 2000;93:1320–8.

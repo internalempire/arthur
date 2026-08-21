@@ -91,8 +91,69 @@ function openableDiseasedFraction(p) {
 }
 
 // Transpulmonary pressure at the relaxation volume: the recoil that holds the
-// lung open against the chest wall, and the negative of pleural pressure there.
+// normal lung open at the reference operating point. It calibrates the lung
+// curve only; the actual passive equilibrium is now solved against an
+// independent chest-wall curve below.
 export const RECOIL_AT_FRC = 5; // cmH2O
+
+// ---------------------------------------------------------------- chest wall
+//
+// The chest wall is an independent elastic element. Earlier versions silently
+// moved its zero-pressure relation whenever lung compliance, capacity or open
+// fraction changed: every lung phenotype was assigned Ppl = -5 cmH2O at the
+// volume that happened to correspond to Pl = +5. That preserved the normal
+// calibration but made a diseased lung drag an otherwise unchanged rib cage to
+// a new reference volume.
+//
+// Human relaxation curves are approximately linear around tidal breathing and
+// stiffen toward both volume extremes. A Boltzmann volume-pressure relation has
+// that shape and an analytic inverse, used here as Pcw(V). The broad asymptotes
+// are numerical shape anchors outside ordinary breathing, not anatomical RV or
+// TLC. The curve is calibrated so the default wall has Pcw = -5 cmH2O and the
+// selected local compliance at the normal 2.2 L operating point.
+export const CHEST_WALL_REFERENCE_PRESSURE = -5; // cmH2O at NORMAL_FRC before load
+// The lower mathematical asymptote lies outside the physical volume range. That
+// keeps the wall close to linear across low-volume ICU breathing while the
+// upper asymptote still supplies the measured stiffening toward maximal
+// expansion. Neither asymptote is an anatomical RV or TLC.
+export const CHEST_WALL_MIN_VOLUME = -5; // L, lower Boltzmann shape anchor
+export const CHEST_WALL_MAX_VOLUME = 10; // L, broad upper shape anchor
+
+const CW_RANGE = CHEST_WALL_MAX_VOLUME - CHEST_WALL_MIN_VOLUME;
+const CW_Q_REFERENCE = (NORMAL_FRC - CHEST_WALL_MIN_VOLUME) / CW_RANGE;
+const logit = (x) => Math.log(x / (1 - x));
+const invLogit = (x) => 1 / (1 + Math.exp(-x));
+const cwFraction = (volume) => clamp(
+  (volume - CHEST_WALL_MIN_VOLUME) / CW_RANGE,
+  1e-6,
+  1 - 1e-6,
+);
+
+const chestWallScale = (p) => {
+  const compliance = Math.max(1e-6, (p.ccw ?? 200) / 1000); // L/cmH2O
+  // For V = NORMAL_FRC, dV/dP is exactly the selected `ccw`.
+  return (CW_RANGE * CW_Q_REFERENCE * (1 - CW_Q_REFERENCE)) / compliance;
+};
+
+/** Relaxed chest-wall recoil pressure at an absolute thoracic volume. */
+export function chestWallPressure(p, volume) {
+  const q = cwFraction(volume);
+  return CHEST_WALL_REFERENCE_PRESSURE + Number(p.cwLoad ?? 0)
+    + chestWallScale(p) * (logit(q) - logit(CW_Q_REFERENCE));
+}
+
+/** Local chest-wall compliance, rather than one slope imposed at all volumes. */
+export function chestWallComplianceAt(p, volume) {
+  const q = cwFraction(volume);
+  return (CW_RANGE * q * (1 - q) / chestWallScale(p)) * 1000; // mL/cmH2O
+}
+
+/** Absolute volume at which the relaxed chest wall has zero recoil. */
+export function chestWallNeutralVolume(p) {
+  const targetLogit = logit(CW_Q_REFERENCE)
+    - (CHEST_WALL_REFERENCE_PRESSURE + Number(p.cwLoad ?? 0)) / chestWallScale(p);
+  return CHEST_WALL_MIN_VOLUME + CW_RANGE * invLogit(targetLogit);
+}
 
 /** The already-aerated share follows present pressure and carries no memory. */
 export function normalOpenFractionAt(p, pl) {
@@ -268,14 +329,14 @@ export function lungVolumeAtRecruitmentState(p, pl, recruitedFraction) {
 }
 
 /**
- * The volume the lung settles at when its recoil balances the chest wall.
+ * Passive zero-airway-pressure equilibrium of the independent lung and wall.
  *
  * Passing a total open fraction is retained for static analyses. The dynamic
- * hysteresis path instead carries only recruited diseased lung and uses
- * `lungVolumeAtRecruitmentState`, so normal lung remains pressure-responsive.
+ * hysteresis path instead carries only recruited diseased lung and uses its own
+ * equilibrium helper below, so normal lung remains pressure-responsive.
  */
 export function relaxationVolume(p, phi = null) {
-  return lungVolumeAtPl(p, RECOIL_AT_FRC, phi);
+  return staticEndExpiratoryVolume(p, 0, phi);
 }
 
 /**
@@ -380,14 +441,13 @@ export function lungComplianceAt(p, lungVolume, eps = 0.25) {
 
 /** End-expiratory equilibrium volume during a passive static PEEP step. */
 export function staticEndExpiratoryVolume(p, peep, phi = null) {
-  const vRelax = relaxationVolume(p, phi);
-  const ccw = Math.max(1e-6, (p.ccw ?? 200) / 1000);
   const balance = (volume) =>
-    -RECOIL_AT_FRC + (volume - vRelax) / ccw
-    + (phi === null ? transpulmonaryAt(p, volume) : transpulmonaryAtFixed(p, volume, phi)) - peep;
+    chestWallPressure(p, volume)
+    + (phi === null ? transpulmonaryAt(p, volume) : transpulmonaryAtFixed(p, volume, phi))
+    - peep;
 
   let lo = 0.02;
-  let hi = Math.max(12, lungVolumeAtPl(p, 80) * 1.05);
+  let hi = CHEST_WALL_MAX_VOLUME - 1e-5;
   for (let i = 0; i < 44; i++) {
     const mid = (lo + hi) / 2;
     if (balance(mid) < 0) lo = mid; else hi = mid;
@@ -397,16 +457,13 @@ export function staticEndExpiratoryVolume(p, peep, phi = null) {
 
 /** Passive EELV for a known recruitment state and pressure-responsive normal lung. */
 export function staticEndExpiratoryVolumeAtRecruitmentState(p, peep, recruitedFraction) {
-  // Keep the same chest-wall reference used by the respiratory integrator.
-  // Recruitment changes absolute volume, not the chest wall's zero-pressure
-  // reference; using a state-specific relaxation volume would count it twice.
-  const vRelax = relaxationVolume(p);
-  const ccw = Math.max(1e-6, (p.ccw ?? 200) / 1000);
-  const balance = (volume) => -RECOIL_AT_FRC + (volume - vRelax) / ccw
+  // Recruitment changes the lung branch, while the independently defined wall
+  // remains at exactly the same absolute-volume relation.
+  const balance = (volume) => chestWallPressure(p, volume)
     + transpulmonaryAtRecruitmentState(p, volume, recruitedFraction) - peep;
 
   let lo = 0.02;
-  let hi = Math.max(12, lungVolumeAtPl(p, 80) * 1.05);
+  let hi = CHEST_WALL_MAX_VOLUME - 1e-5;
   for (let i = 0; i < 44; i++) {
     const mid = (lo + hi) / 2;
     if (balance(mid) < 0) lo = mid; else hi = mid;
@@ -429,7 +486,11 @@ function assessRecruitmentToInflation(p) {
   const lowEelv = staticEndExpiratoryVolume(p, RI_LOW_PEEP);
   const highEelv = staticEndExpiratoryVolume(p, RI_HIGH_PEEP);
   const lungCompliance = lungComplianceAt(p, lowEelv);
-  const lowCompliance = 1 / (1 / lungCompliance + 1 / Math.max(1e-6, p.ccw ?? 200));
+  // Bedside low-PEEP Crs contains the wall compliance at that actual volume,
+  // not the registry's reference slope. This distinction becomes essential
+  // once the independent wall stiffens toward its lower volume range.
+  const wallCompliance = chestWallComplianceAt(p, lowEelv);
+  const lowCompliance = 1 / (1 / lungCompliance + 1 / wallCompliance);
   const pressureStep = RI_HIGH_PEEP - RI_LOW_PEEP;
   const deltaEelv = (highEelv - lowEelv) * 1000;
   const predictedInflation = lowCompliance * pressureStep;
@@ -461,7 +522,7 @@ let lastCalibration = null;
 
 const recruitmentKey = (p, fraction = '') => [
   Number(p.collapsed ?? 0), Number(p.clung ?? 200), Number(p.lungCapacity ?? 6),
-  Number(p.ccw ?? 200),
+  Number(p.ccw ?? 200), Number(p.cwLoad ?? 0),
   Number(p.pOpen ?? 20), Number(p.riRatio ?? 0), fraction,
 ].join('|');
 

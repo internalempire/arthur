@@ -18,6 +18,10 @@
 
 **Central venous pressure (CVP).** Right atrial pressure referenced to atmosphere. The model also reports transmural CVP, which subtracts surrounding pleural pressure.
 
+**Chest-wall compliance (`ccw`).** Local slope of the independent relaxed chest-wall pressure–volume curve near the normal reference volume. It controls pressure change per volume change and is separate from chest-wall load.
+
+**Chest-wall load (`cwLoad`).** Pressure offset applied to the whole relaxed chest-wall curve. A positive load can represent aggregate mass or diaphragmatic loading; it changes resting pressure without being defined as stiffness. See [pleural pressure](pleural-pressure.md).
+
 **Compliance.** Change in volume divided by change in pressure. Lung and chest-wall compliance are reported in mL/cmH₂O; vascular compliance in mL/mmHg. Compliance is the reciprocal of elastance only for a locally linear relation.
 
 ## D–H
@@ -80,7 +84,7 @@
 
 **Wedge / PAWP.** [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md). Clinically it is the distal pressure measured after occluding a pulmonary arterial branch. The model instead uses smoothed atmospheric left atrial pressure as a surrogate and qualifies it with a zone 3 pressure-margin index.
 
-**West zones.** Relations among alveolar, pulmonary arterial and pulmonary venous pressure that alter pulmonary vascular flow. The model represents zone-2 waterfall behaviour and zone-3 fraction in aggregate.
+**West zones.** Relations among alveolar, pulmonary arterial and pulmonary venous pressure that alter pulmonary vascular flow. The model represents zone-2 waterfall behaviour and a zone-3 pressure-margin index in aggregate.
 
 ## Units and conversions
 

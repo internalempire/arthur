@@ -1,8 +1,8 @@
 import { Panel, niceTicks } from '../plot.js';
 import {
-  PPL_FRC, respiratorySystemCompliance,
+  respiratorySystemCompliance,
   lungVolumeAtPl, relaxationVolume, recruitmentBand, stepRecruitedFraction,
-  openFractionFromRecruitmentState,
+  openFractionFromRecruitmentState, chestWallPressure,
 } from '../../model/index.js';
 
 // The Campbell diagram. Pleural pressure follows the chest wall compliance
@@ -71,14 +71,16 @@ export function createCampbell(canvas) {
 
     panel.clip();
 
-    // The chest wall is still a straight line, because it still is one.
+    // Both elastic elements are evaluated against absolute volume. The wall is
+    // almost linear around tidal breathing but bends at the volume extremes;
+    // unlike the old construction, changing the lung cannot translate it.
     const crs = respiratorySystemCompliance(p, r.lungVolume);
-    const relax = (compliance, offset) => {
-      const pts = [];
-      for (let v = -50; v <= vMax; v += vMax / 24) pts.push(offset + v / compliance, v);
-      return pts;
-    };
-    panel.line(relax(p.ccw, PPL_FRC), { color: colors.pleural, width: 1.5, dash: [4, 4], alpha: 0.75 });
+    const vRelax = relaxationVolume(p);
+    const chestWallCurve = [];
+    for (let v = -50; v <= vMax; v += vMax / 32) {
+      chestWallCurve.push(chestWallPressure(p, vRelax + v / 1000), v);
+    }
+    panel.line(chestWallCurve, { color: colors.pleural, width: 1.5, dash: [4, 4], alpha: 0.75 });
 
     // The lung is not. Its relaxation line is the pressure–volume curve itself,
     // drawn by sweeping transpulmonary pressure and reading the volume off it —
@@ -86,7 +88,6 @@ export function createCampbell(canvas) {
     // spring in the model cannot be different springs. In a recruitable lung it
     // has the lower inflection that a bedside manoeuvre draws; in a normal one it
     // is nearly straight, which is why this looked like a line for so long.
-    const vRelax = relaxationVolume(p);
     // The lung's own pressure-volume relation, swept. With hysteresis on it has
     // two recruitment branches. They illustrate retained recruitment, but not
     // the area of a measured respiratory-system P-V loop: tissue and surfactant
@@ -114,7 +115,7 @@ export function createCampbell(canvas) {
         if (vMlHere < -60 || vMlHere > vMax * 1.1) continue;
         curve.push(-pl, vMlHere); // back from the alveolus toward the pleural space
         if (branch === branches[0]) {
-          rsCurve.push(pl + PPL_FRC + vMlHere / p.ccw, vMlHere);
+          rsCurve.push(pl + chestWallPressure(p, vRelax + vMlHere / 1000), vMlHere);
         }
       }
       drawn.push({ curve, dash: branch.dash });
@@ -152,7 +153,7 @@ export function createCampbell(canvas) {
     }
     // The three relaxation lines converge near the top of the plot, so each
     // label is anchored at a different height on its own line.
-    panel.label('Ccw', PPL_FRC + (vMax * 0.92) / p.ccw, vMax * 0.92, {
+    panel.label('Ccw', chestWallPressure(p, vRelax + (vMax * 0.92) / 1000), vMax * 0.92, {
       color: colors.text.pleural, dx: -5, align: 'right', halo: colors.surface,
     });
     const labelOn = (curve, frac) => {

@@ -43,6 +43,35 @@ the source was re-read. The human experiment supports the effect of central
 filling on the PEEP response, but not that numerical ratio. Retaining the ratio
 would make a local model calibration masquerade as an in-vivo measurement.
 
+## Independent chest-wall semantics
+
+The wall and lung now have separate static pressure–volume relations. At zero
+airway pressure, passive volume is the root of `Pcw(V) + Pl(V) = 0`; at a static
+PEEP, the same sum equals the applied pressure. The default calibration remains
+2.2 L with Pcw −5 and Pl +5 cmH₂O, but these pressures are no longer imposed on
+every lung phenotype.
+
+`ccw` is the local wall compliance near the normal reference volume. The wall is
+approximately linear there and stiffens toward the volume extremes. `cwLoad` is
+a separate pressure offset: it moves the relaxed curve without changing the
+selected reference slope. Tests require changes in lung compliance, collapse or
+maximum capacity to leave wall pressure at the same absolute volume unchanged.
+
+Rahn et al. and Agostoni and Hyatt provide the classical independent lung/wall
+relaxation construction. Pereira et al. found that sigmoid equations described
+partitioned lung and chest-wall pressure–volume curves in mechanically ventilated
+acute respiratory failure. These sources support the form and independence of
+the curves; they do not identify the model's remote shape anchors as universal
+human constants. Separate rib-cage, diaphragm and abdominal-wall compartments
+remain deliberately out of scope.
+
+Sources: Rahn H, Otis AB, Chadwick LE, Fenn WO, *Am J Physiol* 1946;146:161–178,
+[doi:10.1152/ajplegacy.1946.146.2.161](https://doi.org/10.1152/ajplegacy.1946.146.2.161);
+Agostoni E, Hyatt RE, *Handbook of Physiology* 1986:113–130,
+[doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309); Pereira C
+et al., *J Appl Physiol* 2003;95:2064–2071,
+[doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003).
+
 ## Current phase-8 EFL semantics
 
 `raw` remains a linear resistance; `clung` is the local compliance of aerated
@@ -472,10 +501,13 @@ for volume dependence, but its exact geometry is no longer transported into the
 human teaching curve.
 
 **One thing the review prompted, first written up wrongly.** Holding tidal volume
-and chest wall compliance fixed and varying only lung compliance, the pleural
-swing is unchanged at 2.8 cmH₂O — it must be, being tidal volume over chest wall
-compliance — yet the variation a preload-responsive patient shows runs from 6% to
-39% as lung compliance falls from 200 to 30 mL/cmH₂O.
+and chest-wall settings fixed while varying only lung compliance leaves the
+pleural swing similar over the ordinary tidal range, because the independent
+wall is close to locally linear there. It is no longer mathematically forced to
+be exactly tidal volume divided by one constant compliance: the wall now has its
+own nonlinear curve, and passive operating volume also moves. The important
+finding survives—arterial variation can change markedly despite a similar
+pleural swing as the pulmonary operating point changes.
 
 The first version of this note concluded that the variation must therefore travel
 by "the alveolar route" rather than the pleural one. That was reasoning by
@@ -485,20 +517,14 @@ alveolar pressure, so a constant pleural *swing* does not mean the pleural route
 is inert; and the conclusion was stated as something the literature had not
 described when the review names it explicitly.
 
-Measured rather than inferred, the chain is:
-
-| | compliance 200 | compliance 30 |
-|---|---|---|
-| pleural swing | 2.79 | 2.79 cmH₂O |
-| venous return swing | 1.45 | 1.64 L/min |
-| right ventricular filling swing | 7.1 | 11.7 mL |
-| right ventricular **stroke volume** swing | 7.9 | **27.0 mL** |
-| resistance swing within the breath | 0.04 | 0.34 Wood units |
-
-Venous return — what the pleural route delivers — barely moves. Filling moves
-moderately. Stroke volume triples, and the amplification between filling and
-stroke volume is not preload: it is the right ventricle ejecting against an
-afterload that is itself swinging with the breath.
+Measured rather than inferred, the current model still separates a relatively
+small change in the pleural/venous-return route from a much larger change in RV
+stroke-volume variation when the pulmonary operating point is moved. Exact
+values are not retained in this narrative because this is not an executable
+table; the guarded claims are the literature rows and scenario tests above. The
+amplification between filling and stroke volume is not necessarily preload: it
+can be the right ventricle ejecting against an afterload that is itself changing
+through the breath.
 
 Which is the review's own caution: *"in patients with impaired right ventricular
 function or increased PVR, such variations may predominantly reflect cyclic

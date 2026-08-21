@@ -65,10 +65,10 @@ Raising PEEP in a passive patient at 500 mL and 14 breaths per minute:
 | 0 | -0.7 | 2.6 | 5.45 |
 | 5 | 0.9 | 2.4 | 5.36 |
 | 10 | 2.4 | 2.1 | 4.99 |
-| 15 | 4.0 | 2.0 | 4.62 |
-| 20 | 5.6 | 1.8 | 4.33 |
+| 15 | 4.0 | 2.0 | 4.61 |
+| 20 | 5.6 | 1.8 | 4.32 |
 
-Across this sweep, measured CVP rises by 6.3 mmHg while transmural CVP falls by 0.8 mmHg.
+Across this sweep, measured CVP rises by 6.4 mmHg while transmural CVP falls by 0.8 mmHg.
 <!-- END GENERATED: transmural-peep -->
 
 A clinician reading only measured CVP would conclude that the patient was becoming better filled while the transmural filling pressure and output were moving in the opposite direction.

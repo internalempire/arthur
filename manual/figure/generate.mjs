@@ -13,7 +13,10 @@ import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { defaultParams } from '../../src/model/parameters.js';
-import { pvrComponents, lungVolumeAtPl, NORMAL_FRC } from '../../src/model/lung.js';
+import {
+  pvrComponents, lungVolumeAtPl, NORMAL_FRC,
+  chestWallPressure, chestWallNeutralVolume,
+} from '../../src/model/lung.js';
 import { RESISTANCE_TO_WOOD } from '../../src/model/units.js';
 import { Simulator } from '../../src/model/simulator.js';
 import { SCENARIOS } from '../../src/model/scenarios.js';
@@ -569,6 +572,44 @@ function pvCurveFigure() {
   });
 }
 
+// --- the independent chest-wall relaxation curve ---------------------------
+
+function chestWallFigure() {
+  const base = defaultParams();
+  const curves = [
+    { label: 'reference wall: Ccw 200', parameters: base },
+    { label: 'stiff wall: Ccw 75', parameters: { ...base, ccw: 75 } },
+    { label: 'reference wall + 6 cmH₂O load', parameters: { ...base, cwLoad: 6 } },
+  ];
+  const series = curves.map(({ label, parameters }) => {
+    const points = [];
+    for (let volume = 0.2; volume <= 6; volume += 0.05) {
+      points.push([volume, chestWallPressure(parameters, volume)]);
+    }
+    return { label, points };
+  });
+  return chart({
+    title: 'Chest-wall stiffness changes slope; external load shifts the curve',
+    xLabel: 'Absolute lung volume (L)',
+    yLabel: 'Relaxed chest-wall pressure, Pcw (cmH₂O)',
+    series,
+    xTick: 1,
+    yTick: 5,
+    xDomain: [0, 6],
+    yDomain: [-20, 25],
+    padRight: 260,
+    markers: [
+      { x: NORMAL_FRC, y: chestWallPressure(base, NORMAL_FRC), label: 'normal passive reference' },
+      { x: chestWallNeutralVolume(base), y: 0, label: 'zero wall recoil', dx: 7, dy: 16 },
+    ],
+    notes: [
+      'the curve is near-linear around tidal breathing',
+      'it stiffens progressively at high volume',
+      'the lung has its own separate curve',
+    ],
+  });
+}
+
 // --- the stress index, in the form a ventilator draws it --------------------
 
 // One full respiratory cycle of airway pressure, starting at the onset of
@@ -856,6 +897,7 @@ const figures = {
   'pvr-j-curve.svg': jCurveFigure(),
   'guyton-peep.svg': guytonFigure(),
   'pv-curve.svg': pvCurveFigure(),
+  'chest-wall.svg': chestWallFigure(),
   'stress-index.svg': stressIndexFigure(),
   'hysteresis.svg': hysteresisFigure(),
   'stressed-volume.svg': stressedVolumeFigure(),

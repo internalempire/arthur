@@ -31,6 +31,8 @@ The index requires constant flow and a passive patient. Any effort during inspir
 
 Airway pressure is sampled through each constant-flow inspiration and fitted once per breath, at the moment the breath ends.
 
+The fitted curve belongs to the **whole respiratory system**, not to isolated lung tissue. The model's independent chest wall is close to linear around ordinary tidal breathing, so recruitment and lung upper-limb stiffening usually dominate the curvature in the examples below. At extreme volume, very low chest-wall compliance or a large wall load, chest-wall curvature can also contribute. The index should therefore be read as “compliance is changing during inflation”, followed by a mechanistic interpretation—not as proof that the change is pulmonary.
+
 The fit is a grid search over the exponent with a linear least-squares solve inside it. For each of 101 candidate exponents between 0.4 and 2.2, the model substitutes $x = t^b$, solves the resulting linear regression for $a$ and $c$ in closed form, and keeps the exponent with the smallest residual. There is no iterative optimiser and no derivative.
 
 The first tenth of the samples is dropped as a fixed implementation choice to reduce the influence of the onset transient and resistive pressure step. Bedside protocols may define the fitted interval differently.
@@ -65,10 +67,10 @@ The panels are scaled independently because their pressure excursions differ. A 
 | lung and breath | stress index | plateau (cmH₂O) | driving pressure (cmH₂O) | breathwise C<sub>rs</sub> (mL/cmH₂O) |
 |---|---:|---:|---:|---:|
 | normal aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8 | 1.01 | 13.2 | 5.2 | 96 |
-| maximum lung capacity 4.0 L, aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 900 mL; PEEP 8 | 1.16 | 18.8 | 10.8 | 83 |
-| the same 4.0 L maximum-capacity lung; VT 350 mL; PEEP 8 | 1.03 | 11.9 | 3.9 | 91 |
-| aerated-lung compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6 | 0.69 | 15.0 | 9.0 | 67 |
-| the same recruitable lung; VT 600 mL; PEEP 14 | 1.10 | 21.1 | 7.1 | 84 |
+| maximum lung capacity 4.0 L, aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 900 mL; PEEP 8 | 1.25 | 19.8 | 11.8 | 76 |
+| the same 4.0 L maximum-capacity lung; VT 350 mL; PEEP 8 | 1.05 | 12.0 | 4.0 | 87 |
+| aerated-lung compliance 40 mL/cmH₂O, 42% collapsed, achieved R/I 0.70, transpulmonary opening midpoint 21 cmH₂O; VT 600 mL; PEEP 2 | 0.62 | 15.0 | 13.0 | 46 |
+| the same recruitable lung; VT 600 mL; PEEP 14 | 1.53 | 29.9 | 15.9 | 38 |
 <!-- END GENERATED: stress-index -->
 
 The normal lung is close to linear. With the same aerated-tissue compliance but a smaller 4 L maximum capacity, a 900 mL breath moves farther up the upper limb and raises the index; reducing tidal volume to 350 mL returns the same lung close to linear. This comparison deliberately changes **capacity**, not compliance, so overdistension is not manufactured by using one control for both properties.
@@ -96,6 +98,7 @@ The final pair is the other reason the feature was added. The same recruitable l
 - **No time dependence in the tissue**, so the model has no stress relaxation and no viscoelastic contribution to the curve's shape. A real trace contains both, and they bend it in ways the model attributes entirely to elastance.
 - **Constant airway resistance.** Flow-dependent resistance would curve the trace on its own; here it cannot.
 - **One compartment**, so no contribution from regions filling with different time constants.
+- The chest wall is nonlinear. Its contribution to curvature is usually small in the model's tidal range but is not mathematically excluded, just as chest-wall mechanics can confound a bedside respiratory-system stress index.
 - The fit range is 0.4 to 2.2, so an extreme value is clipped rather than reported.
 - **There is no inspiratory pause.** Volume control delivers constant flow for the whole of the set inspiratory time, so the trace has no plateau phase; the plateau pressure the model reports is computed as alveolar pressure with the resistive term removed, not measured during a hold. The stress index itself is read from the ramp, but the figure is not the shape a ventilator with a pause would draw.
 - The first-tenth exclusion is a fixed fraction, not an automatic detection of when flow has stabilised.

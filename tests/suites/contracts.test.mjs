@@ -16,6 +16,7 @@ section('Public model API');
     'CHAMBER', 'GROUPS', 'IVC', 'PARAMETERS', 'PPL_FRC', 'RESISTANCE_TO_WOOD',
     'SCENARIOS', 'SCENARIO_BY_ID', 'Simulator', 'TRACE_SECONDS',
     'cardiacFunctionCurve', 'clamp', 'cmH2OtoMmHg', 'curveIntersection',
+    'chestWallComplianceAt', 'chestWallNeutralVolume', 'chestWallPressure',
     'lungRegions', 'lungVolumeAtPl', 'openBand', 'openFractionFromRecruitmentState',
     'pericardialPressure', 'preloadLimbs', 'pvrComponents', 'recruitmentBand', 'relaxationVolume',
     'respiratorySystemCompliance', 'stepOpenFraction', 'stepRecruitedFraction',

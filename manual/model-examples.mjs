@@ -7,7 +7,10 @@
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams } from '../src/model/parameters.js';
 import { SCENARIOS } from '../src/model/scenarios.js';
-import { lungVolumeAtPl, staticEndExpiratoryVolume } from '../src/model/lung.js';
+import {
+  lungVolumeAtPl, staticEndExpiratoryVolume, relaxationVolume,
+  chestWallPressure, transpulmonaryAt,
+} from '../src/model/lung.js';
 
 const SETTLING_SECONDS = 45;
 
@@ -56,10 +59,10 @@ export const STRESS_INDEX_CASES = [
   {
     id: 'recruiting-low',
     title: 'Tidal recruitment',
-    label: 'aerated-lung compliance 60 mL/cmH₂O, 40% collapsed, R/I 0.70, transpulmonary opening midpoint 16 cmH₂O; VT 600 mL; PEEP 6',
+    label: 'aerated-lung compliance 40 mL/cmH₂O, 42% collapsed, achieved R/I 0.70, transpulmonary opening midpoint 21 cmH₂O; VT 600 mL; PEEP 2',
     overrides: {
-      clung: 60, collapsed: 0.4, riRatio: 0.7, pOpen: 16, hysteresis: 'off',
-      vt: 600, peep: 6,
+      clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 21, hysteresis: 'off',
+      vt: 600, peep: 2,
     },
   },
   {
@@ -67,7 +70,7 @@ export const STRESS_INDEX_CASES = [
     title: 'The same lung, held open',
     label: 'the same recruitable lung; VT 600 mL; PEEP 14',
     overrides: {
-      clung: 60, collapsed: 0.4, riRatio: 0.7, pOpen: 16, hysteresis: 'off',
+      clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 21, hysteresis: 'off',
       vt: 600, peep: 14,
     },
   },
@@ -78,7 +81,7 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/stress-index.md', ids: ['stress-index'] },
   { file: 'manual/transmural-pressure.md', ids: ['transmural-peep'] },
   { file: 'manual/venous-return.md', ids: ['venous-return-peep'] },
-  { file: 'manual/pressure-volume-curve.md', ids: ['pv-tissue', 'pv-eelv'] },
+  { file: 'manual/pressure-volume-curve.md', ids: ['pv-tissue', 'pv-eelv', 'lung-wall-equilibrium'] },
   { file: 'manual/pulmonary-transit.md', ids: ['pulmonary-transit'] },
   { file: 'manual/cardiac-tamponade.md', ids: ['cardiac-tamponade'] },
 ];
@@ -203,6 +206,28 @@ function pvEelvBlock() {
   ].join('\n');
 }
 
+function lungWallEquilibriumBlock() {
+  const cases = [
+    ['normal reference', {}],
+    ['collapsed, stiff and non-recruitable lung', {
+      collapsed: 0.42, clung: 40, riRatio: 0, pOpen: 21,
+    }],
+    ['lost lung recoil', { clung: 300 }],
+    ['normal lung with a 6 cmH₂O external wall load', { cwLoad: 6 }],
+  ];
+  return [
+    '*Direct static solution at zero applied airway pressure. The passive volume is where lung and chest-wall recoil are equal and opposite.*',
+    '',
+    '| phenotype | passive volume (L) | chest-wall recoil P<sub>cw</sub> (cmH₂O) | transpulmonary recoil P<sub>l</sub> (cmH₂O) |',
+    '|---|---:|---:|---:|',
+    ...cases.map(([label, overrides]) => {
+      const parameters = { ...defaultParams(), ...overrides, hysteresis: 'off' };
+      const volume = relaxationVolume(parameters);
+      return `| ${label} | ${fixed(volume, 2)} | ${fixed(chestWallPressure(parameters, volume), 1)} | ${fixed(transpulmonaryAt(parameters, volume), 1)} |`;
+    }),
+  ].join('\n');
+}
+
 function pulmonaryTransitBlock() {
   const common = {
     baroreflex: 0, mode: 'vcv', pmus: 0, vt: 450, peep: 5,
@@ -262,6 +287,7 @@ export function renderDocumentedExampleBlocks() {
     ['venous-return-peep', venousReturnBlock(peepRows)],
     ['pv-tissue', pvTissueBlock()],
     ['pv-eelv', pvEelvBlock()],
+    ['lung-wall-equilibrium', lungWallEquilibriumBlock()],
     ['pulmonary-transit', pulmonaryTransitBlock()],
     ['cardiac-tamponade', cardiacTamponadeBlock()],
   ]);

@@ -10,10 +10,11 @@ in mmHg, converted at 1 mmHg = 1.3595 cmH₂O in `src/model/units.js`.
 
 ## The model itself
 
-The equations, the constants, every parameter and every scenario variable are
-documented in [the README](../README.md), which is the single source of truth
-for them. Keeping a second copy here is how this file came to quote three
-numbers the model no longer produced.
+The README is the project overview. Clinician-facing physiology, implementation
+choices and limits live in the [web manual](../manual/home.md); the code and
+executable tests remain the source of truth for exact equations and numerical
+contracts. Keeping several prose copies of exact numbers is how earlier versions
+of this file drifted from the model.
 
 What follows is the part that does not belong in a reference: how the model was
 calibrated, what was checked against the sources, and where it stops being
@@ -34,11 +35,11 @@ Baseline (70 kg adult, passive volume control, VT 450 mL, PEEP 5, RR 14):
 
 | | Model | Expected |
 |---|---|---|
-| Cardiac output | 5.2 L/min | 4.5–6.0 |
-| Arterial pressure | 118/82, mean 102 | — |
+| Cardiac output | 5.4 L/min | 4.5–6.0 |
+| Arterial pressure | 119/81, mean 102 | — |
 | Heart rate (baseline = effective, reflex off) | 75 | — |
-| CVP | 1.1 mmHg | 0–6 |
-| Pulmonary artery | 20/10, mean 15 | 15–25 / 8–15 |
+| CVP | 0.9 mmHg | 0–6 |
+| Pulmonary artery | 19/9, mean 14 | 15–25 / 8–15 |
 | Wedge surrogate | 7 mmHg | 6–12 |
 | Mean systemic filling pressure | 9.1 mmHg | 8–12 |
 | PVR coefficient | 1.2 Wood units | 0.3–2.0 |
@@ -52,7 +53,7 @@ the unopposed mechanical model before autonomic compensation is added.
 Behaviour was checked against the sources rather than only against resting
 numbers. The following all reproduce:
 
-- PEEP 0 → 20: cardiac output 5.8 → 4.3 L/min, CVP −0.5 → 5.8, Pmsf 7.5 → 12.5.
+- PEEP 0 → 20: cardiac output 5.5 → 4.3 L/min, CVP −0.7 → 5.6, Pmsf 7.4 → 12.4.
   The gradient for venous return is partly defended by the abdomen, as Fessler
   and van den Berg describe.
 - Spontaneous inspiration lowers CVP below zero while cardiac output rises.
@@ -60,11 +61,11 @@ numbers. The following all reproduce:
   underfilled starting point than from the plateau of the cardiac-function curve.
   PPV is displayed descriptively but is not used as the validation target.
 - ARDS with right ventricular failure: at its shipped PEEP the RV:LV
-  end-diastolic ratio is about 1.62 and the resistance coefficient is about
-  4.24 WU. Across PEEP 0 → 20 the coefficient falls 4.57 → 3.59 while derived
-  PVR rises 4.73 → 5.04 WU and output falls 4.04 → 3.77 L/min. Setting
-  `riRatio` to zero separates the response: the coefficient rises 4.57 → 4.68,
-  derived PVR 4.84 → 6.74 and output falls 4.01 → 3.58 L/min.
+  end-diastolic ratio is about 1.60 and the resistance coefficient is about
+  3.99 WU. Across PEEP 0 → 20 the coefficient falls 4.50 → 3.61 while derived
+  PVR rises 4.79 → 5.51 WU and output falls 4.58 → 4.05 L/min. Setting
+  `riRatio` to zero separates the response: the coefficient rises 4.52 → 4.82,
+  derived PVR 5.02 → 7.21 and output falls 4.52 → 3.83 L/min.
 - COPD with expiratory flow limitation: at external PEEP 5, about 6.8 cmH₂O of
   intrinsic PEEP and 781 mL of dynamic trapped volume raise CVP while cardiac
   output falls. Slowing respiratory rate from 26 to 12/min reduces those to
@@ -72,7 +73,7 @@ numbers. The following all reproduce:
   total PEEP and absolute EELV almost unchanged below the choke; higher PEEP
   becomes true back-pressure. The hyperinflated lung remains on the right limb
   of the J-curve, but its resistance coefficient changes only modestly, around
-  1.23–1.29 WU within a breath. The acute lesson is impaired filling from
+  1.20–1.27 WU within a breath. The acute lesson is impaired filling from
   persistent intrathoracic pressure, not simulated chronic pulmonary vascular
   disease.
 - Intra-abdominal hypertension raises Pmsf to 21 mmHg while *lowering* cardiac
@@ -80,7 +81,31 @@ numbers. The following all reproduce:
 
 ---
 
-## 2. Volume, venous tone and compliance are separate
+## 2. The lung and chest wall are independent elastic elements
+
+The normal reference is calibrated to 2.2 L, where lung recoil is +5 cmH₂O and
+relaxed wall recoil is −5 cmH₂O. That calibration no longer follows every lung
+phenotype. The wall has its own sigmoid pressure–volume relation: approximately
+linear around tidal breathing, with progressive stiffening toward the volume
+extremes. Passive volume is solved from the point at which lung and wall recoil
+are equal and opposite.
+
+This changes the disease logic without adding a compartment. A collapsed, stiff
+lung meets the unchanged wall at a lower volume and a higher transpulmonary
+pressure. A lung with lost recoil meets it higher. Neither result is supplied as
+an FRC input. The `ccw` control changes local wall slope; the separate `cwLoad`
+control shifts the relaxed curve and resting pressure. The obesity and abdominal-
+hypertension presets can therefore contain stiffness and load without treating
+them as the same lesion.
+
+The implementation deliberately stops at one aggregate wall. It has no rib-
+cage/diaphragm separation, pleural gradient or anthropometric load prediction.
+Rahn et al. and Agostoni and Hyatt establish the independent relaxation-curve
+construction; Pereira et al. support a sigmoid representation in mechanically
+ventilated acute respiratory failure. These sources support the topology, not
+the model's remote asymptotes as universal human constants.
+
+## 3. Volume, venous tone and compliance are separate
 
 The adjustable `stressedVolume` is the baseline amount above the systemic
 venous zero-pressure volume. Moving the control by 500 mL adds or removes 500 mL
@@ -109,7 +134,7 @@ blood volume and venous compliance.
 
 ---
 
-## 3. Pulmonary transit is a volume-to-flow relation, not a pressure delay
+## 4. Pulmonary transit is a volume-to-flow relation, not a pressure delay
 
 The pulmonary artery and vein were already compartments in series, but their
 small compliance time constants transmitted an isolated fall in RV output to LV
@@ -157,7 +182,7 @@ remain absent.
 
 ---
 
-## 4. R/I is a manoeuvre-defined phenotype
+## 5. R/I is a manoeuvre-defined phenotype
 
 The user-facing recruitability control is the recruitment-to-inflation ratio
 measured over a passive PEEP 5 → 15 cmH₂O reference manoeuvre. The model computes
@@ -183,7 +208,7 @@ overdistension, and the simulator does not present it as an optimal-PEEP rule.
 
 ---
 
-## 5. What the occlusion manoeuvres show
+## 6. What the occlusion manoeuvres show
 
 Holding the airway freezes lung volume and pleural pressure, and the circulation
 settles. Each hold contributes one measured pressure–flow pair, and a series of
@@ -213,7 +238,7 @@ patient's Pmsf.
 
 ---
 
-## 6. Limitations
+## 7. Limitations
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 
@@ -407,3 +432,12 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 25. Tuxen DV, Lane S. The effects of ventilatory pattern on hyperinflation,
     airway pressures, and circulation in mechanical ventilation of patients
     with severe air-flow obstruction. *Am Rev Respir Dis* 1987;136:872–879.
+26. Rahn H, Otis AB, Chadwick LE, Fenn WO. The pressure-volume diagram of the
+    thorax and lung. *Am J Physiol* 1946;146:161–178.
+    doi:10.1152/ajplegacy.1946.146.2.161.
+27. Agostoni E, Hyatt RE. Static behavior of the respiratory system. In:
+    *Handbook of Physiology, The Respiratory System*. 1986:113–130.
+    doi:10.1002/cphy.cp030309.
+28. Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest
+    wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*
+    2003;95:2064–2071. doi:10.1152/japplphysiol.00385.2003.

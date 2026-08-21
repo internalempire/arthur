@@ -1,8 +1,9 @@
 // Respiratory mechanics, split into the two series elements the Campbell diagram
-// draws separately: the lung and the chest wall. Volumes are litres above the
-// relaxation volume; pressures cmH2O.
+// draws separately: the lung and the chest wall. State volume remains litres
+// above passive equilibrium for legible waveforms, but both elastic elements are
+// evaluated from the same absolute thoracic volume; pressures are cmH2O.
 //
-//   Ppl  = PPL_FRC + V / Ccw - Pmus        chest wall, linear
+//   Ppl  = Pcw(V_absolute) - Pmus           chest wall, independent sigmoid
 //   Pl   = transpulmonaryAt(V_absolute)    lung, sigmoid — see lung.js
 //   Palv = Ppl + Pl
 //   flow = (Pao - Palv) / Raw
@@ -13,23 +14,21 @@
 //
 // The lung element is no longer a constant compliance. Once recruitment is part
 // of the model the pressure–volume relationship has to be sigmoid, because units
-// that open accept gas, and the resting volume itself becomes an outcome rather
-// than a setting: `relaxationVolume(p)` is where the lung's recoil balances the
-// chest wall, and it rises when pressure opens more units. That is the point of
-// doing it this way, and it is why `frc` is now a description of how much lung
-// is shut rather than a volume the model is told to sit at.
+// that open accept gas. The chest wall now has its own sigmoid relaxation curve;
+// `relaxationVolume(p)` is the intersection of the two independent elements, not
+// the lung volume selected by a fixed 5 cmH2O recoil.
 
 import { clamp } from './units.js';
 import {
   transpulmonaryAt, transpulmonaryAtRecruitmentState, relaxationVolume, lungComplianceAt,
   stepRecruitedFraction, recruitmentBand, openFractionFromRecruitmentState,
   hysteresisGap, staticEndExpiratoryVolume, staticEndExpiratoryVolumeAtRecruitmentState,
-  RECOIL_AT_FRC,
+  chestWallPressure, chestWallComplianceAt, CHEST_WALL_REFERENCE_PRESSURE,
 } from './lung.js';
 
-// Pleural pressure at the relaxation volume. Its negative is the
-// transpulmonary recoil at FRC, which is why alveolar pressure there is zero.
-export const PPL_FRC = -5; // cmH2O
+// Compatibility name for drawings and text that refer to the normal reference.
+// It is no longer imposed at every phenotype's passive equilibrium.
+export const PPL_FRC = CHEST_WALL_REFERENCE_PRESSURE;
 
 // A flow-limited airway behaves like a Starling resistor: once the passive
 // expiratory flow reaches the choke point, a larger alveolar-to-mouth gradient
@@ -102,7 +101,8 @@ export function createRespiratoryState() {
 export function respiratorySystemCompliance(p, lungVolume = null) {
   const v = lungVolume ?? relaxationVolume(p);
   const clungLocal = lungComplianceAt(p, v);
-  return 1 / (1 / clungLocal + 1 / p.ccw);
+  const ccwLocal = chestWallComplianceAt(p, v);
+  return 1 / (1 / clungLocal + 1 / ccwLocal);
 }
 
 // How long the inspiratory muscles are active. Capped at half the respiratory
@@ -184,12 +184,10 @@ function fitStressIndex(samples) {
 
 export function stepRespiratory(p, r, dt) {
   const period = 60 / p.rr;
-  const ccw = p.ccw / 1000;
-  // The reference the chest wall is measured from: where this lung would rest if
-  // it were on its equilibrium branch. Deliberately not the volume the lung is
-  // actually resting at, which with hysteresis depends on what was done to it —
-  // the chest wall knows how much gas is in the chest, not how it got there.
-  const vRelax = relaxationVolume(p);
+  // The passive equilibrium is expensive enough to solve once per public
+  // `advance`, not four thousand times per simulated second. Direct callers can
+  // still omit the cached internal value and receive the same calculation.
+  const vRelax = p._relaxVolume ?? relaxationVolume(p);
   // With no opening/closing gap there is no memory to integrate. Solving the
   // equilibrium curve directly is not just cheaper but necessary: treating an
   // algebraic curve as a lagged state creates a spurious collapse feedback when
@@ -199,29 +197,30 @@ export function stepRespiratory(p, r, dt) {
   if (hysteretic && !(r.recruitedFraction >= 0)) {
     // A lung that has never been inflated starts on the opening branch. This
     // state is an absolute fraction of the whole lung, not a second user input.
-    r.recruitedFraction = recruitmentBand(p, RECOIL_AT_FRC).lo;
+    const plRelax = transpulmonaryAt(p, vRelax);
+    r.recruitedFraction = recruitmentBand(p, plRelax).lo;
   } else if (!hysteretic) {
     // Do not resurrect stale recruitment if hysteresis is switched off and on.
     r.recruitedFraction = null;
   }
 
-  // Alveolar pressure at a given volume above that reference: the chest wall's
-  // linear element plus the lung's sigmoid one. One function, used for the flow
-  // calculation and for the pressures reported afterwards, so they cannot drift
-  // apart.
+  // Alveolar pressure at a given volume above passive equilibrium: independent
+  // chest-wall and lung recoil evaluated at the same absolute volume. One
+  // function is used for flow and reported pressure so they cannot drift apart.
   //
   // With hysteresis only the recruitable diseased share is frozen for the step.
   // Normal lung still follows present pressure, so both branches require a
   // warm-started inverse solve. Freezing the total open fraction here was the
   // structural error that gave normal lung an ARDS-like memory.
   const alveolar = (v, pmus) => {
+    const absoluteVolume = vRelax + v;
     r.plSolved = hysteretic
-      ? transpulmonaryAtRecruitmentState(p, vRelax + v, r.recruitedFraction, r.plSolved)
-      : transpulmonaryAt(p, vRelax + v, r.plSolved);
+      ? transpulmonaryAtRecruitmentState(p, absoluteVolume, r.recruitedFraction, r.plSolved)
+      : transpulmonaryAt(p, absoluteVolume, r.plSolved);
     r.openFraction = hysteretic
       ? openFractionFromRecruitmentState(p, r.plSolved, r.recruitedFraction)
       : null;
-    return (PPL_FRC + v / ccw - pmus) + r.plSolved;
+    return chestWallPressure(p, absoluteVolume) - pmus + r.plSolved;
   };
 
   r.tCycle += dt;
@@ -237,7 +236,7 @@ export function stepRespiratory(p, r, dt) {
     r.flow = 0;
     const palvHeld = alveolar(r.v, r.pmus);
     r.palv = palvHeld;
-    r.ppl = PPL_FRC + r.v / ccw - r.pmus;
+    r.ppl = chestWallPressure(p, vRelax + r.v) - r.pmus;
     // With no flow the airway reads alveolar pressure — that is what a hold is
     // for, and it is why a plateau is measured this way.
     r.paw = palvHeld;
@@ -357,7 +356,7 @@ export function stepRespiratory(p, r, dt) {
 
   // --- derived pressures ---------------------------------------------------
   const palvNew = alveolar(r.v, r.pmus);
-  const ppl = PPL_FRC + r.v / ccw - r.pmus;
+  const ppl = chestWallPressure(p, vRelax + r.v) - r.pmus;
   const paw = p.mode === 'vcv' && r.phase === 'insp'
     ? palvNew + r.flow * p.raw
     : (pao === null ? p.peep : pao);

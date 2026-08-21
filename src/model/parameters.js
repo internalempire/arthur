@@ -87,7 +87,12 @@ export const PARAMETERS = [
   {
     id: 'ccw', group: 'mechanics', label: 'Chest wall compliance', unit: 'mL/cmH₂O',
     min: 40, max: 300, step: 5, default: 200,
-    help: 'A stiff chest wall (obesity, ascites) sends more of each breath into pleural pressure, exaggerating the haemodynamic cost and pulse pressure variation.',
+    help: 'Local slope of the independent chest-wall recoil curve near the normal operating volume. A stiff wall sends more of each delivered volume into pleural pressure; it is distinct from an external load that shifts the whole curve.',
+  },
+  {
+    id: 'cwLoad', group: 'mechanics', label: 'Chest wall load', unit: 'cmH₂O',
+    min: -5, max: 20, step: 0.5, default: 0,
+    help: 'Pressure load that shifts the relaxed chest-wall curve without changing its slope. Positive values represent mass loading or diaphragmatic/abdominal pressure transmission and can make resting pleural pressure less negative or positive.',
   },
   {
     id: 'raw', group: 'mechanics', label: 'Airway resistance', unit: 'cmH₂O/L/s',
