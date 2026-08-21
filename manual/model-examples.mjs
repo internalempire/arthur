@@ -5,7 +5,7 @@
 // The writer and test suite both regenerate these blocks from a fresh Simulator.
 
 import { Simulator } from '../src/model/simulator.js';
-import { defaultParams } from '../src/model/parameters.js';
+import { defaultParams, GROUPS, PARAMETERS } from '../src/model/parameters.js';
 import { SCENARIOS } from '../src/model/scenarios.js';
 import {
   lungVolumeAtPl, staticEndExpiratoryVolume, relaxationVolume,
@@ -90,6 +90,7 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/pulmonary-transit.md', ids: ['pulmonary-transit'] },
   { file: 'manual/cardiac-tamponade.md', ids: ['cardiac-tamponade'] },
   { file: 'manual/inferior-vena-cava.md', ids: ['ivc-respiratory-calibre'] },
+  { file: 'manual/scenarios.md', ids: ['scenario-overrides'] },
 ];
 
 const fixed = (value, digits) => value.toFixed(digits);
@@ -335,6 +336,54 @@ function ivcRespiratoryBlock() {
   ].join('\n');
 }
 
+function scenarioValue(spec, value) {
+  if (spec.type === 'choice') {
+    return spec.options.find((option) => option.value === value)?.label ?? String(value);
+  }
+  if (spec.type === 'checkbox') return value ? 'On' : 'Off';
+  if (spec.unit === 'fraction') return `${Math.round(value * 100)}%`;
+
+  const stepText = String(spec.step ?? 1);
+  const decimals = stepText.includes('.') ? stepText.split('.')[1].length : 0;
+  const formatted = typeof value === 'number' ? value.toFixed(decimals) : String(value);
+  return spec.unit ? `${formatted} ${spec.unit}` : formatted;
+}
+
+function scenarioOverridesBlock() {
+  const reference = defaultParams();
+  const groupNames = new Map(GROUPS.map(({ id, label }) => [id, label]));
+  const known = new Set(PARAMETERS.map(({ id }) => id));
+
+  const sections = SCENARIOS.flatMap((scenario) => {
+    const unknown = Object.keys(scenario.params).filter((id) => !known.has(id));
+    if (unknown.length) throw new Error(`${scenario.id}: undocumented parameters ${unknown.join(', ')}`);
+
+    const changed = PARAMETERS.filter((spec) => Object.hasOwn(scenario.params, spec.id)
+      && !Object.is(scenario.params[spec.id], reference[spec.id]));
+    const heading = `#### ${scenario.name}`;
+    if (!changed.length) {
+      return [heading, '', '*No control differs from the model reference. This preset names the default passive volume-control state.*', ''];
+    }
+
+    return [
+      heading,
+      '',
+      '| domain | control | model reference | preset value |',
+      '|---|---|---:|---:|',
+      ...changed.map((spec) => `| ${groupNames.get(spec.group)} | ${spec.label} | ${scenarioValue(spec, reference[spec.id])} | ${scenarioValue(spec, scenario.params[spec.id])} |`),
+      '',
+    ];
+  });
+
+  return [
+    '*Generated directly from `defaultParams()` and `SCENARIOS`. The reference is the model\'s passive volume-control default, not the healthy spontaneous preset shown when the application opens.*',
+    '',
+    'Only values that actually differ from the reference are listed. A preset may repeat an unchanged value in the source code to make its intended ventilation explicit; such repetitions are omitted here because they do not alter the simulated patient.',
+    '',
+    ...sections,
+  ].join('\n').trimEnd();
+}
+
 export function renderDocumentedExampleBlocks() {
   const rows = stressRows();
   const peepRows = peepSweepRows();
@@ -349,5 +398,6 @@ export function renderDocumentedExampleBlocks() {
     ['pulmonary-transit', pulmonaryTransitBlock()],
     ['cardiac-tamponade', cardiacTamponadeBlock()],
     ['ivc-respiratory-calibre', ivcRespiratoryBlock()],
+    ['scenario-overrides', scenarioOverridesBlock()],
   ]);
 }
