@@ -56,6 +56,9 @@ check('the application shell retains every UI mount point',
   missing.length === 0, missing.join(', '));
 check('the browser entry point remains an ES module',
   /<script\s+type=["']module["']\s+src=["']src\/main\.js["']><\/script>/.test(html));
+check('the header exposes accessible repository and manual links',
+  /id=["']project-repository["'][^>]+href=["']https:\/\/github\.com\/internalempire\/arthur["'][^>]+aria-label=/.test(html)
+    && /id=["']project-manual["'][^>]+href=["']manual\/["'][^>]+aria-label=/.test(html));
 
 const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8');
 const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
@@ -80,4 +83,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n7 UI smoke contracts passed`);
+console.log(`\n8 UI smoke contracts passed`);
