@@ -96,10 +96,14 @@ section('Pulmonary vascular claims exposed to the user stay qualified');
       && pe.note.includes('baroreflex senses only systemic MAP'));
 
   const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8');
+  const pvrManual = readFileSync(new URL('../../manual/pulmonary-vascular-resistance.md', import.meta.url), 'utf8');
   check('README delegates PVR equations and limits to the manual',
     readme.includes('[Pulmonary vascular resistance](manual/pulmonary-vascular-resistance.md)')
       && readme.includes('[Global limits](manual/global-limits.md)')
       && !readme.includes('stretch      = exp('));
+  check('the inflation-deflation comparison uses literal clinical language',
+    pvrManual.includes('inflation and deflation points fall approximately on the same curve')
+      && !pvrManual.includes('approach one relation'));
 
   const zoneThree = settled({ mode: 'vcv', pmus: 0, peep: 0 }).metrics;
   const waterfall = settled({ mode: 'vcv', pmus: 0, peep: 10 }).metrics;
