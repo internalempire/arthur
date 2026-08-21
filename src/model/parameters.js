@@ -167,7 +167,12 @@ export const PARAMETERS = [
   },
   {
     id: 'baroreflexEnabled', group: 'heart', label: 'Baroreflex',
-    type: 'checkbox', default: false,
+    type: 'choice',
+    options: [
+      { value: false, label: 'Off' },
+      { value: true, label: 'On' },
+    ],
+    default: false,
     help: 'Off exposes the uncompensated mechanical heart–lung interaction. On adds one slow aggregate pressure-defence response that changes effective heart rate, systemic resistance, venous tone and contractility together.',
   },
   {

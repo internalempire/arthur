@@ -57,11 +57,18 @@ check('the application shell retains every UI mount point',
 check('the browser entry point remains an ES module',
   /<script\s+type=["']module["']\s+src=["']src\/main\.js["']><\/script>/.test(html));
 
-const controls = readFileSync(new URL('../src/ui/controls.js', import.meta.url), 'utf8');
 const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8');
+const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
+const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
 const { ivcDisplayWidth } = await import(new URL('../src/ui/panels/thorax.js', import.meta.url));
-check('binary parameter controls retain native checkbox semantics',
-  /spec\.type === 'checkbox'/.test(controls) && /input\.checked/.test(controls));
+const baroreflex = PARAMETERS.find((spec) => spec.id === 'baroreflexEnabled');
+const hysteresis = PARAMETERS.find((spec) => spec.id === 'hysteresis');
+check('baroreflex uses the same Off/On selector as recruitment hysteresis',
+  baroreflex?.type === 'choice'
+    && hysteresis?.type === 'choice'
+    && baroreflex.options.map((option) => option.label).join('/') === 'Off/On'
+    && choiceValue(baroreflex, choiceIndex(baroreflex, true)) === true
+    && choiceValue(baroreflex, choiceIndex(baroreflex, false)) === false);
 check('effective heart rate and systemic resistance remain available as tiles',
   /id: 'hr'/.test(stats) && /id: 'svr'/.test(stats));
 check('a plethoric IVC remains visually responsive above the reference calibre',
