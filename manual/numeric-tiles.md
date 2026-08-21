@@ -133,7 +133,7 @@ Related pages: [PV loops](panel-pv-loops.md) · [Ventriculo-arterial coupling](v
 
 ### Respiratory system compliance
 
-The tile reports the ventilator-like breathwise ratio $VT/\Delta P$, using total PEEP when intrinsic PEEP is present. It is not the aerated-tissue compliance control. Recruitment, accessible lung size, chest-wall compliance and proximity to maximum lung capacity can all change the measured value, which is why the subtitle shows open fraction.
+The tile reports the ventilator-like breathwise ratio $VT/\Delta P$, using total PEEP when intrinsic PEEP is present. It is not the aerated-tissue compliance control. Recruitment, accessible lung size, the current local slope of the independent chest-wall curve, wall load and proximity to maximum lung capacity can all change the measured value, which is why the subtitle shows open fraction.
 
 Related pages: [Equation of motion](equation-of-motion.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Two-population lung](two-population-lung.md)
 
@@ -151,7 +151,7 @@ Related page: [Expiratory flow limitation](expiratory-flow-limitation.md)
 
 ### Pleural swing
 
-The amplitude comes from the latest completed breath; the subtitle is instantaneous pleural pressure. Pleural pressure links ventilation to vascular and chamber pressures, but its same numerical swing can have different consequences depending on stressed volume, chest wall, vascular waterfalls and ventricular reserve.
+The amplitude comes from the latest completed breath; the subtitle is instantaneous pleural pressure. Pleural pressure links ventilation to vascular and chamber pressures. Wall compliance primarily changes the swing, while wall load can shift its resting level; the same numerical swing can still have different consequences depending on stressed volume, vascular waterfalls and ventricular reserve.
 
 Related pages: [Pleural pressure](pleural-pressure.md) · [The four effects of a breath](the-four-effects-of-a-breath.md)
 

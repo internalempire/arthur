@@ -49,7 +49,12 @@ export const SCENARIOS = [
     params: {
       mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
       collapsed: 0.42, clung: 40, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6,
-      riRatio: 0.7, pOpen: 18,
+      // With an independent chest wall this lung begins at a higher
+      // transpulmonary pressure than the former fixed-reference construction.
+      // The opening distribution is therefore centred slightly higher so the
+      // selected bedside R/I remains attainable without inventing recruitable
+      // lung beyond the collapsed compartment.
+      riRatio: 0.7, pOpen: 21,
     },
   },
   {
@@ -88,8 +93,11 @@ export const SCENARIOS = [
   {
     id: 'obesity',
     name: 'Stiff chest wall',
-    note: 'Obesity or a tense abdomen. A larger share of every breath goes into pleural pressure, so the haemodynamic cost of the same tidal volume goes up — and so does pulse pressure variation, whether or not the patient is dry.',
-    params: { mode: 'vcv', pmus: 0, vt: 500, peep: 8, rr: 16, ccw: 75, pab0: 12 },
+    note: 'Obesity or a tense abdomen combines two different lesions: the thoracic envelope is less compliant, and its relaxed pressure–volume curve is shifted by an external load. The first makes the pleural-pressure swing larger for the same tidal volume; the second raises the pressure around the heart even before the breath. Their haemodynamic effects emerge together here, but the two controls remain separate.',
+    params: {
+      mode: 'vcv', pmus: 0, vt: 500, peep: 8, rr: 16,
+      ccw: 75, cwLoad: 6, pab0: 12,
+    },
   },
   {
     id: 'copd',
@@ -103,8 +111,11 @@ export const SCENARIOS = [
   {
     id: 'iah',
     name: 'Intra-abdominal hypertension',
-    note: 'Raised abdominal pressure does two opposite things: it raises mean systemic filling pressure, and it raises the pressure at which the vena cava closes. Which one wins depends on how full the patient is.',
-    params: { mode: 'vcv', pmus: 0, vt: 450, peep: 8, rr: 16, pab0: 22, abdCoupling: 6 },
+    note: 'Raised abdominal pressure does opposing things: it mobilises venous blood and raises mean systemic filling pressure, but also raises the pressure at which the vena cava closes and loads the relaxed chest wall through the diaphragm. Which effect dominates depends on filling. The pressure transmitted to the thorax is a selected aggregate load, not a fixed anatomical fraction of abdominal pressure.',
+    params: {
+      mode: 'vcv', pmus: 0, vt: 450, peep: 8, rr: 16,
+      pab0: 22, abdCoupling: 6, cwLoad: 6,
+    },
   },
 ];
 

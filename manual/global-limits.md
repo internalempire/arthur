@@ -15,7 +15,8 @@ Absolute outputs are useful for orientation and internal consistency, especially
 - No oxygen, carbon dioxide, pH, oxygen content, shunt, dead space or alveolar ventilation calculation.
 - No respiratory drive controller, chemoreflex, sedation, neuromuscular blockade or respiratory muscle fatigue.
 - One aggregate lung without lobes, gravitational gradients, pendelluft, regional stress, regional time constants or spatial ventilation–perfusion matching.
-- One pleural pressure and one linear chest wall, without oesophageal-pressure artefact or an independently adjustable chest-wall resting reference.
+- One pleural pressure and one aggregate sigmoid chest wall, without regional gradients, separate rib-cage/diaphragm mechanics or oesophageal-pressure artefact.
+- Chest-wall load is an independently selected pressure offset, not a prediction from anthropometry, posture or abdominal pressure.
 - No airway leak, gas compression, secretions, airway closure, bronchodilator response, trigger delay or patient–ventilator dyssynchrony.
 - EFL is one collapsible-airway choke, not a regional COPD model.
 - Recruitment uses two unit populations and one distributed opening range; tissue and surfactant hysteresis are absent.

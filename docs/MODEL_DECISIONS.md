@@ -938,3 +938,61 @@ The ventricle remains one lumped chamber without geometry, regional wall motion,
 valvular regurgitation, coronary perfusion or force-frequency coupling. The
 double-Hill timing is a population-level waveform, not patient-specific
 electromechanical activation or relaxation.
+
+## 2026-08-21 — Give the chest wall an independent relaxation curve
+
+### Decision
+
+- Replace the phenotype-recentred linear wall with one aggregate sigmoid
+  pressure–volume relation evaluated from absolute lung volume.
+- Preserve the normal reference at 2.2 L, with chest-wall recoil −5 cmH₂O and
+  local compliance 200 mL/cmH₂O. Let the curve stiffen progressively away from
+  the middle-volume range rather than imposing one slope at all volumes.
+- Calculate passive volume from the intersection of lung and wall recoil. At a
+  static PEEP, solve the same balance after adding the applied airway pressure.
+- Keep `ccw` as the local slope near the normal reference and add `cwLoad` as a
+  separate pressure offset. Stiffness and external loading must not be aliases.
+- Keep one aggregate wall. Do not add separate rib-cage, diaphragm and abdominal
+  compartments.
+- Retune the ARDS opening-range centre from 18 to 21 cmH₂O so its selected R/I
+  remains attainable and its human PVR–recruitability constraints remain true
+  after the corrected passive transpulmonary pressure is introduced.
+
+### Why
+
+The former construction calculated each lung phenotype's volume at 5 cmH₂O
+transpulmonary pressure and assigned −5 cmH₂O pleural pressure there. This made
+the normal calibration look correct but silently translated the chest-wall
+relation whenever lung compliance, collapse or capacity changed. A diseased
+lung therefore could not find a new equilibrium against an unchanged thorax.
+
+With the independent relation, the default still rests at 2.2 L. A collapsed,
+stiff, non-recruitable lung instead settles near 1.0 L with lung and wall recoil
+near +11 and −11 cmH₂O; a high-compliance lung settles higher, near 2.4 L. These
+are consequences of the two curves meeting, not separately assigned FRC values.
+A 6 cmH₂O wall load shifts the same normal lung to a lower passive volume while
+preserving the selected reference compliance.
+
+The sigmoid form follows the established human relaxation-curve topology:
+approximately linear over tidal breathing, with reduced compliance toward the
+volume extremes. Its broad shape anchors were chosen for stable, legible ICU-
+range behaviour and were not fitted as individual human RV or TLC measurements.
+
+### Executable contract
+
+Tests require the default operating point and local wall compliance, outward
+recoil below the wall's neutral volume, inward recoil above it, and progressive
+stiffening at low and high volume. Changing `clung`, `collapsed` or
+`lungCapacity` must leave wall pressure at a given absolute volume bit-identical.
+Normal, collapsed-stiff and lost-recoil lungs must each satisfy
+`Pcw + Pl = 0` at their own passive volume. `cwLoad` must shift wall pressure
+without changing its selected local compliance.
+
+### Deliberate limits
+
+There is one wall pressure and no regional pleural gradient. Rib cage,
+diaphragm, abdominal wall and zone-of-apposition geometry remain absent.
+`cwLoad` is a selected aggregate offset rather than a prediction from body mass,
+ascites or abdominal pressure. Chest-wall curvature can contribute to airway-
+pressure curvature at extreme volume, so stress index is a respiratory-system
+measurement rather than proof of a purely pulmonary mechanism.

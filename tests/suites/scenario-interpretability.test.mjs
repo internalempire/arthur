@@ -226,7 +226,7 @@ section('Scenario teaching mechanisms');
 
 {
   const stiff = scenarioMetrics('obesity');
-  const reference = scenarioMetrics('obesity', { ccw: 200, pab0: 5 });
+  const reference = scenarioMetrics('obesity', { ccw: 200, cwLoad: 0, pab0: 5 });
   demonstrates.obesity = stiff.pplSwing > reference.pplSwing * 2
     && stiff.cvp > reference.cvp
     && stiff.co < reference.co
@@ -260,7 +260,7 @@ section('Scenario teaching mechanisms');
 
 {
   const highPressure = scenarioMetrics('iah');
-  const normalPressure = scenarioMetrics('iah', { pab0: 5 });
+  const normalPressure = scenarioMetrics('iah', { pab0: 5, cwLoad: 0 });
   const underfilled = scenarioMetrics('iah', { stressedVolume: 450 });
   const filled = scenarioMetrics('iah', { stressedVolume: 950 });
   demonstrates.iah = highPressure.pmsf > normalPressure.pmsf + 5

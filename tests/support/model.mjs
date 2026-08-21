@@ -21,6 +21,7 @@ import {
   lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,
   normalOpenFractionAt, recruitmentBand, stepRecruitedFraction,
   openFractionFromRecruitmentState,
+  chestWallPressure, chestWallComplianceAt, chestWallNeutralVolume,
   staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
   recruitmentToInflation,
 } from '../../src/model/lung.js';
@@ -39,6 +40,7 @@ export {
   lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,
   normalOpenFractionAt, recruitmentBand, stepRecruitedFraction,
   openFractionFromRecruitmentState,
+  chestWallPressure, chestWallComplianceAt, chestWallNeutralVolume,
   staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
   recruitmentToInflation, readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
 };

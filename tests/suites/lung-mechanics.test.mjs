@@ -1,10 +1,84 @@
 // Static lung mechanics, baby-lung strain, R/I calibration and the PVR operating point.
 import {
-  SCENARIOS, defaultParams,
+  Simulator, SCENARIOS, defaultParams,
   lungRegions, pvrComponents, transpulmonaryAt, relaxationVolume, openFractionAt,
+  chestWallPressure, chestWallComplianceAt, chestWallNeutralVolume,
   calibrateRecruitmentToInflation, recruitmentToInflation,
   section, check, near, settled,
 } from '../support/model.mjs';
+
+section('The independent chest wall');
+{
+  const normal = defaultParams();
+  const neutral = chestWallNeutralVolume(normal);
+
+  check('the normal lung and wall balance at 2.2 L without sharing a curve',
+    near(relaxationVolume(normal), 2.2, 1e-6)
+      && near(chestWallPressure(normal, 2.2), -5, 1e-6)
+      && near(transpulmonaryAt(normal, 2.2), 5, 1e-6),
+    `Pcw ${chestWallPressure(normal, 2.2).toFixed(1)} + `
+      + `Pl ${transpulmonaryAt(normal, 2.2).toFixed(1)} cmH₂O`);
+  check('the selected chest-wall compliance is the local slope at the reference point',
+    near(chestWallComplianceAt(normal, 2.2), normal.ccw, 1e-6),
+    `${chestWallComplianceAt(normal, 2.2).toFixed(0)} mL/cmH₂O`);
+  check('the relaxed wall tends outward at FRC and inward above its neutral volume',
+    neutral > 2.2
+      && near(chestWallPressure(normal, neutral), 0, 1e-6)
+      && chestWallPressure(normal, 6) > 0,
+    `neutral volume ${neutral.toFixed(2)} L; Pcw at 6 L ${chestWallPressure(normal, 6).toFixed(1)} cmH₂O`);
+  check('the wall stiffens toward both volume extremes rather than remaining linear',
+    chestWallComplianceAt(normal, 0.2) < normal.ccw
+      && chestWallComplianceAt(normal, 6) < normal.ccw,
+    `${chestWallComplianceAt(normal, 0.2).toFixed(0)} at low volume, `
+      + `${normal.ccw} near FRC, ${chestWallComplianceAt(normal, 6).toFixed(0)} mL/cmH₂O at high volume`);
+
+  // This is the structural regression test. Lung disease may move the volume
+  // at which the two elements meet, but it cannot move the wall relation itself.
+  const diseasedLungs = [
+    { ...normal, collapsed: 0.42, clung: 40, riRatio: 0, pOpen: 21 },
+    { ...normal, clung: 300 },
+    { ...normal, lungCapacity: 4 },
+  ];
+  check('lung compliance, collapse and capacity cannot translate the chest-wall curve',
+    diseasedLungs.every((p) => near(
+      chestWallPressure(p, 2.2), chestWallPressure(normal, 2.2), 1e-12,
+    )),
+    diseasedLungs.map((p) => chestWallPressure(p, 2.2).toFixed(3)).join(', '));
+
+  for (const [name, phenotype] of [
+    ['collapsed stiff', diseasedLungs[0]],
+    ['lost recoil', diseasedLungs[1]],
+  ]) {
+    const volume = relaxationVolume(phenotype);
+    check(`${name} lung finds its own passive intersection with the same wall`,
+      near(chestWallPressure(phenotype, volume) + transpulmonaryAt(phenotype, volume), 0, 1e-5),
+      `V ${volume.toFixed(2)} L, Pcw ${chestWallPressure(phenotype, volume).toFixed(1)}, `
+        + `Pl ${transpulmonaryAt(phenotype, volume).toFixed(1)} cmH₂O`);
+  }
+  check('collapse lowers passive volume while loss of recoil raises it',
+    relaxationVolume(diseasedLungs[0]) < relaxationVolume(normal)
+      && relaxationVolume(diseasedLungs[1]) > relaxationVolume(normal),
+    `${relaxationVolume(diseasedLungs[0]).toFixed(2)} collapsed, `
+      + `${relaxationVolume(normal).toFixed(2)} normal, `
+      + `${relaxationVolume(diseasedLungs[1]).toFixed(2)} lost recoil L`);
+
+  const loaded = { ...normal, cwLoad: 6 };
+  check('an external load shifts the wall curve without being renamed stiffness',
+    near(chestWallPressure(loaded, 2.2) - chestWallPressure(normal, 2.2), 6, 1e-9)
+      && near(chestWallComplianceAt(loaded, 2.2), chestWallComplianceAt(normal, 2.2), 1e-9)
+      && relaxationVolume(loaded) < relaxationVolume(normal),
+    `Pcw shift ${(chestWallPressure(loaded, 2.2) - chestWallPressure(normal, 2.2)).toFixed(1)} cmH₂O; `
+      + `equilibrium ${relaxationVolume(normal).toFixed(2)} → ${relaxationVolume(loaded).toFixed(2)} L`);
+
+  const live = new Simulator();
+  live.resp.v = 0.4;
+  const volumeBeforeLoad = live.resp.relaxVolume + live.resp.v;
+  live.setParam('cwLoad', 6);
+  const volumeAfterLoad = relaxationVolume(live.params) + live.resp.v;
+  check('changing wall load preserves the gas already present in the lung',
+    near(volumeAfterLoad, volumeBeforeLoad, 1e-9),
+    `${volumeBeforeLoad.toFixed(3)} → ${volumeAfterLoad.toFixed(3)} L`);
+}
 
 section('The two-compartment lung');
 {
@@ -71,7 +145,9 @@ section('The two-compartment lung');
 
   // The mechanism the single-compartment model could not express.
   const closed = lungRegions({ ...ards, riRatio: 0 }, 1.8);
-  const opens = lungRegions({ ...ards, riRatio: 0.8, pOpen: 12 }, 1.8);
+  const opens = lungRegions({
+    ...ards, openableDiseasedFraction: 1, pOpen: 12,
+  }, 1.8);
   check('recruitment lowers strain per unit at an unchanged lung volume',
     opens.openFraction > closed.openFraction && opens.strain < closed.strain,
     `open ${closed.openFraction.toFixed(2)} -> ${opens.openFraction.toFixed(2)}, `
@@ -85,7 +161,7 @@ section('The two-compartment lung');
   // calibration must reproduce attainable targets and disclose when the finite
   // collapsed compartment makes a larger request impossible.
   {
-    const phenotype = { ...p, collapsed: 0.42, clung: 40, ccw: 200, pOpen: 18, riRatio: 0.6 };
+    const phenotype = { ...p, collapsed: 0.42, clung: 40, ccw: 200, pOpen: 20, riRatio: 0.6 };
     const calibration = calibrateRecruitmentToInflation(phenotype);
     const measured = recruitmentToInflation({
       ...phenotype,
@@ -135,7 +211,7 @@ section('The two-compartment lung');
     // still phase-dependent without forcing the visual right-limb retuning back
     // toward the much steeper animal curve this model deliberately retired.
     check('resistance still swings within a breath, though far less than it used to',
-      hi - lo > 0.04 && near(sum / n, 1.27, 0.2),
+      hi - lo > 0.03 && near(sum / n, 1.27, 0.2),
       `mean ${(sum / n).toFixed(2)}, range ${lo.toFixed(2)}–${hi.toFixed(2)} Wood units`);
   }
 
@@ -144,7 +220,7 @@ section('The two-compartment lung');
   // reason resting volume stopped being a parameter.
   const emphysema = { ...p, clung: 300 };
   check('a lung with lost recoil rests hyperinflated without being told to',
-    relaxationVolume(emphysema) > 2.6,
+    relaxationVolume(emphysema) > relaxationVolume(p) + 0.1,
     `${relaxationVolume(emphysema).toFixed(2)} L against ${relaxationVolume(p).toFixed(2)} normal`);
   // Measured where the patient actually breathes, not at their resting volume.
   // The nadir follows the fully open resting volume; trapped gas must still move
@@ -154,7 +230,7 @@ section('The two-compartment lung');
     const copd = settled({ ...SCENARIOS.find((x) => x.id === 'copd').params }, 45);
     const normal = settled({}, 45);
     check('and the gas it traps then puts it on the right limb',
-      copd.metrics.pvrCoefficientWood > normal.metrics.pvrCoefficientWood * 1.02,
+      copd.metrics.pvrCoefficientWood > normal.metrics.pvrCoefficientWood * 1.01,
       `${copd.resp.lungVolume.toFixed(2)} L breathing at `
       + `${copd.metrics.pvrCoefficientWood.toFixed(2)} against a normal `
       + `${normal.metrics.pvrCoefficientWood.toFixed(2)} Wood units`);

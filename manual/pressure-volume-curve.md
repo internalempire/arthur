@@ -97,11 +97,28 @@ This is how the model now separates three lesions:
 
 The first three rows change compliance while preserving the same 6 L ceiling. They therefore have different slopes and reach different volumes at a finite pressure, but converge to the same maximum. The last two rows preserve compliance and change the ceiling.
 
-### The resting reference is calculated
+### Resting volume is the intersection with an independent chest wall
 
-There is no independent FRC control. The model calculates the volume held at 5 cmH₂O of transpulmonary recoil, then references chest-wall displacement to that volume. The default combination — `clung` 200 mL/cmH₂O, `lungCapacity` 6 L and no collapse — is calibrated to a relaxation volume of 2.2 L.
+There is no independent FRC control. The default lung is calibrated to meet the default [chest-wall relaxation curve](pleural-pressure.md) at 2.2 L, but disease phenotypes are not forced to preserve either pressure at that point. Passive equilibrium is solved from:
 
-Changing maximum capacity also scales the zero-pressure volume term, because a smaller anatomical lung should not retain the same absolute baseline volume as a larger one. Changing `clung` changes the volume gained above that baseline. Collapse then multiplies the result by the open fraction.
+$$
+P_l(V_{relax})+P_{cw}(V_{relax})=0
+$$
+
+Changing maximum capacity scales the lung's zero-pressure volume term, because a smaller anatomical lung should not retain the same absolute baseline volume as a larger one. Changing `clung` changes the volume gained for a pressure increment. Collapse multiplies the result by the open fraction. The chest-wall curve remains unchanged unless `ccw`, `cwLoad` or body position is changed.
+
+This distinction changes the meaning of disease states. A collapsed, stiff lung settles at a lower volume and requires greater transpulmonary pressure to balance the stronger outward recoil of the same wall. A lung with lost recoil settles higher. A positive external wall load moves equilibrium lower without being mislabelled as reduced compliance.
+
+<!-- BEGIN GENERATED: lung-wall-equilibrium -->
+*Direct static solution at zero applied airway pressure. The passive volume is where lung and chest-wall recoil are equal and opposite.*
+
+| phenotype | passive volume (L) | chest-wall recoil P<sub>cw</sub> (cmH₂O) | transpulmonary recoil P<sub>l</sub> (cmH₂O) |
+|---|---:|---:|---:|
+| normal reference | 2.20 | -5.0 | 5.0 |
+| collapsed, stiff and non-recruitable lung | 0.99 | -11.1 | 11.1 |
+| lost lung recoil | 2.38 | -4.1 | 4.1 |
+| normal lung with a 6 cmH₂O external wall load | 1.52 | -2.4 | 2.4 |
+<!-- END GENERATED: lung-wall-equilibrium -->
 
 <!-- BEGIN GENERATED: pv-eelv -->
 *Static respiratory-system equilibrium at applied PEEP 5 cmH₂O, with recruitment hysteresis off.*
@@ -109,13 +126,13 @@ Changing maximum capacity also scales the zero-pressure volume term, because a s
 | phenotype | end-expiratory volume (L) |
 |---|---:|
 | normal | 2.71 |
-| 30% collapsed | 1.96 |
-| 50% collapsed | 1.44 |
-| emphysematous, aerated-lung compliance 400 mL/cmH₂O | 3.79 |
-| smaller 4.0 L maximum-capacity lung | 2.28 |
+| 30% collapsed | 2.23 |
+| 50% collapsed | 1.81 |
+| emphysematous, aerated-lung compliance 400 mL/cmH₂O | 3.18 |
+| smaller 4.0 L maximum-capacity lung | 2.48 |
 <!-- END GENERATED: pv-eelv -->
 
-End-expiratory volume is therefore an outcome of lung recoil, capacity, open fraction, chest-wall compliance and applied PEEP. It is not a renamed capacity input.
+End-expiratory volume is therefore an outcome of lung recoil, capacity, open fraction, the independent chest-wall curve and applied PEEP. It is not a renamed capacity input.
 
 ---
 
@@ -129,6 +146,8 @@ End-expiratory volume is therefore an outcome of lung recoil, capacity, open fra
 
 **Capacity is entered in litres for now.** Predicted TLC would require anthropometric inputs and reference equations that add little to the present focus on heart–lung interaction. Direct litre scaling is sufficient for teaching, provided it is not interpreted as spirometric prediction.
 
+**The wall is solved, not recentered.** Preserving −5 cmH₂O pleural pressure at every phenotype's lung-derived reference made the two elastic elements mathematically inseparable. Solving their intersection allows lung disease, wall stiffness and external thoracic load to have different causal meanings.
+
 ---
 
 ## Limits
@@ -139,6 +158,8 @@ End-expiratory volume is therefore an outcome of lung recoil, capacity, open fra
 - The 18% soft-transition width is a didactic coefficient, not a patient-specific measurement.
 - A measured bedside pressure–volume curve also contains resistance, recruitment and time dependence; this tissue relation should not be interpreted as a directly acquired low-flow P–V loop.
 - The model does not supply lower or upper inflection pressures as ventilator-setting recommendations.
+- The chest wall is one aggregate sigmoid relation. Rib cage, diaphragm and abdomen are not separate mechanical compartments.
+- Remote wall curvature is a physiological shape constraint rather than a patient-specific fit.
 
 ---
 
@@ -148,6 +169,9 @@ End-expiratory volume is therefore an outcome of lung recoil, capacity, open fra
 - Harris RS. Pressure–volume curves of the respiratory system. *Respir Care*. 2005;50:78–98.
 - Gattinoni L, Pesenti A. The concept of “baby lung”. *Intensive Care Med*. 2005;31:776–784.
 - Chiumello D, Carlesso E, Cadringher P, et al. Lung stress and strain during mechanical ventilation for acute respiratory distress syndrome. *Am J Respir Crit Care Med*. 2008;178:346–355.
+- Rahn H, Otis AB, Chadwick LE, Fenn WO. The pressure-volume diagram of the thorax and lung. *Am J Physiol*. 1946;146:161–178. [doi:10.1152/ajplegacy.1946.146.2.161](https://doi.org/10.1152/ajplegacy.1946.146.2.161)
+- Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
+- Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 
 ---
 

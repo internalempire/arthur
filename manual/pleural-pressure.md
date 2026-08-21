@@ -1,125 +1,113 @@
 # Pleural pressure
 
-> The pressure surrounding the heart, intrathoracic vessels and lung. In the model its breath-to-breath change is assigned to chest-wall displacement and respiratory-muscle pressure, while its reference point is linked to the lung's calculated relaxation volume.
+> The pressure surrounding the heart, intrathoracic vessels and lung. In the model it comes from an independent chest-wall relaxation curve, shifted by any external wall load and by respiratory-muscle pressure.
 
 ---
 
 ## Physiology
 
-At the end of a passive expiration the lung's elastic recoil pulls inward and the chest wall's recoil pulls outward. The two balance at functional residual capacity, and the space between them sits at roughly −5 cmH₂O.
+At passive end-expiration, lung recoil pulls inward while the chest wall usually tends outward. Functional residual capacity is the volume at which those opposing forces balance, so alveolar pressure equals atmospheric pressure even though pleural pressure is subatmospheric.
 
-Inflating the chest displaces the chest wall outward against its own elastance, so pleural pressure rises. Two things can do the inflating, and they move pleural pressure in opposite directions:
+During inspiration, the sign depends on who expands the thorax:
 
-- **A ventilator** pushes gas in. The chest wall is displaced from inside, and pleural pressure **rises** during inspiration.
-- **The inspiratory muscles** pull the chest wall outward. Pleural pressure **falls** during inspiration.
+- A **ventilator** raises alveolar pressure and displaces the wall outward. Pleural pressure rises.
+- The **inspiratory muscles** pull the wall outward. Pleural pressure falls.
 
-This sign difference is the origin of almost every contrast between positive-pressure and spontaneous breathing in heart–lung interaction. It is why a ventilated patient's venous return falls in inspiration while a spontaneously breathing patient's rises, and why the arterial pressure variation of the two has opposite phase.
+This sign reversal explains much of heart–lung interaction. Positive-pressure inspiration raises measured right atrial pressure while opposing venous return; spontaneous inspiration can lower measured CVP while increasing the transmural filling pressure and the gradient for venous return.
 
-### What determines the size of the swing
+### Swing, resting pressure and load are not the same thing
 
-For a passive, volume-controlled breath in a linear chest wall, the pleural pressure swing is determined mainly by tidal volume and **chest-wall compliance**:
+Chest-wall compliance mainly determines how much pleural pressure changes for a given tidal displacement. Near the usual operating range:
 
 $$
-\Delta P_{pl} = \frac{V_T}{C_{cw}}
+\Delta P_{pl}\approx\frac{V_T}{C_{cw}}
 $$
 
-- $\Delta P_{pl}$ — pleural pressure swing over one breath, cmH₂O
-- $V_T$ — tidal volume, mL
-- $C_{cw}$ — chest wall compliance, mL/cmH₂O
+A wall load does something different. Obesity, ascites or a raised diaphragm can shift the entire relaxed pressure–volume relation, making pleural pressure less negative or positive at rest even if its local slope is unchanged. A patient may have low compliance, a positive load, or both.
 
-A stiff lung raises airway and alveolar pressure steeply, but in this simplified construction the pleural swing is unchanged if the same volume enters against the same chest wall. The fraction of airway pressure transmitted to the pleural space therefore falls as the lung stiffens: the pleural-pressure numerator remains similar while the airway-pressure denominator grows.
-
-The clinical consequence is important and frequently inverted: **a high plateau pressure in a stiff lung is not evidence of high intrathoracic pressure**. The patient with ARDS at 32 cmH₂O of plateau may be transmitting less to the mediastinum than a patient with normal lungs at 20. What raises transmission is a stiff *chest wall* — obesity, oedema, a raised diaphragm, an open abdomen closed under tension. See the [stiff chest-wall and intra-abdominal-hypertension presets](scenarios.md#stiff-chest-wall).
+A stiff lung is different again. It raises airway pressure because more transpulmonary pressure is required to deliver volume. At the same volume and with the same wall, it does not automatically create the same rise in pleural pressure. High plateau pressure is therefore not a reliable surrogate for the pressure surrounding the heart.
 
 ---
 
 ## In the model
 
-Pleural pressure is a linear function of lung volume and muscular effort, evaluated afresh at every step:
+The relaxed wall is a sigmoid function of absolute volume:
 
 $$
-P_{pl} = P_{pl,FRC} + \frac{V}{C_{cw}} - P_{mus}
+P_{cw}=F_{cw}(V;C_{cw})+L_{cw}
 $$
 
-- $P_{pl}$ — pleural pressure, cmH₂O
-- $P_{pl,FRC}$ — pleural pressure at functional residual capacity, fixed at −5 cmH₂O
-- $V$ — lung volume above the model's relaxation reference, mL
-- $C_{cw}$ — chest wall compliance, mL/cmH₂O
-- $P_{mus}$ — pressure generated by the inspiratory muscles, cmH₂O; zero in a passive patient, positive during effort
-
-The lung does not appear explicitly in this local pressure increment. Its tissue contribution enters separately as the transpulmonary pressure required to hold the volume, and alveolar pressure is their sum:
+Pleural pressure then includes respiratory effort:
 
 $$
-P_{alv} = P_{pl} + P_{l}(V)
+P_{pl}=P_{cw}-P_{mus}
 $$
 
-- $P_{alv}$ — alveolar pressure, cmH₂O
-- $P_{l}(V)$ — transpulmonary pressure the lung tissue requires to hold volume $V$, cmH₂O
+The default curve is calibrated so that at the normal 2.2 L reference, $P_{cw}=-5$ cmH₂O and the local slope corresponds to 200 mL/cmH₂O. Its relaxed zero-recoil volume is higher, near 3.2 L: below that volume the wall tends outward; above it the wall tends inward. These are model reference values, not universal patient normals.
 
-That ordering is the core of the [equation of motion](equation-of-motion.md): the chest wall is linear and gives the pleural-pressure increment; the lung gives the transpulmonary pressure; the airway sees their sum. Because $P_l(V)$ comes from the [pressure–volume curve](pressure-volume-curve.md), a recruiting or overdistending lung changes airway pressure without directly changing the pleural swing at the same delivered volume.
+`Chest wall compliance` changes the local slope. `Chest wall load` adds a pressure offset without changing that selected slope. The two controls are kept separate because they have different consequences:
 
-The reference is not fully independent, however. The model recalculates the relaxation volume from aerated-lung compliance, maximum capacity and open fraction, then assigns −5 cmH₂O pleural pressure at that volume. Across phenotypes, the chest-wall relation therefore shifts with the lung rather than intersecting an independently fixed chest-wall curve. This limitation affects comparisons of absolute resting volume and pressure more than the within-breath swing.
+| change | main immediate effect |
+|---|---|
+| lower `ccw` | larger pleural-pressure swing for the same tidal volume |
+| higher `cwLoad` | higher relaxed wall pressure at every absolute volume; lower passive equilibrium volume |
+| lower `clung` | more transpulmonary and airway pressure needed for a given volume |
 
-$P_{mus}$ is a half-sine over the neural inspiratory time, raised to a power slightly above one so the rise is a little slower than the fall.
+![Independent chest-wall relaxation curves](figure/chest-wall.svg)
 
-### What the model shows
+The wall curve is nearly linear around ordinary tidal breathing but bends at larger volume excursions. Consequently, the simple $V_T/C_{cw}$ relation remains a useful local approximation, not an identity imposed at all volumes.
 
-One passive breath of 500 mL at PEEP 5:
+### The passive reference now emerges
 
-| chest wall | lung | pleural swing | plateau |
-|---|---|---|---|
-| 200 mL/cmH₂O | 200 mL/cmH₂O | 2.50 cmH₂O | 10.6 cmH₂O |
-| 200 | 30 | **2.50** | 36.9 |
-| 60 | 200 | **8.34** | 16.2 |
+The model no longer assigns −5 cmH₂O pleural pressure to whichever volume the selected lung reaches at 5 cmH₂O transpulmonary pressure. Instead, it solves the intersection of independent lung and wall recoil:
 
-Stiffening the lung by a factor of nearly seven raises the plateau by 26 cmH₂O and leaves the pleural swing untouched. Stiffening the chest wall by a factor of three more than triples the swing at a plateau far lower than the ARDS case.
+$$
+P_l(V_{relax})+P_{cw}(V_{relax})=0
+$$
 
-### Body position
+A collapsed, stiff lung therefore finds equilibrium at a lower volume, where the unchanged wall pulls outward more strongly and transpulmonary pressure is higher. Loss of lung recoil moves equilibrium upward. This is the physiologically important consequence of making the wall independent.
 
-The prone control changes three quantities at once: chest-wall compliance falls to 65% of its supine value, abdominal pressure rises by 2 cmH₂O, and transpulmonary opening pressure falls by 6 cmH₂O. These fixed changes are a thought experiment for competing mechanisms, not a general physiological description of proning or a prediction for an individual patient.
+### Body position and the abdomen
 
-The last of these is the reason proning is represented as a change in *opening pressure* rather than in resting volume. Proning does not add lung; it redistributes the pleural gradient so dependent units reach their opening pressure at a lower airway pressure. A patient with nothing recruitable gains nothing — which is why it is not a recruitment manoeuvre in a consolidated lung. See [recruitment and R/I](recruitment-and-ri.md).
+Prone position reduces the selected chest-wall compliance to 65% of its supine value, raises abdominal pressure by 2 cmH₂O and lowers the opening-pressure distribution of recruitable lung. These are coarse, simultaneous transformations. Recruitment may offset the expected change in mean pleural pressure, so the model validates chest-wall stiffening from the **larger within-breath pleural swing**, not by requiring mean pleural pressure to rise in every phenotype.
+
+The obesity and intra-abdominal-hypertension scenarios also use a positive wall load. This pressure is selected independently from abdominal pressure because the model has no geometry from which to calculate transmission. It must not be read as a measured abdominal-to-pleural transmission fraction.
 
 ---
 
-## Why this and not something else
+## Why this implementation
 
-The chest wall could have been given the same saturating shape as the lung. It was left linear deliberately: over the tidal range the chest wall is close to linear, and keeping it so means every departure from linearity in the airway pressure trace can be attributed to the lung. The [stress index](stress-index.md) reads that curvature, and it would be uninterpretable if both elements bent.
+An independent wall curve fixes a structural problem that a linear wall could not fix by retuning. Previously, lung disease moved the wall's reference relation along with the lung, so the model could not express the higher transpulmonary pressure expected when a stiff, low-volume lung is held open by an otherwise unchanged thorax.
 
-The alternative of driving pleural pressure from airway pressure with a transmission fraction — a common shortcut, typically "half of PEEP is transmitted" — was rejected. A fixed fraction is exactly the thing this model exists to contradict: transmission is an outcome of the ratio of the two compliances, and it varies from under a fifth to over two thirds across the control space.
+The model still uses one aggregate wall. Dividing it into rib cage, diaphragm and abdominal wall would allow more accurate posture and obesity mechanics, but would introduce several poorly constrained compartments outside the app's main purpose: mechanical interaction between ventilation and circulation.
 
-Proning is resolved at integration time rather than written back into the sliders, so the controls keep showing the patient's supine mechanics. Turning someone over does not change how stiff their lung is, and the interface should not claim it does.
+A fixed airway-to-pleural transmission fraction was rejected. Pressure transmission is an outcome of lung recoil, wall recoil, volume and load. It should change when those properties change.
 
 ---
 
 ## Limits
 
-### Of the construction
-
-- **One pleural pressure for the whole thorax.** There is no vertical gradient and therefore no dependent-to-non-dependent difference. Proning's effect on that gradient is represented by its consequence — a lower opening pressure — rather than by the gradient itself.
-- **The chest wall is linear at all volumes**, including volumes where a real chest wall is not.
-- **No rib cage and diaphragm as separate compartments**, so no distinction between their contributions to the swing, and no zone of apposition geometry.
-- $P_{mus}$ is one waveform scaled by one control. There is no inspiratory threshold load, no expiratory muscle activity, no dyssynchrony and no fatigue.
-- Prone is a single alternative to supine with three fixed coefficients, not a continuum of positions.
-
-### Of clinical application
-
-- The model's pleural pressure is the true value. A clinician has an oesophageal balloon, whose absolute value carries a positional artefact and whose validity depends on an occlusion test — none of which is simulated. Do not use the model to justify a specific oesophageal number.
-- The transmission fractions the model produces are properties of *its* two compliances. They illustrate that transmission is variable; they are not a lookup table for a patient.
-- The three prone coefficients are representative magnitudes, not a prediction for an individual. The model can show why proning's haemodynamic effect is ambiguous; it cannot say which way it will fall in one patient.
+- One pleural pressure replaces vertical and regional gradients.
+- There is no separate rib cage, diaphragm, abdominal wall or zone-of-apposition geometry.
+- `cwLoad` is an aggregate offset, not a body-mass or intra-abdominal-pressure model.
+- The remote curvature of the sigmoid is a didactic shape choice; it has not been fitted to an individual human relaxation manoeuvre.
+- Oesophageal pressure measurement, calibration, positional artefact and occlusion testing are absent.
+- Muscle pressure is one waveform; expiratory effort, dyssynchrony and fatigue are absent.
+- Prone coefficients are representative directional choices, not predictions for an individual patient.
 
 ---
 
 ## References
 
-- Gattinoni L, Chiumello D, Carlesso E, Valenza F. Bench-to-bedside review: chest wall elastance in acute lung injury/ARDS patients. *Crit Care* 2004;8:350–5.
-- Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med* 2014;189:520–31.
-- Guérin C, Reignier J, Richard J-C, et al. Prone positioning in severe acute respiratory distress syndrome. *N Engl J Med* 2013;368:2159–68.
-- Jozwiak M, Teboul J-L, Anguel N, et al. Beneficial hemodynamic effects of prone positioning in patients with acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2013;188:1428–33.
-- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
+- Rahn H, Otis AB, Chadwick LE, Fenn WO. The pressure-volume diagram of the thorax and lung. *Am J Physiol*. 1946;146:161–178. [doi:10.1152/ajplegacy.1946.146.2.161](https://doi.org/10.1152/ajplegacy.1946.146.2.161)
+- Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
+- Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
+- Behazin N, Jones SB, Cohen RI, Loring SH. Respiratory restriction and elevated pleural and esophageal pressures in morbid obesity. *J Appl Physiol*. 2010;108:212–218. [doi:10.1152/japplphysiol.91356.2008](https://doi.org/10.1152/japplphysiol.91356.2008)
+- Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med*. 2014;189:520–531. [doi:10.1164/rccm.201312-2193CI](https://doi.org/10.1164/rccm.201312-2193CI)
+- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med*. 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
 
 ---
 
 ## See also
 
-[Transmural pressure](transmural-pressure.md) · [Equation of motion](equation-of-motion.md) · [Abdominal pressure](abdominal-pressure.md) · [Pressure–volume curve](pressure-volume-curve.md) · [The four effects of a breath](the-four-effects-of-a-breath.md) · [Chest-wall and abdominal scenarios](scenarios.md#stiff-chest-wall) · [Controls: mechanics](controls-mechanics.md)
+[Transmural pressure](transmural-pressure.md) · [Equation of motion](equation-of-motion.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Abdominal pressure](abdominal-pressure.md) · [The Campbell diagram](panel-campbell.md) · [Clinical scenarios](scenarios.md)

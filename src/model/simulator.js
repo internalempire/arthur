@@ -122,6 +122,15 @@ export class Simulator {
     if (id === 'stressedVolume') {
       this.circ.vSv += value - this.params.stressedVolume;
     }
+    // Preserve the gas already present when either elastic element moves the
+    // passive equilibrium. `resp.v` is a display-friendly offset from that
+    // equilibrium, not the stored absolute thoracic volume.
+    const mechanicsChanged = id === 'collapsed' || id === 'clung' || id === 'lungCapacity'
+      || id === 'riRatio' || id === 'pOpen' || id === 'ccw' || id === 'cwLoad'
+      || id === 'position';
+    const absoluteVolume = mechanicsChanged
+      ? (this.resp.relaxVolume || relaxationVolume(resolveParams(this.params))) + this.resp.v
+      : null;
     this.params[id] = value;
     // Volume and pressure control are entered as genuinely passive modes.
     // Scenarios with spontaneous effort must not carry that muscle pressure
@@ -131,15 +140,9 @@ export class Simulator {
     if (id === 'mode' && (value === 'vcv' || value === 'pcv')) {
       this.params.pmus = 0;
     }
-    if (id === 'collapsed' || id === 'clung' || id === 'lungCapacity'
-      || id === 'riRatio' || id === 'pOpen') {
-      // These move the resting volume, which `resp.v` is measured from. The gas
-      // in the lung cannot jump, so hold the absolute volume and re-reference it
-      // rather than letting the offset carry the change.
-      const before = this.resp.relaxVolume || relaxationVolume(this.params);
-      const absolute = before + this.resp.v;
-      const after = relaxationVolume(this.params);
-      this.resp.v = Math.max(-after * 0.9, absolute - after);
+    if (mechanicsChanged) {
+      const after = relaxationVolume(resolveParams(this.params));
+      this.resp.v = Math.max(-after * 0.9, absoluteVolume - after);
       this.resp.plSolved = null;
     }
   }
@@ -188,7 +191,13 @@ export class Simulator {
     // resting lung volume. Resolved once here — the parameters cannot change
     // mid-advance — so every consumer sees one consistent set.
     const positioned = resolveParams(this.params);
-    this.effective = { ...positioned };
+    this.effective = {
+      ...positioned,
+      // Static lung-wall equilibrium is unchanged during this advance. Cache it
+      // once: solving a sigmoid intersection at every 0.25 ms step would add
+      // cost without adding physiology.
+      _relaxVolume: relaxationVolume(positioned),
+    };
     for (let s = 0; s < steps; s++) {
       // The reflex senses a mean pressure and modifies what the integrator
       // reads, so it is applied before the step rather than corrected after.

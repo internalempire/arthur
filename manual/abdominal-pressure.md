@@ -35,6 +35,8 @@ $$
 
 `pab0` is the patient's intra-abdominal pressure and `abdCoupling` is how strongly lung volume raises it — the diaphragm's descent expressed as a coefficient rather than as geometry.
 
+The pressure load transmitted to the thorax is represented separately by `cwLoad`. It shifts the independent [chest-wall relaxation curve](pleural-pressure.md) and can raise resting pleural pressure without changing the selected wall compliance. `pab0` does **not** automatically determine `cwLoad`: abdominal-to-thoracic transmission depends on posture, diaphragm configuration and abdominal compliance, none of which is resolved. The intra-abdominal-hypertension preset selects both values to construct one teaching phenotype; it does not encode a universal transmission fraction.
+
 The two opposing consequences are separated by one state variable: how distended the venous reservoir is. The model reads that from the elastic pressure the reservoir already generates, and forms a zone index between 0 and 1:
 
 $$
@@ -104,6 +106,7 @@ The `0.6` splanchnic fraction, the transition window and the resistance coeffici
 - **The zone index is inferred, not measured.** It is a function of the reservoir's own elastic pressure, so it is an internal coefficient in the sense used under [interpretability](interpretability.md) — never displayed as though it were a zone diagnosis.
 - **The diaphragm has no geometry.** Its descent is a coefficient on lung volume, so there is no zone of apposition, no rib cage expansion from diaphragmatic contraction, and no distinction between the abdominal pressure a passive descent produces and that of a vigorous contraction.
 - Abdominal compliance is not represented: the same volume displacement produces the same pressure rise regardless of whether the abdomen is lax or tense.
+- Thoracic wall load is selected independently from abdominal pressure. The model cannot predict how much of a measured Pab reaches pleural pressure in a particular patient.
 
 ### Of clinical application
 
@@ -120,6 +123,7 @@ The `0.6` splanchnic fraction, the transition window and the resistance coeffici
 - Malbrain MLNG, Cheatham ML, Kirkpatrick A, et al. Results from the International Conference of Experts on Intra-abdominal Hypertension and Abdominal Compartment Syndrome. *Intensive Care Med* 2006;32:1722–32.
 - Kirkpatrick AW, Roberts DJ, De Waele J, et al. Intra-abdominal hypertension and the abdominal compartment syndrome: updated consensus definitions and clinical practice guidelines. *Intensive Care Med* 2013;39:1190–206.
 - Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
+- Behazin N, Jones SB, Cohen RI, Loring SH. Respiratory restriction and elevated pleural and esophageal pressures in morbid obesity. *J Appl Physiol*. 2010;108:212–218. [doi:10.1152/japplphysiol.91356.2008](https://doi.org/10.1152/japplphysiol.91356.2008)
 
 ---
 
