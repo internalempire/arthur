@@ -73,7 +73,7 @@ Related pages: [Stressed volume](stressed-volume.md) · [Venous tone](venous-ton
 
 ### Preload reserve
 
-The model perturbs the analytic Guyton operating point and reports the local fractional gain in flow per mmHg of additional filling pressure. The subtitle also shows the absolute slope and whether the point lies on the steep limb or plateau. This is a property of the model's cardiac-function construction, not a validated bedside index or a fluid prescription.
+The model perturbs the analytic Guyton operating point and reports the local fractional gain in predicted steady flow per mmHg of additional filling pressure. The ascending relation calculates RV output from RV filling and current pulmonary arterial load; it does not independently test LV reserve. The subtitle also shows the absolute slope and whether the point lies on the steep limb or plateau. This is an internal analytic construction, not a validated bedside index or a fluid prescription.
 
 Related page: [Preload reserve](preload-reserve.md)
 

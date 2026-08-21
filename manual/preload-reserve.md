@@ -1,6 +1,6 @@
 # Preload reserve
 
-> Preload reserve asks how much additional output the current circulation gains when its filling pressure rises; the model reads that local gain from the intersection of venous return and cardiac function rather than inferring it from PPV.
+> Preload reserve asks how much additional steady flow the analytic Guyton construction predicts when systemic filling pressure rises. In the model, the ascending relation is an RV-function curve; the readout does not independently test LV reserve.
 
 ---
 
@@ -8,7 +8,9 @@
 
 Fluid responsiveness means that a reversible or actual increase in cardiac preload produces a clinically meaningful increase in stroke volume or cardiac output. It is not the same as hypovolaemia, and it does not establish that fluid is indicated: a responder may already be adequately perfused, while fluid can cause harm even when output rises.
 
-The [Guyton construction](venous-return.md) makes the mechanism visible. Raising mean systemic filling pressure moves the venous-return relation and shifts the operating point. If the cardiac function curve is steep there, flow rises. If it is flat, the new intersection moves mainly toward higher filling pressure.
+The [Guyton construction](venous-return.md) makes the mechanism visible. Raising mean systemic filling pressure moves the venous-return relation and shifts the operating point. If the heart can use the added filling, flow rises; if it cannot, the new intersection moves mainly toward higher filling pressure.
+
+Classical diagrams call the ascending relation the cardiac-function curve. The model gives that general label a specific implementation: it calculates **predicted RV output** from right atrial filling pressure, RV diastolic mechanics, RV contractility and current pulmonary arterial load. The intersection is treated as whole-circuit flow only by assuming that, at steady state, venous return, RV output and LV output become equal.
 
 ![Equilibrium output as mean systemic filling pressure is increased](figure/preload-reserve.svg)
 
@@ -18,7 +20,7 @@ The clinically familiar fluid challenge is a finite volume intervention. The mod
 
 ## In the model
 
-The simulator raises and lowers model Pmsf by 0.5 mmHg around the current state, recomputes the intersection of the same venous-return and cardiac-function curves drawn in the panel, and estimates the central slope:
+The simulator raises and lowers model Pmsf by 0.5 mmHg around the current state, recomputes the intersection of the same venous-return and RV-function curves drawn in the panel, and estimates the central slope:
 
 $$
 R_{preload} = \frac{1}{Q}\frac{\Delta Q}{\Delta P_{msf}}
@@ -30,6 +32,8 @@ $$
 - $\Delta P_{msf}$ — change in mean systemic filling pressure, mmHg
 
 The value is displayed as percent of current output per mmHg. A value of 0.10 therefore reads “about 10% more output for one additional mmHg of filling pressure” within the local construction.
+
+Here, “output” means the common steady flow predicted at the intersection. The ascending curve itself calculates RV output; it does not run a separate LV filling or LV-function calculation at each perturbed point.
 
 The panel highlights the limb at or above 8%/mmHg. This split is a model classifier, not a clinical threshold. After correction of ventricular activation, a deterministic sweep across loading, resistance, heart rate, RV function, venous compliance, PEEP and abdominal pressure found that this boundary agreed with the model's own definition of a 500 mL responder in about 87% of configurations. Discordance is expected because a finite bolus can cross the knee of the curve and because venous compliance determines how much pressure a given volume buys.
 
@@ -52,11 +56,13 @@ Preload reserve is a **readout**, not a treatment and not a hidden control. It d
 
 The reserve is largest when the heart can convert a small rise in filling pressure into substantially more forward flow. In the model it therefore depends mainly on:
 
-- **current filling:** stressed volume and venous tone help determine where the circulation sits on its cardiac-function curve;
+- **current filling:** stressed volume and venous tone help determine where the circulation sits on its RV-function curve;
 - **the route back to the heart:** resistance to venous return, venous collapse and the pressures surrounding the great veins determine how readily extra upstream pressure becomes extra flow;
-- **the heart's ability to accept and eject that flow:** ventricular contractility, diastolic stiffness, pericardial constraint and ventricular interdependence shape the cardiac-function curve;
-- **right-ventricular afterload:** pulmonary vascular load and lung inflation can flatten the useful response to additional filling;
+- **the modeled RV response:** the RV diastolic pressure–volume relation, RV contractility, pleural and pericardial pressure, and the effective pulmonary arterial load determine the ascending curve;
+- **right-ventricular afterload:** pulmonary vascular load and lung inflation can flatten the useful response to additional right-sided filling;
 - **the current output:** the displayed percentage is normalised to present flow, so the same absolute gain represents a larger percentage when starting output is low.
+
+The actual closed-loop simulation still contains the LV, ventricular interaction and pulmonary transit. They can influence the current state from which the analytic curve is built. However, the preload-reserve calculation does not independently ask whether the LV could accept and eject the extra flow after the pulmonary circulation has transmitted it. A low LV reserve can therefore be underrepresented by this particular readout.
 
 Venous compliance deserves a separate sentence. It determines how much a given volume of fluid raises filling pressure, but preload reserve is expressed **per mmHg**, not per millilitre. The readout therefore answers, “what would one more mmHg buy?” It does not predict how many millilitres are needed to create that pressure change.
 
@@ -79,7 +85,8 @@ The calculation is expressed per mmHg rather than per millilitre. Converting pre
 - The reserve is derived from a steady-state analytical construction applied to a breathing closed-loop simulation.
 - The 8%/mmHg split is a didactic classifier with broad, not exact, agreement with the model's 500 mL experiment.
 - The slope is local; a finite intervention can leave the steep limb and yield less benefit than the derivative suggests.
-- The cardiac-function approximation uses the current model RV afterload and does not simulate a full new steady state at every infinitesimal point.
+- The ascending relation is an RV-function approximation. It uses current RV afterload and external pressures and does not simulate a full new biventricular steady state at every perturbed point.
+- LV filling reserve and LV systolic limitation are not independently tested by the analytic slope.
 - Added volume is placed immediately in one venous reservoir with no distribution or loss.
 
 ### Of clinical application

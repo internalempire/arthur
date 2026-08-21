@@ -56,7 +56,7 @@
 
 **Plateau pressure.** Airway pressure intended to represent the zero-flow end-inspiratory elastic load. The model computes it; it does not perform a true inspiratory pause for the routine tile.
 
-**Preload reserve.** Local slope of the model cardiac-function curve at its operating point, expressing how much output would rise with additional right atrial filling pressure. It is an internal coefficient, not a validated bedside index.
+**Preload reserve.** Local change in the analytic Guyton intersection when mean systemic filling pressure rises. The ascending relation predicts RV output rather than independently testing LV reserve. It is an internal coefficient, not a validated bedside index.
 
 **Pulmonary vascular resistance (PVR).** Clinically, $(mPAP-PAWP)/CO$, reported in Wood units. The model separately reports this derived aggregate and the coefficient used in its pulmonary flow law. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 

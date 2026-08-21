@@ -44,7 +44,7 @@ const PANELS = [
       const m = sim.metrics, op = m.operatingPoint;
       return `The simulated state sits at a right atrial pressure of ${n(op.pra)} mmHg and a flow of `
         + `${n(op.flow, 2)} L/min. Mean systemic filling pressure is ${n(m.pmsf)} mmHg, so the gradient `
-        + `driving venous return is ${n(m.gradientVr)} mmHg. The cardiac function curve is anchored at a `
+        + `driving venous return is ${n(m.gradientVr)} mmHg. The model RV-function curve is anchored at a `
         + `pleural pressure of ${n(op.ppl)} mmHg.`;
     },
     rows: (sim) => {

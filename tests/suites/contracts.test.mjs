@@ -265,7 +265,9 @@ section('The Guyton points remain explicitly distinguished');
 {
   const panel = readFileSync(new URL('../../manual/panel-guyton.md', import.meta.url), 'utf8');
   const venousReturn = readFileSync(new URL('../../manual/venous-return.md', import.meta.url), 'utf8');
+  const preloadReserve = readFileSync(new URL('../../manual/preload-reserve.md', import.meta.url), 'utf8');
   const examples = readFileSync(new URL('../../manual/model-examples.mjs', import.meta.url), 'utf8');
+  const guytonUi = readFileSync(new URL('../../src/ui/panels/guyton.js', import.meta.url), 'utf8');
 
   check('the filled point is identified as venous inflow rather than cardiac output',
     panel.includes('venous inflow from the inferior vena cava into the right atrium')
@@ -279,6 +281,13 @@ section('The Guyton points remain explicitly distinguished');
   check('high RV afterload is documented as an analytic limitation',
     venousReturn.includes('severe RV pressure loading')
       && venousReturn.includes('construction error as well as a dynamic physiological signal'));
+  check('the ascending curve is explicitly RV rather than LV function',
+    panel.includes('implements it more specifically as an **RV-function curve**')
+      && panel.includes('It is not an independently calculated LV-function curve')
+      && guytonUi.includes("panel.label('RV function'"));
+  check('preload reserve does not claim to test LV reserve independently',
+    preloadReserve.includes('does not independently test LV reserve')
+      && preloadReserve.includes('LV filling reserve and LV systolic limitation are not independently tested'));
   check('generated examples do not call a cardiac-cycle mean a respiratory-cycle mean',
     !examples.includes('respiratory-cycle mean used by the Guyton construction'));
 }

@@ -6,9 +6,9 @@ import {
 
 // The Guyton diagram. Both curves share right atrial pressure as their abscissa,
 // so their intersection is the operating point. Intrathoracic pressure slides
-// the cardiac function curve along that axis while leaving the venous return
+// the model RV-function curve along that axis while leaving the venous return
 // curve where it is — which is the entire mechanism by which a breath changes
-// cardiac output.
+// the predicted right-sided steady flow.
 
 const TRAIL_INTERVAL = 0.025; // s of simulated time between trail samples
 const TRAIL_POINTS = 480;     // about 12 s of physiology
@@ -69,7 +69,7 @@ export function createGuyton(canvas) {
 
     panel.clip();
 
-    // Pleural pressure marker: where the cardiac function curve is anchored.
+    // Pleural pressure marker: where the model RV-function curve is anchored.
     const pplMmHg = cmH2OtoMmHg(sim.resp.ppl);
     ctx.save();
     ctx.strokeStyle = colors.inkMuted;
@@ -87,9 +87,10 @@ export function createGuyton(canvas) {
     panel.line(vr.points, { color: colors.venous, width: 2 });
     panel.line(cf.points, { color: colors.arterial, width: 2 });
 
-    // The stretch of the cardiac function curve where filling would actually buy
-    // output, drawn over it. Which side of that the marker sits on is the whole
-    // question, and this makes it a place on the picture rather than a claim.
+    // The stretch of the RV-function curve where filling would actually buy
+    // predicted RV output, drawn over it. Which side of that the marker sits on
+    // is the whole question, and this makes it a place on the picture rather
+    // than a claim.
     const limbs = preloadLimbs(p, c, op);
     if (limbs.steep.length >= 4) {
       panel.line(limbs.steep, { color: colors.arterial, width: 5, alpha: 0.28 });
@@ -103,7 +104,7 @@ export function createGuyton(canvas) {
       color: colors.text.venous, dx: 6, dy: -10, halo: colors.surface,
     });
     const cfLabelIdx = Math.floor(cf.points.length * 0.82) & ~1;
-    panel.label('Cardiac function', cf.points[cfLabelIdx], cf.points[cfLabelIdx + 1], {
+    panel.label('RV function', cf.points[cfLabelIdx], cf.points[cfLabelIdx + 1], {
       color: colors.text.arterial, dx: -6, dy: -10, align: 'right', halo: colors.surface,
     });
 
@@ -187,7 +188,7 @@ export function createGuyton(canvas) {
       });
     }
 
-    panel.title('Guyton diagram', colors, 'where venous return meets cardiac function');
+    panel.title('Guyton diagram', colors, 'where venous return meets predicted RV output');
   }
 
   function clearTrail() { trail.length = 0; lastSample = -1; }

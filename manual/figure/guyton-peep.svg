@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" class="arthur-fig" role="img"
-  aria-label="Guyton construction at two levels of PEEP. Each level shows a venous return curve falling with right atrial pressure and a cardiac function curve rising with it. Raising PEEP shifts both curves rightward and the operating point to a lower cardiac output at a higher right atrial pressure.">
+  aria-label="Guyton construction at two levels of PEEP. Each level shows a venous return curve falling with right atrial pressure and the model RV-function curve rising with it. Raising PEEP shifts both curves rightward and the analytic intersection to a lower predicted RV output at a higher right atrial pressure.">
 <style>
   svg.arthur-fig .bg { fill: none }
   svg.arthur-fig .axis { stroke: var(--fig-axis, #9aa4b2); stroke-width: 1 }
@@ -26,7 +26,7 @@
   }
 </style>
 <rect class="bg" width="760" height="430"/>
-<text class="title" x="66" y="16">Venous return and cardiac function, at two levels of PEEP</text>
+<text class="title" x="66" y="16">Venous return and model RV function, at two levels of PEEP</text>
 <line class="grid" x1="66" y1="345.0" x2="610" y2="345.0"/><text class="tick" x="57" y="349.0" text-anchor="end">1</text>
 <line class="grid" x1="66" y1="312.0" x2="610" y2="312.0"/><text class="tick" x="57" y="316.0" text-anchor="end">2</text>
 <line class="grid" x1="66" y1="279.0" x2="610" y2="279.0"/><text class="tick" x="57" y="283.0" text-anchor="end">3</text>
@@ -59,5 +59,5 @@
 <line class="total" x1="626" y1="48" x2="654" y2="48"/><text class="label" x="660" y="52">PEEP 5</text><text class="tick" x="626" y="68">5.41 L/min at 1.0 mmHg</text>
 <line class="alv" x1="626" y1="88" x2="654" y2="88"/><text class="label" x="660" y="92">PEEP 15</text><text class="tick" x="626" y="108">4.79 L/min at 3.8 mmHg</text>
 <text class="tick" x="626" y="138">solid: venous return</text>
-<text class="tick" x="626" y="154">dashed: cardiac function</text>
+<text class="tick" x="626" y="154">dashed: predicted RV output</text>
 </svg>

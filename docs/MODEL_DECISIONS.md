@@ -84,15 +84,16 @@ patient making strong spontaneous efforts. The previous preset correctly
 withheld PPV in the interface but contradicted that safeguard in its name and
 note by teaching from an unstable internal value. Preload sensitivity is a
 different quantity: it asks how the settled intersection of venous return and
-cardiac function moves with filling pressure, so it remains defined in this
-phenotype. The revised scenario therefore teaches the narrower and defensible
+the model RV-function curve moves with filling pressure, so it remains defined
+in this phenotype. It does not independently test LV reserve. The revised
+scenario therefore teaches the narrower and defensible
 point that a large transmitted pressure swing does not by itself establish
 preload reserve.
 
 ### Deliberate limits
 
-The local slope is a property of the model's Guyton construction, not a
-validated bedside cutoff or a replacement for a fluid challenge. Irregular
+The local slope is a property of the model's right-sided Guyton construction,
+not a validated bedside cutoff or a replacement for a fluid challenge. Irregular
 effort, arrhythmia, changing tidal volume and arterial waveform measurement
 error remain outside the scenario.
 
