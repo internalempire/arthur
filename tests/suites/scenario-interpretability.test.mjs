@@ -69,6 +69,26 @@ function phaseMeans(id) {
   };
 }
 
+// Remove cardiac pulsation from IVC volume by averaging samples that occur at
+// the same respiratory phase over multiple breaths. The returned swing is a
+// property of the model compartment, not an ultrasound collapsibility index.
+function respiratoryIvcProfile(simulator, seconds = 18) {
+  const bins = Array.from({ length: 60 }, () => ({ volume: 0, n: 0 }));
+  const period = 60 / simulator.params.rr;
+  for (let i = 0; i < seconds / 0.01; i++) {
+    simulator.advance(0.01, true);
+    const phase = (simulator.resp.tCycle % period) / period;
+    const bin = bins[Math.min(bins.length - 1, Math.floor(phase * bins.length))];
+    bin.volume += simulator.circ.vIVC;
+    bin.n++;
+  }
+  const volumes = bins.filter(({ n }) => n > 0).map(({ volume, n }) => volume / n);
+  const minimum = Math.min(...volumes);
+  const maximum = Math.max(...volumes);
+  const mean = volumes.reduce((sum, volume) => sum + volume, 0) / volumes.length;
+  return { mean, swing: (maximum - minimum) / mean };
+}
+
 const demonstrates = {};
 
 section('Scenario catalogue decisions');
@@ -183,10 +203,14 @@ section('Scenario teaching mechanisms');
 }
 
 {
-  const constrained = scenarioMetrics('cardiac-tamponade', {}, 60);
-  const decompressed = scenarioMetrics('cardiac-tamponade', {
+  const constrainedSimulator = scenarioSimulator('cardiac-tamponade', {}, 60);
+  const decompressedSimulator = scenarioSimulator('cardiac-tamponade', {
     pericardialCapacity: 430,
   }, 60);
+  const constrained = constrainedSimulator.metrics;
+  const decompressed = decompressedSimulator.metrics;
+  const constrainedIvc = respiratoryIvcProfile(constrainedSimulator);
+  const decompressedIvc = respiratoryIvcProfile(decompressedSimulator);
   const rvRecovery = decompressed.rvEdv / constrained.rvEdv;
   const lvRecovery = decompressed.lvEdv / constrained.lvEdv;
   const diastolic = [
@@ -199,12 +223,17 @@ section('Scenario teaching mechanisms');
     && decompressed.cvp < constrained.cvp - 5
     && decompressed.co > constrained.co * 1.35
     && decompressed.map > constrained.map + 15
-    && rvRecovery > lvRecovery;
+    && rvRecovery > lvRecovery
+    && constrainedIvc.mean > decompressedIvc.mean + 30
+    && constrainedIvc.swing > 0.03
+    && constrainedIvc.swing < decompressedIvc.swing;
   check('tamponade preset produces shared diastolic constraint relieved by decompression',
     demonstrates['cardiac-tamponade'],
     `Pperi ${constrained.pPeri.toFixed(1)} → ${decompressed.pPeri.toFixed(1)} mmHg, `
       + `CO ${constrained.co.toFixed(2)} → ${decompressed.co.toFixed(2)} L/min, `
-      + `diastolic span ${(Math.max(...diastolic) - Math.min(...diastolic)).toFixed(1)} mmHg`);
+      + `IVC ${constrainedIvc.mean.toFixed(0)} → ${decompressedIvc.mean.toFixed(0)} mL, `
+      + `respiratory swing ${(constrainedIvc.swing * 100).toFixed(1)} → `
+      + `${(decompressedIvc.swing * 100).toFixed(1)}%`);
 }
 
 {

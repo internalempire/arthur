@@ -996,3 +996,41 @@ diaphragm, abdominal wall and zone-of-apposition geometry remain absent.
 ascites or abdominal pressure. Chest-wall curvature can contribute to airway-
 pressure curvature at extreme volume, so stress index is a respiratory-system
 measurement rather than proof of a purely pulmonary mechanism.
+
+## 2026-08-21 — Preserve respiratory IVC motion above the reference dilated calibre
+
+### Decision
+
+- Leave the separate IVC compartment, its compliance, resistance split and
+  circulation equations unchanged.
+- Replace the panel's linear fullness scale, which hard-clipped at the volume
+  corresponding to 5 mmHg transmural pressure, with a square-root transformation
+  from distending volume to displayed calibre.
+- Treat 5 mmHg as the reference dilated width rather than the maximum width. A
+  higher emergency guardrail remains only to protect the drawing from extreme
+  out-of-domain sizes.
+- Require the tamponade preset to keep a larger mean IVC volume and a smaller,
+  non-zero respiratory volume swing than the same state after restored
+  pericardial capacity.
+
+### Why
+
+The tamponade circulation was not static: after respiratory-phase averaging,
+its IVC volume varied by about 11% around a mean near 172 mL. The old drawing
+nevertheless showed zero movement because the entire cycle remained above its
+150 mL ceiling. That converted a blunted response into a categorical absence
+and made the visual statement stronger than both the model state and human
+echocardiographic evidence support.
+
+For a tube of approximately fixed length, cross-sectional area is proportional
+to distending volume and diameter follows its square root. This is sufficient to
+compress the high-volume range while retaining a small change. It is a display
+mapping, not a new physiological equation and not an ultrasound calibration.
+
+### Deliberate limits
+
+The model has one aggregate IVC with no measurement plane, longitudinal motion,
+elliptical collapse, separate thoracic and abdominal segments or deep-inspiration
+manoeuvre. The displayed percentage must therefore be read only as the direction
+and relative ordering of calibre change. It is not an IVC collapsibility index
+and is not compared with the bedside 50% threshold.

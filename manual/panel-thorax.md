@@ -10,7 +10,7 @@ The outline is the thorax. Its size follows absolute lung volume, and its colour
 
 The central disc represents both ventricles. Its total size follows combined RV and LV volume; the septum divides its area according to their volume ratio and bows according to the model's septal pressure interaction. The drawing therefore makes RV dilatation and leftward septal displacement visible, but it is not an echocardiographic view.
 
-The dashed outer ring appears only when model pericardial pressure is appreciably above zero. The inferior vena cava narrows and widens with its own blood volume rather than with instantaneous right atrial pressure, so it stays dilated and fixed in tamponade and collapses during strong inspiratory draw; see [inferior vena cava](inferior-vena-cava.md).
+The dashed outer ring appears only when model pericardial pressure is appreciably above zero. The inferior vena cava narrows and widens with its own blood volume rather than with instantaneous right-atrial pressure, so it remains dilated with a blunted respiratory excursion in tamponade and narrows more during an effective inspiratory draw; see [inferior vena cava](inferior-vena-cava.md).
 
 The annotations keep atmospheric and transmural quantities together: airway, alveolar, pleural and abdominal pressure on the left; CVP, transmural CVP and the model RV:LV end-diastolic volume ratio on the right.
 
@@ -19,7 +19,7 @@ The annotations keep atmospheric and transmural quantities together: airway, alv
 - Compare spontaneous and positive-pressure inspiration: the colour wash reverses with pleural pressure.
 - Raise abdominal pressure: the IVC narrows when its surrounding pressure rises relative to the blood volume it holds.
 - Raise pulmonary vascular load: watch RV enlargement, septal displacement and LV filling together.
-- Load the cardiac-tamponade preset: the dashed ring follows pericardial pressure and the IVC stays dilated and fixed, while restoring pericardial capacity permits both ventricles to refill.
+- Load the cardiac-tamponade preset: the dashed ring follows pericardial pressure and the IVC remains dilated but still moves slightly with its represented blood volume; restoring pericardial capacity permits both ventricles to refill.
 - Increase PEEP in a recruitable and a non-recruitable lung: the same airway pressure can produce different lung volume and RV load.
 
 ## In the model

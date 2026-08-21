@@ -3,8 +3,33 @@ import { cmH2OtoMmHg, clamp, IVC } from '../../model/index.js';
 // A schematic of the pressure chamber within a pressure chamber. Everything
 // drawn here is bound to a model variable: the thorax expands with lung volume,
 // the ventricles scale with their volumes, the septum bows with the transmural
-// pressure difference across it, and the inferior vena cava narrows as right
-// atrial pressure approaches the pressure surrounding it.
+// pressure difference across it, and the inferior vena cava follows the blood
+// volume held in its own compliant compartment.
+
+const IVC_REFERENCE_DISTENDING_VOLUME = IVC.c * 5;
+const IVC_MAX_DISPLAY_CALIBRE = 1.4;
+
+/**
+ * Convert IVC distending volume to a schematic diameter scale.
+ *
+ * For a tube of approximately fixed length, cross-sectional area is
+ * proportional to distending volume and diameter therefore follows its square
+ * root. The upper guardrail protects the panel at extreme model states, but is
+ * deliberately above the reference distended calibre: a plethoric IVC can still
+ * show a small respiratory excursion instead of freezing at an ordinary value.
+ */
+export function ivcDisplayCalibre(volume) {
+  const distendingVolume = Math.max(0, volume - IVC.vu);
+  return clamp(
+    Math.sqrt(distendingVolume / IVC_REFERENCE_DISTENDING_VOLUME),
+    0,
+    IVC_MAX_DISPLAY_CALIBRE,
+  );
+}
+
+export function ivcDisplayWidth(volume) {
+  return 1.5 + ivcDisplayCalibre(volume) * 18.5;
+}
 
 export function createThorax(canvas) {
   const ctx = canvas.getContext('2d');
@@ -187,14 +212,11 @@ export function createThorax(canvas) {
 
     // ---- inferior vena cava ----------------------------------------------
     // Calibre follows the IVC's own blood volume rather than instantaneous right
-    // atrial pressure. Fullness normalised to the volume 5 mmHg of transmural
-    // distension would hold: at ~5 mmHg the IVC is fully recruited. Below its
-    // unstressed volume it collapses to a slender line; above ~5 mmHg of
-    // distension it reaches its maximum displayed width.
-    const ivcFullness = clamp(
-      (c.vIVC - IVC.vu) / (IVC.c * 5), 0, 1,
-    );
-    const ivcW = (1.5 + ivcFullness * 18.5) * scale;
+    // atrial pressure. Five mmHg of transmural distension defines the reference
+    // dilated width, not a hard maximum; the square-root map continues above it
+    // so a plethoric IVC retains its smaller respiratory excursion.
+    const ivcCalibre = ivcDisplayCalibre(c.vIVC);
+    const ivcW = ivcDisplayWidth(c.vIVC) * scale;
     const ivcTop = cy + R * 0.7;
     const ivcBottom = h - 26 * scale;
     ctx.save();
@@ -205,7 +227,7 @@ export function createThorax(canvas) {
     ctx.lineTo(cx - 6 * scale + ivcW / 2, ivcTop);
     ctx.closePath();
     ctx.fillStyle = colors.venous;
-    ctx.globalAlpha = 0.20 + ivcFullness * 0.15;
+    ctx.globalAlpha = 0.20 + clamp(ivcCalibre, 0, 1) * 0.15;
     ctx.fill();
     ctx.globalAlpha = 0.9;
     ctx.strokeStyle = colors.venous;
