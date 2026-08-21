@@ -87,9 +87,9 @@ The preset can therefore teach why a shared external pressure restricts filling 
 ## References
 
 - Schulz-Menger J, Collini V, Gröschel J, et al. 2025 ESC Guidelines for the management of myocarditis and pericarditis. *Eur Heart J*. 2025;46:3952–4041. [doi:10.1093/eurheartj/ehaf192](https://doi.org/10.1093/eurheartj/ehaf192)
-- Reddy PS, Curtiss EI, Uretsky BF. Spectrum of hemodynamic changes in cardiac tamponade. *Am J Cardiol*. 1990;66:1487–1491.
-- Reddy PS, Curtiss EI, O'Toole JD, et al. Cardiac tamponade: hemodynamic observations in man. *Circulation*. 1978;58:265–272. [PubMed](https://pubmed.ncbi.nlm.nih.gov/668074/)
-- Appleton CP, Hatle LK, Popp RL. Cardiac tamponade and pericardial effusion: respiratory variation in transvalvular flow velocities studied by Doppler echocardiography. *J Am Coll Cardiol*. 1988;11:1020–1030.
+- Reddy PS, Curtiss EI, Uretsky BF. Spectrum of hemodynamic changes in cardiac tamponade. *Am J Cardiol*. 1990;66:1487–1491. [doi:10.1016/0002-9149(90)90540-H](https://doi.org/10.1016/0002-9149(90)90540-H)
+- Reddy PS, Curtiss EI, O'Toole JD, et al. Cardiac tamponade: hemodynamic observations in man. *Circulation*. 1978;58:265–272. [doi:10.1161/01.CIR.58.2.265](https://doi.org/10.1161/01.CIR.58.2.265)
+- Appleton CP, Hatle LK, Popp RL. Cardiac tamponade and pericardial effusion: respiratory variation in transvalvular flow velocities studied by Doppler echocardiography. *J Am Coll Cardiol*. 1988;11:1020–1030. [doi:10.1016/S0735-1097(98)90060-2](https://doi.org/10.1016/S0735-1097(98)90060-2)
 - Himelman RB, Kircher B, Rockey DC, Schiller NB. Inferior vena cava plethora with blunted respiratory response: a sensitive echocardiographic sign of cardiac tamponade. *J Am Coll Cardiol*. 1988;12:1470–1477. [doi:10.1016/S0735-1097(88)80011-1](https://doi.org/10.1016/S0735-1097(88)80011-1)
 - Hamzaoui O, Monnet X, Teboul JL. Pulsus paradoxus. *Eur Respir J*. 2013;42:1696–1705. [doi:10.1183/09031936.00138912](https://doi.org/10.1183/09031936.00138912)
 - Tyberg JV, Misbach GA, Glantz SA, Moores WY, Parmley WW. A mechanism for shifts in the diastolic left ventricular pressure–volume curve: the role of the pericardium. *Eur J Cardiol*. 1978;7 Suppl:163–175. [PubMed](https://pubmed.ncbi.nlm.nih.gov/668760/)

@@ -85,7 +85,7 @@ Executable checks require the reflex to be off by default, defend MAP by increas
 
 ## References
 
-- Eckberg DL, Sleight P. *Human Baroreflexes in Health and Disease*. Oxford: Clarendon Press; 1992.
+- Eckberg DL, Sleight P. *Human Baroreflexes in Health and Disease*. Oxford: Clarendon Press; 1992. [doi:10.1093/oso/9780198576938.001.0001](https://doi.org/10.1093/oso/9780198576938.001.0001)
 - Chapleau MW, Abboud FM. Determinants of sensitization of carotid baroreceptors by pulsatile pressure in dogs. *Circ Res*. 1989;65:566–577. [doi:10.1161/01.RES.65.3.566](https://doi.org/10.1161/01.RES.65.3.566)
 - Skrapari I, Tentolouris N, Katsilambros N. Baroreflex function: determinants in healthy subjects and disturbances in diabetes, obesity and metabolic syndrome. *Curr Diabetes Rev*. 2006;2:329–338. [doi:10.2174/157339906777950589](https://doi.org/10.2174/157339906777950589)
 - Persichini R, Lai C, Teboul JL, et al. Venous return and mean systemic filling pressure: physiology and clinical applications. *Crit Care*. 2022;26:150. [doi:10.1186/s13054-022-04024-x](https://doi.org/10.1186/s13054-022-04024-x)

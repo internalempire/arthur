@@ -84,7 +84,7 @@ Use the model to ask “which mechanism could produce this direction, and in wha
 - Pinsky MR. Heart lung interactions during mechanical ventilation. *Curr Opin Crit Care*. 2012;18:256–260. [doi:10.1097/MCC.0b013e3283532b73](https://doi.org/10.1097/MCC.0b013e3283532b73)
 - Mahmood SS, Pinsky MR. Heart–lung interactions during mechanical ventilation: the basics. *Ann Transl Med*. 2018;6:349. [doi:10.21037/atm.2018.04.29](https://doi.org/10.21037/atm.2018.04.29)
 - Ventetuolo CE, Klinger JR. Management of acute right ventricular failure in the intensive care unit. *Ann Am Thorac Soc*. 2014;11:811–822. [doi:10.1513/AnnalsATS.201312-446FR](https://doi.org/10.1513/AnnalsATS.201312-446FR)
-- Oberkampf WL, Roy CJ. *Verification and Validation in Scientific Computing*. Cambridge University Press; 2010.
+- Oberkampf WL, Roy CJ. *Verification and Validation in Scientific Computing*. Cambridge University Press; 2010. [doi:10.1017/CBO9780511760396](https://doi.org/10.1017/CBO9780511760396)
 
 ---
 

@@ -96,10 +96,9 @@ The difference was not cosmetic. With the earlier opening distribution, the refe
 ## References
 
 - Chen L, Del Sorbo L, Grieco DL, et al. [Potential for lung recruitment estimated by the recruitment-to-inflation ratio in ARDS: a clinical trial](https://doi.org/10.1164/rccm.201902-0334OC). *Am J Respir Crit Care Med* 2020;201:178–87.
-- Chen L, Chen G-Q, Shore K, et al. Implementing a bedside assessment of respiratory mechanics in patients with acute respiratory distress syndrome. *Crit Care* 2017;21:84.
-- Gattinoni L, Caironi P, Cressoni M, et al. Lung recruitment in patients with the acute respiratory distress syndrome. *N Engl J Med* 2006;354:1775–86.
-- Cappio Borlino S, et al. Pulmonary vascular effects of PEEP and recruitability in ARDS. *Am J Respir Crit Care Med* 2024;210(7).
-- Del Sorbo L, Tisminetzky M, Chen L, et al. Association of lung recruitability and response to PEEP. *Am J Respir Crit Care Med* 2023;207:1465–72.
+- Chen L, Chen G-Q, Shore K, et al. Implementing a bedside assessment of respiratory mechanics in patients with acute respiratory distress syndrome. *Crit Care* 2017;21:84. [doi:10.1186/s13054-017-1671-8](https://doi.org/10.1186/s13054-017-1671-8)
+- Gattinoni L, Caironi P, Cressoni M, et al. Lung recruitment in patients with the acute respiratory distress syndrome. *N Engl J Med* 2006;354:1775–86. [doi:10.1056/NEJMoa052052](https://doi.org/10.1056/NEJMoa052052)
+- Cappio Borlino S, Hagry J, Lai C, et al. The effect of positive end-expiratory pressure on pulmonary vascular resistance depends on lung recruitability in patients with acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2024;210:900–907. [doi:10.1164/rccm.202402-0383OC](https://doi.org/10.1164/rccm.202402-0383OC)
 
 ---
 

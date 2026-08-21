@@ -51,7 +51,7 @@ Pericardial constraint changes the gain of the shared pressure, while pericardia
 - Suga H, Sagawa K. Instantaneous pressure–volume relationships and their ratio in the excised, supported canine left ventricle. *Circ Res*. 1974;35:117–126. [doi:10.1161/01.RES.35.1.117](https://doi.org/10.1161/01.RES.35.1.117)
 - Stergiopulos N, Meister JJ, Westerhof N. Determinants of stroke volume and systolic and diastolic aortic pressure. *Am J Physiol*. 1996;270:H2050–H2059. [doi:10.1152/ajpheart.1996.270.6.H2050](https://doi.org/10.1152/ajpheart.1996.270.6.H2050)
 - Senzaki H, Chen CH, Kass DA. Single-beat estimation of end-systolic pressure–volume relation in humans. *Circulation*. 1996;94:2497–2506. [doi:10.1161/01.CIR.94.10.2497](https://doi.org/10.1161/01.CIR.94.10.2497)
-- Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. *Am J Physiol*. 1983;245:H773–H780.
+- Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. *Am J Physiol*. 1983;245:H773–H780. [doi:10.1152/ajpheart.1983.245.5.H773](https://doi.org/10.1152/ajpheart.1983.245.5.H773)
 - Dampney RAL. Central neural control of the cardiovascular system: current perspectives. *Adv Physiol Educ*. 2016;40:283–296. [doi:10.1152/advan.00027.2016](https://doi.org/10.1152/advan.00027.2016)
 
 ---

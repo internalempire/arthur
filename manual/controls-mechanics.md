@@ -70,7 +70,7 @@ Prone position is deliberately coarse. It combines directional changes intended 
 
 - Chen L, Del Sorbo L, Grieco DL, et al. Potential for lung recruitment estimated by the recruitment-to-inflation ratio in ARDS. *Am J Respir Crit Care Med*. 2020;201:178–187. [doi:10.1164/rccm.201902-0334OC](https://doi.org/10.1164/rccm.201902-0334OC)
 - Mead J, Turner JM, Macklem PT, Little JB. Significance of the relationship between lung recoil and maximum expiratory flow. *J Appl Physiol*. 1967;22:95–108. [doi:10.1152/jappl.1967.22.1.95](https://doi.org/10.1152/jappl.1967.22.1.95)
-- Pelosi P, D'Andrea L, Vitale G, et al. Vertical gradient of regional lung inflation in adult respiratory distress syndrome. *Am J Respir Crit Care Med*. 1994;149:8–13.
+- Pelosi P, D'Andrea L, Vitale G, et al. Vertical gradient of regional lung inflation in adult respiratory distress syndrome. *Am J Respir Crit Care Med*. 1994;149:8–13. [doi:10.1164/ajrccm.149.1.8111603](https://doi.org/10.1164/ajrccm.149.1.8111603)
 - Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
 - Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Behazin N, Jones SB, Cohen RI, Loring SH. Respiratory restriction and elevated pleural and esophageal pressures in morbid obesity. *J Appl Physiol*. 2010;108:212–218. [doi:10.1152/japplphysiol.91356.2008](https://doi.org/10.1152/japplphysiol.91356.2008)

@@ -58,7 +58,7 @@ Their conclusion:
 
 > *Inflation produces a volume-dependent increase in the resistance of both alveolar and extra-alveolar vessels.*
 
-### Peták group 2008 — isolated perfused rat lung
+### Peták group 2009 — isolated perfused rat lung
 
 Swept transpulmonary pressure from 2.5 to 22 cmH₂O — the range every ventilated patient in this simulator occupies.
 
@@ -97,4 +97,4 @@ The alveolar limb (exponential rise with stretch) is qualitatively consistent wi
 
 - Thomas LJ, Griffo ZJ, Roos A. Effect of negative pressure inflation of the lung on pulmonary vascular resistance. *J Appl Physiol* 1961;16:451–6. [doi:10.1152/jappl.1961.16.3.451](https://doi.org/10.1152/jappl.1961.16.3.451)
 - Hakim TS, Michel RP, Chang HK. Partitioning of pulmonary vascular resistance in dogs by arterial and venous occlusion. *J Appl Physiol* 1982;52:710–5. [doi:10.1152/jappl.1982.52.3.710](https://doi.org/10.1152/jappl.1982.52.3.710)
-- Peták F, et al. Pulmonary vascular response to lung inflation: the effect of lung volume history. *Respir Physiol Neurobiol* 2008.
+- Peták F, Albu G, Lele E, et al. Lung mechanical and vascular changes during positive- and negative-pressure lung inflations: importance of reference pressures in the pulmonary vasculature. *J Appl Physiol* 2009;106:935–42. [doi:10.1152/japplphysiol.00831.2007](https://doi.org/10.1152/japplphysiol.00831.2007)

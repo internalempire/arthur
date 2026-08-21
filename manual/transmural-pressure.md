@@ -106,11 +106,11 @@ The cost is that every compartment must have a defensible answer to "what surrou
 
 ## References
 
-- Pinsky MR. Cardiopulmonary interactions: physiologic basis and clinical applications. *Ann Am Thorac Soc* 2018;15(Suppl 1):S45–S48.
-- Magder S. Central venous pressure: a useful but not so simple measurement. *Crit Care Med* 2006;34:2224–7.
-- Mahmood SS, Pinsky MR. Heart–lung interactions during mechanical ventilation. *Ann Transl Med* 2018;6:349.
+- Pinsky MR. Cardiopulmonary interactions: physiologic basis and clinical applications. *Ann Am Thorac Soc* 2018;15(Suppl 1):S45–S48. [doi:10.1513/AnnalsATS.201704-339FR](https://doi.org/10.1513/AnnalsATS.201704-339FR)
+- Magder S. Central venous pressure: a useful but not so simple measurement. *Crit Care Med* 2006;34:2224–7. [doi:10.1097/01.CCM.0000227646.98423.98](https://doi.org/10.1097/01.CCM.0000227646.98423.98)
+- Mahmood SS, Pinsky MR. Heart–lung interactions during mechanical ventilation: the basics. *Ann Transl Med* 2018;6:349. [doi:10.21037/atm.2018.04.29](https://doi.org/10.21037/atm.2018.04.29)
 - Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
-- Jardin F, Farcot JC, Boisante L, et al. Influence of positive end-expiratory pressure on left ventricular performance. *N Engl J Med* 1981;304:387–92.
+- Jardin F, Farcot JC, Boisante L, et al. Influence of positive end-expiratory pressure on left ventricular performance. *N Engl J Med* 1981;304:387–92. [doi:10.1056/NEJM198102123040703](https://doi.org/10.1056/NEJM198102123040703)
 
 ---
 

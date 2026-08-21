@@ -129,10 +129,10 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 - Suga H, Sagawa K. [Instantaneous pressure–volume relationships and their ratio in the excised, supported canine left ventricle](https://doi.org/10.1161/01.res.35.1.117). *Circ Res* 1974;35:117–26.
 - Stergiopulos N, Meister JJ, Westerhof N. [Determinants of stroke volume and systolic and diastolic aortic pressure](https://doi.org/10.1152/ajpheart.1996.270.6.H2050). *Am J Physiol* 1996;270:H2050–9.
 - Senzaki H, Chen CH, Kass DA. [Single-beat estimation of end-systolic pressure–volume relation in humans](https://doi.org/10.1161/01.CIR.94.10.2497). *Circulation* 1996;94:2497–2506.
-- Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. *Am J Physiol* 1983;245:H773–80.
-- Burkhoff D, Sagawa K. Ventricular efficiency predicted by an analytical model. *Am J Physiol* 1986;250:R1021–7.
-- Guarracino F, Baldassarri R, Pinsky MR. Ventriculo-arterial decoupling in acutely altered hemodynamic states. *Crit Care* 2013;17:213.
-- Chantler PD, Lakatta EG, Najjar SS. Arterial–ventricular coupling: mechanistic insights into cardiovascular performance at rest and during exercise. *J Appl Physiol* 2008;105:1342–51.
+- Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. *Am J Physiol* 1983;245:H773–80. [doi:10.1152/ajpheart.1983.245.5.H773](https://doi.org/10.1152/ajpheart.1983.245.5.H773)
+- Burkhoff D, Sagawa K. Ventricular efficiency predicted by an analytical model. *Am J Physiol* 1986;250:R1021–7. [doi:10.1152/ajpregu.1986.250.6.R1021](https://doi.org/10.1152/ajpregu.1986.250.6.R1021)
+- Guarracino F, Baldassarri R, Pinsky MR. Ventriculo-arterial decoupling in acutely altered hemodynamic states. *Crit Care* 2013;17:213. [doi:10.1186/cc12522](https://doi.org/10.1186/cc12522)
+- Chantler PD, Lakatta EG, Najjar SS. Arterial–ventricular coupling: mechanistic insights into cardiovascular performance at rest and during exercise. *J Appl Physiol* 2008;105:1342–51. [doi:10.1152/japplphysiol.90600.2008](https://doi.org/10.1152/japplphysiol.90600.2008)
 
 ---
 

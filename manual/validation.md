@@ -92,10 +92,10 @@ Pull requests use three verification profiles. Documentation-only changes rebuil
 
 ## References
 
-- Oberkampf WL, Roy CJ. *Verification and Validation in Scientific Computing*. Cambridge University Press; 2010.
+- Oberkampf WL, Roy CJ. *Verification and Validation in Scientific Computing*. Cambridge University Press; 2010. [doi:10.1017/CBO9780511760396](https://doi.org/10.1017/CBO9780511760396)
 - Cappio Borlino S, Hagry J, Lai C, et al. The effect of PEEP on pulmonary vascular resistance depends on lung recruitability in patients with ARDS. *Am J Respir Crit Care Med*. 2024;210:900–907. [doi:10.1164/rccm.202402-0383OC](https://doi.org/10.1164/rccm.202402-0383OC)
-- Fougères E, Teboul JL, Richard C, et al. Haemodynamic impact of a positive end-expiratory pressure setting in ARDS. *Crit Care Med*. 2010;38:802–807.
-- Ranieri VM, Dambrosio M, Brienza N. Intrinsic PEEP and cardiopulmonary interaction in COPD. *Eur Respir J*. 1996;9:1283–1292. [PubMed](https://pubmed.ncbi.nlm.nih.gov/8804950/)
+- Fougères E, Teboul JL, Richard C, et al. Haemodynamic impact of a positive end-expiratory pressure setting in ARDS. *Crit Care Med*. 2010;38:802–807. [doi:10.1097/CCM.0b013e3181c587fd](https://doi.org/10.1097/CCM.0b013e3181c587fd)
+- Ranieri VM, Dambrosio M, Brienza N. Intrinsic PEEP and cardiopulmonary interaction in COPD. *Eur Respir J*. 1996;9:1283–1292. [doi:10.1183/09031936.96.09061283](https://doi.org/10.1183/09031936.96.09061283)
 
 ---
 
