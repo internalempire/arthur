@@ -1,5 +1,15 @@
 import { PARAMETERS, GROUPS } from '../model/index.js';
 
+/** Return the typed value represented by a choice element's option index. */
+export function choiceValue(spec, selectedIndex) {
+  return spec.options[Number(selectedIndex)]?.value;
+}
+
+/** Find the option index without coercing booleans or numbers into strings. */
+export function choiceIndex(spec, value) {
+  return spec.options.findIndex((option) => Object.is(option.value, value));
+}
+
 export function createControls(container, sim, onChange) {
   const rows = new Map();
 
@@ -50,9 +60,11 @@ export function createControls(container, sim, onChange) {
     let input;
     if (spec.type === 'choice') {
       input = document.createElement('select');
-      for (const opt of spec.options) {
+      for (const [index, opt] of spec.options.entries()) {
         const o = document.createElement('option');
-        o.value = opt.value;
+        // DOM option values are strings. Store the index so choices can safely
+        // carry typed values such as the boolean used by the baroreflex switch.
+        o.value = String(index);
         o.textContent = opt.label;
         input.appendChild(o);
       }
@@ -70,7 +82,7 @@ export function createControls(container, sim, onChange) {
     input.id = `ctrl-${spec.id}`;
     input.className = 'ctrl-input';
     input.addEventListener('input', () => {
-      const v = spec.type === 'choice' ? input.value
+      const v = spec.type === 'choice' ? choiceValue(spec, input.value)
         : spec.type === 'checkbox' ? input.checked
           : parseFloat(input.value);
       sim.setParam(spec.id, v);
@@ -98,7 +110,7 @@ export function createControls(container, sim, onChange) {
   function paint(spec, input, value) {
     const v = sim.params[spec.id];
     if (spec.type === 'choice') {
-      value.textContent = spec.options.find((o) => o.value === v)?.label ?? v;
+      value.textContent = spec.options.find((option) => Object.is(option.value, v))?.label ?? v;
     } else if (spec.type === 'checkbox') {
       value.textContent = v ? 'On' : 'Off';
     } else {
@@ -132,6 +144,7 @@ export function createControls(container, sim, onChange) {
   function sync() {
     for (const { spec, input, value } of rows.values()) {
       if (spec.type === 'checkbox') input.checked = Boolean(sim.params[spec.id]);
+      else if (spec.type === 'choice') input.value = String(choiceIndex(spec, sim.params[spec.id]));
       else input.value = sim.params[spec.id];
       paint(spec, input, value);
     }
