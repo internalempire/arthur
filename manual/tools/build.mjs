@@ -26,6 +26,11 @@ function referencesIn(source) {
   return references;
 }
 
+/** The authored H1 is the canonical user-facing title everywhere in the UI. */
+function titleIn(source) {
+  return source.match(/^#\s+(.+)$/m)?.[1].trim() ?? null;
+}
+
 /**
  * Prefer DOI/PubMed identity, then author-year-volume-pages.
  *
@@ -56,9 +61,10 @@ function referenceKey(reference) {
 
 const sourceFiles = readdirSync(ROOT)
   .filter((f) => f.endsWith('.md') && !f.startsWith('_') && f !== 'bibliography.md');
+const sources = new Map(sourceFiles.map((file) => [file, readFileSync(join(ROOT, file), 'utf8')]));
 const byKey = new Map();
 for (const file of sourceFiles) {
-  for (const reference of referencesIn(readFileSync(join(ROOT, file), 'utf8'))) {
+  for (const reference of referencesIn(sources.get(file))) {
     const key = referenceKey(reference);
     const previous = byKey.get(key);
     // When two pages cite the same work differently, keep the more useful form:
@@ -106,8 +112,14 @@ const written = readdirSync(ROOT)
   .filter((f) => f.endsWith('.md') && !f.startsWith('_'))
   .map((f) => f.replace(/\.md$/, ''))
   .sort();
+const titles = Object.fromEntries(written.map((slug) => {
+  const source = slug === 'bibliography'
+    ? readFileSync(join(ROOT, 'bibliography.md'), 'utf8')
+    : sources.get(`${slug}.md`);
+  return [slug, titleIn(source) ?? slug];
+}));
 
-writeFileSync(join(ROOT, 'status.json'), JSON.stringify({ written }, null, 2) + '\n');
+writeFileSync(join(ROOT, 'status.json'), JSON.stringify({ written, titles }, null, 2) + '\n');
 
 const total = manifest.sections.reduce((a, s) => a + s.pages.length, 0);
 const lines = [
@@ -123,7 +135,7 @@ for (const section of manifest.sections) {
   lines.push(`## ${section.label}`, '');
   for (const [slug, blurb] of section.pages) {
     const mark = written.includes(slug) ? '' : ' *(not written yet)*';
-    lines.push(`- [${slug.replace(/-/g, ' ')}](${slug}.md) — ${blurb}${mark}`);
+    lines.push(`- [${titles[slug] ?? slug.replace(/-/g, ' ')}](${slug}.md) — ${blurb}${mark}`);
   }
   lines.push('');
 }

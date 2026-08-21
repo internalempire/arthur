@@ -46,7 +46,7 @@ Plotting Paw alone would mix elastic and resistive pressure. Adding Palv and Ppl
 ## References
 
 - Campbell EJM. The respiratory muscles and the mechanics of breathing. Lloyd-Luke; 1958.
-- Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. American Physiological Society; 1986.
+- Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. American Physiological Society; 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
 - Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Mauri T, Yoshida T, Bellani G, et al. Esophageal and transpulmonary pressure in the clinical setting. *Ann Intensive Care*. 2016;6:77. [doi:10.1186/s13613-016-0186-0](https://doi.org/10.1186/s13613-016-0186-0)
 

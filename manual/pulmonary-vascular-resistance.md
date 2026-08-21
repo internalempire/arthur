@@ -250,9 +250,9 @@ The first two are topological: they test the shape, not a fitted number, because
 **Design sources**
 
 - Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3) — Fig. 1C is the clinical two-limb synthesis this page follows.
-- Mahmood SS, Pinsky MR. Heart–lung interactions during mechanical ventilation. *Ann Transl Med* 2018;6:349.
+- Mahmood SS, Pinsky MR. Heart–lung interactions during mechanical ventilation: the basics. *Ann Transl Med* 2018;6:349. [doi:10.21037/atm.2018.04.29](https://doi.org/10.21037/atm.2018.04.29)
 - Kenny J-ÉS. *An Approach to Mechanical Heart–Lung Interaction*, 2020.
-- Yuriditsky E, Mireles-Cabodevila E, Alviar CL. *ATS Scholar* 2025;6:94–108.
+- Yuriditsky E, Mireles-Cabodevila E, Alviar CL. How I Teach: Heart–Lung Interactions during Mechanical Ventilation. Positive Pressure and the Right Ventricle. *ATS Scholar* 2025;6:94–108. [doi:10.34197/ats-scholar.2024-0059HT](https://doi.org/10.34197/ats-scholar.2024-0059HT)
 
 **Volume dependence of pulmonary vascular resistance**
 
@@ -266,11 +266,11 @@ The first two are topological: they test the shape, not a fitted number, because
 **The waterfall and zonal behaviour**
 
 - West JB, Dollery CT, Naimark A. [Distribution of blood flow in isolated lung; relation to vascular and alveolar pressures](https://doi.org/10.1152/jappl.1964.19.4.713). *J Appl Physiol* 1964;19:713–24.
-- Permutt S, Bromberger-Barnea B, Bane HN. Alveolar pressure, pulmonary venous pressure and the vascular waterfall. *Med Thorac* 1962;19:239–60.
+- Permutt S, Bromberger-Barnea B, Bane HN. Alveolar pressure, pulmonary venous pressure and the vascular waterfall. *Med Thorac* 1962;19:239–60. [doi:10.1159/000192224](https://doi.org/10.1159/000192224)
 
 **Hypoxic vasoconstriction**
 
-- von Euler US, Liljestrand G. Observations on the pulmonary arterial blood pressure in the cat. *Acta Physiol Scand* 1946;12:301–20.
+- von Euler US, Liljestrand G. Observations on the pulmonary arterial blood pressure in the cat. *Acta Physiol Scand* 1946;12:301–20. [doi:10.1111/j.1748-1716.1946.tb00389.x](https://doi.org/10.1111/j.1748-1716.1946.tb00389.x)
 - Sylvester JT, Shimoda LA, Aaronson PI, Ward JPT. [Hypoxic pulmonary vasoconstriction](https://doi.org/10.1152/physrev.00041.2010). *Physiol Rev* 2012;92:367–520.
 
 **Human in-vivo calibration and clinical consequence**

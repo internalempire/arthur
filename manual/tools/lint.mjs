@@ -76,11 +76,11 @@ for (const file of files) {
     if (/^https?:|^#|^mailto:/.test(href)) continue;
     if (href.startsWith('../')) {
       if (!existsSync(resolve(ROOT, href))) err(file, null, `link leaves the manual and the target is missing: ${href}`);
-    } else if (href.endsWith('.md')) {
+    } else if (/^[^#]+\.md(?:#.*)?$/.test(href)) {
       // Valid if the page is planned (a dangling link is a marker) or if the
       // file exists — which covers the machinery pages, deliberately absent
       // from the manifest because they are not part of the reading order.
-      const target = href.replace(/\.md$/, '');
+      const target = href.split('#')[0].replace(/\.md$/, '');
       if (!planned.has(target) && !existsSync(join(ROOT, `${target}.md`))) {
         err(file, null, `link to "${target}", which is neither a written page nor in the manifest`);
       }

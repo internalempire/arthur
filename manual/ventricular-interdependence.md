@@ -111,10 +111,10 @@ The gains, reference volumes and pericardial constants are **didactic shape coef
 
 ## References
 
-- Taylor RR, Covell JW, Sonnenblick EH, Ross J. Dependence of ventricular distensibility on filling of the opposite ventricle. *Am J Physiol* 1967;213:711–8.
-- Santamore WP, Dell'Italia LJ. Ventricular interdependence: significant left ventricular contributions to right ventricular systolic function. *Prog Cardiovasc Dis* 1998;40:289–308.
-- Belenkie I, Dani R, Smith ER, Tyberg JV. Effects of volume loading during experimental acute pulmonary embolism. *Circulation* 1989;80:178–88.
-- Jardin F, Farcot JC, Boisante L, et al. Influence of positive end-expiratory pressure on left ventricular performance. *N Engl J Med* 1981;304:387–92.
+- Taylor RR, Covell JW, Sonnenblick EH, Ross J. Dependence of ventricular distensibility on filling of the opposite ventricle. *Am J Physiol* 1967;213:711–8. [doi:10.1152/ajplegacy.1967.213.3.711](https://doi.org/10.1152/ajplegacy.1967.213.3.711)
+- Santamore WP, Dell'Italia LJ. Ventricular interdependence: significant left ventricular contributions to right ventricular systolic function. *Prog Cardiovasc Dis* 1998;40:289–308. [doi:10.1016/S0033-0620(98)80049-2](https://doi.org/10.1016/S0033-0620(98)80049-2)
+- Belenkie I, Dani R, Smith ER, Tyberg JV. Effects of volume loading during experimental acute pulmonary embolism. *Circulation* 1989;80:178–88. [doi:10.1161/01.CIR.80.1.178](https://doi.org/10.1161/01.CIR.80.1.178)
+- Jardin F, Farcot JC, Boisante L, et al. Influence of positive end-expiratory pressure on left ventricular performance. *N Engl J Med* 1981;304:387–92. [doi:10.1056/NEJM198102123040703](https://doi.org/10.1056/NEJM198102123040703)
 - Mekontso Dessap A, Boissier F, Charron C, et al. [Acute cor pulmonale during protective ventilation for acute respiratory distress syndrome](https://doi.org/10.1007/s00134-015-4141-2). *Intensive Care Med* 2016;42:862–70.
 
 ---

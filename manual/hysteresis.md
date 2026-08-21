@@ -132,11 +132,11 @@ Executable tests require the following properties:
 
 ## References
 
-- Rimensberger PC, Cox PN, Frndova H, Bryan AC. The open lung during small tidal volume ventilation: concepts of recruitment and "optimal" positive end-expiratory pressure. *Crit Care Med* 1999;27:1946–52.
-- Hickling KG. [Best compliance during a decremental, but not incremental, positive end-expiratory pressure trial is related to open-lung positive end-expiratory pressure](https://pubmed.ncbi.nlm.nih.gov/11208628/). *Am J Respir Crit Care Med* 2001;163:69–78.
-- Crotti S, Mascheroni D, Caironi P, et al. Recruitment and derecruitment during acute respiratory failure: a clinical study. *Am J Respir Crit Care Med* 2001;164:131–40.
-- Albert SP, DiRocco J, Allen GB, et al. [The role of time and pressure on alveolar recruitment](https://pubmed.ncbi.nlm.nih.gov/19074576/). *J Appl Physiol* 2009;106:757–65.
-- Albert RK. The role of ventilation-induced surfactant dysfunction and atelectasis in causing acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2012;185:702–8.
+- Rimensberger PC, Cox PN, Frndova H, Bryan AC. The open lung during small tidal volume ventilation: concepts of recruitment and "optimal" positive end-expiratory pressure. *Crit Care Med* 1999;27:1946–52. [doi:10.1097/00003246-199909000-00038](https://doi.org/10.1097/00003246-199909000-00038)
+- Hickling KG. Best compliance during a decremental, but not incremental, positive end-expiratory pressure trial is related to open-lung positive end-expiratory pressure. *Am J Respir Crit Care Med* 2001;163:69–78. [doi:10.1164/ajrccm.163.1.9905084](https://doi.org/10.1164/ajrccm.163.1.9905084)
+- Crotti S, Mascheroni D, Caironi P, et al. Recruitment and derecruitment during acute respiratory failure: a clinical study. *Am J Respir Crit Care Med* 2001;164:131–40. [doi:10.1164/ajrccm.164.1.2007011](https://doi.org/10.1164/ajrccm.164.1.2007011)
+- Albert SP, DiRocco J, Allen GB, et al. The role of time and pressure on alveolar recruitment. *J Appl Physiol* 2009;106:757–65. [doi:10.1152/japplphysiol.90735.2008](https://doi.org/10.1152/japplphysiol.90735.2008)
+- Albert RK. The role of ventilation-induced surfactant dysfunction and atelectasis in causing acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2012;185:702–8. [doi:10.1164/rccm.201109-1667PP](https://doi.org/10.1164/rccm.201109-1667PP)
 
 ---
 

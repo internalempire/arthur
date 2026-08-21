@@ -5,6 +5,24 @@ import {
   section, check, near, settled,
 } from '../support/model.mjs';
 import { pvrZoomDomain } from '../../src/ui/panels/pvrcurve.js';
+import { fallbackTitle, manualHash, parseManualHash } from '../../manual/navigation.mjs';
+
+section('Manual navigation and clinical titles');
+{
+  const route = parseManualHash('#/pulmonary-vascular-resistance#what-the-model-shows');
+  check('an in-page anchor is not treated as part of the Markdown filename',
+    route.slug === 'pulmonary-vascular-resistance' && route.anchor === 'what-the-model-shows');
+  check('manual hashes preserve both page and in-page destination',
+    manualHash(route.slug, route.anchor) === '#/pulmonary-vascular-resistance#what-the-model-shows');
+  check('fallback titles preserve familiar clinical notation',
+    fallbackTitle('pvr-nadir-at-frc') === 'PVR nadir at FRC'
+      && fallbackTitle('recruitment-and-ri') === 'Recruitment and R/I');
+
+  const status = JSON.parse(readFileSync(new URL('../../manual/status.json', import.meta.url), 'utf8'));
+  check('the sidebar title source is generated from authored page headings',
+    status.titles['pvr-nadir-at-frc'] === 'Why the PVR nadir is at FRC'
+      && status.titles['pmsf-and-occlusions'] === 'Pmsf and occlusions');
+}
 
 section('Public model API');
 {

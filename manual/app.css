@@ -200,6 +200,7 @@ main:focus { outline: none; }
   border-bottom: 1px solid var(--rule); letter-spacing: -.01em;
 }
 .prose h3 { font-size: 1.06rem; margin: 1.9rem 0 .6rem; }
+.prose h2, .prose h3 { scroll-margin-top: calc(var(--topbar-h) + 1rem); }
 .prose p { margin: 0 0 1.05rem; }
 .prose a { color: var(--accent); text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent); }
 .prose ul, .prose ol { margin: 0 0 1.05rem; padding-left: 1.4rem; }
@@ -208,7 +209,7 @@ main:focus { outline: none; }
 
 .prose blockquote {
   margin: 0 0 1.6rem; padding: .85rem 1.15rem;
-  border-left: 3px solid var(--quote-bar); border-radius: 0 8px 8px 0;
+  border: 1px solid var(--rule); border-radius: 8px;
   background: var(--bg-soft); color: var(--text-muted); font-style: italic;
 }
 .prose blockquote p:last-child { margin: 0; }

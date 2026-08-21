@@ -101,9 +101,9 @@ Time still works. At the shipped PEEP, slowing the rate from 26 to 12 breaths pe
 
 ## References
 
-- Pepe PE, Marini JJ. Occult positive end-expiratory pressure in mechanically ventilated patients with airflow obstruction: the auto-PEEP effect. *Am Rev Respir Dis* 1982;126:166–70.
-- Tuxen DV, Lane S. The effects of ventilatory pattern on hyperinflation, airway pressures, and circulation in mechanical ventilation of patients with severe air-flow obstruction. *Am Rev Respir Dis* 1987;136:872–9.
-- Ranieri VM, Giuliani R, Cinnella G, et al. Physiologic effects of positive end-expiratory pressure in patients with chronic obstructive pulmonary disease during acute ventilatory failure and controlled mechanical ventilation. *Am Rev Respir Dis* 1993;147:5–13.
+- Pepe PE, Marini JJ. Occult positive end-expiratory pressure in mechanically ventilated patients with airflow obstruction: the auto-PEEP effect. *Am Rev Respir Dis* 1982;126:166–70. [doi:10.1164/arrd.1982.126.1.166](https://doi.org/10.1164/arrd.1982.126.1.166)
+- Tuxen DV, Lane S. The effects of ventilatory pattern on hyperinflation, airway pressures, and circulation in mechanical ventilation of patients with severe air-flow obstruction. *Am Rev Respir Dis* 1987;136:872–9. [doi:10.1164/ajrccm/136.4.872](https://doi.org/10.1164/ajrccm/136.4.872)
+- Ranieri VM, Giuliani R, Cinnella G, et al. Physiologic effects of positive end-expiratory pressure in patients with chronic obstructive pulmonary disease during acute ventilatory failure and controlled mechanical ventilation. *Am Rev Respir Dis* 1993;147:5–13. [doi:10.1164/ajrccm/147.1.5](https://doi.org/10.1164/ajrccm/147.1.5)
 - van den Berg B, Aerts JGJV, Bogaard JM. Effect of continuous positive airway pressure (CPAP) in patients with chronic obstructive pulmonary disease (COPD) depending on intrinsic PEEP levels. *Eur Respir J* 1991;4:561–7.
 
 ---

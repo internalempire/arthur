@@ -40,7 +40,7 @@ A realistic illustration would imply regional and geometric information the lump
 
 ## References
 
-- Jardin F, Vieillard-Baron A. Right ventricular function and positive pressure ventilation in clinical practice. *Crit Care*. 2003;7:217–223.
+- Jardin F, Vieillard-Baron A. Right ventricular function and positive pressure ventilation in clinical practice: from hemodynamic subsets to respirator settings. *Intensive Care Med*. 2003;29:1426–1434. [doi:10.1007/s00134-003-1873-1](https://doi.org/10.1007/s00134-003-1873-1)
 - Magder S. Heart–lung interaction in spontaneous breathing subjects: the basics. *Ann Transl Med*. 2018;6:348. [doi:10.21037/atm.2018.06.19](https://doi.org/10.21037/atm.2018.06.19)
 
 ---
