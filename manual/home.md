@@ -69,7 +69,7 @@ This provenance does not make the result independently validated. The developmen
 
 ## Why a linked manual
 
-The manual follows the persistent-wiki approach described in [`llm-wiki.md`](../llm-wiki.md): physiological explanations, implementation choices, reversals and limitations are kept as interconnected Markdown pages rather than rediscovered from chat history. The source pages remain readable without the web viewer, and Git records how each claim changes.
+The manual follows the persistent-wiki approach described in [Karpathy's LLM-Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): physiological explanations, implementation choices, reversals and limitations are kept as interconnected Markdown pages rather than rediscovered from chat history. The source pages remain readable without the web viewer, and Git records how each claim changes.
 
 ## Limits
 
