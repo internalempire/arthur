@@ -41,7 +41,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Question.** Why is a large pleural-pressure swing not itself evidence of preload responsiveness?
 
-**Try.** Observe the pleural swing and the position of the operating point on the cardiac-function relation; then inspect the preload-reserve readout and the PPV interpretability warning.
+**Try.** Observe the pleural swing and the position of the operating point on the model RV-function relation; then inspect the preload-reserve readout and the PPV interpretability warning.
 
 **Read.** The preset is spontaneously breathing, so PPV is withheld even though an internal waveform variation exists. The pleural swing exceeds 20 cmH₂O while the local preload reserve remains below the model's steep-limb threshold. The useful lesson is that transmitted pressure and position on the filling curve are different quantities. Do not use the hidden PPV value as the demonstration.
 

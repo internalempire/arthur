@@ -58,7 +58,7 @@ numbers. The following all reproduce:
   and van den Berg describe.
 - Spontaneous inspiration lowers CVP below zero while cardiac output rises.
 - Hypovolaemia: a 500 mL stressed-volume step raises cardiac output more from an
-  underfilled starting point than from the plateau of the cardiac-function curve.
+  underfilled starting point than from the plateau of the model RV-function curve.
   PPV is displayed descriptively but is not used as the validation target.
 - ARDS with right ventricular failure: at its shipped PEEP the RV:LV
   end-diastolic ratio is about 1.60 and the resistance coefficient is about

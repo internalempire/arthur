@@ -600,7 +600,9 @@ export function venousReturnCurve(p, c, mean, nPoints = 90, pmsfOverride = null)
 }
 
 /**
- * Right ventricular function as a function of right atrial pressure, in L/min.
+ * Predicted right-ventricular output as a function of right atrial pressure,
+ * in L/min. The public name retains conventional Guyton "cardiac function"
+ * terminology, but this is not an independently calculated LV-output curve.
  * Filling pressure is converted to transmural pressure, inverted through the RV
  * EDPVR to an end-diastolic volume, then run through the single-beat
  * elastance relation with the arterial elastance the RV currently faces.
@@ -660,17 +662,18 @@ export function cardiacFunctionCurve(p, c, mean, nPoints = 90) {
 }
 
 /**
- * How much cardiac output the operating point gains per mmHg of filling
+ * How much predicted steady flow the operating point gains per mmHg of filling
  * pressure — the slope of the Guyton construction rather than of either curve
- * alone.
+ * alone. The ascending curve is predicted RV output; treating the intersection
+ * as systemic cardiac output requires whole-circuit steady state.
  *
  * This is what "on the steep part of the Starling curve" means once it is stated
  * precisely. Adding volume translates the venous return curve to the right and
- * leaves cardiac function where it is, so the question is how far the
+ * leaves modeled RV function where it is, so the question is how far the
  * intersection climbs when it does. On the steep limb it climbs; on the plateau
- * it slides sideways along a flat cardiac function curve and the output barely
+ * it slides sideways along a flat RV-function curve and predicted flow barely
  * moves. Both curves matter: a stiff venous system moves the intersection
- * further for the same volume, and a flat cardiac function curve stops it
+ * further for the same volume, and a flat RV-function curve stops it
  * counting for anything.
  *
  * Deliberately expressed per mmHg of mean systemic filling pressure rather than
@@ -704,18 +707,18 @@ export function preloadSensitivity(p, c, mean, delta = 0.5) {
 }
 
 /**
- * The cardiac function curve split into the part where filling buys output and
- * the part where it does not.
+ * The model RV-function curve split into the part where filling buys predicted
+ * RV output and the part where it does not.
  *
- * Every intersection lies on the cardiac function curve by construction, so
+ * Every intersection lies on the RV-function curve by construction, so
  * sweeping filling pressure traces a segment of that curve rather than a new
  * one — drawing it as a separate line, as a first version of this did, adds
  * nothing but ink. What is worth drawing is which portion of it is steep, so
- * that "on the steep part of the Starling curve" is a place on the picture
+ * that "on the steep part of the model RV curve" is a place on the picture
  * instead of a claim in a tile.
  *
  * Sensitivity is evaluated along the sweep by finite differences, so it carries
- * both curves the way `preloadSensitivity` does: a flat cardiac function curve
+ * both curves the way `preloadSensitivity` does: a flat RV-function curve
  * and a stiff venous system give different answers at the same point.
  */
 export function preloadLimbs(p, c, mean, span = 14, nPoints = 48) {

@@ -28,7 +28,7 @@ The relation is held fixed while 500 mL is added to the reservoir: the point mov
 
 ### Stressed volume is not fluid responsiveness
 
-A rise in stressed volume usually raises the pressure available to drive venous return, but cardiac output rises only if the heart can use the additional filling. On the plateau of the cardiac function curve, extra stressed volume mainly raises filling pressure. The separate [preload reserve](preload-reserve.md) readout asks whether filling is likely to buy flow in the current model state.
+A rise in stressed volume usually raises the pressure available to drive venous return, but cardiac output rises only if the heart can use the additional filling. On the plateau of the model RV-function curve, extra stressed volume mainly raises right-sided filling pressure. The separate [preload reserve](preload-reserve.md) readout asks whether filling is likely to buy predicted steady flow, but does not independently test LV reserve.
 
 ---
 

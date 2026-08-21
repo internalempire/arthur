@@ -199,10 +199,10 @@ function guytonFigure() {
   }).join('\n');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" class="${ROOT}" role="img"
-  aria-label="Guyton construction at two levels of PEEP. Each level shows a venous return curve falling with right atrial pressure and a cardiac function curve rising with it. Raising PEEP shifts both curves rightward and the operating point to a lower cardiac output at a higher right atrial pressure.">
+  aria-label="Guyton construction at two levels of PEEP. Each level shows a venous return curve falling with right atrial pressure and the model RV-function curve rising with it. Raising PEEP shifts both curves rightward and the analytic intersection to a lower predicted RV output at a higher right atrial pressure.">
 <style>${STYLE}</style>
 <rect class="bg" width="${W}" height="${H}"/>
-<text class="title" x="${PAD.l}" y="16">Venous return and cardiac function, at two levels of PEEP</text>
+<text class="title" x="${PAD.l}" y="16">Venous return and model RV function, at two levels of PEEP</text>
 ${ticks.join('\n')}
 <line class="axis" x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t + plotH}"/>
 <line class="axis" x1="${PAD.l}" y1="${PAD.t + plotH}" x2="${PAD.l + plotW}" y2="${PAD.t + plotH}"/>
@@ -211,7 +211,7 @@ ${curves}
 <text class="label" x="${PAD.l + plotW / 2}" y="${H - 6}" text-anchor="middle">Right atrial pressure (mmHg)</text>
 ${key}
 <text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 112}">solid: venous return</text>
-<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: cardiac function</text>
+<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: predicted RV output</text>
 </svg>
 `;
 }

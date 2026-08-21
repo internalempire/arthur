@@ -1,6 +1,6 @@
 # Venous return
 
-> Flow back to the heart is driven by the difference between the pressure filling the venous reservoir and the pressure in the right atrium. Cardiac output settles where venous return and cardiac function are equal; neither curve determines it alone.
+> Flow back to the heart is driven by the difference between the pressure filling the venous reservoir and the pressure in the right atrium. In the model, steady flow is predicted where venous return equals the output of the RV-function curve; systemic cardiac output becomes equal to that flow only at whole-circuit steady state.
 
 ---
 
@@ -27,15 +27,17 @@ Two features of this expression carry most of the clinical content.
 
 ### The Guyton construction
 
-Two relations run in opposite directions against the same variable. Venous return **falls** as right atrial pressure rises. Cardiac output **rises** as right atrial pressure rises, because a fuller ventricle ejects more. Plotted together, they cross at one point, and the circulation must operate there — that is the only pressure at which what returns equals what is ejected.
+Two relations run in opposite directions against the same variable. Venous return **falls** as right atrial pressure rises. The traditional cardiac-function relation **rises**, because a fuller heart can eject more. In the model this second relation is specifically calculated from the **right ventricle**: right atrial pressure determines RV filling, and RV contractility and pulmonary arterial load determine predicted RV output. The curves cross where predicted venous return equals predicted RV output.
 
-![Venous return and cardiac function at two levels of PEEP](figure/guyton-peep.svg)
+That crossing is often labelled cardiac output in a Guyton diagram. This is valid as a steady-state shorthand: after the complete serial circulation settles, venous return, RV output and LV output must have the same mean value. It does not mean that the model's ascending curve directly calculates LV performance.
 
-The construction earns its place because it separates two questions that a single cardiac output number confuses. Fluid responsiveness is primarily determined by where the operating point lies on the **cardiac function curve**: on its ascending limb, additional filling can raise output; on its plateau, additional filling mainly raises filling pressure. Giving volume also shifts the venous return curve to the right by raising mean systemic filling pressure, and the new output is the intersection of both relations — see [preload reserve](preload-reserve.md).
+![Venous return and predicted RV output at two levels of PEEP](figure/guyton-peep.svg)
+
+The construction earns its place because it separates two questions that a single cardiac output number confuses. In the model, the position on the **RV-function curve** asks whether more right-sided filling can raise predicted RV output: on its ascending limb, it can; on its plateau, additional filling mainly raises filling pressure. Giving volume also shifts the venous-return curve to the right by raising mean systemic filling pressure, and the new predicted steady flow is the intersection of both relations — see [preload reserve](preload-reserve.md).
 
 This must not be confused with the **plateau of the venous return curve** at very low right atrial pressure. That plateau reflects collapse of the great veins and limits the maximum venous return; it is not the flat limb of the Frank–Starling relation.
 
-It also shows why PEEP costs output. Raising PEEP shifts the cardiac function curve rightward, because the ventricle now sits inside a higher surrounding pressure and needs a higher measured atrial pressure to reach the same transmural filling. The crossing moves to a lower flow at a higher right atrial pressure — exactly the pattern in [transmural pressure](transmural-pressure.md), seen graphically.
+It also shows why PEEP can cost output. Raising PEEP shifts the RV-function curve rightward, because the RV now sits inside a higher surrounding pressure and needs a higher measured atrial pressure to reach the same transmural filling. The crossing moves to a lower predicted flow at a higher right atrial pressure — exactly the pattern in [transmural pressure](transmural-pressure.md), seen graphically.
 
 ### The venous-return plateau is not a Frank–Starling phenomenon
 
@@ -60,7 +62,7 @@ Mean systemic filling pressure comes from the [stressed volume](stressed-volume.
 The panel combines a measurement from the running circulation with a theoretical steady-state construction:
 
 - **the filled simulated point** plots right atrial pressure against IVC-to-right-atrial venous inflow. Both are averaged over the most recent heartbeat. Its flow coordinate is not RV output, LV output or cardiac output;
-- **the hollow equilibrium point** is the crossing of the analytic venous-return and cardiac-function curves. It predicts the local steady state that would be reached if the current conditions were held constant long enough.
+- **the hollow equilibrium point** is the crossing of the analytic venous-return and RV-function curves. It predicts where venous return and RV output would become equal if the current conditions were held constant long enough. It becomes a prediction of systemic cardiac output only under the additional steady-state assumption that RV and LV output have also equilibrated.
 
 The one-heartbeat averaging window removes cardiac pulsation while deliberately preserving respiratory movement. The filled point therefore follows venous inflow through the breath; the hollow point does not claim to be a second measurement of the same instantaneous flow.
 
@@ -100,7 +102,7 @@ Mean systemic filling pressure *rises* with PEEP — the abdominal contribution 
 
 ## Why this and not something else
 
-The model integrates a closed loop and *derives* the Guyton diagram from it, rather than using the diagram as the model. A pure Guyton model — two straight lines and their intersection — is a useful teaching device but cannot show breath-by-breath behaviour or temporary blood storage. Here, separating the measured point from the calculated crossing makes both the dynamic physiology and the approximation visible. A small separation may reflect a circulation in motion; a large or persistent separation may also reveal that the local analytic cardiac curve is inadequate for the current state.
+The model integrates a closed loop and *derives* the Guyton diagram from it, rather than using the diagram as the model. A pure Guyton model — two curves and their intersection — is a useful teaching device but cannot show breath-by-breath behaviour or temporary blood storage. Here, separating the measured point from the calculated crossing makes both the dynamic physiology and the approximation visible. A small separation may reflect a circulation in motion; a large or persistent separation may also reveal that the local analytic RV curve is inadequate for the current state.
 
 Venous return uses a soft collapse law rather than a hard `max()`, for reasons given under [vascular waterfalls](vascular-waterfalls.md).
 
@@ -116,7 +118,7 @@ The resistance to venous return is a single control. Splitting it into the sever
 - **No stress relaxation, no transcapillary escape, no distribution kinetics.** Volume added stays where it is put.
 - **The resistance to venous return is a constant** apart from the abdominal term. It does not vary with flow, tone or vessel calibre.
 - **The Guyton diagram is a steady-state construction** applied to a non-steady state. Respiratory variation and temporary blood storage can separate the filled point from the crossing.
-- **The analytic cardiac-function curve is deliberately simplified.** It does not reproduce every consequence of RV dilation, ventricular interdependence, pulmonary transit or volume history. In severe RV pressure loading, including pulmonary embolism, a persistent gap may be a construction error as well as a dynamic physiological signal.
+- **The analytic curve represents the RV, not an independent biventricular or LV function curve.** It does not reproduce every consequence of RV dilation, ventricular interdependence, pulmonary transit, LV limitation or volume history. In severe RV pressure loading, including pulmonary embolism, a persistent gap may be a construction error as well as a dynamic physiological signal.
 - **The filled point is venous inflow, not cardiac output.** Its height must not be read as simultaneous RV or LV forward flow.
 - Mean systemic filling pressure here is computed from the model's own state. It is an internal quantity, not the thing an occlusion manoeuvre measures — see [Pmsf and occlusions](pmsf-and-occlusions.md).
 
