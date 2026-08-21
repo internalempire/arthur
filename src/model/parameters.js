@@ -48,7 +48,7 @@ export const PARAMETERS = [
   {
     id: 'peep', group: 'ventilation', label: 'PEEP', unit: 'cmH₂O',
     min: 0, max: 24, step: 1, default: 5,
-    help: 'PEEP raises both end-expiratory lung volume and mean intrathoracic pressure. The first moves PVR along the J-curve; the second shifts the cardiac function curve.',
+    help: 'PEEP raises both end-expiratory lung volume and mean intrathoracic pressure. The first moves PVR along the J-curve; the second shifts the model RV-function curve.',
   },
   {
     id: 'ti', group: 'ventilation', label: 'Inspiratory time', unit: 's',

@@ -1,7 +1,7 @@
 # Clinical scenarios
 > All clinical presets, the question each asks, and the limits of the answer.
 
-The presets are not miniature patient records and they do not predict treatment response. Each is a settled phenotype chosen to make one heart–lung interaction easy to interrogate. Use the preset to establish the starting state, change one control, allow several breaths for the circulation to settle, and ask whether the causal chain visible in the panels matches the question below.
+The presets are not miniature patient records and they do not predict treatment response. Each is a settled phenotype chosen to make one heart–lung interaction easy to interrogate. Use the preset to establish the starting state, change one control, allow several breaths for the circulation to settle, and ask whether the causal chain visible in the panels matches the question below. The exact controls that construct every phenotype are listed under [preset parameter changes](#preset-parameter-changes).
 
 ## Physiology
 
@@ -105,7 +105,148 @@ The preset's opening-range centre is 21 cmH₂O. This is not a proposed clinical
 
 ## In the model
 
-Selecting a scenario replaces the current controls with defaults plus that scenario's explicit overrides. It does not apply a scripted sequence, preserve the previous patient's state or force an outcome after the selection. Touching any control changes the label to *Custom* because the patient no longer matches the preset.
+Selecting a scenario first restores `defaultParams()` and then applies that scenario's explicit overrides. It does not inherit controls from the previously selected preset, apply a scripted sequence or force an outcome after selection. The application opens with *Healthy, breathing spontaneously*, but that opening preset is not the baseline from which the other scenarios are built. The code reference is the passive volume-control default shown below. Touching any control changes the label to *Custom* because the patient no longer matches the preset.
+
+### Preset parameter changes
+
+<!-- BEGIN GENERATED: scenario-overrides -->
+*Generated directly from `defaultParams()` and `SCENARIOS`. The reference is the model's passive volume-control default, not the healthy spontaneous preset shown when the application opens.*
+
+Only values that actually differ from the reference are listed. A preset may repeat an unchanged value in the source code to make its intended ventilation explicit; such repetitions are omitted here because they do not alter the simulated patient.
+
+#### Healthy, breathing spontaneously
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Ventilatory mode | Volume control | Spontaneous |
+| Ventilation | PEEP | 5 cmH₂O | 0 cmH₂O |
+| Ventilation | Inspiratory effort | 0.0 cmH₂O | 8.0 cmH₂O |
+
+#### Healthy, passive volume control
+
+*No control differs from the model reference. This preset names the default passive volume-control state.*
+
+#### PEEP escalation
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | PEEP | 5 cmH₂O | 14 cmH₂O |
+
+#### Septic shock, fluid responsive
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Respiratory rate | 14 /min | 18 /min |
+| Ventilation | Tidal volume | 450 mL | 560 mL |
+| Ventilation | PEEP | 5 cmH₂O | 8 cmH₂O |
+| Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 150 mL/cmH₂O |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 330 mL |
+| Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.85 mmHg·s/mL |
+| Cardiac function | Baseline heart rate | 75 /min | 105 /min |
+| Cardiac function | Baroreflex | Off | On |
+
+#### Large pleural swings, limited preload reserve
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Ventilatory mode | Volume control | Spontaneous |
+| Ventilation | Respiratory rate | 14 /min | 24 /min |
+| Ventilation | PEEP | 5 cmH₂O | 6 cmH₂O |
+| Ventilation | Inspiratory effort | 0.0 cmH₂O | 22.0 cmH₂O |
+| Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 100 mL/cmH₂O |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 950 mL |
+| Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.75 mmHg·s/mL |
+| Cardiac function | Baseline heart rate | 75 /min | 100 /min |
+
+#### ARDS with right ventricular failure
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Respiratory rate | 14 /min | 24 /min |
+| Ventilation | Tidal volume | 450 mL | 350 mL |
+| Ventilation | PEEP | 5 cmH₂O | 12 cmH₂O |
+| Respiratory mechanics | Aerated-lung compliance | 200 mL/cmH₂O | 40 mL/cmH₂O |
+| Respiratory mechanics | Collapsed lung | 0% | 42% |
+| Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.28 mmHg/mL |
+| Pulmonary circulation | Open-lung PVR at FRC | 0.07 mmHg·s/mL | 0.17 mmHg·s/mL |
+| Respiratory mechanics | Recruitment-to-inflation ratio | 0.50 R/I | 0.70 R/I |
+| Respiratory mechanics | Opening pressure | 20 cmH₂O | 21 cmH₂O |
+| Pulmonary circulation | Hypoxic vasoconstriction | 1.0 × | 1.6 × |
+
+#### Acute pulmonary embolism
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Ventilatory mode | Volume control | Spontaneous |
+| Ventilation | Respiratory rate | 14 /min | 24 /min |
+| Ventilation | PEEP | 5 cmH₂O | 0 cmH₂O |
+| Ventilation | Inspiratory effort | 0.0 cmH₂O | 6.0 cmH₂O |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 1050 mL |
+| Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 1.25 mmHg·s/mL |
+| Cardiac function | Baseline heart rate | 75 /min | 118 /min |
+| Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.32 mmHg/mL |
+| Pulmonary circulation | Open-lung PVR at FRC | 0.07 mmHg·s/mL | 0.44 mmHg·s/mL |
+
+#### Cardiac tamponade
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Ventilatory mode | Volume control | Spontaneous |
+| Ventilation | Respiratory rate | 14 /min | 20 /min |
+| Ventilation | PEEP | 5 cmH₂O | 0 cmH₂O |
+| Ventilation | Inspiratory effort | 0.0 cmH₂O | 10.0 cmH₂O |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 1050 mL |
+| Cardiac function | Baseline heart rate | 75 /min | 105 /min |
+| Cardiac function | Pericardial constraint | 1.0 × | 4.0 × |
+| Cardiac function | Pericardial capacity | 430 mL | 100 mL |
+
+#### Cardiogenic pulmonary oedema
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Respiratory rate | 14 /min | 18 /min |
+| Ventilation | PEEP | 5 cmH₂O | 10 cmH₂O |
+| Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 75 mL/cmH₂O |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 1050 mL |
+| Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 1.25 mmHg·s/mL |
+| Cardiac function | Baseline heart rate | 75 /min | 95 /min |
+| Cardiac function | LV contractility (Ees) | 3.0 mmHg/mL | 0.6 mmHg/mL |
+| Cardiac function | LV diastolic stiffness | 0.028 1/mL | 0.040 1/mL |
+
+#### Stiff chest wall
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Respiratory rate | 14 /min | 16 /min |
+| Ventilation | Tidal volume | 450 mL | 500 mL |
+| Ventilation | PEEP | 5 cmH₂O | 8 cmH₂O |
+| Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 75 mL/cmH₂O |
+| Respiratory mechanics | Chest wall load | 0.0 cmH₂O | 6.0 cmH₂O |
+| Respiratory mechanics | Baseline abdominal pressure | 4 cmH₂O | 12 cmH₂O |
+
+#### COPD with dynamic hyperinflation
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Respiratory rate | 14 /min | 26 /min |
+| Ventilation | Tidal volume | 450 mL | 500 mL |
+| Ventilation | Inspiratory time | 1.20 s | 0.90 s |
+| Respiratory mechanics | Aerated-lung compliance | 200 mL/cmH₂O | 300 mL/cmH₂O |
+| Respiratory mechanics | Airway resistance | 5.0 cmH₂O/L/s | 24.0 cmH₂O/L/s |
+| Respiratory mechanics | Expiratory flow limitation | Off | On |
+
+#### Intra-abdominal hypertension
+
+| domain | control | model reference | preset value |
+|---|---|---:|---:|
+| Ventilation | Respiratory rate | 14 /min | 16 /min |
+| Ventilation | PEEP | 5 cmH₂O | 8 cmH₂O |
+| Respiratory mechanics | Chest wall load | 0.0 cmH₂O | 6.0 cmH₂O |
+| Respiratory mechanics | Baseline abdominal pressure | 4 cmH₂O | 22 cmH₂O |
+| Respiratory mechanics | Diaphragm–abdomen coupling | 4.0 cmH₂O/L | 6.0 cmH₂O/L |
+<!-- END GENERATED: scenario-overrides -->
+
+These tables describe how each starting phenotype is assembled, not what every control means or what outcome it guarantees. The control pages explain the mechanisms in more detail: [ventilation](controls-ventilation.md), [respiratory mechanics](controls-mechanics.md), [volume and vascular tone](controls-volume.md), [heart](controls-heart.md) and [pulmonary circulation](controls-pulmonary.md).
 
 Two presets have an explicit intervention contract beyond their settled snapshot. In cardiogenic pulmonary oedema, the PEEP 0-to-10 comparison requires mean output to rise, LV transmural end-systolic pressure to fall, and end-systolic volume to fall more than end-diastolic volume. In cardiac tamponade, restoring pericardial capacity must lower pericardial pressure and CVP, increase pressure and output, and restore proportionally more RV than LV end-diastolic volume. These conditions distinguish the proposed mechanisms from a plausible-looking resting state.
 

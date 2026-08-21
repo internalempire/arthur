@@ -57,7 +57,7 @@ The source table records whether each row currently agrees. Its status field is 
 
 ### Scenario contracts
 
-Every preset is tested for safety and a settled snapshot. [`SCENARIO_VALIDATION.md`](../docs/SCENARIO_VALIDATION.md) asks the more important question: does the proposed intervention actually demonstrate the claim written beside it? Presets are labelled supported, qualified or needing correction. The former weaning preset was removed because the model lacked enough of its mechanism to reproduce the intended lesson.
+Every preset is tested for safety and a settled snapshot. The parameter-difference tables in the [scenario page](scenarios.md#preset-parameter-changes) are generated directly from `defaultParams()` and `SCENARIOS`; manual validation fails if the documented tables no longer match the code. [`SCENARIO_VALIDATION.md`](../docs/SCENARIO_VALIDATION.md) asks the more important question: does the proposed intervention actually demonstrate the claim written beside it? Presets are labelled supported, qualified or needing correction. The former weaning preset was removed because the model lacked enough of its mechanism to reproduce the intended lesson.
 
 ## Calibration hierarchy
 
