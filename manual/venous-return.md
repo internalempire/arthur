@@ -57,21 +57,33 @@ Mean systemic filling pressure comes from the [stressed volume](stressed-volume.
 
 ### The two marks on the diagram
 
-The panel draws two things that are easy to conflate, and deliberately distinguishes them:
+The panel combines a measurement from the running circulation with a theoretical steady-state construction:
 
-- **the simulated point** — where the integrated model actually is: cycle-mean right atrial pressure against cycle-mean flow;
-- **the equilibrium point** — where the graphical analysis says it should be: the crossing of the two curves.
+- **the filled simulated point** plots right atrial pressure against IVC-to-right-atrial venous inflow. Both are averaged over the most recent heartbeat. Its flow coordinate is not RV output, LV output or cardiac output;
+- **the hollow equilibrium point** is the crossing of the analytic venous-return and cardiac-function curves. It predicts the local steady state that would be reached if the current conditions were held constant long enough.
 
-They are close but not identical, because the Guyton construction is a steady-state analysis being applied to a circulation that is never quite in steady state: compliant compartments are still filling and emptying within each breath. Showing only the crossing would present an idealisation as the model's answer. Both marks are shown so the size of that idealisation is visible.
+The one-heartbeat averaging window removes cardiac pulsation while deliberately preserving respiratory movement. The filled point therefore follows venous inflow through the breath; the hollow point does not claim to be a second measurement of the same instantaneous flow.
 
-Everything on the diagram is a cycle mean. An earlier version plotted instantaneous right atrial pressure against a beat-averaged output — two quantities measured over different windows — and the marker skidded across a third of the axis at heart rate while barely moving vertically.
+At steady state, mean venous return and cardiac output must be equal. Within a breath they may differ because the right heart can temporarily store blood:
+
+$$
+\frac{dV_{right}}{dt} = \dot{Q}_{vr} - \dot{Q}_{rv}
+$$
+
+- $V_{right}$ — blood contained in the right atrium and ventricle, mL
+- $\dot{Q}_{vr}$ — venous inflow entering the right heart, mL/s
+- $\dot{Q}_{rv}$ — flow ejected by the RV, mL/s
+
+If venous inflow rises before the RV can eject it, right-heart volume increases temporarily. If inflow later falls below RV output, that stored volume is released. The pulmonary circulation adds a second store between RV output and LV inflow. The diagram shows venous inflow but does not display actual RV output as a separate point, so the distance between the filled and hollow points is not a direct measure of either store.
+
+This distinction is especially important in pulmonary embolism. A spontaneous inspiration can increase venous return immediately, while a pressure-loaded RV and the pulmonary circulation transmit a much smaller or delayed change to LV output. A broad filled-point path can therefore be physiologically coherent. A persistent mean separation can also expose the limits of the simplified analytic cardiac curve under severe RV pressure loading; it must not automatically be interpreted as physiology.
 
 ### What the model shows
 
 A passive patient at 500 mL, 14 breaths per minute:
 
 <!-- BEGIN GENERATED: venous-return-peep -->
-*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure is the respiratory-cycle mean used by the Guyton construction.*
+*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. The displayed right atrial pressure is averaged over one cardiac cycle, as in the moving Guyton point; this suppresses cardiac pulsation but preserves respiratory movement.*
 
 | PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |
 |---:|---:|---:|---:|
@@ -88,7 +100,7 @@ Mean systemic filling pressure *rises* with PEEP — the abdominal contribution 
 
 ## Why this and not something else
 
-The model integrates a closed loop and *derives* the Guyton diagram from it, rather than using the diagram as the model. A pure Guyton model — two straight lines and their intersection — is a fine teaching device but cannot show the breath-by-breath behaviour, cannot produce a pulse pressure, and cannot be wrong in an interesting way. Here the curves are constructed from the same state variables the integrator advances, so a discrepancy between the crossing and the simulated point is information rather than an error.
+The model integrates a closed loop and *derives* the Guyton diagram from it, rather than using the diagram as the model. A pure Guyton model — two straight lines and their intersection — is a useful teaching device but cannot show breath-by-breath behaviour or temporary blood storage. Here, separating the measured point from the calculated crossing makes both the dynamic physiology and the approximation visible. A small separation may reflect a circulation in motion; a large or persistent separation may also reveal that the local analytic cardiac curve is inadequate for the current state.
 
 Venous return uses a soft collapse law rather than a hard `max()`, for reasons given under [vascular waterfalls](vascular-waterfalls.md).
 
@@ -103,7 +115,9 @@ The resistance to venous return is a single control. Splitting it into the sever
 - **One venous reservoir.** No splanchnic, cutaneous or muscular capacitance beds, and therefore no redistribution between fast and slow compartments. A fluid bolus arrives instantaneously in one place.
 - **No stress relaxation, no transcapillary escape, no distribution kinetics.** Volume added stays where it is put.
 - **The resistance to venous return is a constant** apart from the abdominal term. It does not vary with flow, tone or vessel calibre.
-- **The Guyton diagram is a steady-state construction** applied to a non-steady state. The gap between the two marks is the size of that assumption, and it grows with the size of the respiratory swing.
+- **The Guyton diagram is a steady-state construction** applied to a non-steady state. Respiratory variation and temporary blood storage can separate the filled point from the crossing.
+- **The analytic cardiac-function curve is deliberately simplified.** It does not reproduce every consequence of RV dilation, ventricular interdependence, pulmonary transit or volume history. In severe RV pressure loading, including pulmonary embolism, a persistent gap may be a construction error as well as a dynamic physiological signal.
+- **The filled point is venous inflow, not cardiac output.** Its height must not be read as simultaneous RV or LV forward flow.
 - Mean systemic filling pressure here is computed from the model's own state. It is an internal quantity, not the thing an occlusion manoeuvre measures — see [Pmsf and occlusions](pmsf-and-occlusions.md).
 
 ### Of clinical application

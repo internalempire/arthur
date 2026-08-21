@@ -260,3 +260,25 @@ section('The README remains a complete project overview');
       && !readme.includes('BEGIN GENERATED: readme-stress-index')
       && !readme.includes('stretch      = exp('));
 }
+
+section('The Guyton points remain explicitly distinguished');
+{
+  const panel = readFileSync(new URL('../../manual/panel-guyton.md', import.meta.url), 'utf8');
+  const venousReturn = readFileSync(new URL('../../manual/venous-return.md', import.meta.url), 'utf8');
+  const examples = readFileSync(new URL('../../manual/model-examples.mjs', import.meta.url), 'utf8');
+
+  check('the filled point is identified as venous inflow rather than cardiac output',
+    panel.includes('venous inflow from the inferior vena cava into the right atrium')
+      && panel.includes('It is **not** RV output, LV output or cardiac output'));
+  check('the averaging window is one heartbeat and preserves respiratory motion',
+    panel.includes('Using one cardiac cycle')
+      && panel.includes('without averaging away the respiratory change'));
+  check('temporary right-heart storage is explained',
+    venousReturn.includes('dV_{right}')
+      && venousReturn.includes('temporarily store blood'));
+  check('high RV afterload is documented as an analytic limitation',
+    venousReturn.includes('severe RV pressure loading')
+      && venousReturn.includes('construction error as well as a dynamic physiological signal'));
+  check('generated examples do not call a cardiac-cycle mean a respiratory-cycle mean',
+    !examples.includes('respiratory-cycle mean used by the Guyton construction'));
+}

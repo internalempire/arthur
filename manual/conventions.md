@@ -46,7 +46,7 @@ Flow is positive in the forward physiological direction. Lung volume in the wave
 
 ## Time conventions
 
-Waveforms show the most recent 12 seconds. Numerical haemodynamic values are generally beat or cycle measurements smoothed for readability; the instantaneous drawing may therefore lead or lag a tile slightly. The Guyton filled point is a cycle-mean simulated state, whereas its hollow point is an analytic steady-state crossing.
+Waveforms show the most recent 12 seconds. Numerical haemodynamic values are generally beat or cycle measurements smoothed for readability; the instantaneous drawing may therefore lead or lag a tile slightly. The Guyton filled point uses one-cardiac-cycle means of right atrial pressure and IVC-to-right-atrial venous inflow; it is not a cardiac-output measurement. Its hollow point is an analytic steady-state crossing.
 
 Simulation speed changes wall-clock playback only. Pause freezes state; it is not an occlusion. Respiratory holds are model manoeuvres and continue according to simulated time.
 

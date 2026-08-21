@@ -157,7 +157,7 @@ function transmuralBlock(rows) {
 
 function venousReturnBlock(rows) {
   return [
-    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure is the respiratory-cycle mean used by the Guyton construction.*',
+    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. The displayed right atrial pressure is averaged over one cardiac cycle, as in the moving Guyton point; this suppresses cardiac pulsation but preserves respiratory movement.*',
     '',
     '| PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |',
     '|---:|---:|---:|---:|',
