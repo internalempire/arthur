@@ -1,6 +1,6 @@
 # The Guyton diagram
 
-> The Guyton panel places venous return and cardiac function on the same right-atrial-pressure axis, while keeping the simulated operating point separate from the analytic crossing.
+> The Guyton panel combines a theoretical steady-state construction with the circulation that is actually being simulated. The two points answer different questions and should not be read as duplicate measurements of cardiac output.
 
 ---
 
@@ -14,9 +14,32 @@ At sufficiently low right atrial pressure, venous return no longer rises linearl
 
 Right atrial pressure is on the horizontal axis and flow on the vertical axis. The venous-return curve slopes downward; the cardiac-function curve slopes upward. The highlighted part of the cardiac curve marks where more filling meaningfully raises output.
 
-The filled point labelled *simulated* is the circulation's cycle-mean right atrial pressure and flow. The hollow point is the intersection calculated from the two analytic curves. They are expected to be close but not identical because the integrated circulation is pulsatile and nonlinear.
+The graph superimposes two different layers:
 
-The vertical Ppl marker shows where surrounding thoracic pressure anchors the cardiac-function relation. The faint trail is the path walked by the simulated operating point over recent breaths.
+- **the filled simulated point** is a measurement from the running model. Its horizontal coordinate is right atrial pressure averaged over the most recent heartbeat. Its vertical coordinate is venous inflow from the inferior vena cava into the right atrium, averaged over the same heartbeat. It is **not** RV output, LV output or cardiac output;
+- **the hollow analytic point** is the crossing predicted by the venous-return and cardiac-function curves under the current conditions. It asks where flow would settle if those conditions were held long enough for venous return and forward cardiac output to become equal.
+
+Using one cardiac cycle suppresses the rapid cardiac pulsation without averaging away the respiratory change. The filled point can therefore move around the graph during a breath. The faint trail shows that recent venous-inflow path over approximately 12 seconds; it is not a cardiac-output loop.
+
+At sustained steady state, venous return, RV output and LV output have the same mean value. They need not be equal at every moment within a breath. The right heart can temporarily store blood:
+
+$$
+\frac{dV_{right}}{dt} = \dot{Q}_{vr} - \dot{Q}_{rv}
+$$
+
+- $V_{right}$ — blood contained in the right atrium and ventricle, mL
+- $\dot{Q}_{vr}$ — venous inflow entering the right heart, mL/s
+- $\dot{Q}_{rv}$ — flow ejected by the RV into the pulmonary circulation, mL/s
+
+When inflow exceeds RV output, the right heart fills; when RV output exceeds inflow, it empties blood stored earlier in the breath. The pulmonary circulation can likewise store blood when RV output and LV inflow differ. The panel plots only the first inflow in this serial pathway and does not separately plot actual RV output, so the vertical distance between the two displayed points must not be used as a direct measure of blood storage.
+
+The vertical Ppl marker shows where surrounding thoracic pressure anchors the cardiac-function relation.
+
+### Why the points can separate in pulmonary embolism
+
+During spontaneous inspiration, falling pleural pressure can lower right atrial pressure and transiently accelerate venous return. In pulmonary embolism, the pressure-loaded RV cannot necessarily pass that extra inflow into the pulmonary circulation within the same heartbeat. The filled point can therefore travel through a broad respiratory path while actual RV and LV output vary less.
+
+A persistent separation from the hollow point has a second meaning: the analytic cardiac-function curve is only a local, single-beat approximation. It is most reliable near ordinary loading conditions and less faithful when the RV is markedly dilated or faces high afterload. The distance between the points is therefore partly a visible consequence of non-steady flow and partly a limit of the analytic construction. It is not, by itself, a physiological measurement or a severity index.
 
 ## Occlusion points
 
@@ -24,13 +47,15 @@ End-expiratory and end-inspiratory holds add square measured points: mean right 
 
 ## In the model
 
-All coordinates on this panel use cycle means. The cardiac-function curve is a single-beat approximation around the current model state, while the filled operating point comes from numerical integration. The venous-return curve includes stressed volume, venous compliance, abdominal pressure, resistance to return and the caval waterfall.
+The filled point uses numerical integration and a rolling window of one cardiac cycle for both coordinates. The analytic cardiac-function curve is a single-beat approximation around the current state. The analytic venous-return curve includes stressed volume, venous compliance, abdominal pressure, resistance to return and the caval waterfall.
 
 ## Limits
 
 - The curves describe one aggregate systemic venous return pathway; SVC and IVC are not separated.
 - Pmsf is exactly accessible as an internal model variable but not directly measurable in vivo.
-- The cardiac-function curve compresses biventricular and pulmonary-transit behaviour into a local construction.
+- The cardiac-function curve compresses biventricular interaction, pulmonary transit and volume history into a local construction. Its crossing can materially underestimate the simulated forward flow in severe RV pressure loading.
+- The simulated point reports IVC-to-right-atrial inflow, not SVC flow or cardiac output.
+- Point separation cannot be assigned entirely to physiology: part may come from the analytic approximation itself.
 - A steep highlighted limb is an internal preload-reserve coefficient, not a validated fluid-responsiveness test.
 - Occlusion points are idealised and do not include changes in vascular tone, stress relaxation or clinical measurement error.
 
