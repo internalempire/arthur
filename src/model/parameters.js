@@ -237,7 +237,7 @@ export const PARAMETERS = [
   {
     id: 'piston', group: 'pulmonary', label: 'Pulmonary capacitance coupling', unit: 'mL/L',
     min: 0, max: 200, step: 5, default: 85,
-    help: 'Lung inflation squeezes blood out of the pulmonary vessels toward the left atrium — the "piston" that drives most of the stroke volume variation seen during mechanical ventilation.',
+    help: 'Sets how strongly lung inflation transiently displaces blood from the pulmonary vascular reservoir toward the left atrium. This "piston" is one immediate contributor to LV filling and stroke-volume variation; changes in RV preload and afterload, reaching the left heart after pulmonary transit, may dominate in other phenotypes.',
   },
 ];
 
