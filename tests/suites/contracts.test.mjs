@@ -128,6 +128,24 @@ section('PPV remains descriptive rather than a filling-state verdict');
       && figures.includes("'ppv-filling.svg': ppvFillingFigure()"));
 }
 
+section('Tamponade IVC remains plethoric without being drawn as immobile');
+{
+  const ivcPage = readFileSync(new URL('../../manual/inferior-vena-cava.md', import.meta.url), 'utf8');
+  const thoraxPage = readFileSync(new URL('../../manual/panel-thorax.md', import.meta.url), 'utf8');
+  const validation = readFileSync(new URL('../../docs/SCENARIO_VALIDATION.md', import.meta.url), 'utf8');
+  check('the manual describes blunted rather than universally absent excursion',
+    ivcPage.includes('does not require the diameter to be completely motionless')
+      && ivcPage.includes('small respiratory excursion')
+      && !ivcPage.includes('dilated and fixed')
+      && !thoraxPage.includes('dilated and fixed'));
+  check('the IVC comparison is generated from the current model',
+    ivcPage.includes('BEGIN GENERATED: ivc-respiratory-calibre')
+      && ivcPage.includes('END GENERATED: ivc-respiratory-calibre'));
+  check('scenario validation distinguishes the schematic from ultrasound',
+    validation.includes('directional volume-based schematic')
+      && validation.includes('non-zero displayed respiratory excursion'));
+}
+
 section('The drawn curves agree with the integrator');
 for (const sc of SCENARIOS) {
   const s = new Simulator();

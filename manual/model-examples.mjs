@@ -11,15 +11,20 @@ import {
   lungVolumeAtPl, staticEndExpiratoryVolume, relaxationVolume,
   chestWallPressure, transpulmonaryAt,
 } from '../src/model/lung.js';
+import { ivcDisplayWidth } from '../src/ui/panels/thorax.js';
 
 const SETTLING_SECONDS = 45;
 
-function settled(overrides) {
+function settledSimulator(overrides) {
   const simulator = new Simulator();
   simulator.params = { ...defaultParams(), ...overrides };
   simulator.reset();
   simulator.advance(SETTLING_SECONDS, true);
-  return simulator.metrics;
+  return simulator;
+}
+
+function settled(overrides) {
+  return settledSimulator(overrides).metrics;
 }
 
 export const EFL_EXAMPLE = {
@@ -84,6 +89,7 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/pressure-volume-curve.md', ids: ['pv-tissue', 'pv-eelv', 'lung-wall-equilibrium'] },
   { file: 'manual/pulmonary-transit.md', ids: ['pulmonary-transit'] },
   { file: 'manual/cardiac-tamponade.md', ids: ['cardiac-tamponade'] },
+  { file: 'manual/inferior-vena-cava.md', ids: ['ivc-respiratory-calibre'] },
 ];
 
 const fixed = (value, digits) => value.toFixed(digits);
@@ -277,6 +283,58 @@ function cardiacTamponadeBlock() {
   ].join('\n');
 }
 
+function ivcRespiratoryProfile(overrides) {
+  const simulator = settledSimulator(overrides);
+  const bins = Array.from({ length: 60 }, () => ({ volume: 0, n: 0 }));
+  const period = 60 / simulator.params.rr;
+
+  // Phase-bin many ordinary breaths so cardiac pulsation does not masquerade
+  // as respiratory calibre change. This is the same spontaneous effort selected
+  // by each preset, not a deep-inspiration or sniff manoeuvre.
+  for (let i = 0; i < 3000; i++) {
+    simulator.advance(0.01, true);
+    const phase = (simulator.resp.tCycle % period) / period;
+    const bin = bins[Math.min(bins.length - 1, Math.floor(phase * bins.length))];
+    bin.volume += simulator.circ.vIVC;
+    bin.n++;
+  }
+
+  const volumes = bins.filter(({ n }) => n > 0).map(({ volume, n }) => volume / n);
+  const minimum = Math.min(...volumes);
+  const maximum = Math.max(...volumes);
+  const mean = volumes.reduce((sum, value) => sum + value, 0) / volumes.length;
+  const minimumWidth = ivcDisplayWidth(minimum);
+  const maximumWidth = ivcDisplayWidth(maximum);
+  return {
+    mean,
+    volumeSwing: ((maximum - minimum) / mean) * 100,
+    displayedCalibreChange: ((maximumWidth - minimumWidth) / maximumWidth) * 100,
+  };
+}
+
+function ivcRespiratoryBlock() {
+  const healthy = SCENARIOS.find(({ id }) => id === 'healthy-spont');
+  const tamponade = SCENARIOS.find(({ id }) => id === 'cardiac-tamponade');
+  const states = [
+    ['healthy spontaneous preset', healthy.params],
+    ['cardiac-tamponade preset', tamponade.params],
+    ['same tamponade state, capacity restored', {
+      ...tamponade.params, pericardialCapacity: 430,
+    }],
+  ].map(([label, parameters]) => ({
+    label,
+    profile: ivcRespiratoryProfile(parameters),
+  }));
+
+  return [
+    '*Executable setup: each preset is settled for 45 s, then IVC volume is averaged by respiratory phase over 30 s. These are ordinary model breaths, not a deep-inspiration or sniff test.*',
+    '',
+    '| state | mean IVC volume (mL) | respiratory volume swing (% of mean) | change in displayed calibre (%) |',
+    '|---|---:|---:|---:|',
+    ...states.map(({ label, profile }) => `| ${label} | ${Math.round(profile.mean)} | ${fixed(profile.volumeSwing, 1)} | ${fixed(profile.displayedCalibreChange, 1)} |`),
+  ].join('\n');
+}
+
 export function renderDocumentedExampleBlocks() {
   const rows = stressRows();
   const peepRows = peepSweepRows();
@@ -290,5 +348,6 @@ export function renderDocumentedExampleBlocks() {
     ['lung-wall-equilibrium', lungWallEquilibriumBlock()],
     ['pulmonary-transit', pulmonaryTransitBlock()],
     ['cardiac-tamponade', cardiacTamponadeBlock()],
+    ['ivc-respiratory-calibre', ivcRespiratoryBlock()],
   ]);
 }

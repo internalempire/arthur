@@ -227,8 +227,11 @@ claim a calibrated clinical pulsus-paradoxus threshold; PPV remains unavailable
 during spontaneous breathing.
 
 **Not represented.** Effusion accumulation and drainage, loculation,
-right-sided chamber-wall collapse, IVC plethora, Doppler respiratory variation,
-electrical alternans, coronary perfusion and constrictive physiology.
+right-sided chamber-wall collapse, echocardiographically calibrated IVC diameter
+or Doppler respiratory variation, electrical alternans, coronary perfusion and
+constrictive physiology. The aggregate IVC compartment does reproduce a dilated
+conduit with a smaller but non-zero displayed respiratory excursion; this is a
+directional volume-based schematic rather than a diagnostic ultrasound sign.
 
 ## Cardiogenic pulmonary oedema (`lv-failure`)
 

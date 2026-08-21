@@ -77,7 +77,7 @@ The scenario is also not forced to meet a numerical diagnostic threshold. It mus
 - **Pulsus paradoxus is not quantitatively calibrated.** Respiratory arterial variation increases in the constrained state, but the preset is not required to cross the clinical 10 mmHg threshold. The existing PPV tile is unavailable during spontaneous breathing and must not be repurposed as a pulsus-paradoxus measurement.
 - There is no pericardial fluid compartment, accumulation rate, drainage flow or loculated effusion. Capacity is an aggregate surrogate, not an echocardiographic volume.
 - There is no right-atrial or right-ventricular wall collapse represented geometrically. The thorax panel shows pressure and chamber volume, not diagnostic echocardiographic signs.
-- The inferior vena cava is modelled as a compliant compartment whose volume reflects fullness; see [inferior vena cava](inferior-vena-cava.md). The visual diameter in the thorax panel is a model state, not an ultrasound collapsibility measurement.
+- The inferior vena cava is modelled as a compliant compartment whose volume remains high but still varies modestly through the breath; see [inferior vena cava](inferior-vena-cava.md). The thorax panel preserves this blunted excursion, but its displayed calibre is not an ultrasound collapsibility measurement.
 - Coronary perfusion, myocardial ischaemia and the effect of falling arterial pressure on RV performance are absent.
 - The model does not represent low-pressure tamponade, regional postoperative tamponade, severe pulmonary hypertension masking right-sided collapse, constrictive or effusive–constrictive pericarditis.
 - Autonomic compensation senses filtered systemic MAP only. It does not respond directly to pericardial pressure, chamber stretch or venous congestion.
@@ -90,6 +90,7 @@ The preset can therefore teach why a shared external pressure restricts filling 
 - Reddy PS, Curtiss EI, Uretsky BF. Spectrum of hemodynamic changes in cardiac tamponade. *Am J Cardiol*. 1990;66:1487–1491.
 - Reddy PS, Curtiss EI, O'Toole JD, et al. Cardiac tamponade: hemodynamic observations in man. *Circulation*. 1978;58:265–272. [PubMed](https://pubmed.ncbi.nlm.nih.gov/668074/)
 - Appleton CP, Hatle LK, Popp RL. Cardiac tamponade and pericardial effusion: respiratory variation in transvalvular flow velocities studied by Doppler echocardiography. *J Am Coll Cardiol*. 1988;11:1020–1030.
+- Himelman RB, Kircher B, Rockey DC, Schiller NB. Inferior vena cava plethora with blunted respiratory response: a sensitive echocardiographic sign of cardiac tamponade. *J Am Coll Cardiol*. 1988;12:1470–1477. [doi:10.1016/S0735-1097(88)80011-1](https://doi.org/10.1016/S0735-1097(88)80011-1)
 - Hamzaoui O, Monnet X, Teboul JL. Pulsus paradoxus. *Eur Respir J*. 2013;42:1696–1705. [doi:10.1183/09031936.00138912](https://doi.org/10.1183/09031936.00138912)
 - Tyberg JV, Misbach GA, Glantz SA, Moores WY, Parmley WW. A mechanism for shifts in the diastolic left ventricular pressure–volume curve: the role of the pericardium. *Eur J Cardiol*. 1978;7 Suppl:163–175. [PubMed](https://pubmed.ncbi.nlm.nih.gov/668760/)
 
