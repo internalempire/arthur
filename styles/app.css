@@ -64,11 +64,18 @@ body {
 
 .brand-link {
   display: inline-grid;
+  width: 34px;
   height: 34px;
-  padding: 0;
   place-items: center;
   color: var(--ink);
   text-decoration: none;
+}
+
+.brand-link:hover { opacity: 0.72; }
+
+.brand-link:focus-visible {
+  outline: 2px solid var(--venous);
+  outline-offset: 2px;
 }
 
 .brand-link-icon {
