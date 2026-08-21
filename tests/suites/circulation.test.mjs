@@ -164,17 +164,24 @@ section('Cyclic right ventricular afterload');
     stiff.rvLvRatio < 1.2, `RV:LV ${stiff.rvLvRatio.toFixed(2)}`);
 }
 
-section('Variation at the filled end of the range');
+section('Variation is non-monotone across the filling range');
 {
   // Averaged over a minute: variation is computed from the beats in one
   // respiratory cycle, so at four or five beats per breath a single reading
   // moves by more than a point depending on which beats land where.
   const meanPpv = (over, seconds = 60) => {
-    const s = settled({ mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150, ...over }, 45);
+    const s = settled({ mode: 'vcv', pmus: 0, vt: 560, peep: 5, rr: 14, ...over }, 45);
     let sum = 0, n = 0;
     for (let i = 0; i < seconds / 0.05; i++) { s.advance(0.05, true); sum += s.variation().ppv; n++; }
     return sum / n;
   };
+
+  const dry = meanPpv({ stressedVolume: 300 });
+  const intermediate = meanPpv({ stressedVolume: 700 });
+  const drySim = settled({ mode: 'vcv', pmus: 0, vt: 560, peep: 5, rr: 14, stressedVolume: 300 }, 45);
+  check('severe underfilling can show low PPV despite marked preload reserve',
+    dry < intermediate - 1 && drySim.metrics.preload.steep,
+    `${dry.toFixed(1)}% PPV with ${(drySim.metrics.preload.relative * 100).toFixed(1)}%/mmHg reserve`);
 
   const trough = meanPpv({ stressedVolume: 900 });
   const filled = meanPpv({ stressedVolume: 1400 });
@@ -191,7 +198,7 @@ section('Variation at the filled end of the range');
   // The payoff of having both: the reserve reads the curve rather than the
   // waveform, so it is not fooled by the mechanism that produces this variation.
   {
-    const filledSim = settled({ mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150, stressedVolume: 1400 }, 45);
+    const filledSim = settled({ mode: 'vcv', pmus: 0, vt: 560, peep: 5, rr: 14, stressedVolume: 1400 }, 45);
     check('the preload reserve is not fooled by the lung-driven variation',
       !filledSim.metrics.preload.steep,
       `variation ${filledSim.metrics.ppv.toFixed(1)}% but reserve `
@@ -200,6 +207,6 @@ section('Variation at the filled end of the range');
 
   // The mechanism needs open capillaries, which is why it only shows up here.
   check('it appears only where zone III is everywhere',
-    settled({ mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150, stressedVolume: 1400 }, 45).metrics.zone3 > 0.9
-      && settled({ mode: 'vcv', pmus: 0, vt: 420, peep: 8, rr: 18, ccw: 150, stressedVolume: 500 }, 45).metrics.zone3 < 0.3);
+    settled({ mode: 'vcv', pmus: 0, vt: 560, peep: 5, rr: 14, stressedVolume: 1400 }, 45).metrics.zone3 > 0.9
+      && settled({ mode: 'vcv', pmus: 0, vt: 560, peep: 5, rr: 14, stressedVolume: 500 }, 45).metrics.zone3 < 0.3);
 }

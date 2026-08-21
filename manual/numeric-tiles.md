@@ -173,7 +173,7 @@ Related page: [Stress index](stress-index.md)
 
 ### Pulse pressure variation
 
-PPV and SVV compare extrema over recent complete respiratory cycles. The model deliberately does not colour them with a fluid-responsiveness cutoff. Spontaneous effort makes the tile unavailable; low tidal volume, too few beats per breath, RV dilatation or high abdominal pressure add caution because they weaken or confound the usual mechanism.
+PPV and SVV compare extrema over recent complete respiratory cycles. The tile explicitly labels them as descriptive rather than a verdict on filling state, and the model deliberately does not colour them with a fluid-responsiveness cutoff. In particular, a low PPV can coexist with substantial [preload reserve](preload-reserve.md) when severe underfilling weakens transmission through the pulmonary circulation. Spontaneous effort makes the tile unavailable; low tidal volume, too few beats per breath, RV dilatation or high abdominal pressure add caution because they weaken or confound the usual mechanism.
 
 Related page: [Pulse pressure variation](pulse-pressure-variation.md)
 
