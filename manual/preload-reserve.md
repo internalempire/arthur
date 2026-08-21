@@ -46,6 +46,22 @@ The exact gains are properties of these model states. The point is the separatio
 
 Unlike PPV, preload reserve remains available during spontaneous breathing and low tidal volume because it is not read from a respiratory waveform. It can still become unavailable if the two analytical curves have no finite crossing.
 
+### What changes it — and what it changes
+
+Preload reserve is a **readout**, not a treatment and not a hidden control. It describes the current circulation; the number is never fed back into the simulation and therefore changes nothing by itself.
+
+The reserve is largest when the heart can convert a small rise in filling pressure into substantially more forward flow. In the model it therefore depends mainly on:
+
+- **current filling:** stressed volume and venous tone help determine where the circulation sits on its cardiac-function curve;
+- **the route back to the heart:** resistance to venous return, venous collapse and the pressures surrounding the great veins determine how readily extra upstream pressure becomes extra flow;
+- **the heart's ability to accept and eject that flow:** ventricular contractility, diastolic stiffness, pericardial constraint and ventricular interdependence shape the cardiac-function curve;
+- **right-ventricular afterload:** pulmonary vascular load and lung inflation can flatten the useful response to additional filling;
+- **the current output:** the displayed percentage is normalised to present flow, so the same absolute gain represents a larger percentage when starting output is low.
+
+Venous compliance deserves a separate sentence. It determines how much a given volume of fluid raises filling pressure, but preload reserve is expressed **per mmHg**, not per millilitre. The readout therefore answers, “what would one more mmHg buy?” It does not predict how many millilitres are needed to create that pressure change.
+
+The value can influence only the clinician's interpretation of the model: a high reserve identifies a steep simulated operating point, while a low reserve identifies a plateau. It does not establish hypovolaemia, tissue hypoperfusion or an indication for fluid.
+
 ---
 
 ## Why this and not something else

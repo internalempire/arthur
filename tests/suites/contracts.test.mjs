@@ -112,6 +112,22 @@ section('Pulmonary vascular claims exposed to the user stay qualified');
       && waterfall.interpretability.pvrDerived.reasons[0].includes('wedge surrogate'));
 }
 
+section('PPV remains descriptive rather than a filling-state verdict');
+{
+  const stats = readFileSync(new URL('../../src/ui/stats.js', import.meta.url), 'utf8');
+  const page = readFileSync(new URL('../../manual/pulse-pressure-variation.md', import.meta.url), 'utf8');
+  const figures = readFileSync(new URL('../../manual/figure/generate.mjs', import.meta.url), 'utf8');
+  check('the numerical tile disclaims a filling-state interpretation',
+    stats.includes('descriptive only · not a filling-state verdict'));
+  check('the manual exposes both non-monotonic filling extremes',
+    page.includes('severe underfilling')
+      && page.includes('quantitative limitation of the model')
+      && page.includes('neither a low nor a high model PPV identifies filling state'));
+  check('the filling comparison is generated from the model rather than drawn by hand',
+    page.includes('figure/ppv-filling.svg')
+      && figures.includes("'ppv-filling.svg': ppvFillingFigure()"));
+}
+
 section('The drawn curves agree with the integrator');
 for (const sc of SCENARIOS) {
   const s = new Simulator();

@@ -271,22 +271,21 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 - **No gas exchange.** There is no oxygen, CO₂, pH or shunt. Hypoxic pulmonary
   vasoconstriction is a coefficient on derecruited lung, not a consequence of an
   alveolar oxygen tension.
-- **Pulse pressure variation has a weak filled-end rise.** The model no longer
-  claims a monotonic separation between a fluid responder and non-responder:
-  pulmonary transit changes the amplitude and phase, while the direct pulmonary
-  venous piston can raise variation again at high filling.
+- **Pulse pressure variation is non-monotonic at both filling extremes.** The
+  model no longer claims a monotonic separation between a fluid responder and
+  non-responder. At severe underfilling, absent zone-III piston contribution and
+  stronger low-flow pulmonary filtering can produce a small arterial variation
+  despite marked preload reserve. This is documented as a quantitative model
+  limitation, not a human hypovolaemia rule. At high filling, the direct
+  pulmonary venous piston can raise variation again even when additional filling
+  buys little output.
 
-  There is one, and it has a mechanism. Above about 900 mL of stressed volume the
-  West zone III fraction reaches 96–100%, and with the capillaries open along
-  their whole length the lung can squeeze blood forward into the left atrium with
-  each breath — the `piston` term. Variation then rises again, from 2.3% at 900 mL
-  to 3.0% at 1400 mL, in patients who gain little from a bolus. Setting `piston`
-  to zero collapses it to 0.7%, which is how the mechanism was identified. This is
-  the direct-filling component of the classical Δup, and it appears exactly where
-  it should: only when the patient is full enough for zone III to be everywhere.
+  The filled-end rise has a represented mechanism. Once the capillaries are open
+  along their whole length, lung inflation can squeeze blood forward into the
+  left atrium with each breath — the `piston` term. Removing that term suppresses
+  the rise. This is the direct-filling component of the classical Δup.
 
-  It is a weak false positive — 3.0% would not mislead anyone, where the real
-  thing reaches double figures. And the other classical sources are still absent:
+  The other classical sources are still absent:
   irregular, variable-depth efforts and arrhythmia, neither of which this model
   has, since effort is a reproducible half-sine and the rhythm is metronomic.
 

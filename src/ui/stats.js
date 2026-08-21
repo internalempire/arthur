@@ -71,7 +71,7 @@ const TILES = [
   {
     id: 'ppv', label: 'Pulse pressure var.', unit: '%', kind: 'derived',
     get: (m) => m.ppv.toFixed(0),
-    sub: (m) => `SVV ${m.svv.toFixed(0)}%`,
+    sub: (m) => `SVV ${m.svv.toFixed(0)}% · descriptive only · not a filling-state verdict`,
     quality: (m) => m.interpretability.ppv,
     // Intentionally no diagnostic colour threshold: the model demonstrates how
     // ventilation changes PPV, but is not calibrated to turn it into a fluid-

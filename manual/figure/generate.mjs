@@ -506,6 +506,106 @@ function ppvFigure() {
   });
 }
 
+// --- PPV versus filling, beside preload reserve ---------------------------
+
+function ppvFillingFigure() {
+  // Use a passive, regular breath with a tidal volume large enough to avoid the
+  // app's low-VT caution. Each PPV point is averaged over multiple respiratory
+  // cycles; a single one-cycle value moves with beat/breath alignment.
+  const volumes = [250, 300, 350, 400, 450, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400];
+  const samples = volumes.map((stressedVolume) => {
+    const sim = settled({
+      mode: 'vcv', pmus: 0, vt: 560, peep: 5, rr: 14,
+      stressedVolume, baroreflexEnabled: false,
+    }, 45);
+    let ppv = 0;
+    const n = 120;
+    for (let i = 0; i < n; i++) {
+      sim.advance(0.25, true);
+      ppv += sim.variation().ppv;
+    }
+    return {
+      stressedVolume,
+      ppv: ppv / n,
+      reserve: sim.metrics.preload ? sim.metrics.preload.relative * 100 : 0,
+    };
+  });
+
+  const FW = 760;
+  const FH = 520;
+  const left = 72;
+  const right = 180;
+  const top = 44;
+  const bottom = 54;
+  const gap = 58;
+  const width = FW - left - right;
+  const panelH = (FH - top - bottom - gap) / 2;
+  const lowerTop = top + panelH + gap;
+  const xLo = volumes[0];
+  const xHi = volumes[volumes.length - 1];
+  const ppvHi = Math.max(4, Math.ceil(Math.max(...samples.map((s) => s.ppv)) / 2) * 2);
+  const reserveHi = Math.max(10, Math.ceil(Math.max(...samples.map((s) => s.reserve)) / 5) * 5);
+  const x = (v) => left + ((v - xLo) / (xHi - xLo)) * width;
+  const yPpv = (v) => top + panelH - (v / ppvHi) * panelH;
+  const yReserve = (v) => lowerTop + panelH - (v / reserveHi) * panelH;
+  const path = (key, y) => samples.map((s, i) =>
+    `${i ? 'L' : 'M'}${x(s.stressedVolume).toFixed(1)} ${y(s[key]).toFixed(1)}`).join(' ');
+
+  const grid = [];
+  for (let v = 0; v <= ppvHi; v += 2) {
+    grid.push(`<line class="grid" x1="${left}" y1="${yPpv(v).toFixed(1)}" x2="${left + width}" y2="${yPpv(v).toFixed(1)}"/>`
+      + `<text class="tick" x="${left - 9}" y="${(yPpv(v) + 4).toFixed(1)}" text-anchor="end">${v}</text>`);
+  }
+  for (let v = 0; v <= reserveHi; v += 5) {
+    grid.push(`<line class="grid" x1="${left}" y1="${yReserve(v).toFixed(1)}" x2="${left + width}" y2="${yReserve(v).toFixed(1)}"/>`
+      + `<text class="tick" x="${left - 9}" y="${(yReserve(v) + 4).toFixed(1)}" text-anchor="end">${v}</text>`);
+  }
+  for (let v = 300; v <= 1400; v += 200) {
+    grid.push(`<text class="tick" x="${x(v).toFixed(1)}" y="${lowerTop + panelH + 19}" text-anchor="middle">${v}</text>`);
+  }
+
+  const dry = samples.find((s) => s.stressedVolume === 300);
+  const full = samples.find((s) => s.stressedVolume === 1400);
+  const marker = (sample, y, colour) =>
+    `<circle cx="${x(sample.stressedVolume).toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" style="fill:${colour};stroke:none"/>`;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${FW} ${FH}" class="${ROOT}" role="img"
+  aria-label="Two aligned model plots against selected stressed volume. Pulse pressure variation is low at severe underfilling, rises and falls through intermediate filling, and rises again at high filling. Preload reserve falls steadily as filling increases, showing that low pulse pressure variation does not identify a full circulation.">
+<style>${STYLE}</style>
+<rect class="bg" width="${FW}" height="${FH}"/>
+<text class="title" x="${left}" y="18">PPV does not identify filling state in the model</text>
+${grid.join('\n')}
+<line class="axis" x1="${left}" y1="${top}" x2="${left}" y2="${top + panelH}"/>
+<line class="axis" x1="${left}" y1="${top + panelH}" x2="${left + width}" y2="${top + panelH}"/>
+<line class="axis" x1="${left}" y1="${lowerTop}" x2="${left}" y2="${lowerTop + panelH}"/>
+<line class="axis" x1="${left}" y1="${lowerTop + panelH}" x2="${left + width}" y2="${lowerTop + panelH}"/>
+<path class="total" d="${path('ppv', yPpv)}"/>
+<path class="extra" style="stroke-dasharray:none;stroke-width:2.5" d="${path('reserve', yReserve)}"/>
+${marker(dry, yPpv(dry.ppv), 'var(--fig-total, #1f6feb)')}
+${marker(dry, yReserve(dry.reserve), 'var(--fig-extra, #2a9d8f)')}
+${marker(full, yPpv(full.ppv), 'var(--fig-total, #1f6feb)')}
+${marker(full, yReserve(full.reserve), 'var(--fig-extra, #2a9d8f)')}
+<text class="label" x="${left}" y="${top - 9}">PPV (%) — respiratory waveform variation</text>
+<text class="label" x="${left}" y="${lowerTop - 9}">Preload reserve (% of output per mmHg)</text>
+<text class="label" x="${left + width / 2}" y="${FH - 7}" text-anchor="middle">Selected stressed volume (mL)</text>
+<line class="total" x1="${left + width + 18}" y1="${top + 18}" x2="${left + width + 48}" y2="${top + 18}"/>
+<text class="label" x="${left + width + 55}" y="${top + 22}">PPV</text>
+<line class="extra" style="stroke-dasharray:none;stroke-width:2.5" x1="${left + width + 18}" y1="${top + 42}" x2="${left + width + 48}" y2="${top + 42}"/>
+<text class="label" x="${left + width + 55}" y="${top + 46}">preload reserve</text>
+<text class="tick" x="${left + width + 18}" y="${top + 79}">At 300 mL:</text>
+<text class="tick" x="${left + width + 18}" y="${top + 95}">${dry.ppv.toFixed(1)}% PPV,</text>
+<text class="tick" x="${left + width + 18}" y="${top + 111}">${dry.reserve.toFixed(1)}%/mmHg reserve</text>
+<text class="tick" x="${left + width + 18}" y="${top + 139}">At 1400 mL:</text>
+<text class="tick" x="${left + width + 18}" y="${top + 155}">${full.ppv.toFixed(1)}% PPV,</text>
+<text class="tick" x="${left + width + 18}" y="${top + 171}">${full.reserve.toFixed(1)}%/mmHg reserve</text>
+<text class="tick" x="${left + width + 18}" y="${lowerTop + 28}">Same passive breath</text>
+<text class="tick" x="${left + width + 18}" y="${lowerTop + 44}">at every point.</text>
+<text class="tick" x="${left + width + 18}" y="${lowerTop + 72}">Model example;</text>
+<text class="tick" x="${left + width + 18}" y="${lowerTop + 88}">not bedside cutoffs.</text>
+</svg>
+`;
+}
+
 // --- Pmsf estimated from inspiratory holds --------------------------------
 
 function pmsfOcclusionFigure() {
@@ -906,6 +1006,7 @@ const figures = {
   'baroreflex.svg': baroreflexFigure(),
   'preload-reserve.svg': preloadReserveFigure(),
   'ppv.svg': ppvFigure(),
+  'ppv-filling.svg': ppvFillingFigure(),
   'pmsf-occlusions.svg': pmsfOcclusionFigure(),
   'wedge-pressure.svg': wedgeFigure(),
   'pericardial-pressure.svg': pericardialFigure(),

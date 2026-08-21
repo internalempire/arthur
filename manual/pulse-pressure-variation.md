@@ -42,7 +42,15 @@ The model has no arrhythmia, so regular rhythm is always present and cannot be c
 
 An earlier version used a 13% threshold and was tuned against the Michard 2000 cohort. That was retired: the study's ventilation and population do not justify transporting one regression into every scenario. The tidal-volume challenge was also removed because applying it to an incompletely calibrated PPV amplitude could create a convincing but model-specific false result.
 
-The filled end of the model is mildly non-monotonic. Once nearly all pulmonary vessels are in zone 3, the lung's venous piston can squeeze blood toward the left atrium and raise PPV slightly even when additional volume buys little output. This is one reason the independent [preload reserve](preload-reserve.md) readout is shown alongside variation.
+The model's PPV is non-monotonic at **both** ends of the filling range.
+
+At severe underfilling, a small PPV can coexist with marked [preload reserve](preload-reserve.md). Two represented mechanisms contribute. First, pulmonary venous pressure is too low to keep the pulmonary vessels open along their full length: this is outside zone 3, so inflation cannot squeeze much blood forward and the piston contribution almost disappears. Second, low cardiac output lengthens transit through the compliant pulmonary circulation, which can blunt the right-sided variation before it appears in left-ventricular output. The arterial waveform can therefore vary little even though more filling would raise output substantially. This is a quantitative limitation of the model, **not** a clinical rule about profound hypovolaemia.
+
+At the filled end, the opposite problem appears. Once nearly all pulmonary vessels are in zone 3, inflation can squeeze blood toward the left atrium and raise PPV again even when additional filling buys little output. The figure places the model's PPV above its independent preload-reserve readout across the same filling sweep.
+
+![Model PPV and preload reserve across the filling range](figure/ppv-filling.svg)
+
+The practical reading is deliberately simple: neither a low nor a high model PPV identifies filling state or fluid responsiveness. Use PPV to observe respiratory waveform variation; use preload reserve to ask whether additional filling would raise model output.
 
 ---
 
@@ -84,6 +92,7 @@ Executable checks require PPV to be withheld during spontaneous breathing, quali
 - Michard F, Boussat S, Chemla D, et al. Relation between respiratory changes in arterial pulse pressure and fluid responsiveness in septic patients with acute circulatory failure. *Am J Respir Crit Care Med*. 2000;162:134–138. [doi:10.1164/ajrccm.162.1.9903035](https://doi.org/10.1164/ajrccm.162.1.9903035)
 - De Backer D, Heenen S, Piagnerelli M, Koch M, Vincent JL. Pulse pressure variations to predict fluid responsiveness: influence of tidal volume. *Intensive Care Med*. 2005;31:517–523. [doi:10.1007/s00134-005-2586-4](https://doi.org/10.1007/s00134-005-2586-4)
 - Mahjoub Y, Pila C, Friggeri A, et al. False-positive pulse pressure variation is detected by Doppler evaluation of the right ventricle. *Crit Care Med*. 2009;37:2570–2575. [doi:10.1097/CCM.0b013e3181a380a3](https://doi.org/10.1097/CCM.0b013e3181a380a3)
+- Vieillard-Baron A, Chergui K, Augarde R, et al. Cyclic changes in arterial pulse during respiratory support revisited by Doppler echocardiography. *Am J Respir Crit Care Med*. 2003;168:671–676. [doi:10.1164/rccm.200301-135OC](https://doi.org/10.1164/rccm.200301-135OC)
 - Teboul JL, Monnet X, Chemla D, Michard F. Arterial pulse pressure variation with mechanical ventilation. *Am J Respir Crit Care Med*. 2019;199:22–31. [doi:10.1164/rccm.201801-0088CI](https://doi.org/10.1164/rccm.201801-0088CI)
 - Hamzaoui O, Shi R, Carelli S, et al. Changes in pulse pressure variation to assess preload responsiveness in mechanically ventilated patients with spontaneous breathing activity. *Br J Anaesth*. 2021;127:532–538. [doi:10.1016/j.bja.2021.05.034](https://doi.org/10.1016/j.bja.2021.05.034)
 
