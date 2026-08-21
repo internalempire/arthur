@@ -183,7 +183,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Venegas JG, Harris RS, Simon BA. A comprehensive equation for the pulmonary pressure–volume curve. *J Appl Physiol*. 1998;84:389–395.
 - Ventetuolo CE, Klinger JR. Management of acute right ventricular failure in the intensive care unit. *Ann Am Thorac Soc*. 2014;11:811–822. [doi:10.1513/AnnalsATS.201312-446FR](https://doi.org/10.1513/AnnalsATS.201312-446FR)
 - Vieillard-Baron A, Charron C, Caille V, et al. Prone positioning unloads the right ventricle in severe ARDS. *Chest*. 2007;132:1440–1446. <https://doi.org/10.1378/chest.07-1013>
-- Vieillard-Baron A, Chergui K, Augarde R, et al. Cyclic changes in arterial pulse during respiratory support revisited by Doppler echocardiography. *Am J Respir Crit Care Med* 2003;168:671–6.
+- Vieillard-Baron A, Chergui K, Augarde R, et al. Cyclic changes in arterial pulse during respiratory support revisited by Doppler echocardiography. *Am J Respir Crit Care Med*. 2003;168:671–676. [doi:10.1164/rccm.200301-135OC](https://doi.org/10.1164/rccm.200301-135OC)
 - Vieillard-Baron A, Price LC, Matthay MA. Acute cor pulmonale in ARDS. *Intensive Care Med*. 2013;39:1836–1838. [doi:10.1007/s00134-013-3045-2](https://doi.org/10.1007/s00134-013-3045-2)
 - von Euler US, Liljestrand G. Observations on the pulmonary arterial blood pressure in the cat. *Acta Physiol Scand* 1946;12:301–20.
 ## W

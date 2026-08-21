@@ -22,7 +22,9 @@ The control raises resistance only in the pathway associated with derecruited un
 
 ### Pulmonary capacitance coupling
 
-Inflation displaces blood from the compliant pulmonary reservoir toward the left atrium, producing an immediate left-sided filling effect. The coefficient sets the strength of this “venous piston”. It does not change mean blood volume and is independent of the delayed change in RV output crossing the lung.
+Inflation can displace blood from the compliant pulmonary reservoir toward the left atrium, producing an immediate left-sided filling effect. The coefficient sets the strength of this “venous piston”. It does not change mean blood volume and is independent of the delayed change in RV output crossing the lung.
+
+The piston is one contributor to respiratory stroke-volume variation, not its universal driver. During positive-pressure ventilation, reduced RV preload and cyclic RV afterload can reduce RV output; that change reaches the left heart later because blood must cross the pulmonary circulation. Which component dominates depends on filling, lung mechanics, RV function and pulmonary vascular conditions. Vieillard-Baron and colleagues demonstrated both the immediate inspiratory increase in pulmonary venous flow and the opposite-phase variation of right- and left-ventricular output; the observation supports the mechanism, but not a claim that it dominates every phenotype.
 
 ## Why three controls
 
@@ -41,6 +43,7 @@ The separation prevents three different mechanisms from being reduced to a gener
 - Sylvester JT, Shimoda LA, Aaronson PI, Ward JPT. Hypoxic pulmonary vasoconstriction. *Physiol Rev*. 2012;92:367–520. [doi:10.1152/physrev.00041.2010](https://doi.org/10.1152/physrev.00041.2010)
 - Pinsky MR. Heart lung interactions during mechanical ventilation. *Curr Opin Crit Care*. 2012;18:256–260. [doi:10.1097/MCC.0b013e3283532b73](https://doi.org/10.1097/MCC.0b013e3283532b73)
 - Brower R, Wise RA, Hassapoyannes C, et al. Effect of lung inflation on lung blood volume and pulmonary venous flow. *J Appl Physiol*. 1985;58:954–963.
+- Vieillard-Baron A, Chergui K, Augarde R, et al. Cyclic changes in arterial pulse during respiratory support revisited by Doppler echocardiography. *Am J Respir Crit Care Med*. 2003;168:671–676. [doi:10.1164/rccm.200301-135OC](https://doi.org/10.1164/rccm.200301-135OC)
 
 ---
 
