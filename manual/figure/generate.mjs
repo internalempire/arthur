@@ -471,7 +471,7 @@ function preloadReserveFigure() {
       { x: low[0], y: low[1], label: 'lower filling' },
       { x: high[0], y: high[1], label: 'higher filling', dx: -90 },
     ],
-    notes: ['10% of current flow per mmHg', 'is a model classifier,', 'not a bedside cutoff'],
+    notes: ['8% of current flow per mmHg', 'is a model classifier,', 'not a bedside cutoff'],
   });
 }
 

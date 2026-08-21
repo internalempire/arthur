@@ -13,7 +13,7 @@
 | RV contractility ($E_{es}$) | 0.08–1.60 mmHg/mL | RV end-systolic elastance |
 | LV diastolic stiffness | 0.010–0.080 /mL | exponent of the LV end-diastolic pressure–volume relation |
 
-Contractility changes the slope of the end-systolic relation, not arterial resistance. Diastolic stiffness changes how rapidly LV filling pressure rises with volume. Ejection fraction remains load-dependent, so it should not be used as a direct readout of the selected $E_{es}$.
+Contractility changes the slope of the end-systolic relation, not arterial resistance. The ventricular activation waveform is normalised to a peak of one, so the selected $E_{es}$ is the peak active slope actually reached by the chamber. Diastolic stiffness changes how rapidly LV filling pressure rises with volume. Ejection fraction remains load-dependent, so it should not be used as a direct readout of the selected $E_{es}$.
 
 The model has no force–frequency relation: changing baseline heart rate does not automatically change contractility. Very high rate shortens filling time but does not reproduce ischaemia or rate-dependent relaxation. When the baroreflex is on, the Heart rate tile shows the effective rate used by the circulation; the control itself continues to show the selected baseline.
 
@@ -49,6 +49,8 @@ Pericardial constraint changes the gain of the shared pressure, while pericardia
 ## References
 
 - Suga H, Sagawa K. Instantaneous pressure–volume relationships and their ratio in the excised, supported canine left ventricle. *Circ Res*. 1974;35:117–126. [doi:10.1161/01.RES.35.1.117](https://doi.org/10.1161/01.RES.35.1.117)
+- Stergiopulos N, Meister JJ, Westerhof N. Determinants of stroke volume and systolic and diastolic aortic pressure. *Am J Physiol*. 1996;270:H2050–H2059. [doi:10.1152/ajpheart.1996.270.6.H2050](https://doi.org/10.1152/ajpheart.1996.270.6.H2050)
+- Senzaki H, Chen CH, Kass DA. Single-beat estimation of end-systolic pressure–volume relation in humans. *Circulation*. 1996;94:2497–2506. [doi:10.1161/01.CIR.94.10.2497](https://doi.org/10.1161/01.CIR.94.10.2497)
 - Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. *Am J Physiol*. 1983;245:H773–H780.
 - Dampney RAL. Central neural control of the cardiovascular system: current perspectives. *Adv Physiol Educ*. 2016;40:283–296. [doi:10.1152/advan.00027.2016](https://doi.org/10.1152/advan.00027.2016)
 

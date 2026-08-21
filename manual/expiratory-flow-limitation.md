@@ -49,12 +49,12 @@ An obstructed phenotype at 26 breaths per minute:
 
 | applied PEEP (cmH₂O) | total PEEP (cmH₂O) | dynamic trapped volume (mL) | end-expiratory volume (L) | cardiac output (L/min) |
 |---:|---:|---:|---:|---:|
-| 0 | 11.6 | 1361 | 4.03 | 4.25 |
-| 5 | 11.8 | 781 | 4.05 | 4.25 |
-| 6 | 12.5 | 742 | 4.13 | 4.23 |
-| 8 | 14.4 | 715 | 4.34 | 4.14 |
-| 10 | 16.3 | 693 | 4.54 | 4.03 |
-| 13 | 19.2 | 650 | 4.84 | 3.87 |
+| 0 | 11.6 | 1361 | 4.03 | 4.66 |
+| 5 | 11.8 | 781 | 4.05 | 4.65 |
+| 6 | 12.5 | 742 | 4.13 | 4.60 |
+| 8 | 14.4 | 715 | 4.34 | 4.48 |
+| 10 | 16.3 | 693 | 4.54 | 4.36 |
+| 13 | 19.2 | 650 | 4.84 | 4.19 |
 <!-- END GENERATED: efl-peep -->
 
 For this phenotype, total PEEP and end-expiratory volume are essentially unchanged from applied PEEP 0 to 5 cmH₂O. The departure becomes detectable just above 5 and is clear by 8–10 cmH₂O: applied pressure is then adding to absolute lung volume rather than merely substituting for part of intrinsic pressure. Dynamic trapped volume can fall while absolute end-expiratory volume rises because it is measured above the passive equilibrium volume at the same applied PEEP.

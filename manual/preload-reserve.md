@@ -31,7 +31,7 @@ $$
 
 The value is displayed as percent of current output per mmHg. A value of 0.10 therefore reads “about 10% more output for one additional mmHg of filling pressure” within the local construction.
 
-The panel highlights the limb at or above 10%/mmHg. This split is a model classifier, not a clinical threshold. In a deterministic sweep across loading, resistance, heart rate, RV function, venous compliance, PEEP and abdominal pressure, it agreed with the model's own definition of a 500 mL responder in about 83% of configurations. Discordance is expected because a finite bolus can cross the knee of the curve and because venous compliance determines how much pressure a given volume buys.
+The panel highlights the limb at or above 8%/mmHg. This split is a model classifier, not a clinical threshold. After correction of ventricular activation, a deterministic sweep across loading, resistance, heart rate, RV function, venous compliance, PEEP and abdominal pressure found that this boundary agreed with the model's own definition of a 500 mL responder in about 87% of configurations. Discordance is expected because a finite bolus can cross the knee of the curve and because venous compliance determines how much pressure a given volume buys.
 
 ### A reproducible comparison
 
@@ -39,8 +39,8 @@ With passive volume control, VT 560 mL, RR 14/min, PEEP 5 and baroreflex disable
 
 | model state | local reserve | output before | output after +500 mL selected stressed volume | gain |
 |---|---:|---:|---:|---:|
-| lower filling | 16.0%/mmHg | 3.72 L/min | 5.25 L/min | +41% |
-| higher filling | 5.7%/mmHg | 5.58 L/min | 5.97 L/min | +7% |
+| lower filling — 300 mL selected stressed volume | 15.9%/mmHg | 3.79 L/min | 5.65 L/min | +49% |
+| higher filling — 900 mL selected stressed volume | 6.8%/mmHg | 5.91 L/min | 6.76 L/min | +14% |
 
 The exact gains are properties of these model states. The point is the separation: the same added volume raises output much more on the steep limb.
 
@@ -61,7 +61,7 @@ The calculation is expressed per mmHg rather than per millilitre. Converting pre
 ### Of the construction
 
 - The reserve is derived from a steady-state analytical construction applied to a breathing closed-loop simulation.
-- The 10%/mmHg split is a didactic classifier with broad, not exact, agreement with the model's 500 mL experiment.
+- The 8%/mmHg split is a didactic classifier with broad, not exact, agreement with the model's 500 mL experiment.
 - The slope is local; a finite intervention can leave the steep limb and yield less benefit than the derivative suggests.
 - The cardiac-function approximation uses the current model RV afterload and does not simulate a full new steady state at every infinitesimal point.
 - Added volume is placed immediately in one venous reservoir with no distribution or loss.

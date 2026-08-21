@@ -13,6 +13,7 @@ import {
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
   systemicVenousVolumeState, pulmonaryTransitEstimate,
   pulmonaryTransitMeanTime, PULMONARY_TRANSIT, pericardialPressure,
+  ventricularActivation,
 } from '../../src/model/circulation.js';
 import { applyBaroreflex, BARO } from '../../src/model/baroreflex.js';
 import {
@@ -32,6 +33,7 @@ export {
   preloadSensitivity, preloadLimbs, curveIntersection, PRELOAD_STEEP,
   systemicVenousVolumeState, pulmonaryTransitEstimate,
   pulmonaryTransitMeanTime, PULMONARY_TRANSIT, pericardialPressure,
+  ventricularActivation,
   applyBaroreflex, BARO,
   pvrComponents, lungRegions, transpulmonaryAt, relaxationVolume, openFractionAt,
   lungVolumeAtPl, lungComplianceAt, openBand, stepOpenFraction,

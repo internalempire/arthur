@@ -51,13 +51,13 @@ The **Cardiac tamponade** preset represents a compensated, spontaneously breathi
 
 | state | capacity (mL) | P<sub>peri</sub> (mmHg) | CVP (mmHg) | RV end-diastolic pressure (mmHg) | PA diastolic (mmHg) | wedge surrogate (mmHg) |
 |---|---:|---:|---:|---:|---:|---:|
-| constrained preset | 100 | 9.7 | 6.8 | 8.5 | 12.5 | 10.2 |
-| capacity restored | 430 | 0.0 | -0.9 | 0.1 | 15.8 | 10.7 |
+| constrained preset | 100 | 8.5 | 6.0 | 7.6 | 12.5 | 9.5 |
+| capacity restored | 430 | 0.0 | -1.0 | -1.1 | 14.0 | 8.4 |
 
 | state | RV EDV (mL) | LV EDV (mL) | cardiac output (L/min) | MAP (mmHg) |
 |---|---:|---:|---:|---:|
-| constrained preset | 71 | 96 | 4.03 | 82.1 |
-| capacity restored | 127 | 147 | 6.58 | 126.0 |
+| constrained preset | 68 | 95 | 4.74 | 94.5 |
+| capacity restored | 111 | 137 | 7.24 | 139.6 |
 <!-- END GENERATED: cardiac-tamponade -->
 
 The constrained state brings the four clinically compared diastolic pressures into the same broad range, markedly reduces both ventricular end-diastolic volumes and depresses flow. Restoring capacity lowers pericardial pressure and CVP while RV filling recovers proportionally more than LV filling. This preferential RV effect emerges from the shared pressure acting on a lower-pressure chamber; it is not scripted into the scenario.

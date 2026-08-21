@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 144 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 146 unique entries.
 
 ---
 
@@ -155,10 +155,12 @@ A citation documents the physiological or methodological claim made on its sourc
 - Sagawa K, Maughan L, Suga H, Sunagawa K. *Cardiac Contraction and the Pressure–Volume Relationship*. Oxford University Press; 1988.
 - Santamore WP, Dell'Italia LJ. Ventricular interdependence: significant left ventricular contributions to right ventricular systolic function. *Prog Cardiovasc Dis* 1998;40:289–308.
 - Schulz-Menger J, Collini V, Gröschel J, et al. 2025 ESC Guidelines for the management of myocarditis and pericarditis. *Eur Heart J*. 2025;46:3952–4041. [doi:10.1093/eurheartj/ehaf192](https://doi.org/10.1093/eurheartj/ehaf192)
+- Senzaki H, Chen CH, Kass DA. Single-beat estimation of end-systolic pressure–volume relation in humans. *Circulation*. 1996;94:2497–2506. [doi:10.1161/01.CIR.94.10.2497](https://doi.org/10.1161/01.CIR.94.10.2497)
 - Seraphim A, Knott KD, Menacho K, et al. Prognostic value of pulmonary transit time and pulmonary blood volume estimation using myocardial perfusion CMR. *JACC Cardiovasc Imaging*. 2021;14:2107–2119. [doi:10.1016/j.jcmg.2021.03.029](https://doi.org/10.1016/j.jcmg.2021.03.029)
 - Simmons DH, Linde LM, Miller JH, O'Reilly RJ. [Relation between lung volume and pulmonary vascular resistance](https://doi.org/10.1161/01.RES.9.2.465). *Circ Res* 1961;9:465–71.
 - Skrapari I, Tentolouris N, Katsilambros N. Baroreflex function: determinants in healthy subjects and disturbances in diabetes, obesity and metabolic syndrome. *Curr Diabetes Rev*. 2006;2:329–338. [doi:10.2174/157339906777950589](https://doi.org/10.2174/157339906777950589)
 - Smiseth OA, Thompson CR, Ling H, Robinson M, Miyagishima RT. Juxtacardiac pleural pressure during positive end-expiratory pressure ventilation: an intraoperative study in patients with open pericardium. *J Am Coll Cardiol*. 1994;23:753–758. [doi:10.1016/0735-1097(94)90764-1](https://doi.org/10.1016/0735-1097(94)90764-1)
+- Stergiopulos N, Meister JJ, Westerhof N. Determinants of stroke volume and systolic and diastolic aortic pressure. *Am J Physiol*. 1996;270:H2050–H2059. [doi:10.1152/ajpheart.1996.270.6.H2050](https://doi.org/10.1152/ajpheart.1996.270.6.H2050)
 - Suga H, Sagawa K. Instantaneous pressure–volume relationships and their ratio in the excised, supported canine left ventricle. *Circ Res*. 1974;35:117–126. [doi:10.1161/01.RES.35.1.117](https://doi.org/10.1161/01.RES.35.1.117)
 - Sun X-M, Chen G-Q, Zhou Y-M, et al. Stress index can be accurately and reliably assessed by visually inspecting ventilator waveforms. *Respir Care* 2018;63:1094–101.
 - Sunagawa K, Maughan WL, Burkhoff D, Sagawa K. Left ventricular interaction with arterial load studied in isolated canine ventricle. *Am J Physiol* 1983;245:H773–80.
