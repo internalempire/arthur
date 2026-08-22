@@ -18,9 +18,9 @@ const SHRINK_DELAY = 4;
 const STRIPS = [
   {
     id: 'resp',
-    label: 'Respiratory pressures',
+    label: 'Airway & pleural pressure',
     unit: 'cmH₂O',
-    height: 1.0,
+    height: 0.9,
     series: [
       {
         channel: 'paw', color: 'airway', label: 'Paw · Pplat',
@@ -32,10 +32,17 @@ const STRIPS = [
           ? `${tilePrimaryValue('ppl', m)} (Δ ${m.pplSwing.toFixed(1)})`
           : '—'),
       },
+    ],
+  },
+  {
+    id: 'transpulmonary',
+    label: 'Transpulmonary pressure',
+    unit: 'cmH₂O',
+    height: 0.65,
+    series: [
       {
         channel: 'pl', color: 'transpulmonary', label: 'P', subscript: 'L',
         ariaLabel: 'Transpulmonary pressure',
-        paintOrder: 0,
         summary: (m) => tilePrimaryValue('pl', m),
       },
     ],
@@ -216,12 +223,7 @@ export function createWaveforms(container) {
       if (lo < 0 && hi > 0) panel.axisLine(colors, { y: 0 });
 
       panel.clip();
-      // The rail keeps the clinically useful Paw, Ppl, PL reading order. Paint
-      // PL first instead, so its purple stroke stays underneath Paw and Ppl
-      // wherever the pressure curves meet or overlap.
-      const paintBuffers = [...buffers]
-        .sort((a, b) => (a.paintOrder ?? 1) - (b.paintOrder ?? 1));
-      for (const b of paintBuffers) {
+      for (const b of buffers) {
         panel.series(b.data, b.n, 0, WINDOW_SECONDS, { color: colors[b.color], width: 1.8 });
       }
       panel.unclip();

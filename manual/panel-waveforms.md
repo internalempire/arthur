@@ -1,16 +1,18 @@
 # The waveform panel
 
-> Three time-aligned strips show respiratory pressure, vascular pressure and lung volume over the same 12 seconds.
+> Four time-aligned strips show airway and pleural pressure, transpulmonary pressure, vascular pressure and lung volume over the same 12 seconds.
 
 ---
 
 ## How to read it
 
-The top strip shows airway pressure (Paw), pleural pressure (Ppl) and transpulmonary pressure ($P_L$) in cmH₂O. Ppl is the pressure surrounding the lung and intrathoracic circulation. $P_L=P_{alv}-P_{pl}$ is the pressure across the lung itself. Showing both makes it possible to see whether a respiratory pressure change mainly loads the thorax or actually distends the lung.
+The first strip shows airway pressure (Paw) and pleural pressure (Ppl) in cmH₂O. The strip immediately below shows transpulmonary pressure ($P_L=P_{alv}-P_{pl}$) on its own cmH₂O axis. Ppl is the pressure surrounding the lung and intrathoracic circulation; $P_L$ is the pressure across the lung itself.
 
-The middle strip shows systemic arterial, pulmonary arterial and central venous pressure in mmHg. The bottom strip shows lung volume above the calculated resting reference in mL. Light vertical bands identify inspiration in all three strips, allowing events to be aligned without mentally matching different time axes.
+The separate $P_L$ strip is a graphical choice, not a different equation. On one shared numerical axis, positive $P_L$ would correctly appear above a near-zero Paw and a negative Ppl. Giving it a time-aligned strip below Paw and Ppl preserves the true value while keeping the visual and numerical reading order consistent.
 
-The rail on the right mixes two kinds of readout deliberately. Plateau pressure, systemic and pulmonary systolic/diastolic pressure, CVP and tidal volume remain the slower summaries used in the numerical tiles. Ppl and $P_L$ show the current model state at the rail's readable update rate. The Ppl row also keeps the latest breath's swing in parentheses. The curves themselves remain continuous at the model's trace sampling rate.
+The third strip shows systemic arterial, pulmonary arterial and central venous pressure in mmHg. The bottom strip shows lung volume above the calculated resting reference in mL. Light vertical bands identify inspiration in all four strips, allowing events to be aligned without mentally matching different time axes.
+
+The rail on the right mixes two kinds of readout deliberately. Plateau pressure, systemic and pulmonary systolic/diastolic pressure, CVP and tidal volume remain the slower summaries used in the numerical tiles. Ppl and $P_L$ show the current model state at the rail's readable update rate. The Ppl row also keeps the latest breath's swing in parentheses. $P_L$ is placed in the second rail beside its own curve. The curves themselves remain continuous at the model's trace sampling rate.
 
 Respiratory and vascular pressures deliberately do not share an axis. Their units and magnitudes differ, and a dual axis would make visual crossings physiologically meaningless.
 
