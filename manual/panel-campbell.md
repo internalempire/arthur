@@ -29,6 +29,8 @@ The dashed chest-wall relation is also generated from the same independent sigmo
 
 The combined respiratory-system relation is the sum of lung and wall recoil at each absolute volume. This is why the three curves continue to agree with the live Paw, Palv and Ppl points even when the resting volume changes.
 
+The vertical scale is chosen once from the current ventilator settings and the model's lung–chest-wall mechanics. It remains fixed throughout the breath, so an apparent change in loop height reflects a change in volume rather than a moving axis. Changing a control or selecting a scenario recalculates the scale once for the new conditions.
+
 The area between branches is not a complete measured respiratory-system hysteresis loop. Tissue viscoelasticity and surfactant hysteresis are absent, so the panel shows recruitment-state memory only. See [hysteresis](hysteresis.md).
 
 ## Why this construction
@@ -42,6 +44,7 @@ Plotting Paw alone would mix elastic and resistive pressure. Adding Palv and Ppl
 - Respiratory muscle work is not partitioned into pressure–time product or oxygen cost.
 - Surface-tension and tissue hysteresis are absent; the displayed recruitment loop is not the complete classical lung P–V loop.
 - Routine plateau pressure is calculated rather than measured during an end-inspiratory occlusion.
+- The fixed scale is a display envelope derived from the selected settings. It is not a predicted tidal-volume measurement.
 
 ## References
 

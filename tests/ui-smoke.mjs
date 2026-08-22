@@ -65,6 +65,7 @@ const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.m
 const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
 const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
 const { airwayReadout } = await import(new URL('../src/ui/panels/waveforms.js', import.meta.url));
+const { createCampbellVolumeScale } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
 const { ivcDisplayWidth } = await import(new URL('../src/ui/panels/thorax.js', import.meta.url));
 const baroreflex = PARAMETERS.find((spec) => spec.id === 'baroreflexEnabled');
 const hysteresis = PARAMETERS.find((spec) => spec.id === 'hysteresis');
@@ -94,6 +95,16 @@ const assistedAirway = {
 check('the waveform rail keeps Paw live when plateau is unavailable',
   airwayReadout(passiveAirway) === '8.4 (Pplat 14.2)'
     && airwayReadout(assistedAirway) === '8.4');
+const campbellScale = createCampbellVolumeScale();
+const psvSettings = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
+Object.assign(psvSettings, { mode: 'psv', pinsp: 14, pmus: 6, peep: 0 });
+const firstCampbellLimit = campbellScale.resolve(psvSettings, 120);
+check('the Campbell vertical scale remains fixed throughout one parameter state',
+  firstCampbellLimit >= 1500
+    && campbellScale.resolve(psvSettings, firstCampbellLimit + 500) === firstCampbellLimit);
+campbellScale.reset();
+check('the Campbell vertical scale recalculates after controls change',
+  campbellScale.resolve({ ...psvSettings, pinsp: 30 }, 120) > firstCampbellLimit);
 check('a plethoric IVC remains visually responsive above the reference calibre',
   ivcDisplayWidth(180) > ivcDisplayWidth(160)
     && ivcDisplayWidth(160) > ivcDisplayWidth(150));
@@ -103,4 +114,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n10 UI smoke contracts passed`);
+console.log(`\n12 UI smoke contracts passed`);

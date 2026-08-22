@@ -3,6 +3,8 @@ import {
   respiratorySystemCompliance,
   lungVolumeAtPl, relaxationVolume, recruitmentBand, stepRecruitedFraction,
   openFractionFromRecruitmentState, chestWallPressure,
+  staticEndExpiratoryVolume,
+  EXPIRATORY_FLOW_LIMIT,
 } from '../../model/index.js';
 
 // The Campbell diagram. Pleural pressure follows the chest wall compliance
@@ -13,6 +15,55 @@ import {
 const LOOP_INTERVAL = 0.02; // s of simulated time between samples
 const LOOP_POINTS = 900;    // about three breaths at a normal rate
 
+/**
+ * Choose the Campbell volume range from settings rather than from the moving
+ * sample. A canvas that rescales as volume rises makes a stable breath look as
+ * if its amplitude is changing and prevents visual comparison within a cycle.
+ *
+ * Pressure-targeted modes use the static volume reached by the combined lung
+ * and wall at the largest applied-plus-muscle pressure. Volume control uses the
+ * requested VT above its PEEP equilibrium; with flow limitation, the simple
+ * exponential emptying envelope also reserves room for steady gas trapping.
+ * These are display bounds, not additional respiratory physiology.
+ */
+export function campbellVolumeLimit(p, currentVolumeMl = 0) {
+  const vRelax = relaxationVolume(p);
+  const peepVolume = staticEndExpiratoryVolume(p, p.peep);
+  const peepOffset = Math.max(0, peepVolume - vRelax);
+  let expectedPeak;
+
+  if (p.mode === 'vcv') {
+    const period = 60 / Math.max(1, p.rr);
+    const expiratoryTime = Math.max(0.05, period - p.ti);
+    const crs = respiratorySystemCompliance(p, peepVolume);
+    const passiveTau = Math.max(0.02, p.raw * crs / 1000);
+    const expiratoryTau = p.efl === 'on'
+      ? Math.max(passiveTau, EXPIRATORY_FLOW_LIMIT.minimumTimeConstant)
+      : passiveTau;
+    const emptiedFraction = Math.max(0.08, 1 - Math.exp(-expiratoryTime / expiratoryTau));
+    expectedPeak = peepOffset + (p.vt / 1000) / emptiedFraction;
+  } else {
+    const ventilatorPressure = p.mode === 'spont' ? p.peep : p.peep + p.pinsp;
+    const peakSystemPressure = ventilatorPressure + p.pmus;
+    expectedPeak = staticEndExpiratoryVolume(p, peakSystemPressure) - vRelax;
+  }
+
+  const paddedMl = Math.max(900, currentVolumeMl * 1.15, expectedPeak * 1150);
+  return Math.ceil(paddedMl / 100) * 100;
+}
+
+/** A resettable, testable lock: one parameter choice gets one vertical scale. */
+export function createCampbellVolumeScale() {
+  let limit = null;
+  return {
+    resolve(p, currentVolumeMl = 0) {
+      if (limit === null) limit = campbellVolumeLimit(p, currentVolumeMl);
+      return limit;
+    },
+    reset() { limit = null; },
+  };
+}
+
 export function createCampbell(canvas) {
   const panel = new Panel(canvas, { padding: [22, 58, 34, 48] });
   const pplLoop = [];
@@ -21,6 +72,7 @@ export function createCampbell(canvas) {
   const prev = { ppl: [], paw: [], palv: [] };
   let breathSeen = -1;
   let lastSample = -1;
+  const volumeScale = createCampbellVolumeScale();
 
   function render(sim, colors) {
     panel.resize();
@@ -51,7 +103,7 @@ export function createCampbell(canvas) {
       }
     }
 
-    const vMax = Math.max(900, vMl * 1.25, p.vt * 1.6 + p.peep * respiratorySystemCompliance(p, r.lungVolume));
+    const vMax = volumeScale.resolve(p, vMl);
     let pLo = -12, pHi = 30;
     for (const [pl, pw] of [[pplLoop, pawLoop], [prev.ppl, prev.paw]]) {
       for (let i = 0; i < pl.length; i += 2) {
@@ -179,6 +231,7 @@ export function createCampbell(canvas) {
     pplLoop.length = 0; pawLoop.length = 0; palvLoop.length = 0;
     prev.ppl.length = 0; prev.paw.length = 0; prev.palv.length = 0;
     breathSeen = -1; lastSample = -1;
+    volumeScale.reset();
   }
 
   return { render, clearTrail };
