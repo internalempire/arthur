@@ -64,6 +64,7 @@ const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8
 const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.meta.url));
 const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
 const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
+const { airwayReadout } = await import(new URL('../src/ui/panels/waveforms.js', import.meta.url));
 const { ivcDisplayWidth } = await import(new URL('../src/ui/panels/thorax.js', import.meta.url));
 const baroreflex = PARAMETERS.find((spec) => spec.id === 'baroreflexEnabled');
 const hysteresis = PARAMETERS.find((spec) => spec.id === 'hysteresis');
@@ -82,6 +83,17 @@ check('respiratory-pressure tiles expose instantaneous Ppl, Palv and PL',
   tilePrimaryValue('ppl', pressureMetrics) === '-5.2'
     && tilePrimaryValue('palv', pressureMetrics) === '0.9'
     && tilePrimaryValue('pl', pressureMetrics) === '6.1');
+const passiveAirway = {
+  valid: true, paw: 8.4, pplat: 14.2,
+  interpretability: { plateau: { level: 'ok' } },
+};
+const assistedAirway = {
+  ...passiveAirway,
+  interpretability: { plateau: { level: 'unavailable' } },
+};
+check('the waveform rail keeps Paw live when plateau is unavailable',
+  airwayReadout(passiveAirway) === '8.4 (Pplat 14.2)'
+    && airwayReadout(assistedAirway) === '8.4');
 check('a plethoric IVC remains visually responsive above the reference calibre',
   ivcDisplayWidth(180) > ivcDisplayWidth(160)
     && ivcDisplayWidth(160) > ivcDisplayWidth(150));
@@ -91,4 +103,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n9 UI smoke contracts passed`);
+console.log(`\n10 UI smoke contracts passed`);

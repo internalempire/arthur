@@ -15,6 +15,18 @@ const WINDOW_SECONDS = TRACE_SECONDS;
 // allowed to shrink, in seconds of simulated time.
 const SHRINK_DELAY = 4;
 
+/**
+ * Paw is always a live pressure. Pplat is a breath-level passive-mechanics
+ * estimate and may accompany it, but must never replace or suppress it.
+ */
+export function airwayReadout(metrics) {
+  const paw = tilePrimaryValue('paw', metrics);
+  if (paw === '—') return paw;
+  return metrics.interpretability?.plateau?.level === 'ok'
+    ? `${paw} (Pplat ${metrics.pplat.toFixed(1)})`
+    : paw;
+}
+
 const STRIPS = [
   {
     id: 'resp',
@@ -23,8 +35,9 @@ const STRIPS = [
     height: 1.1,
     series: [
       {
-        channel: 'paw', color: 'airway', label: 'Paw · Pplat',
-        summary: (m) => tilePrimaryValue('pplat', m),
+        channel: 'paw', color: 'airway', label: 'Paw',
+        ariaLabel: 'Airway pressure',
+        summary: airwayReadout,
       },
       {
         channel: 'palv', color: 'alveolar', label: 'P', subscript: 'alv',
