@@ -291,7 +291,10 @@ select { min-width: 150px; }
   height: calc(100% - 16px);
 }
 
-.panel-waves { height: 340px; }
+/* Four independently scaled, time-aligned strips keep PL below Paw/Ppl without
+   falsifying its positive pressure on their shared numerical axis. The extra
+   height preserves the previous plot density instead of squeezing each trace. */
+.panel-waves { height: 420px; }
 .panel-waves > div { height: 100%; }
 
 .waveform-stack {
