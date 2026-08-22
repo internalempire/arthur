@@ -18,13 +18,18 @@ const SHRINK_DELAY = 4;
 const STRIPS = [
   {
     id: 'resp',
-    label: 'Airway & pleural pressure',
+    label: 'Airway, alveolar & pleural pressure',
     unit: 'cmH₂O',
-    height: 0.9,
+    height: 1.1,
     series: [
       {
         channel: 'paw', color: 'airway', label: 'Paw · Pplat',
         summary: (m) => tilePrimaryValue('pplat', m),
+      },
+      {
+        channel: 'palv', color: 'alveolar', label: 'P', subscript: 'alv',
+        ariaLabel: 'Alveolar pressure',
+        summary: (m) => tilePrimaryValue('palv', m),
       },
       {
         channel: 'ppl', color: 'pleural', label: 'Ppl',

@@ -6,7 +6,7 @@
 
 ## How a model state becomes a number
 
-The circulation is integrated at every time step, but most bedside quantities are not instantaneous. Systolic and diastolic pressures come from the latest completed cardiac cycle. Cardiac output uses the latest left ventricular stroke volume and current effective heart rate. Mean vascular pressures are exponential three-second averages. Most respiratory summaries come from the latest completed breath, but the pleural and transpulmonary tiles show the current model pressure. A tile can therefore lag an animated chamber or instantaneous waveform without either being wrong.
+The circulation is integrated at every time step, but most bedside quantities are not instantaneous. Systolic and diastolic pressures come from the latest completed cardiac cycle. Cardiac output uses the latest left ventricular stroke volume and current effective heart rate. Mean vascular pressures are exponential three-second averages. Most respiratory summaries come from the latest completed breath, but the alveolar, pleural and transpulmonary tiles show the current model pressure. A tile can therefore lag an animated chamber or instantaneous waveform without either being wrong.
 
 After measurement, the interface may apply a calculation such as $(mPAP-wedge)/CO$, $VT/\Delta P$ or respiratory variation. It then asks whether the assumptions needed to give that calculation its clinical name are present. Finally, a colour may draw attention to a teaching state. These four stages are separate:
 
@@ -156,6 +156,23 @@ The main number is the current absolute pleural pressure: the pressure surroundi
 Chest-wall compliance mainly changes the swing; chest-wall load can shift the resting level. The same swing can therefore begin from different absolute pressures and have different circulatory consequences.
 
 Related pages: [Pleural pressure](pleural-pressure.md) · [Transmural pressure](transmural-pressure.md) · [The four effects of a breath](the-four-effects-of-a-breath.md)
+
+### Alveolar pressure
+
+The main number is the current pressure inside the model's single alveolar compartment. It is not interchangeable with Paw. During flow, the two are separated by the pressure needed to move gas through the airway:
+
+$$
+\dot V=\frac{P_{aw}-P_{alv}}{R_{aw}}
+$$
+
+- $\dot V$ — respiratory flow, in L/s and positive during inspiration;
+- $P_{aw}$ — pressure at the airway opening, in cmH₂O;
+- $P_{alv}$ — alveolar pressure, in cmH₂O;
+- $R_{aw}$ — airway resistance, in cmH₂O/(L/s).
+
+The subtitle prints Paw and the signed Paw-minus-Palv gradient. In an unsupported spontaneous breath, Palv becomes negative to draw gas inward and positive to drive it outward even though Paw remains zero. At zero flow, Paw and Palv are equal in the model.
+
+Related pages: [Equation of motion](equation-of-motion.md) · [Pleural pressure](pleural-pressure.md) · [The waveform panel](panel-waveforms.md)
 
 ### Transpulmonary pressure
 

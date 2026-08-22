@@ -53,7 +53,7 @@ $$
 - $P_{alv}$ — alveolar pressure, in cmH₂O;
 - $P_{pl}$ — pleural pressure, in cmH₂O.
 
-The interface therefore gives these pressures different visual roles. The pleural-pressure tile and waveform rail put the current Ppl in the foreground and retain the latest breath's swing as secondary context. A separate $P_L$ tile and trace show the pressure across the lung. This keeps “pressure around the circulation” distinct from “pressure distending the lung” without asking the user to subtract two moving curves mentally.
+The interface therefore gives these pressures different visual roles. The pleural-pressure tile and waveform rail put the current Ppl in the foreground and retain the latest breath's swing as secondary context. A Palv tile and curve expose the pressure inside the alveolar compartment and its gradient from Paw. A separate $P_L$ tile and trace show the pressure across the lung. This keeps “pressure at the airway”, “pressure inside the alveoli”, “pressure around the circulation” and “pressure distending the lung” distinct.
 
 The default curve is calibrated so that at the normal 2.2 L reference, $P_{cw}=-5$ cmH₂O and the local slope corresponds to 200 mL/cmH₂O. Its relaxed zero-recoil volume is higher, near 3.2 L: below that volume the wall tends outward; above it the wall tends inward. These are model reference values, not universal patient normals.
 

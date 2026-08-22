@@ -173,6 +173,11 @@ const TILES = [
     sub: (m) => `swing ${m.pplSwing.toFixed(1)}`,
   },
   {
+    id: 'palv', label: 'Alveolar pressure', unit: 'cmH₂O', kind: 'measured',
+    get: (m) => m.palv.toFixed(1),
+    sub: (m) => `Paw ${m.paw.toFixed(1)} · Paw − Palv ${(m.paw - m.palv).toFixed(1)}`,
+  },
+  {
     id: 'pl', label: 'Transpulmonary pressure', unit: 'cmH₂O', kind: 'measured',
     get: (m) => m.pl.toFixed(1),
     sub: (m) => `Palv ${m.palv.toFixed(1)} − Ppl ${m.ppl.toFixed(1)}`,
@@ -207,6 +212,7 @@ const DEFAULT_VISIBLE = TILES.map((t) => t.id);
 const STORAGE_KEY = 'arthur.tileLayout';
 const READOUT_MIGRATION_KEY = 'arthur.tileLayout.effective-rate-and-svr';
 const TRANSPULMONARY_MIGRATION_KEY = 'arthur.tileLayout.transpulmonary-pressure';
+const ALVEOLAR_MIGRATION_KEY = 'arthur.tileLayout.alveolar-pressure';
 
 function insertAfter(ids, anchor, id) {
   if (ids.includes(id)) return;
@@ -235,11 +241,20 @@ function loadLayout() {
         localStorage.setItem(TRANSPULMONARY_MIGRATION_KEY, 'done');
         changed = true;
       }
+      if (localStorage.getItem(ALVEOLAR_MIGRATION_KEY) !== 'done') {
+        // Palv belongs between the surrounding pleural pressure and the
+        // transpulmonary pressure calculated from it. Add it once without
+        // revisiting or overriding the user's other tile choices.
+        insertAfter(saved, 'ppl', 'palv');
+        localStorage.setItem(ALVEOLAR_MIGRATION_KEY, 'done');
+        changed = true;
+      }
       if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
       return saved;
     }
     localStorage.setItem(READOUT_MIGRATION_KEY, 'done');
     localStorage.setItem(TRANSPULMONARY_MIGRATION_KEY, 'done');
+    localStorage.setItem(ALVEOLAR_MIGRATION_KEY, 'done');
   } catch { /* ignore */ }
   return [...DEFAULT_VISIBLE];
 }
