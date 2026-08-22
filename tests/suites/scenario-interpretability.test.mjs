@@ -101,7 +101,7 @@ section('Scenario teaching mechanisms');
   const phase = phaseMeans('healthy-spont');
   const metrics = scenarioMetrics('healthy-spont');
   demonstrates['healthy-spont'] = phase.cvpIn < phase.cvpOut - 1
-    && phase.flowIn > phase.flowOut + 0.3
+    && phase.flowIn > phase.flowOut + 0.05
     && metrics.cvpTransmural > metrics.cvp
     && metrics.interpretability.ppv.level === 'unavailable';
   check('healthy spontaneous breathing separates measured pressure from filling',
@@ -155,7 +155,7 @@ section('Scenario teaching mechanisms');
   // teaching contrast is therefore large transmitted pressure versus the
   // local slope of the settled Guyton operating point, which remains defined
   // without passive ventilation or a regular arterial waveform.
-  demonstrates['swing-limited-reserve'] = metrics.pplSwing > 15
+  demonstrates['swing-limited-reserve'] = metrics.pplSwing > 18
     && !metrics.preload.steep
     && metrics.preload.relative < 0.10
     && metrics.interpretability.ppv.level === 'unavailable';

@@ -68,7 +68,7 @@ The delay is the one place where a mechanism was added specifically to get the *
 - **Transit remains aggregate.** Its mean now changes with represented pulmonary blood volume and RV output, but one staged path cannot reproduce regional capillary transit, shunt or contrast kinetics. The staged portion is bounded to 0.8–6 s for numerical stability.
 - **One pleural pressure**, so no regional differences in how the breath reaches different parts of the heart.
 - The piston is a single coefficient acting on pulmonary venous unstressed volume. It is a stand-in for a distributed squeezing of a compliant bed, not a representation of it.
-- Spontaneous effort is one waveform with one amplitude control: no inspiratory threshold load, no expiratory muscle recruitment, no dyssynchrony.
+- Spontaneous effort is one aggregate activation with one amplitude control and a regular post-inspiratory decay. There is no inspiratory threshold load, separately recruited expiratory-muscle pressure or complete dyssynchrony model.
 
 ### Of clinical application
 

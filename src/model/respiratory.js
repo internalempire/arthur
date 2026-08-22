@@ -8,9 +8,11 @@
 //   Palv = Ppl + Pl
 //   flow = (Pao - Palv) / Raw
 //
-// Pleural pressure therefore follows the chest wall compliance curve while
-// alveolar pressure follows the sum of both — the distinction that makes airway
-// pressure a poor proxy for the pressure the heart actually feels.
+// In a passive subject pleural pressure follows the chest-wall curve. Active
+// inspiratory pressure displaces it to the left, including briefly after neural
+// inspiration while post-inspiratory activity brakes early expiration. Alveolar
+// pressure follows the sum of both elastic elements — the distinction that makes
+// airway pressure a poor proxy for the pressure the heart actually feels.
 //
 // The lung element is no longer a constant compliance. Once recruitment is part
 // of the model the pressure–volume relationship has to be sigmoid, because units
@@ -40,6 +42,19 @@ export const EXPIRATORY_FLOW_LIMIT = {
   minimumTimeConstant: 4.5, // s
 };
 
+// Effective pressure-generating activity is not identical to the neural switch.
+// Conscious adults retain inspiratory muscle pressure into expiration: Shee et
+// al. measured a mean half-decay at about 23% of expiratory time and near-complete
+// release late in expiration. One activation state captures that behaviour
+// without adding a separate muscle compartment or drawing a Campbell-loop limb
+// by hand. Scaling relaxation to expiratory time also preserves the observed
+// relation between decay rate and breathing pattern.
+export const POST_INSPIRATORY_ACTIVITY = Object.freeze({
+  activationTimeConstant: 0.06, // s; fast pressure recruitment during inspiration
+  relaxationTimeFraction: 0.30, // exponential tau as a fraction of expiratory time
+  silentFraction: 0.005,        // avoid carrying a numerically irrelevant tail
+});
+
 export function createRespiratoryState() {
   return {
     v: 0, // L above relaxation volume
@@ -48,6 +63,8 @@ export function createRespiratoryState() {
     tCycle: 0,
     tPhase: 0,
     pmus: 0,
+    neuralDrive: 0,
+    inspiratoryActivation: 0,
     prevPhase: 'exp',
     canTrigger: true,
     breathCount: 0,
@@ -111,14 +128,42 @@ function neuralInspiratoryTime(p, period) {
   return Math.min(p.ti, period * 0.5);
 }
 
-// Inspiratory muscle pressure: one continuous rise-and-release over the neural
-// inspiratory time, zero in a fully passive patient. It has to reach zero at
-// both ends — a discontinuity here would make the phase detector chatter.
-function musclePressure(p, tCycle, period) {
+// Inspiratory neural drive rises smoothly until the neural switch-off. The
+// pressure-generating state below follows it quickly on the way up and relaxes
+// more slowly on the way down. This separation is what lets post-inspiratory
+// braking emerge without confusing it with active expiratory-muscle pressure.
+function neuralInspiratoryDrive(p, tCycle, period) {
   if (p.pmus <= 0) return 0;
   const tNeural = neuralInspiratoryTime(p, period);
   if (tCycle >= tNeural) return 0;
-  return p.pmus * Math.sin((Math.PI * tCycle) / tNeural) ** 1.2;
+  return Math.sin((Math.PI * 0.5 * tCycle) / tNeural) ** 1.2;
+}
+
+function stepInspiratoryActivation(p, r, dt, period) {
+  if (p.pmus <= 0) {
+    r.neuralDrive = 0;
+    r.inspiratoryActivation = 0;
+    return 0;
+  }
+
+  const drive = neuralInspiratoryDrive(p, r.tCycle, period);
+  const tNeural = neuralInspiratoryTime(p, period);
+  const expiratoryTime = Math.max(0.2, period - tNeural);
+  const tau = drive > r.inspiratoryActivation
+    ? POST_INSPIRATORY_ACTIVITY.activationTimeConstant
+    : POST_INSPIRATORY_ACTIVITY.relaxationTimeFraction * expiratoryTime;
+
+  // Exact integration of a first-order activation step keeps the result stable
+  // when the numerical timestep is halved in convergence tests.
+  const weight = 1 - Math.exp(-dt / tau);
+  r.inspiratoryActivation += (drive - r.inspiratoryActivation) * weight;
+  r.inspiratoryActivation = clamp(r.inspiratoryActivation, 0, 1);
+  if (drive === 0
+    && r.inspiratoryActivation < POST_INSPIRATORY_ACTIVITY.silentFraction) {
+    r.inspiratoryActivation = 0;
+  }
+  r.neuralDrive = drive;
+  return p.pmus * r.inspiratoryActivation;
 }
 
 // Airway opening pressure applied by the ventilator for the current phase.
@@ -226,7 +271,7 @@ export function stepRespiratory(p, r, dt) {
   r.tCycle += dt;
   r.tPhase += dt;
 
-  r.pmus = musclePressure(p, r.tCycle, period);
+  r.pmus = stepInspiratoryActivation(p, r, dt, period);
 
   // --- occlusion manoeuvres ------------------------------------------------
   // A hold freezes the airway: no flow, so alveolar pressure equilibrates with
@@ -257,8 +302,8 @@ export function stepRespiratory(p, r, dt) {
     // Patient-triggered, flow-cycled. The ventilator will not trigger again
     // until effort has fallen away and a fresh one begins, so cycling off in
     // the middle of an effort cannot immediately retrigger the same breath.
-    if (r.pmus < 0.2) r.canTrigger = true;
-    if (r.phase === 'exp' && r.canTrigger && r.pmus > 0.5) {
+    if (r.neuralDrive < 0.02) r.canTrigger = true;
+    if (r.phase === 'exp' && r.canTrigger && r.neuralDrive > 0.05) {
       r.phase = 'insp';
       r.tPhase = 0;
       r.peakInspFlow = 0;
@@ -271,9 +316,17 @@ export function stepRespiratory(p, r, dt) {
       }
     }
   } else if (p.mode === 'spont') {
-    // Driven by the clock rather than by the muscle pressure, so the phase
-    // cannot flicker at the two instants where effort passes through zero.
-    r.phase = r.tCycle < neuralInspiratoryTime(p, period) ? 'insp' : 'exp';
+    // Neural inspiration starts the breath, but mechanical inspiration ends
+    // only when flow reverses. Post-inspiratory activation can therefore brake
+    // expiration without making a still-inward flow count as expiration.
+    if (r.phase === 'exp' && r.neuralDrive > 0 && r.flow > 0) {
+      r.phase = 'insp';
+      r.tPhase = 0;
+    } else if (r.phase === 'insp'
+      && r.neuralDrive === 0 && r.flow <= 0) {
+      r.phase = 'exp';
+      r.tPhase = 0;
+    }
   } else {
     if (r.phase === 'exp' && r.tCycle >= period) {
       r.phase = 'insp';

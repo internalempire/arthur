@@ -14,7 +14,7 @@
 | inspiratory pressure | 4–40 cmH₂O above PEEP | airway pressure target in pressure control and pressure support |
 | PEEP | 0–24 cmH₂O | external end-expiratory airway pressure |
 | inspiratory time | 0.4–2.5 s | duration of inspiration and, with rate, available expiratory time |
-| inspiratory effort | 0–30 cmH₂O | peak patient muscle-pressure contribution |
+| inspiratory effort | 0–30 cmH₂O | scale of the patient's peak inspiratory muscle pressure |
 
 ### Ventilatory mode
 
@@ -38,7 +38,11 @@ PEEP raises mean airway pressure and usually end-expiratory lung volume. Its hae
 
 ### Inspiratory effort
 
-Effort is represented as one smooth muscle-pressure waveform. Non-zero effort during positive-pressure ventilation makes PPV unavailable because the passive controlled-breath assumptions are absent. The model does not simulate dyssynchrony, variable neural timing or work of breathing.
+The slider sets the pressure scale of one aggregate inspiratory-muscle activation. Neural drive rises smoothly during the selected neural inspiratory time. Effective pressure follows it rapidly and then decays into early expiration instead of being switched off instantaneously. This residual **post-inspiratory activity** slows early lung emptying and lets the expiratory limb of the [Campbell diagram](panel-campbell.md) remain separated from the relaxed chest-wall curve.
+
+The decay time is derived from the available expiratory time, so rate and inspiratory time change its absolute duration. There is no additional braking control: the residual pressure, its effect on alveolar pressure and the resulting expiratory flow all emerge from the same respiratory equation of motion.
+
+Non-zero effort during positive-pressure ventilation makes PPV unavailable because the passive controlled-breath assumptions are absent. Pressure support can cycle before muscle activation has disappeared, so the model can show a simplified post-inspiratory load; it does not reproduce the full range of trigger and cycling asynchronies or calculate clinical work of breathing.
 
 ## Why these controls
 
@@ -48,7 +52,8 @@ The set exposes the minimum respiratory inputs needed to distinguish negative- f
 
 - No flow waveform selection, rise time, trigger sensitivity, cycling criterion, pause time, pressure ramp or patient–ventilator dyssynchrony.
 - Volume control uses constant flow throughout inspiration and has no inspiratory pause.
-- Pressure support is a simplified pressure boundary combined with effort, not a complete trigger/cycle algorithm.
+- Pressure support is a simplified pressure boundary combined with flow cycling and effort, not a complete trigger/cycle algorithm.
+- Post-inspiratory activity is one aggregate, regular decay. It is not diaphragm electrical activity, a patient-specific neural controller or active abdominal expiration.
 - No gas exchange, oxygen concentration, dead space, respiratory drive controller or sedation.
 - Control ranges are model operating ranges, not recommended ventilator settings.
 
@@ -57,6 +62,8 @@ The set exposes the minimum respiratory inputs needed to distinguish negative- f
 - Pinsky MR. Cardiovascular issues in respiratory care. *Chest*. 2005;128:592S–597S. [doi:10.1378/chest.128.5_suppl_2.592S](https://doi.org/10.1378/chest.128.5_suppl_2.592S)
 - Tobin MJ. *Principles and Practice of Mechanical Ventilation*. 3rd ed. McGraw-Hill; 2013.
 - Marini JJ, Gattinoni L. Management of COVID-19 respiratory distress. *JAMA*. 2020;323:2329–2330. [doi:10.1001/jama.2020.6825](https://doi.org/10.1001/jama.2020.6825)
+- Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
+- Coiffard B, Dianti J, Telias I, et al. Dyssynchronous diaphragm contractions impair diaphragm function in mechanically ventilated patients. *Crit Care*. 2024;28:107. [doi:10.1186/s13054-024-04894-3](https://doi.org/10.1186/s13054-024-04894-3)
 
 ---
 

@@ -58,6 +58,8 @@
 
 **Plateau pressure.** Airway pressure intended to represent the zero-flow end-inspiratory elastic load. The model computes it; it does not perform a true inspiratory pause for the routine tile.
 
+**Post-inspiratory activity.** Persistence of inspiratory-muscle activation into early expiration. It slows the initial expiratory fall in lung volume and shifts the active Campbell loop away from the relaxed chest-wall curve. The model represents this as a gradual decay of the same aggregate inspiratory activation, not as a separate expiratory muscle. See [the Campbell diagram](panel-campbell.md).
+
 **Preload reserve.** Local change in the analytic Guyton intersection when mean systemic filling pressure rises. The ascending relation predicts RV output rather than independently testing LV reserve. It is an internal coefficient, not a validated bedside index.
 
 **Pulmonary vascular resistance (PVR).** Clinically, $(mPAP-PAWP)/CO$, reported in Wood units. The model separately reports this derived aggregate and the coefficient used in its pulmonary flow law. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).

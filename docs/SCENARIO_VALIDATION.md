@@ -25,11 +25,11 @@ does not tune a preset or change an equation to make a row pass.
 
 | Preset | Status | Main finding |
 |---|---|---|
-| `healthy-spont` | supported | Inspiration lowers measured CVP while forward flow rises; PPV is correctly withheld. |
+| `healthy-spont` | supported | Inspiration lowers measured CVP while venous inflow rises modestly; post-inspiratory activity brakes early expiration and PPV is correctly withheld. |
 | `healthy-vcv` | supported | Passive inflation reverses the respiratory direction of CVP and lowers settled output relative to spontaneous breathing. |
 | `peep-escalation` | qualified | Higher PEEP raises CVP and mean systemic filling pressure while lowering output; the size is illustrative. |
 | `septic-responder` | qualified | Added stressed volume raises output and removing compensation exposes hypotension; the coefficients are didactic. |
-| `swing-limited-reserve` | qualified | A >20 cmH2O pleural swing coexists with a non-steep local preload slope; PPV is correctly withheld during spontaneous effort. |
+| `swing-limited-reserve` | qualified | An approximately 20 cmH2O pleural swing coexists with a non-steep local preload slope; PPV is correctly withheld during spontaneous effort. |
 | `ards-rv` | qualified | RV pressure overload and the recruitability interaction are present; extreme PEEP and prone responses must not be read quantitatively. |
 | `pulmonary-embolism` | qualified | The baseline pressure-flow-RV phenotype is coherent; vascular obstruction and autonomic compensation remain aggregate inputs. |
 | `cardiac-tamponade` | qualified | Reduced pericardial capacity produces shared diastolic constraint and preferential RV underfilling; decompression is directional, not a calibrated drainage model. |
@@ -48,8 +48,8 @@ ranges.
 inspiration while right-heart filling increases?
 
 **What the model produces.** During inspiration, mean CVP is approximately
-−4.0 rather than −0.9 mmHg in expiration, while instantaneous forward flow is
-approximately 5.9 rather than 5.5 L/min. The mean displayed CVP is −1.5 mmHg,
+−3.6 rather than −1.3 mmHg in expiration, while forward venous inflow is
+approximately 5.7 rather than 5.6 L/min. The mean displayed CVP is negative,
 but transmural CVP is positive. This is the intended distinction between a
 pressure measured relative to atmosphere and the distending pressure across the
 atrial wall.
@@ -135,7 +135,7 @@ fluid kinetics.
 fluid responsiveness?
 
 **What the model produces.** Pleural pressure swings by about 20 cmH2O while the
-local preload reserve is about 6.8% of output per mmHg of filling pressure,
+local preload reserve is about 7.7% of output per mmHg of filling pressure,
 below the model's 8%/mmHg steep-limb threshold. The preset is spontaneously
 breathing, so the model correctly labels PPV **unavailable**.
 
@@ -143,7 +143,7 @@ breathing, so the model correctly labels PPV **unavailable**.
 settled Guyton operating point, not an arterial waveform index. That preserves
 the spontaneous-breathing phenotype and makes the intended distinction
 internally coherent: pressure transmission is not preload reserve. The
-6.8%/mmHg value and the 8%/mmHg boundary are model teaching constructs, not a
+7.7%/mmHg value and the 8%/mmHg boundary are model teaching constructs, not a
 validated bedside fluid-responsiveness threshold.
 
 **Not represented.** Irregular effort, tidal-volume variability, reverse

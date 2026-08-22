@@ -794,6 +794,121 @@ ${body}
 `;
 }
 
+// --- Campbell diagram and post-inspiratory activity -----------------------
+
+function campbellPostInspiratoryFigure() {
+  // One settled healthy spontaneous breath. The live limb is not drawn from a
+  // teaching template: it is sampled from the same Ppl, flow and activation
+  // state used by the circulation. Static references use the same lung and
+  // chest-wall functions as the interactive Campbell panel.
+  const p = {
+    ...defaultParams(), mode: 'spont', pmus: 8, peep: 0, rr: 14, ti: 1.2,
+  };
+  const sim = settled(p, 35);
+  const period = 60 / p.rr;
+  sim.advance(period - sim.resp.tCycle + sim.dt, true);
+
+  const live = [];
+  const sampleStep = 0.005;
+  for (let elapsed = 0; elapsed < period; elapsed += sampleStep) {
+    sim.advance(sampleStep, true);
+    live.push({
+      pressure: sim.resp.ppl,
+      volume: sim.resp.lungVolume,
+      phase: sim.resp.phase,
+      activation: sim.resp.inspiratoryActivation,
+    });
+  }
+
+  const liveVolumes = live.map(({ volume }) => volume);
+  const yMin = Math.floor((Math.min(...liveVolumes) - 0.08) * 10) / 10;
+  const yMax = Math.ceil((Math.max(...liveVolumes) + 0.08) * 10) / 10;
+  const wall = [];
+  for (let i = 0; i <= 160; i++) {
+    const volume = yMin + ((yMax - yMin) * i) / 160;
+    wall.push([chestWallPressure(p, volume), volume]);
+  }
+  const lung = [];
+  for (let i = 0; i <= 300; i++) {
+    const pl = (20 * i) / 300;
+    const volume = lungVolumeAtPl(p, pl);
+    if (volume >= yMin && volume <= yMax) lung.push([-pl, volume]);
+  }
+
+  const pressures = [
+    ...live.map(({ pressure }) => pressure),
+    ...wall.map(([pressure]) => pressure),
+    ...lung.map(([pressure]) => pressure),
+  ];
+  const xMin = Math.floor(Math.min(...pressures) / 2) * 2 - 1;
+  const xMax = Math.ceil(Math.max(...pressures) / 2) * 2 + 1;
+  const pad = { l: 72, r: 150, t: 38, b: 56 };
+  const pw = W - pad.l - pad.r;
+  const ph = H - pad.t - pad.b;
+  const x = (value) => pad.l + ((value - xMin) / (xMax - xMin)) * pw;
+  const y = (value) => pad.t + ph - ((value - yMin) / (yMax - yMin)) * ph;
+  const path = (points) => points.map(([px, py], index) =>
+    `${index ? 'L' : 'M'}${x(px).toFixed(1)} ${y(py).toFixed(1)}`).join(' ');
+  const livePath = path(live.map(({ pressure, volume }) => [pressure, volume]));
+
+  const xTicks = [];
+  for (let value = Math.ceil(xMin / 2) * 2; value <= xMax; value += 2) {
+    xTicks.push(`<line class="grid" x1="${x(value).toFixed(1)}" y1="${pad.t}" x2="${x(value).toFixed(1)}" y2="${pad.t + ph}"/>`
+      + `<text class="tick" x="${x(value).toFixed(1)}" y="${pad.t + ph + 19}" text-anchor="middle">${value}</text>`);
+  }
+  const yTicks = [];
+  for (let value = Math.ceil(yMin * 5) / 5; value <= yMax + 1e-9; value += 0.2) {
+    yTicks.push(`<line class="grid" x1="${pad.l}" y1="${y(value).toFixed(1)}" x2="${pad.l + pw}" y2="${y(value).toFixed(1)}"/>`
+      + `<text class="tick" x="${pad.l - 9}" y="${(y(value) + 4).toFixed(1)}" text-anchor="end">${value.toFixed(1)}</text>`);
+  }
+
+  const brake = live
+    .filter(({ phase }) => phase === 'exp')
+    .reduce((best, point) => (Math.abs(point.activation - 0.45)
+      < Math.abs(best.activation - 0.45) ? point : best));
+  const brakeWall = chestWallPressure(p, brake.volume);
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" class="${ROOT}" role="img"
+  aria-label="Model Campbell diagram during one healthy spontaneous breath. The pleural-pressure loop surrounds reversed lung recoil, and during expiration residual inspiratory activity keeps pleural pressure between the lung and relaxed chest-wall curves before it approaches the wall late in expiration.">
+<style>${STYLE}
+  svg.${ROOT} .campbell-lung { stroke: #8b7cf6; stroke-width: 2.2; stroke-dasharray: 7 5; fill: none }
+  svg.${ROOT} .campbell-wall { stroke: var(--fig-extra, #2a9d8f); stroke-width: 2.2; stroke-dasharray: 3 5; fill: none }
+  svg.${ROOT} .campbell-live { stroke: #00a878; stroke-width: 3; fill: none }
+  svg.${ROOT} .campbell-muscle { stroke: #d97706; stroke-width: 1.8; stroke-dasharray: 4 3 }
+  svg.${ROOT} .campbell-dot { fill: #00a878; stroke: var(--fig-text, #2b3138); stroke-width: 1 }
+  @media (prefers-color-scheme: dark) {
+    svg.${ROOT} .campbell-lung { stroke: #a99cff }
+    svg.${ROOT} .campbell-wall { stroke: #4fd1c1 }
+    svg.${ROOT} .campbell-live { stroke: #20c997 }
+    svg.${ROOT} .campbell-muscle { stroke: #f59e0b }
+    svg.${ROOT} .campbell-dot { fill: #20c997; stroke: #d6dbe2 }
+  }
+</style>
+<rect class="bg" width="${W}" height="${H}"/>
+<text class="title" x="${pad.l}" y="20">One spontaneous breath with post-inspiratory activity</text>
+${xTicks.join('\n')}
+${yTicks.join('\n')}
+<line class="axis" x1="${pad.l}" y1="${pad.t}" x2="${pad.l}" y2="${pad.t + ph}"/>
+<line class="axis" x1="${pad.l}" y1="${pad.t + ph}" x2="${pad.l + pw}" y2="${pad.t + ph}"/>
+<path class="campbell-lung" d="${path(lung)}"/>
+<path class="campbell-wall" d="${path(wall)}"/>
+<path class="campbell-live" d="${livePath}"/>
+<line class="campbell-muscle" x1="${x(brake.pressure).toFixed(1)}" y1="${y(brake.volume).toFixed(1)}" x2="${x(brakeWall).toFixed(1)}" y2="${y(brake.volume).toFixed(1)}"/>
+<circle class="campbell-dot" cx="${x(brake.pressure).toFixed(1)}" cy="${y(brake.volume).toFixed(1)}" r="4"/>
+<text class="label" x="${pad.l + pw + 18}" y="${pad.t + 28}">C<tspan baseline-shift="sub" font-size="9">L</tspan>: −P<tspan baseline-shift="sub" font-size="9">L</tspan></text>
+<line class="campbell-lung" x1="${pad.l + pw + 18}" y1="${pad.t + 38}" x2="${pad.l + pw + 56}" y2="${pad.t + 38}"/>
+<text class="label" x="${pad.l + pw + 18}" y="${pad.t + 72}">C<tspan baseline-shift="sub" font-size="9">cw</tspan>: relaxed wall</text>
+<line class="campbell-wall" x1="${pad.l + pw + 18}" y1="${pad.t + 82}" x2="${pad.l + pw + 56}" y2="${pad.t + 82}"/>
+<text class="label" x="${pad.l + pw + 18}" y="${pad.t + 116}">live P<tspan baseline-shift="sub" font-size="9">pl</tspan> loop</text>
+<line class="campbell-live" x1="${pad.l + pw + 18}" y1="${pad.t + 126}" x2="${pad.l + pw + 56}" y2="${pad.t + 126}"/>
+<text class="tick" x="${pad.l + pw + 18}" y="${pad.t + 160}">orange: residual</text>
+<text class="tick" x="${pad.l + pw + 18}" y="${pad.t + 176}">inspiratory pressure</text>
+<text class="label" transform="translate(18 ${pad.t + ph / 2}) rotate(-90)" text-anchor="middle">Absolute lung volume (L)</text>
+<text class="label" x="${pad.l + pw / 2}" y="${H - 8}" text-anchor="middle">Pleural pressure (cmH₂O)</text>
+</svg>
+`;
+}
+
 // --- recruitment hysteresis -------------------------------------------------
 
 // One preparation, one continuous state: PEEP is walked up and then back down
@@ -999,6 +1114,7 @@ const figures = {
   'pv-curve.svg': pvCurveFigure(),
   'chest-wall.svg': chestWallFigure(),
   'stress-index.svg': stressIndexFigure(),
+  'campbell-post-inspiratory.svg': campbellPostInspiratoryFigure(),
   'hysteresis.svg': hysteresisFigure(),
   'stressed-volume.svg': stressedVolumeFigure(),
   'venous-tone.svg': venousToneFigure(),

@@ -1,5 +1,6 @@
 // Directional heart-lung relations and the aggregate COPD/EFL teaching model.
 import {
+  Simulator, defaultParams, chestWallPressure,
   staticEndExpiratoryVolume, section, check, near, settled,
 } from '../support/model.mjs';
 
@@ -24,6 +25,65 @@ section('Ventilatory mode transitions');
     sim.params.mode === 'pcv' && sim.params.pmus === 0);
 }
 
+section('Post-inspiratory activity');
+{
+  const rr = 14;
+  const ti = 1.2;
+  const period = 60 / rr;
+  const expiratoryTime = period - ti;
+  const sim = new Simulator({ dt: 0.0005 });
+  sim.params = {
+    ...defaultParams(), mode: 'spont', pmus: 8, peep: 0, rr, ti,
+  };
+  sim.reset();
+  // reset() deliberately settles the full circulation for 15 s, so begin the
+  // probe at the next respiratory-cycle boundary rather than assuming t = 0.
+  sim.advance(period - sim.resp.tCycle + sim.dt, true);
+
+  // Neural switch-off is not an instantaneous disappearance of pressure. The
+  // stored effective activation is the mechanism that produces expiratory
+  // braking; no Campbell-plot coordinate is prescribed by the test or model.
+  sim.advance(ti - sim.resp.tCycle, true);
+  sim.advance(sim.dt * 2, true);
+  const pressureAtSwitchOff = sim.resp.pmus;
+  check('inspiratory pressure persists when neural inspiration switches off',
+    sim.resp.neuralDrive === 0 && pressureAtSwitchOff > 7,
+    `drive ${sim.resp.neuralDrive.toFixed(3)}, Pmus ${pressureAtSwitchOff.toFixed(2)} cmH2O`);
+
+  sim.advance(0.23 * expiratoryTime, true);
+  const pressureAtStudyHalfTime = sim.resp.pmus;
+  check('post-inspiratory pressure approximately halves in the first quarter of expiration',
+    pressureAtStudyHalfTime < pressureAtSwitchOff * 0.6
+      && pressureAtStudyHalfTime > pressureAtSwitchOff * 0.35,
+    `${pressureAtSwitchOff.toFixed(2)} -> ${pressureAtStudyHalfTime.toFixed(2)} cmH2O`);
+
+  // Early expiration should sit between reversed lung recoil and the relaxed
+  // wall: continued inspiratory activity keeps Ppl left of Ccw, while positive
+  // alveolar pressure places it right of -PL.
+  const relaxedWall = chestWallPressure(sim.effective, sim.resp.lungVolume);
+  check('the active expiratory Campbell limb lies between CL and Ccw',
+    sim.resp.phase === 'exp'
+      && sim.resp.ppl > -sim.resp.pl
+      && sim.resp.ppl < relaxedWall
+      && near(relaxedWall - sim.resp.ppl, sim.resp.pmus, 1e-6),
+    `-PL ${(-sim.resp.pl).toFixed(2)}, Ppl ${sim.resp.ppl.toFixed(2)}, Ccw ${relaxedWall.toFixed(2)} cmH2O`);
+
+  sim.advance(0.56 * expiratoryTime, true);
+  check('post-inspiratory pressure is small late in expiration',
+    sim.resp.pmus < pressureAtSwitchOff * 0.1,
+    `${sim.resp.pmus.toFixed(2)} cmH2O at 79% of expiratory time`);
+
+  const passive = new Simulator({ dt: 0.0005 });
+  passive.params = { ...defaultParams(), mode: 'vcv', pmus: 0, peep: 0 };
+  passive.reset();
+  passive.advance(2, true);
+  const passiveWall = chestWallPressure(passive.effective, passive.resp.lungVolume);
+  check('a passive patient has no hidden post-inspiratory activity',
+    passive.resp.inspiratoryActivation === 0
+      && passive.resp.pmus === 0
+      && near(passive.resp.ppl, passiveWall, 1e-9));
+}
+
 section('Physiological relations');
 {
   const peep0 = settled({ peep: 0 });
@@ -43,9 +103,12 @@ section('Physiological relations');
   check('spontaneous breathing lowers measured central venous pressure',
     spont.metrics.cvp < passive.metrics.cvp,
     `${passive.metrics.cvp.toFixed(1)} -> ${spont.metrics.cvp.toFixed(1)} mmHg`);
-  check('spontaneous breathing raises cardiac output',
-    spont.metrics.co > passive.metrics.co,
-    `${passive.metrics.co.toFixed(2)} -> ${spont.metrics.co.toFixed(2)} L/min`);
+  // Negative-pressure inspiration raises right-sided filling, but its effect on
+  // whole-circuit output is delayed and can be opposed by LV afterload and
+  // pulmonary storage. RV end-diastolic volume is the direct relation here.
+  check('spontaneous breathing raises right ventricular filling',
+    spont.metrics.rvEdv > passive.metrics.rvEdv + 3,
+    `${passive.metrics.rvEdv.toFixed(1)} -> ${spont.metrics.rvEdv.toFixed(1)} mL`);
   check('transmural filling pressure exceeds the measured one when breathing in',
     spont.metrics.cvpTransmural > spont.metrics.cvp,
     `${spont.metrics.cvp.toFixed(1)} vs ${spont.metrics.cvpTransmural.toFixed(1)} mmHg`);
