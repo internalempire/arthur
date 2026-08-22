@@ -35,7 +35,7 @@ These layers can expose contradictions, stale documentation and implausible dire
 
 ### Core physiological contracts
 
-The tests change one variable and require a direction: passive PEEP raises measured CVP and commonly lowers output in the reference state; spontaneous inspiration lowers measured CVP while raising transmural filling; added volume helps more when underfilled; short expiration traps gas; a stiff chest wall transmits more pleural pressure; raised pulmonary load dilates a vulnerable RV; disabling septal coupling relieves its LV filling penalty.
+The tests change one variable and require a direction: passive PEEP raises measured CVP and commonly lowers output in the reference state; spontaneous inspiration lowers measured CVP while raising transmural filling and RV end-diastolic volume; post-inspiratory pressure persists into early expiration and then decays; added volume helps more when underfilled; short expiration traps gas; a stiff chest wall transmits more pleural pressure; raised pulmonary load dilates a vulnerable RV; disabling septal coupling relieves its LV filling penalty.
 
 These tests demonstrate that the encoded mechanism has not reversed. They do not specify how large the response should be in a patient.
 

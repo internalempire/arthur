@@ -77,7 +77,7 @@ The function name in the code remains `cardiacFunctionCurve`, reflecting convent
 - The RV-function curve does not independently calculate LV filling or LV output. Calling its ordinate systemic cardiac output is justified only at the predicted steady-state intersection.
 - The curve holds the current external pressures and effective pulmonary arterial load while sweeping right atrial pressure. It therefore compresses ventricular interaction, pulmonary transit and volume history into a local approximation, and can materially underestimate simulated forward flow in severe RV pressure loading.
 - The simulated point reports IVC-to-right-atrial inflow, not SVC flow or cardiac output.
-- Point separation cannot be assigned entirely to physiology: part may come from the analytic approximation itself.
+- Point separation cannot be assigned entirely to physiology: part may come from the analytic approximation itself. This limitation is most visible during severe RV pressure loading and during very large spontaneous pleural-pressure swings.
 - A steep highlighted limb is an internal preload-reserve coefficient, not a validated fluid-responsiveness test.
 - Occlusion points are idealised and do not include changes in vascular tone, stress relaxation or clinical measurement error.
 

@@ -65,7 +65,9 @@ This is the key structural change. A collapsed, stiff lung now meets the unchang
 
 ### Dynamic breaths
 
-Volume control imposes inspiratory flow and lets pressure emerge. Pressure control applies airway pressure and lets flow decay as alveolar pressure approaches it. Spontaneous and assisted breaths subtract the muscle-pressure waveform from the relaxed wall pressure.
+Volume control imposes inspiratory flow and lets pressure emerge. Pressure control applies airway pressure and lets flow decay as alveolar pressure approaches it. Spontaneous and assisted breaths subtract effective inspiratory-muscle pressure from the relaxed wall pressure.
+
+The neural command and effective muscle pressure are not treated as the same instantaneous signal. One internal activation state rises rapidly during neural inspiration and decays more slowly after neural switch-off. The residual pressure lowers pleural and alveolar pressure during early expiration, reducing outward flow. Volume then changes more slowly, which feeds back through both nonlinear recoil relations. This is the model's aggregate representation of post-inspiratory expiratory braking; the [Campbell diagram](panel-campbell.md#what-happens-during-active-expiration) shows its pressure–volume consequence.
 
 The simulator stores respiratory volume as displacement from the current passive equilibrium for numerical convenience, but lung and wall pressure are always calculated from absolute volume. When an elastic control changes, the gas already in the lung is preserved and only this internal reference is updated.
 
@@ -89,7 +91,8 @@ The simulator stores respiratory volume as displacement from the current passive
 - The wall curve is a calibrated teaching relation, not a patient-specific oesophageal pressure–volume fit.
 - Rib cage, diaphragm and abdominal wall are not separate compartments.
 - The `Chest wall load` is an aggregate pressure offset; it is not calculated from body mass, ascites volume or a fixed fraction of abdominal pressure.
-- There is no expiratory muscle activity, inspiratory threshold load, dyssynchrony or respiratory-muscle fatigue.
+- Post-inspiratory inspiratory activity is represented by one regular decay, but there is no separately recruited expiratory-muscle pressure, inspiratory threshold load, respiratory-drive controller or respiratory-muscle fatigue.
+- Pressure support has simplified flow cycling; the model does not reproduce the full range of patient–ventilator dyssynchrony.
 - Airway resistance is linear except for the separate [expiratory flow-limitation](expiratory-flow-limitation.md) choke.
 - The ventilator has no circuit compliance, leak, trigger delay or rise-time control.
 
@@ -101,6 +104,7 @@ The simulator stores respiratory volume as displacement from the current passive
 - Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
 - Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med*. 2014;189:520–531. [doi:10.1164/rccm.201312-2193CI](https://doi.org/10.1164/rccm.201312-2193CI)
+- Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
 
 ---
 

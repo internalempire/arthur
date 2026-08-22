@@ -33,6 +33,16 @@ and therefore corresponds to the magnitude of the local slope of each pressure�
 - The horizontal Vrel line marks the passive balance point between lung and chest wall.
 - The live dot marks the current pleural pressure and lung volume.
 
+![The model Campbell loop during one spontaneous breath, including post-inspiratory braking](figure/campbell-post-inspiratory.svg)
+
+In spontaneous breathing, the live loop runs around $C_L$, not around $C_{cw}$. The reason is easiest to see from:
+
+$$
+P_{pl}=-P_L+P_{alv}
+$$
+
+At zero flow and zero airway pressure, $P_{alv}$ is approximately zero, so the live point falls on $-P_L$. During inspiration, a slightly negative alveolar pressure moves the inspiratory limb to the left of $C_L$. During expiration, positive alveolar pressure moves the expiratory limb to its right. The width around $C_L$ therefore reflects the pressure associated with flow. In the model that resistive pressure comes from the airways; tissue resistance is not represented separately.
+
 During spontaneous inspiration, pleural pressure becomes more negative than the pressure predicted by the relaxed chest wall at the same volume. The horizontal distance between the live point and $C_{cw}$ is inspiratory muscle pressure:
 
 $$
@@ -41,7 +51,7 @@ $$
 
 The panel marks this distance with an orange dashed segment. Clinically, this is the pressure being generated to move the respiratory system away from passive relaxation.
 
-During passive mechanical ventilation, inspiratory muscle pressure is absent. The pleural-pressure trajectory is therefore determined predominantly by the chest wall and may overlap $C_{cw}$. Ventilator pressure is represented by airway and alveolar pressure in the [waveforms](panel-waveforms.md), rather than as an additional Campbell curve.
+During passive mechanical ventilation, inspiratory muscle pressure is absent. In this ideal elastic wall, the pleural-pressure trajectory therefore overlaps $C_{cw}$. Ventilator pressure is represented by airway and alveolar pressure in the [waveforms](panel-waveforms.md), rather than as an additional Campbell curve.
 
 ## Zooming the diagram
 
@@ -49,9 +59,31 @@ The `+` and `−` controls enlarge or reduce the view around the current pleural
 
 The middle button reports the selected magnification. **Fit** restores the complete static construction. Zoom changes only the view; it does not alter respiratory mechanics, ventilator settings or model state. Selecting a scenario or changing a control recentres the magnified view on the new operating point.
 
-## What happens during expiration
+## What happens after spontaneous inspiration
 
-When respiratory muscles are inactive, pleural pressure follows the relaxed chest-wall relation:
+Ending the neural inspiratory command does not make inspiratory muscle pressure disappear immediately. In conscious adults, inspiratory muscle activity commonly persists into early expiration and slows lung emptying. This is **post-inspiratory activity**, also called expiratory braking. It is continued inspiratory activity while the muscle lengthens, not contraction of the abdominal or other active expiratory muscles.
+
+While that activity remains:
+
+$$
+P_{pl}=P_{cw}(V)-P_{mus}
+$$
+
+Pleural pressure therefore remains more negative than the relaxed-wall pressure. The expiratory limb stays between $C_L$ and $C_{cw}$ and approaches $C_{cw}$ only as post-inspiratory activity fades. At the same time, the lower pleural pressure reduces alveolar pressure and the outward pressure gradient, so expiration is genuinely slowed; the trajectory is not imposed on the graph.
+
+The model represents this with one internal pressure-generating activation state, $a$. Neural drive rises during inspiration. Activation follows it rapidly, but after neural switch-off it decays more slowly:
+
+$$
+\frac{da}{dt}=\frac{u-a}{\tau}
+$$
+
+$$
+P_{mus}=P_{mus,max}a
+$$
+
+The expiratory time constant is 30% of the available expiratory time. This gives an approximate half-decay during the first quarter of expiration and leaves little activity late in the breath, consistent with the broad timing reported in conscious adults. It is a population-scale teaching calibration, not a patient-specific neural or diaphragmatic model. Respiratory rate and inspiratory time therefore alter the absolute duration of the decay without adding another control.
+
+When the patient is completely passive, activation is exactly zero and pleural pressure follows the relaxed chest wall:
 
 $$
 P_{pl} = P_{cw}(V)
@@ -67,7 +99,7 @@ $$
 \dot V = \frac{P_{aw} - P_{alv}}{R_{aw}}
 $$
 
-Airway resistance therefore changes how quickly volume returns toward equilibrium. With high resistance or expiratory flow limitation, expiration may remain incomplete, producing dynamic hyperinflation and intrinsic PEEP. The model does not include a separate viscoelastic resistance of lung tissue or chest wall; its resistive contribution is concentrated in the airways.
+Airway resistance therefore changes how quickly volume returns toward equilibrium. With high resistance or expiratory flow limitation, expiration may remain incomplete, producing dynamic hyperinflation and intrinsic PEEP. Post-inspiratory activity also slows early expiration, but through muscle pressure rather than airway obstruction.
 
 ## How the model constructs the curves
 
@@ -83,7 +115,7 @@ The fitted axes cover the static pressure–volume domain of the selected patien
 
 - Pleural pressure is known exactly in the simulation. Real oesophageal-pressure measurements require positioning, calibration and awareness of regional pleural-pressure gradients.
 - One aggregate chest wall replaces separate rib-cage, abdominal and diaphragmatic compartments.
-- The model does not include tissue viscoelasticity, chest-wall resistance or a separate active expiratory-muscle pressure.
+- The model does not include tissue viscoelasticity, chest-wall resistance or a separate active expiratory-muscle pressure. Post-inspiratory inspiratory activity is represented; abdominal-muscle expiration is not.
 - Surface-tension and tissue hysteresis are absent. When two $C_L$ branches are visible, their separation describes recruitment memory only.
 - Vrel equals FRC only in a passive system without external or intrinsic PEEP.
 - The displayed $P_{mus}$ is the pressure generated by the model's inspiratory-effort mechanism. It is not a measurement of diaphragmatic pressure, pressure–time product or metabolic work.
@@ -94,6 +126,8 @@ The fitted axes cover the static pressure–volume domain of the selected patien
 - Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. American Physiological Society; 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
 - Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Mauri T, Yoshida T, Bellani G, et al. Esophageal and transpulmonary pressure in the clinical setting. *Ann Intensive Care*. 2016;6:77. [doi:10.1186/s13613-016-0186-0](https://doi.org/10.1186/s13613-016-0186-0)
+- Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
+- Nuñez Silveira JM, Gallardo A, Alcala G, et al. Work of breathing by the Campbell diagram: physiology and practice. *Respir Care*. 2026. [doi:10.1177/19433654261453096](https://doi.org/10.1177/19433654261453096)
 
 ---
 

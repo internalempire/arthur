@@ -152,8 +152,8 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | Ventilatory mode | Volume control | Spontaneous |
 | Ventilation | Respiratory rate | 14 /min | 24 /min |
 | Ventilation | PEEP | 5 cmH₂O | 6 cmH₂O |
-| Ventilation | Inspiratory effort | 0.0 cmH₂O | 22.0 cmH₂O |
-| Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 100 mL/cmH₂O |
+| Ventilation | Inspiratory effort | 0.0 cmH₂O | 30.0 cmH₂O |
+| Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 150 mL/cmH₂O |
 | Volume & vascular tone | Baseline stressed volume | 700 mL | 950 mL |
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.75 mmHg·s/mL |
 | Cardiac function | Baseline heart rate | 75 /min | 100 /min |

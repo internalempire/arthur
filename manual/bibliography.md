@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 133 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 136 unique entries.
 
 ---
 
@@ -37,6 +37,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Chen L, Chen G-Q, Shore K, et al. Implementing a bedside assessment of respiratory mechanics in patients with acute respiratory distress syndrome. *Crit Care* 2017;21:84. [doi:10.1186/s13054-017-1671-8](https://doi.org/10.1186/s13054-017-1671-8)
 - Chen L, Del Sorbo L, Grieco DL, et al. Potential for lung recruitment estimated by the recruitment-to-inflation ratio in ARDS. *Am J Respir Crit Care Med*. 2020;201:178–187. [doi:10.1164/rccm.201902-0334OC](https://doi.org/10.1164/rccm.201902-0334OC)
 - Chiumello D, Carlesso E, Cadringher P, et al. Lung stress and strain during mechanical ventilation for acute respiratory distress syndrome. *Am J Respir Crit Care Med*. 2008;178:346–355. [doi:10.1164/rccm.200710-1589OC](https://doi.org/10.1164/rccm.200710-1589OC)
+- Coiffard B, Dianti J, Telias I, et al. Dyssynchronous diaphragm contractions impair diaphragm function in mechanically ventilated patients. *Crit Care*. 2024;28:107. [doi:10.1186/s13054-024-04894-3](https://doi.org/10.1186/s13054-024-04894-3)
 - Cressoni M, Cadringher P, Chiurazzi C, et al. Lung inhomogeneity in patients with acute respiratory distress syndrome. *Am J Respir Crit Care Med* 2014;189:149–58. [doi:10.1164/rccm.201308-1567OC](https://doi.org/10.1164/rccm.201308-1567OC)
 - Crotti S, Mascheroni D, Caironi P, et al. Recruitment and derecruitment during acute respiratory failure: a clinical study. *Am J Respir Crit Care Med* 2001;164:131–40. [doi:10.1164/ajrccm.164.1.2007011](https://doi.org/10.1164/ajrccm.164.1.2007011)
 ## D
@@ -107,6 +108,9 @@ A citation documents the physiological or methodological claim made on its sourc
 - Michard F, Boussat S, Chemla D, et al. Relation between respiratory changes in arterial pulse pressure and fluid responsiveness in septic patients with acute circulatory failure. *Am J Respir Crit Care Med*. 2000;162:134–138. [doi:10.1164/ajrccm.162.1.9903035](https://doi.org/10.1164/ajrccm.162.1.9903035)
 - Monnet X, Marik PE, Teboul JL. Prediction of fluid responsiveness: an update. *Ann Intensive Care*. 2016;6:111. [doi:10.1186/s13613-016-0216-7](https://doi.org/10.1186/s13613-016-0216-7)
 - Moreno AH, Katz AI, Gold LD, Reddy RV. Mechanics of distension of dog veins and other very thin-walled tubular structures. *Circ Res*. 1970;27:1069–1080. [doi:10.1161/01.RES.27.6.1069](https://doi.org/10.1161/01.RES.27.6.1069)
+## N
+
+- Nuñez Silveira JM, Gallardo A, Alcala G, et al. Work of breathing by the Campbell diagram: physiology and practice. *Respir Care*. 2026. [doi:10.1177/19433654261453096](https://doi.org/10.1177/19433654261453096)
 ## O
 
 - Oberkampf WL, Roy CJ. *Verification and Validation in Scientific Computing*. Cambridge University Press; 2010. [doi:10.1017/CBO9780511760396](https://doi.org/10.1017/CBO9780511760396)
@@ -146,6 +150,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Schulz-Menger J, Collini V, Gröschel J, et al. 2025 ESC Guidelines for the management of myocarditis and pericarditis. *Eur Heart J*. 2025;46:3952–4041. [doi:10.1093/eurheartj/ehaf192](https://doi.org/10.1093/eurheartj/ehaf192)
 - Senzaki H, Chen CH, Kass DA. Single-beat estimation of end-systolic pressure–volume relation in humans. *Circulation*. 1996;94:2497–2506. [doi:10.1161/01.CIR.94.10.2497](https://doi.org/10.1161/01.CIR.94.10.2497)
 - Seraphim A, Knott KD, Menacho K, et al. Prognostic value of pulmonary transit time and pulmonary blood volume estimation using myocardial perfusion CMR. *JACC Cardiovasc Imaging*. 2021;14:2107–2119. [doi:10.1016/j.jcmg.2021.03.029](https://doi.org/10.1016/j.jcmg.2021.03.029)
+- Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
 - Simmons DH, Linde LM, Miller JH, O'Reilly RJ. [Relation between lung volume and pulmonary vascular resistance](https://doi.org/10.1161/01.RES.9.2.465). *Circ Res* 1961;9:465–71.
 - Skrapari I, Tentolouris N, Katsilambros N. Baroreflex function: determinants in healthy subjects and disturbances in diabetes, obesity and metabolic syndrome. *Curr Diabetes Rev*. 2006;2:329–338. [doi:10.2174/157339906777950589](https://doi.org/10.2174/157339906777950589)
 - Smiseth OA, Thompson CR, Ling H, Robinson M, Miyagishima RT. Juxtacardiac pleural pressure during positive end-expiratory pressure ventilation: an intraoperative study in patients with open pericardium. *J Am Coll Cardiol*. 1994;23:753–758. [doi:10.1016/0735-1097(94)90764-1](https://doi.org/10.1016/0735-1097(94)90764-1)

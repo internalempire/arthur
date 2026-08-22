@@ -80,9 +80,9 @@ This is not an echocardiographic diameter equation. It is a visually compressed 
 
 | state | mean IVC volume (mL) | respiratory volume swing (% of mean) | change in displayed calibre (%) |
 |---|---:|---:|---:|
-| healthy spontaneous preset | 84 | 17.3 | 18.7 |
-| cardiac-tamponade preset | 172 | 11.5 | 7.5 |
-| same tamponade state, capacity restored | 114 | 13.7 | 10.8 |
+| healthy spontaneous preset | 81 | 18.4 | 19.5 |
+| cardiac-tamponade preset | 167 | 10.9 | 7.0 |
+| same tamponade state, capacity restored | 110 | 12.8 | 10.1 |
 <!-- END GENERATED: ivc-respiratory-calibre -->
 
 The respiratory volume swing is not the same as ultrasound collapsibility. The displayed-calibre column reports only how much the schematic width changes after the square-root transformation. In the tamponade preset, the underlying IVC volume continues to vary through the breath; the drawing now shows that small excursion rather than clipping every value above 150 mL to the same width.

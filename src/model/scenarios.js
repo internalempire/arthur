@@ -5,7 +5,7 @@ export const SCENARIOS = [
   {
     id: 'healthy-spont',
     name: 'Healthy, breathing spontaneously',
-    note: 'Watch the central venous pressure fall during inspiration while cardiac output rises. The measured pressure drops; the transmural pressure — the one the atrium feels — goes up.',
+    note: 'Watch central venous pressure fall during inspiration while venous inflow rises modestly. The measured pressure drops, but transmural pressure — the pressure that distends the atrium — rises. Post-inspiratory muscle activity then brakes early expiration rather than disappearing at the neural switch.',
     params: { mode: 'spont', pmus: 8, peep: 0, rr: 14 },
   },
   {
@@ -36,9 +36,9 @@ export const SCENARIOS = [
     // the Guyton operating point instead. Keeping that distinction in the
     // scenario itself prevents a hidden waveform number from becoming a
     // surrogate fluid-responsiveness test.
-    note: 'The same patient after resuscitation, now making vigorous efforts against a stiff chest wall. Pleural pressure swings by more than 20 cmH₂O, but the operating point has limited local preload reserve: pressure swing and fluid responsiveness are not the same quantity. PPV is deliberately unavailable because the patient is breathing spontaneously; inspect the Guyton construction instead.',
+    note: 'The same patient after resuscitation, now making vigorous efforts against a relatively stiff chest wall. Pleural pressure swings by about 20 cmH₂O, but the operating point has limited local preload reserve: pressure swing and fluid responsiveness are not the same quantity. PPV is deliberately unavailable because the patient is breathing spontaneously; inspect the Guyton construction instead.',
     params: {
-      mode: 'spont', pmus: 22, peep: 6, rr: 24, ccw: 100,
+      mode: 'spont', pmus: 30, peep: 6, rr: 24, ccw: 150,
       stressedVolume: 950, svr: 0.75, hr: 100,
     },
   },

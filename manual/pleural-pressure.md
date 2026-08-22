@@ -43,6 +43,8 @@ $$
 P_{pl}=P_{cw}-P_{mus}
 $$
 
+$P_{mus}$ is an effective pressure-generating state, not an on/off copy of neural inspiration. It rises during the inspiratory command and decays through early expiration. While this post-inspiratory activity persists, pleural pressure remains more negative than the relaxed chest-wall pressure and expiratory flow is braked. The [Campbell diagram](panel-campbell.md#what-happens-during-active-expiration) shows why the active expiratory trajectory therefore approaches $C_{cw}$ gradually instead of falling onto it as soon as inspiration ends.
+
 The pressure that distends the lung is then:
 
 $$
@@ -105,7 +107,7 @@ A fixed airway-to-pleural transmission fraction was rejected. Pressure transmiss
 - `cwLoad` is an aggregate offset, not a body-mass or intra-abdominal-pressure model.
 - The remote curvature of the sigmoid is a didactic shape choice; it has not been fitted to an individual human relaxation manoeuvre.
 - Oesophageal pressure measurement, calibration, positional artefact and occlusion testing are absent.
-- Muscle pressure is one waveform; expiratory effort, dyssynchrony and fatigue are absent.
+- Muscle pressure is one aggregate activation with post-inspiratory decay. Separate expiratory-muscle recruitment, variable neural drive, fatigue and a full dyssynchrony model are absent.
 - Prone coefficients are representative directional choices, not predictions for an individual patient.
 
 ---
@@ -118,6 +120,7 @@ A fixed airway-to-pleural transmission fraction was rejected. Pressure transmiss
 - Behazin N, Jones SB, Cohen RI, Loring SH. Respiratory restriction and elevated pleural and esophageal pressures in morbid obesity. *J Appl Physiol*. 2010;108:212–218. [doi:10.1152/japplphysiol.91356.2008](https://doi.org/10.1152/japplphysiol.91356.2008)
 - Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med*. 2014;189:520–531. [doi:10.1164/rccm.201312-2193CI](https://doi.org/10.1164/rccm.201312-2193CI)
 - Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med*. 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
+- Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
 
 ---
 
