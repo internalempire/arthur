@@ -9,13 +9,15 @@
 // used for every label, annotation and status word. Computed, not chosen.
 const LIGHT_TEXT = {
   arterial: '#cf4242', venous: '#2974d0', pulmonary: '#008300', airway: '#be542a',
-  pleural: '#15855d', transpulmonary: '#4a3aa7', volume: '#9c6a00', flow: '#4a3aa7',
+  alveolar: '#006f9e', pleural: '#15855d', transpulmonary: '#4a3aa7',
+  volume: '#9c6a00', flow: '#4a3aa7',
   good: '#0a870a', warning: '#986d0f', serious: '#ac6042', critical: '#d03b3b',
 };
 
 const DARK_TEXT = {
   arterial: '#e66767', venous: '#3987e5', pulmonary: '#269626', airway: '#d95b28',
-  pleural: '#199e70', transpulmonary: '#9085e9', volume: '#c98500', flow: '#9085e9',
+  alveolar: '#2ca6d6', pleural: '#199e70', transpulmonary: '#9085e9',
+  volume: '#c98500', flow: '#9085e9',
   good: '#0ca30c', warning: '#fab219', serious: '#ec835a', critical: '#d75858',
 };
 
@@ -35,6 +37,7 @@ const LIGHT = {
   venous: '#2a78d6',
   pulmonary: '#008300',
   airway: '#eb6834',
+  alveolar: '#0075a5',
   pleural: '#1baf7a',
   transpulmonary: '#4a3aa7',
   volume: '#eda100',
@@ -62,6 +65,7 @@ const DARK = {
   venous: '#3987e5',
   pulmonary: '#008300',
   airway: '#d95926',
+  alveolar: '#2ca6d6',
   pleural: '#199e70',
   transpulmonary: '#9085e9',
   volume: '#c98500',

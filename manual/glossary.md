@@ -10,6 +10,8 @@
 
 **Afterload.** The load opposing ventricular ejection. It is not represented by one pressure alone. For the LV, surrounding pleural pressure changes transmural ejection load; for the RV, pulmonary vascular resistance, critical closing behaviour and pulsatile load all matter, although the model represents only part of them. See [transmural pressure](transmural-pressure.md) and [the right ventricle](the-right-ventricle.md).
 
+**Alveolar pressure ($P_{alv}$).** Pressure inside the model's single alveolar compartment, in cmH₂O. During flow it differs from airway-opening pressure by the pressure gradient across airway resistance. At zero flow the two equilibrate unless a flow-limiting boundary condition remains active. See [the waveform panel](panel-waveforms.md).
+
 **Auto-PEEP / intrinsic PEEP.** Positive alveolar pressure remaining at end-expiration because expiration did not reach the resting equilibrium. See [expiratory flow limitation](expiratory-flow-limitation.md).
 
 **Capacitance.** The capacity of a vascular compartment to contain volume at a given pressure. The model keeps capacity shifts caused by [venous tone](venous-tone.md) separate from compliance.

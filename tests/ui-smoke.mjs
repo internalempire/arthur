@@ -78,8 +78,9 @@ check('effective heart rate and systemic resistance remain available as tiles',
 const pressureMetrics = {
   valid: true, ppl: -5.2, pplSwing: 7.8, pl: 6.1, palv: 0.9,
 };
-check('respiratory-pressure tiles prioritise instantaneous Ppl and expose PL',
+check('respiratory-pressure tiles expose instantaneous Ppl, Palv and PL',
   tilePrimaryValue('ppl', pressureMetrics) === '-5.2'
+    && tilePrimaryValue('palv', pressureMetrics) === '0.9'
     && tilePrimaryValue('pl', pressureMetrics) === '6.1');
 check('a plethoric IVC remains visually responsive above the reference calibre',
   ivcDisplayWidth(180) > ivcDisplayWidth(160)

@@ -18,7 +18,7 @@ const PANELS = [
     title: 'Waveforms',
     summary: (sim) => {
       const m = sim.metrics;
-      return `Airway pressure ${n(m.paw)}, pleural pressure ${n(m.ppl)} and transpulmonary pressure ${n(m.pl)} cmH₂O; `
+      return `Airway pressure ${n(m.paw)}, alveolar pressure ${n(m.palv)}, pleural pressure ${n(m.ppl)} and transpulmonary pressure ${n(m.pl)} cmH₂O; `
         + `arterial ${n(m.sbp, 0)} over ${n(m.dbp, 0)}, pulmonary artery ${n(m.papSys, 0)} over ${n(m.papDia, 0)}, `
         + `central venous ${n(m.cvp)} mmHg; lung volume ${n((m.lungVolume - sim.resp.relaxVolume) * 1000, 0)} mL above resting.`;
     },
@@ -27,6 +27,7 @@ const PANELS = [
       return [
         ['Airway pressure, now', `${n(m.paw)} cmH₂O`],
         ['Airway pressure, peak this breath', `${n(m.ppeak)} cmH₂O`],
+        ['Alveolar pressure, now', `${n(m.palv)} cmH₂O (Paw − Palv ${n(m.paw - m.palv)})`],
         ['Pleural pressure, now', `${n(m.ppl)} cmH₂O`],
         ['Pleural pressure, swing this breath', `${n(m.pplSwing)} cmH₂O`],
         ['Transpulmonary pressure, now', `${n(m.pl)} cmH₂O (Palv ${n(m.palv)} − Ppl ${n(m.ppl)})`],
