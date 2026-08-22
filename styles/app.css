@@ -306,7 +306,9 @@ select { min-width: 150px; }
 .waveform-stack .strip {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) clamp(8.5rem, 16vw, 10rem);
+  /* Paw may carry the passive Pplat context. Reserve enough width for the
+     longest truthful value instead of letting it collide with the trace label. */
+  grid-template-columns: minmax(0, 1fr) clamp(12.5rem, 18vw, 13rem);
   flex-basis: 0;
   min-height: 0;
 }
