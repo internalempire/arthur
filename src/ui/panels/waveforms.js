@@ -33,8 +33,9 @@ const STRIPS = [
           : '—'),
       },
       {
-        channel: 'pl', color: 'transpulmonary', label: 'Pₗ',
+        channel: 'pl', color: 'transpulmonary', label: 'P', subscript: 'L',
         ariaLabel: 'Transpulmonary pressure',
+        paintOrder: 0,
         summary: (m) => tilePrimaryValue('pl', m),
       },
     ],
@@ -98,7 +99,13 @@ export function createWaveforms(container) {
 
       const label = document.createElement('dt');
       label.className = 'waveform-readout-label';
-      label.textContent = series.label;
+      label.append(series.label);
+      if (series.subscript) {
+        const subscript = document.createElement('sub');
+        subscript.textContent = series.subscript;
+        label.appendChild(subscript);
+      }
+      if (series.ariaLabel) label.setAttribute('aria-label', series.ariaLabel);
 
       const value = document.createElement('dd');
       const output = document.createElement('output');
@@ -209,7 +216,12 @@ export function createWaveforms(container) {
       if (lo < 0 && hi > 0) panel.axisLine(colors, { y: 0 });
 
       panel.clip();
-      for (const b of buffers) {
+      // The rail keeps the clinically useful Paw, Ppl, PL reading order. Paint
+      // PL first instead, so its purple stroke stays underneath Paw and Ppl
+      // wherever the pressure curves meet or overlap.
+      const paintBuffers = [...buffers]
+        .sort((a, b) => (a.paintOrder ?? 1) - (b.paintOrder ?? 1));
+      for (const b of paintBuffers) {
         panel.series(b.data, b.n, 0, WINDOW_SECONDS, { color: colors[b.color], width: 1.8 });
       }
       panel.unclip();
