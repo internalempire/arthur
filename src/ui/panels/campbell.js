@@ -13,9 +13,24 @@ const LOOP_INTERVAL = 0.02; // simulated seconds between samples
 const LOOP_POINTS = 900;    // roughly three normal breaths
 const PL_MIN = -5;
 const PL_MAX = 45;
+const ZOOM_LEVELS = Object.freeze([1, 1.5, 2, 3]);
 
 const roundDown = (value, step) => Math.floor(value / step) * step;
 const roundUp = (value, step) => Math.ceil(value / step) * step;
+
+/** Keep a two-axis zoom inside the complete static Campbell construction. */
+export function campbellZoomDomain(full, focus, factor = 1) {
+  const zoom = Math.max(1, Number(factor) || 1);
+  if (zoom === 1) return { ...full };
+
+  const xSpan = (full.xMax - full.xMin) / zoom;
+  const ySpan = (full.yMax - full.yMin) / zoom;
+  const focusX = Number.isFinite(focus?.x) ? focus.x : (full.xMin + full.xMax) / 2;
+  const focusY = Number.isFinite(focus?.y) ? focus.y : (full.yMin + full.yMax) / 2;
+  const xMin = Math.min(full.xMax - xSpan, Math.max(full.xMin, focusX - xSpan / 2));
+  const yMin = Math.min(full.yMax - ySpan, Math.max(full.yMin, focusY - ySpan / 2));
+  return { xMin, xMax: xMin + xSpan, yMin, yMax: yMin + ySpan };
+}
 
 /**
  * Build the static reference curves from the same constitutive relations used
@@ -91,12 +106,68 @@ function closestPoint(points, targetVolume) {
   return best;
 }
 
-export function createCampbell(canvas) {
+export function createCampbell(canvas, { onViewChange } = {}) {
   const panel = new Panel(canvas, { padding: [22, 50, 40, 58] });
   const pplLoop = [];
   const previousLoop = [];
   let breathSeen = -1;
   let lastSample = -1;
+  let zoomIndex = 0;
+  let zoomFocus = null;
+
+  // Match the PVR chart's native, keyboard-operable controls. Campbell zooms
+  // both axes because its clinical purpose is to inspect the live breath
+  // against two pressure-volume relations, not to preserve one fixed axis.
+  const zoomControls = document.createElement('div');
+  zoomControls.className = 'pvr-zoom campbell-zoom';
+  zoomControls.setAttribute('role', 'group');
+  zoomControls.setAttribute('aria-label', 'Zoom for Campbell diagram');
+
+  const zoomOut = document.createElement('button');
+  zoomOut.type = 'button';
+  zoomOut.textContent = '\u2212';
+  zoomOut.setAttribute('aria-label', 'Zoom out on Campbell diagram');
+  zoomOut.title = 'Zoom out';
+
+  const zoomReset = document.createElement('button');
+  zoomReset.type = 'button';
+  zoomReset.className = 'pvr-zoom-reset';
+  zoomReset.setAttribute('aria-label', 'Reset Campbell diagram to the full range');
+  zoomReset.title = 'Fit the full Campbell construction';
+
+  const zoomIn = document.createElement('button');
+  zoomIn.type = 'button';
+  zoomIn.textContent = '+';
+  zoomIn.setAttribute('aria-label', 'Zoom in around the current point on Campbell diagram');
+  zoomIn.title = 'Zoom in around the current point';
+
+  zoomControls.append(zoomOut, zoomReset, zoomIn);
+  canvas.insertAdjacentElement('afterend', zoomControls);
+
+  function syncZoomControls() {
+    const factor = ZOOM_LEVELS[zoomIndex];
+    zoomOut.disabled = zoomIndex === 0;
+    zoomIn.disabled = zoomIndex === ZOOM_LEVELS.length - 1;
+    zoomReset.disabled = zoomIndex === 0;
+    zoomReset.textContent = zoomIndex === 0 ? 'Fit' : `${Math.round(factor * 100)}%`;
+    zoomReset.setAttribute('aria-label', zoomIndex === 0
+      ? 'Campbell diagram already fitted to the full range'
+      : `Reset Campbell diagram from ${Math.round(factor * 100)} percent zoom to the full range`);
+  }
+
+  function setZoomIndex(next) {
+    const clamped = Math.min(ZOOM_LEVELS.length - 1, Math.max(0, next));
+    if (clamped === zoomIndex) return;
+    zoomIndex = clamped;
+    if (zoomIndex === 0) zoomFocus = null;
+    syncZoomControls();
+    onViewChange?.();
+  }
+
+  zoomOut.addEventListener('click', () => setZoomIndex(zoomIndex - 1));
+  zoomIn.addEventListener('click', () => setZoomIndex(zoomIndex + 1));
+  zoomReset.addEventListener('click', () => setZoomIndex(0));
+  syncZoomControls();
 
   function render(sim, colors) {
     panel.resize();
@@ -118,7 +189,13 @@ export function createCampbell(canvas) {
     }
 
     const reference = classicalCampbellCurves(p);
-    const { xMin, xMax, yMin, yMax } = reference.domain;
+    if (zoomIndex > 0 && zoomFocus === null) {
+      // Freeze the centre until settings change or the user returns to Fit.
+      // This prevents the axes from following every point of the live breath.
+      zoomFocus = { x: r.ppl, y: r.lungVolume };
+    }
+    const view = campbellZoomDomain(reference.domain, zoomFocus, ZOOM_LEVELS[zoomIndex]);
+    const { xMin, xMax, yMin, yMax } = view;
     panel.setDomain(xMin, xMax, yMin, yMax);
     panel.grid(colors, {
       xTicks: niceTicks(xMin, xMax, 6), xFormat: (v) => v.toFixed(0),
@@ -137,7 +214,7 @@ export function createCampbell(canvas) {
     });
     for (const branch of reference.lungCurves) {
       panel.line(branch.points, {
-        color: colors.inkMuted, width: 1.7, dash: branch.dash, alpha: 0.82,
+        color: colors.transpulmonary, width: 1.9, dash: branch.dash, alpha: 0.9,
       });
     }
 
@@ -156,13 +233,14 @@ export function createCampbell(canvas) {
     }
     panel.unclip();
 
-    const wallLabel = closestPoint(reference.chestWall, yMax * 0.75);
-    const lungLabel = closestPoint(reference.lungCurves[0].points, yMax * 0.72);
-    panel.label('relaxed chest wall', wallLabel[0], wallLabel[1], {
+    const labelVolume = yMin + (yMax - yMin) * 0.8;
+    const wallLabel = closestPoint(reference.chestWall, labelVolume);
+    const lungLabel = closestPoint(reference.lungCurves[0].points, labelVolume);
+    panel.subscriptLabel('C', 'cw', wallLabel[0], wallLabel[1], {
       color: colors.text.pleural, dx: -5, align: 'right', halo: colors.surface,
     });
-    panel.label('−P_L · lung recoil', lungLabel[0], lungLabel[1], {
-      color: colors.inkMuted, dx: -5, align: 'right', halo: colors.surface,
+    panel.subscriptLabel('C', 'L', lungLabel[0], lungLabel[1], {
+      color: colors.text.transpulmonary, dx: -5, align: 'right', halo: colors.surface,
     });
     const relaxationLabel = p.peep === 0 && sim.metrics.autoPeep < 0.2 ? 'FRC = Vrel' : 'Vrel';
     panel.label(relaxationLabel, xMin, reference.vRelax, {
@@ -191,6 +269,7 @@ export function createCampbell(canvas) {
     previousLoop.length = 0;
     breathSeen = -1;
     lastSample = -1;
+    zoomFocus = null;
   }
 
   return { render, clearTrail };

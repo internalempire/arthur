@@ -238,6 +238,46 @@ export class Panel {
   }
 
   /**
+   * Draw physiological symbols such as C with a true canvas subscript. Plain
+   * Unicode has no uppercase subscript L, so composing the glyphs avoids an
+   * underscore or a misleading lowercase character in clinical notation.
+   */
+  subscriptLabel(base, subscript, x, y, {
+    color, align = 'left', dx = 6, dy = 0, halo,
+  }) {
+    const { ctx } = this;
+    ctx.save();
+    const baseFont = '600 11px system-ui, -apple-system, "Segoe UI", sans-serif';
+    const subFont = '600 8px system-ui, -apple-system, "Segoe UI", sans-serif';
+    ctx.font = baseFont;
+    const baseWidth = ctx.measureText(base).width;
+    ctx.font = subFont;
+    const subWidth = ctx.measureText(subscript).width;
+    const totalWidth = baseWidth + subWidth;
+    const anchorX = this.sx(x) + dx;
+    const startX = align === 'right' ? anchorX - totalWidth
+      : align === 'center' ? anchorX - totalWidth / 2 : anchorX;
+    const py = this.sy(y) + dy;
+
+    const draw = (method) => {
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.font = baseFont;
+      ctx[method](base, startX, py);
+      ctx.font = subFont;
+      ctx[method](subscript, startX + baseWidth, py + 3);
+    };
+    if (halo) {
+      ctx.lineWidth = 3.5;
+      ctx.strokeStyle = halo;
+      draw('strokeText');
+    }
+    ctx.fillStyle = color;
+    draw('fillText');
+    ctx.restore();
+  }
+
+  /**
    * Panel heading, with the subtitle dropped rather than clipped when the panel
    * is too narrow for both. A half-written label reads as a rendering fault.
    */
