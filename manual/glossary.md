@@ -76,6 +76,8 @@
 
 **Transmural pressure.** Pressure inside a structure minus pressure surrounding it. See [transmural pressure](transmural-pressure.md).
 
+**Transpulmonary pressure ($P_L$).** Alveolar pressure minus pleural pressure, in cmH₂O. It is the pressure across the lung; the model reports one global instantaneous value. See [pleural pressure](pleural-pressure.md).
+
 **Unstressed volume.** Vascular volume that fills the vascular space without generating appreciable elastic recoil.
 
 **Vascular waterfall.** Flow limitation in which downstream pressure ceases to control flow once it falls below a critical closing pressure. See [vascular waterfalls](vascular-waterfalls.md).

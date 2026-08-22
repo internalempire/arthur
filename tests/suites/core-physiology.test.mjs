@@ -50,6 +50,24 @@ section('Physiological relations');
     spont.metrics.cvpTransmural > spont.metrics.cvp,
     `${spont.metrics.cvp.toFixed(1)} vs ${spont.metrics.cvpTransmural.toFixed(1)} mmHg`);
 
+  // Ppl and PL are now interrogable waveform states. Record PL explicitly on
+  // the common trace clock so a future time cursor can point to one coherent
+  // respiratory state rather than subtracting mismatched samples.
+  spont.advance(0.2);
+  const pplTrace = spont.trace('ppl');
+  const palvTrace = spont.trace('palv');
+  const plTrace = spont.trace('pl');
+  const lastPressureSample = plTrace.n - 1;
+  check('the transpulmonary trace equals alveolar minus pleural pressure',
+    lastPressureSample >= 0
+      && plTrace.n === pplTrace.n
+      && plTrace.n === palvTrace.n
+      && near(plTrace.data[lastPressureSample],
+        palvTrace.data[lastPressureSample] - pplTrace.data[lastPressureSample], 1e-4),
+    lastPressureSample >= 0
+      ? `${palvTrace.data[lastPressureSample].toFixed(2)} − ${pplTrace.data[lastPressureSample].toFixed(2)} = ${plTrace.data[lastPressureSample].toFixed(2)} cmH2O`
+      : 'no recorded pressure samples');
+
   const dry = settled({ stressedVolume: 330, vt: 560, ccw: 150, svr: 0.85, hr: 105 });
   const wet = settled({ stressedVolume: 830, vt: 560, ccw: 150, svr: 0.85, hr: 105 });
   // Phase 1 retired the Michard-based PPV calibration. Do not reintroduce it as

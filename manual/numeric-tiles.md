@@ -6,7 +6,7 @@
 
 ## How a model state becomes a number
 
-The circulation is integrated at every time step, but most bedside quantities are not instantaneous. Systolic and diastolic pressures come from the latest completed cardiac cycle. Cardiac output uses the latest left ventricular stroke volume and current effective heart rate. Mean vascular pressures are exponential three-second averages. Respiratory quantities generally come from the latest completed breath. A tile can therefore lag an animated chamber or instantaneous waveform without either being wrong.
+The circulation is integrated at every time step, but most bedside quantities are not instantaneous. Systolic and diastolic pressures come from the latest completed cardiac cycle. Cardiac output uses the latest left ventricular stroke volume and current effective heart rate. Mean vascular pressures are exponential three-second averages. Most respiratory summaries come from the latest completed breath, but the pleural and transpulmonary tiles show the current model pressure. A tile can therefore lag an animated chamber or instantaneous waveform without either being wrong.
 
 After measurement, the interface may apply a calculation such as $(mPAP-wedge)/CO$, $VT/\Delta P$ or respiratory variation. It then asks whether the assumptions needed to give that calculation its clinical name are present. Finally, a colour may draw attention to a teaching state. These four stages are separate:
 
@@ -149,11 +149,29 @@ Total PEEP is applied PEEP plus intrinsic PEEP from the last breath. Dynamic tra
 
 Related page: [Expiratory flow limitation](expiratory-flow-limitation.md)
 
-### Pleural swing
+### Pleural pressure
 
-The amplitude comes from the latest completed breath; the subtitle is instantaneous pleural pressure. Pleural pressure links ventilation to vascular and chamber pressures. Wall compliance primarily changes the swing, while wall load can shift its resting level; the same numerical swing can still have different consequences depending on stressed volume, vascular waterfalls and ventricular reserve.
+The main number is the current absolute pleural pressure: the pressure surrounding the lung, heart and intrathoracic vessels at that instant. The subtitle retains the swing measured over the latest completed breath. This order matters clinically: the absolute pressure helps interpret transmural filling and ejection load now, whereas the swing describes how strongly breathing has varied that surrounding pressure over one breath.
 
-Related pages: [Pleural pressure](pleural-pressure.md) · [The four effects of a breath](the-four-effects-of-a-breath.md)
+Chest-wall compliance mainly changes the swing; chest-wall load can shift the resting level. The same swing can therefore begin from different absolute pressures and have different circulatory consequences.
+
+Related pages: [Pleural pressure](pleural-pressure.md) · [Transmural pressure](transmural-pressure.md) · [The four effects of a breath](the-four-effects-of-a-breath.md)
+
+### Transpulmonary pressure
+
+This separate tile shows the current pressure across the lung:
+
+$$
+P_L=P_{alv}-P_{pl}
+$$
+
+- $P_L$ — transpulmonary pressure, in cmH₂O;
+- $P_{alv}$ — alveolar pressure, in cmH₂O;
+- $P_{pl}$ — pleural pressure, in cmH₂O.
+
+The subtitle prints the two pressures used in the subtraction. Keeping $P_L$ separate from Ppl distinguishes the pressure that distends the lung from the pressure surrounding the circulation. It is an exact global model state, not an oesophageal-pressure measurement and not a regional estimate of lung stress.
+
+Related pages: [Pleural pressure](pleural-pressure.md) · [The Campbell diagram](panel-campbell.md) · [The waveform panel](panel-waveforms.md)
 
 ---
 

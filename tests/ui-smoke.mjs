@@ -61,6 +61,7 @@ check('the header exposes accessible repository and manual links',
     && /id=["']project-manual["'][^>]+href=["']manual\/["'][^>]+aria-label=/.test(html));
 
 const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8');
+const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.meta.url));
 const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
 const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
 const { ivcDisplayWidth } = await import(new URL('../src/ui/panels/thorax.js', import.meta.url));
@@ -74,6 +75,12 @@ check('baroreflex uses the same Off/On selector as recruitment hysteresis',
     && choiceValue(baroreflex, choiceIndex(baroreflex, false)) === false);
 check('effective heart rate and systemic resistance remain available as tiles',
   /id: 'hr'/.test(stats) && /id: 'svr'/.test(stats));
+const pressureMetrics = {
+  valid: true, ppl: -5.2, pplSwing: 7.8, pl: 6.1, palv: 0.9,
+};
+check('respiratory-pressure tiles prioritise instantaneous Ppl and expose PL',
+  tilePrimaryValue('ppl', pressureMetrics) === '-5.2'
+    && tilePrimaryValue('pl', pressureMetrics) === '6.1');
 check('a plethoric IVC remains visually responsive above the reference calibre',
   ivcDisplayWidth(180) > ivcDisplayWidth(160)
     && ivcDisplayWidth(160) > ivcDisplayWidth(150));
@@ -83,4 +90,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n8 UI smoke contracts passed`);
+console.log(`\n9 UI smoke contracts passed`);

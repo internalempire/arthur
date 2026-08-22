@@ -6,24 +6,24 @@
 
 ## How to read it
 
-The top strip shows airway pressure (Paw) and pleural pressure (Ppl) in cmH₂O. Their separation helps distinguish pressure applied at the airway from pressure transmitted to the thorax.
+The top strip shows airway pressure (Paw), pleural pressure (Ppl) and transpulmonary pressure ($P_L$) in cmH₂O. Ppl is the pressure surrounding the lung and intrathoracic circulation. $P_L=P_{alv}-P_{pl}$ is the pressure across the lung itself. Showing both makes it possible to see whether a respiratory pressure change mainly loads the thorax or actually distends the lung.
 
 The middle strip shows systemic arterial, pulmonary arterial and central venous pressure in mmHg. The bottom strip shows lung volume above the calculated resting reference in mL. Light vertical bands identify inspiration in all three strips, allowing events to be aligned without mentally matching different time axes.
 
-The rail on the right deliberately does **not** print the latest instantaneous sample. It repeats the slower summaries used in the numerical tiles: plateau pressure beside Paw, pleural-pressure swing beside Ppl, systolic/diastolic systemic pressure, systolic/diastolic PAP, CVP, and delivered tidal volume. The curves therefore remain continuous, while the adjacent numbers retain the same meaning and update cadence as the clinical readouts elsewhere in the interface.
+The rail on the right mixes two kinds of readout deliberately. Plateau pressure, systemic and pulmonary systolic/diastolic pressure, CVP and tidal volume remain the slower summaries used in the numerical tiles. Ppl and $P_L$ show the current model state at the rail's readable update rate. The Ppl row also keeps the latest breath's swing in parentheses. The curves themselves remain continuous at the model's trace sampling rate.
 
 Respiratory and vascular pressures deliberately do not share an axis. Their units and magnitudes differ, and a dual axis would make visual crossings physiologically meaningless.
 
 ## Useful comparisons
 
-- In spontaneous breathing, locate the fall in Ppl and measured CVP during inspiration; then inspect transmural CVP in the tile.
-- In volume control, compare the pressure response with the linear rise in volume.
+- In spontaneous breathing, locate the fall in Ppl and measured CVP during inspiration; compare it with the rise in $P_L$, then inspect transmural CVP in the tile.
+- In volume control, compare how Paw, Ppl and $P_L$ divide the pressure required to deliver the rising volume.
 - With flow limitation, identify incomplete return of lung volume before the next breath and compare it with auto-PEEP.
 - After changing RV load, look for the delayed left-sided arterial response over subsequent beats rather than expecting an immediate mirror image.
 
 ## In the model
 
-Each trace contains the most recent 12 seconds sampled at 250 Hz. Vertical ranges expand immediately to prevent clipping but shrink only after the data have remained comfortably inside the current range for four simulated seconds. This stabilises visual amplitude while the physiology is steady.
+Each trace contains the most recent 12 seconds sampled at 250 Hz. $P_L$ is stored on the same clock as Paw and Ppl, so every plotted point represents one internally consistent respiratory state. Vertical ranges expand immediately to prevent clipping but shrink only after the data have remained comfortably inside the current range for four simulated seconds. This stabilises visual amplitude while the physiology is steady.
 
 The panel shows no airflow trace. Expiratory flow limitation must be inferred from volume not returning, auto-PEEP and the EFL readout; the manifest previously described this panel as containing flow and has been corrected.
 
@@ -44,4 +44,4 @@ The panel shows no airflow trace. Expiratory flow limitation must be inferred fr
 
 ## See also
 
-[The four effects of a breath](the-four-effects-of-a-breath.md) · [Pulmonary transit](pulmonary-transit.md) · [Expiratory flow limitation](expiratory-flow-limitation.md) · [Numerical tiles](numeric-tiles.md)
+[Pleural pressure](pleural-pressure.md) · [The Campbell diagram](panel-campbell.md) · [The four effects of a breath](the-four-effects-of-a-breath.md) · [Pulmonary transit](pulmonary-transit.md) · [Expiratory flow limitation](expiratory-flow-limitation.md) · [Numerical tiles](numeric-tiles.md)

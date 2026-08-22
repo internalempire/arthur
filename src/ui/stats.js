@@ -168,9 +168,14 @@ const TILES = [
     status: (m) => (m.autoPeep > 1.5 ? ['warning', 'gas trapping'] : null),
   },
   {
-    id: 'ppl', label: 'Pleural swing', unit: 'cmH₂O', kind: 'measured',
-    get: (m) => m.pplSwing.toFixed(1),
-    sub: (m) => `now ${m.ppl.toFixed(1)}`,
+    id: 'ppl', label: 'Pleural pressure', unit: 'cmH₂O', kind: 'measured',
+    get: (m) => m.ppl.toFixed(1),
+    sub: (m) => `swing ${m.pplSwing.toFixed(1)}`,
+  },
+  {
+    id: 'pl', label: 'Transpulmonary pressure', unit: 'cmH₂O', kind: 'measured',
+    get: (m) => m.pl.toFixed(1),
+    sub: (m) => `Palv ${m.palv.toFixed(1)} − Ppl ${m.ppl.toFixed(1)}`,
   },
   {
     id: 'pmsf', label: 'Mean systemic filling', unit: 'mmHg', kind: 'derived',
@@ -201,6 +206,7 @@ const DEFAULT_VISIBLE = TILES.map((t) => t.id);
 
 const STORAGE_KEY = 'arthur.tileLayout';
 const READOUT_MIGRATION_KEY = 'arthur.tileLayout.effective-rate-and-svr';
+const TRANSPULMONARY_MIGRATION_KEY = 'arthur.tileLayout.transpulmonary-pressure';
 
 function insertAfter(ids, anchor, id) {
   if (ids.includes(id)) return;
@@ -212,18 +218,28 @@ function loadLayout() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (Array.isArray(saved) && saved.length > 0) {
+      let changed = false;
       if (localStorage.getItem(READOUT_MIGRATION_KEY) !== 'done') {
         // These readouts did not exist when older layouts were saved. Add them
         // once beside the quantities they explain, then respect any later hide
         // or reorder action exactly like every other user-customisable tile.
         insertAfter(saved, 'co', 'hr');
         insertAfter(saved, 'map', 'svr');
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
         localStorage.setItem(READOUT_MIGRATION_KEY, 'done');
+        changed = true;
       }
+      if (localStorage.getItem(TRANSPULMONARY_MIGRATION_KEY) !== 'done') {
+        // Keep this migration separate: revisiting the older migration would
+        // re-enable HR or SVR for users who deliberately hid those tiles.
+        insertAfter(saved, 'ppl', 'pl');
+        localStorage.setItem(TRANSPULMONARY_MIGRATION_KEY, 'done');
+        changed = true;
+      }
+      if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
       return saved;
     }
     localStorage.setItem(READOUT_MIGRATION_KEY, 'done');
+    localStorage.setItem(TRANSPULMONARY_MIGRATION_KEY, 'done');
   } catch { /* ignore */ }
   return [...DEFAULT_VISIBLE];
 }

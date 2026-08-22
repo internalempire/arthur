@@ -30,7 +30,7 @@ class Ring {
   }
 }
 
-const CHANNELS = ['paw', 'ppl', 'palv', 'art', 'cvp', 'pap', 'paop', 'flow', 'volume', 'co', 'insp'];
+const CHANNELS = ['paw', 'ppl', 'pl', 'palv', 'art', 'cvp', 'pap', 'paop', 'flow', 'volume', 'co', 'insp'];
 
 // The Guyton diagram is a steady-state analysis: its axes are mean pressure and
 // mean flow. Cardiac pulsatility does not belong on it — right atrial pressure
@@ -344,6 +344,11 @@ export class Simulator {
     const c = this.circ, r = this.resp;
     this.traces.paw.push(r.paw);
     this.traces.ppl.push(r.ppl);
+    // Keep transpulmonary pressure on the same sampling clock as Paw and Ppl.
+    // A displayed subtraction of two independently read buffers would be
+    // mathematically equivalent today, but recording the model state directly
+    // makes the channel explicit and ready for synchronized cursor inspection.
+    this.traces.pl.push(r.pl);
     this.traces.palv.push(r.palv);
     this.traces.art.push(c.p.sa);
     this.traces.cvp.push(c.p.ra);
