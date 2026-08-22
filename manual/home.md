@@ -43,7 +43,7 @@ The tiles combine direct model measurements, derived physiological indices and i
 | anatomical thorax | what is moving, what surrounds each chamber, and which pressures are being transmitted? | [Thorax](panel-thorax.md) |
 | waveforms | what happened first within the breath or cardiac cycle? | [Waveforms](panel-waveforms.md) |
 | ventricular pressure–volume loops | did filling, contractility or afterload change the beat? | [PV loops](panel-pv-loops.md) |
-| Campbell diagram | how are airway, alveolar and pleural pressure related to volume and respiratory work? | [Campbell diagram](panel-campbell.md) |
+| Campbell diagram | how do pleural pressure, passive recoil and inspiratory muscle pressure relate to lung volume? | [Campbell diagram](panel-campbell.md) |
 | Guyton diagram | where do venous return and predicted RV output meet, and is there preload reserve? | [Guyton diagram](panel-guyton.md) |
 | PVR against lung volume | how do alveolar and extra-alveolar vessels create the J-shaped pulmonary vascular load? | [PVR curve](panel-pvr-curve.md) |
 

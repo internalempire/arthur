@@ -65,7 +65,7 @@ const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.m
 const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
 const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
 const { airwayReadout } = await import(new URL('../src/ui/panels/waveforms.js', import.meta.url));
-const { createCampbellVolumeScale } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
+const { classicalCampbellCurves } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
 const { ivcDisplayWidth } = await import(new URL('../src/ui/panels/thorax.js', import.meta.url));
 const baroreflex = PARAMETERS.find((spec) => spec.id === 'baroreflexEnabled');
 const hysteresis = PARAMETERS.find((spec) => spec.id === 'hysteresis');
@@ -95,16 +95,21 @@ const assistedAirway = {
 check('the waveform rail keeps Paw live when plateau is unavailable',
   airwayReadout(passiveAirway) === '8.4 (Pplat 14.2)'
     && airwayReadout(assistedAirway) === '8.4');
-const campbellScale = createCampbellVolumeScale();
 const psvSettings = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
 Object.assign(psvSettings, { mode: 'psv', pinsp: 14, pmus: 6, peep: 0 });
-const firstCampbellLimit = campbellScale.resolve(psvSettings, 120);
-check('the Campbell vertical scale remains fixed throughout one parameter state',
-  firstCampbellLimit >= 1500
-    && campbellScale.resolve(psvSettings, firstCampbellLimit + 500) === firstCampbellLimit);
-campbellScale.reset();
-check('the Campbell vertical scale recalculates after controls change',
-  campbellScale.resolve({ ...psvSettings, pinsp: 30 }, 120) > firstCampbellLimit);
+const campbell = classicalCampbellCurves(psvSettings);
+const wallStart = campbell.chestWall.slice(0, 2);
+const wallEnd = campbell.chestWall.slice(-2);
+const lungStart = campbell.lungCurves[0].points.slice(0, 2);
+const lungEnd = campbell.lungCurves[0].points.slice(-2);
+check('the classical Campbell curves have their physiological orientation',
+  wallEnd[0] > wallStart[0] && wallEnd[1] > wallStart[1]
+    && lungEnd[0] < lungStart[0] && lungEnd[1] > lungStart[1]);
+check('the Campbell domain shows absolute volume and the full passive construction',
+  campbell.domain.yMin === 0
+    && campbell.domain.yMax >= psvSettings.lungCapacity * 0.9
+    && campbell.domain.xMin <= -40
+    && campbell.vRelax > 0);
 check('a plethoric IVC remains visually responsive above the reference calibre',
   ivcDisplayWidth(180) > ivcDisplayWidth(160)
     && ivcDisplayWidth(160) > ivcDisplayWidth(150));

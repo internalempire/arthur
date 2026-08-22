@@ -1,237 +1,196 @@
 import { Panel, niceTicks } from '../plot.js';
 import {
-  respiratorySystemCompliance,
   lungVolumeAtPl, relaxationVolume, recruitmentBand, stepRecruitedFraction,
   openFractionFromRecruitmentState, chestWallPressure,
-  staticEndExpiratoryVolume,
-  EXPIRATORY_FLOW_LIMIT,
 } from '../../model/index.js';
 
-// The Campbell diagram. Pleural pressure follows the chest wall compliance
-// curve; airway pressure follows the respiratory system curve. The horizontal
-// distance between the two loops at any volume is the pressure spent on the
-// lung — and the pleural loop is the one the heart lives inside.
+// Classical Campbell construction. Pressure is pleural pressure throughout:
+// the relaxed chest wall is Pcw(V), the lung recoil curve is plotted as -PL(V),
+// and the live breath is the Ppl-volume loop. Paw and Palv belong to different
+// pressure constructions and remain available in the waveform panel.
 
-const LOOP_INTERVAL = 0.02; // s of simulated time between samples
-const LOOP_POINTS = 900;    // about three breaths at a normal rate
+const LOOP_INTERVAL = 0.02; // simulated seconds between samples
+const LOOP_POINTS = 900;    // roughly three normal breaths
+const PL_MIN = -5;
+const PL_MAX = 45;
+
+const roundDown = (value, step) => Math.floor(value / step) * step;
+const roundUp = (value, step) => Math.ceil(value / step) * step;
 
 /**
- * Choose the Campbell volume range from settings rather than from the moving
- * sample. A canvas that rescales as volume rises makes a stable breath look as
- * if its amplitude is changing and prevents visual comparison within a cycle.
- *
- * Pressure-targeted modes use the static volume reached by the combined lung
- * and wall at the largest applied-plus-muscle pressure. Volume control uses the
- * requested VT above its PEEP equilibrium; with flow limitation, the simple
- * exponential emptying envelope also reserves room for steady gas trapping.
- * These are display bounds, not additional respiratory physiology.
+ * Build the static reference curves from the same constitutive relations used
+ * by the integrator. The returned domain spans the patient's physical volume
+ * range rather than following the current breath, so the panel cannot rescale
+ * from frame to frame.
  */
-export function campbellVolumeLimit(p, currentVolumeMl = 0) {
+export function classicalCampbellCurves(p, steps = 80) {
   const vRelax = relaxationVolume(p);
-  const peepVolume = staticEndExpiratoryVolume(p, p.peep);
-  const peepOffset = Math.max(0, peepVolume - vRelax);
-  let expectedPeak;
+  const branches = p.hysteresis === 'on'
+    ? [{ direction: 'up', dash: [2, 4] }, { direction: 'down', dash: [6, 3] }]
+    : [{ direction: null, dash: [5, 4] }];
 
-  if (p.mode === 'vcv') {
-    const period = 60 / Math.max(1, p.rr);
-    const expiratoryTime = Math.max(0.05, period - p.ti);
-    const crs = respiratorySystemCompliance(p, peepVolume);
-    const passiveTau = Math.max(0.02, p.raw * crs / 1000);
-    const expiratoryTau = p.efl === 'on'
-      ? Math.max(passiveTau, EXPIRATORY_FLOW_LIMIT.minimumTimeConstant)
-      : passiveTau;
-    const emptiedFraction = Math.max(0.08, 1 - Math.exp(-expiratoryTime / expiratoryTau));
-    expectedPeak = peepOffset + (p.vt / 1000) / emptiedFraction;
-  } else {
-    const ventilatorPressure = p.mode === 'spont' ? p.peep : p.peep + p.pinsp;
-    const peakSystemPressure = ventilatorPressure + p.pmus;
-    expectedPeak = staticEndExpiratoryVolume(p, peakSystemPressure) - vRelax;
+  const lungCurves = branches.map((branch) => {
+    const points = [];
+    let recruited = branch.direction === 'down' ? recruitmentBand(p, PL_MAX).lo : null;
+    for (let i = 0; i <= steps; i++) {
+      const fraction = i / steps;
+      const pl = branch.direction === 'down'
+        ? PL_MAX - fraction * (PL_MAX - PL_MIN)
+        : PL_MIN + fraction * (PL_MAX - PL_MIN);
+      if (branch.direction) {
+        recruited = stepRecruitedFraction(
+          p, recruited ?? recruitmentBand(p, pl).lo, pl,
+        );
+      }
+      const openFraction = branch.direction
+        ? openFractionFromRecruitmentState(p, pl, recruited)
+        : null;
+      points.push(-pl, lungVolumeAtPl(p, pl, openFraction));
+    }
+    return { points, dash: branch.dash };
+  });
+
+  const lungVolumes = lungCurves.flatMap(({ points }) => points.filter((_, i) => i % 2));
+  const highestLungVolume = Math.max(vRelax, ...lungVolumes);
+  const yMax = Math.max(
+    1,
+    roundUp(Math.max(vRelax + 0.8, highestLungVolume * 1.04), 0.5),
+  );
+  const chestWall = [];
+  for (let i = 0; i <= steps; i++) {
+    const volume = 0.02 + (i / steps) * (yMax - 0.02);
+    chestWall.push(chestWallPressure(p, volume), volume);
   }
 
-  const paddedMl = Math.max(900, currentVolumeMl * 1.15, expectedPeak * 1150);
-  return Math.ceil(paddedMl / 100) * 100;
-}
+  const pressures = [
+    ...chestWall.filter((_, i) => i % 2 === 0),
+    ...lungCurves.flatMap(({ points }) => points.filter((_, i) => i % 2 === 0)),
+  ];
+  const xMin = roundDown(Math.min(...pressures, Math.min(...pressures) - p.pmus) - 2, 5);
+  const xMax = roundUp(Math.max(...pressures) + 2, 5);
 
-/** A resettable, testable lock: one parameter choice gets one vertical scale. */
-export function createCampbellVolumeScale() {
-  let limit = null;
   return {
-    resolve(p, currentVolumeMl = 0) {
-      if (limit === null) limit = campbellVolumeLimit(p, currentVolumeMl);
-      return limit;
-    },
-    reset() { limit = null; },
+    chestWall,
+    lungCurves,
+    vRelax,
+    relaxPressure: chestWallPressure(p, vRelax),
+    domain: { xMin, xMax, yMin: 0, yMax },
   };
 }
 
+function closestPoint(points, targetVolume) {
+  let best = [points[0], points[1]];
+  let distance = Math.abs(points[1] - targetVolume);
+  for (let i = 2; i < points.length; i += 2) {
+    const candidate = Math.abs(points[i + 1] - targetVolume);
+    if (candidate < distance) {
+      best = [points[i], points[i + 1]];
+      distance = candidate;
+    }
+  }
+  return best;
+}
+
 export function createCampbell(canvas) {
-  const panel = new Panel(canvas, { padding: [22, 58, 34, 48] });
+  const panel = new Panel(canvas, { padding: [22, 50, 40, 58] });
   const pplLoop = [];
-  const pawLoop = [];
-  const palvLoop = [];
-  const prev = { ppl: [], paw: [], palv: [] };
+  const previousLoop = [];
   let breathSeen = -1;
   let lastSample = -1;
-  const volumeScale = createCampbellVolumeScale();
 
   function render(sim, colors) {
     panel.resize();
-    const ctx = panel.begin();
+    panel.begin();
     const { params: p, resp: r } = sim;
 
-    const vMl = r.v * 1000;
-    // Sampled on simulated time, so the loop keeps its shape whatever the frame
-    // rate and does not accumulate while paused.
+    // Sample simulated time rather than display frames. This keeps the loop
+    // independent of animation speed and prevents accumulation while paused.
     if (sim.time - lastSample >= LOOP_INTERVAL) {
       lastSample = sim.time;
-      // One breath at a time, and only the one before it kept.
-      //
-      // A rolling buffer spanning several breaths draws them all on top of each
-      // other, which is fine while they coincide and unreadable the moment a
-      // parameter changes and they stop coinciding. Keeping the previous breath
-      // and fading it shows the change instead of tangling with it.
       if (r.breathCount !== breathSeen) {
         breathSeen = r.breathCount;
-        prev.ppl = pplLoop.slice(); prev.paw = pawLoop.slice(); prev.palv = palvLoop.slice();
-        pplLoop.length = 0; pawLoop.length = 0; palvLoop.length = 0;
+        previousLoop.length = 0;
+        previousLoop.push(...pplLoop);
+        pplLoop.length = 0;
       }
-      pplLoop.push(r.ppl, vMl);
-      pawLoop.push(r.paw, vMl);
-      palvLoop.push(r.palv, vMl);
-      if (pplLoop.length > LOOP_POINTS * 2) {
-        pplLoop.splice(0, 2); pawLoop.splice(0, 2); palvLoop.splice(0, 2);
-      }
+      pplLoop.push(r.ppl, r.lungVolume);
+      if (pplLoop.length > LOOP_POINTS * 2) pplLoop.splice(0, 2);
     }
 
-    const vMax = volumeScale.resolve(p, vMl);
-    let pLo = -12, pHi = 30;
-    for (const [pl, pw] of [[pplLoop, pawLoop], [prev.ppl, prev.paw]]) {
-      for (let i = 0; i < pl.length; i += 2) {
-        pLo = Math.min(pLo, pl[i] - 2);
-        pHi = Math.max(pHi, pw[i] + 2);
-      }
-    }
-    panel.setDomain(pLo, pHi, -50, vMax);
-
+    const reference = classicalCampbellCurves(p);
+    const { xMin, xMax, yMin, yMax } = reference.domain;
+    panel.setDomain(xMin, xMax, yMin, yMax);
     panel.grid(colors, {
-      xTicks: niceTicks(pLo, pHi, 6), xFormat: (v) => v.toFixed(0),
-      yTicks: niceTicks(0, vMax, 4), yFormat: (v) => v.toFixed(0),
-      xLabel: 'Pressure (cmH₂O)',
-      yLabel: 'Volume above resting (mL)',
+      xTicks: niceTicks(xMin, xMax, 6), xFormat: (v) => v.toFixed(0),
+      yTicks: niceTicks(yMin, yMax, 5), yFormat: (v) => v.toFixed(1),
+      xLabel: 'Pleural pressure, Ppl (cmH₂O)',
+      yLabel: 'Absolute lung volume (L)',
     });
-    panel.axisLine(colors, { x: 0, y: 0 });
+    panel.axisLine(colors, { x: 0 });
 
     panel.clip();
-
-    // Both elastic elements are evaluated against absolute volume. The wall is
-    // almost linear around tidal breathing but bends at the volume extremes;
-    // unlike the old construction, changing the lung cannot translate it.
-    const crs = respiratorySystemCompliance(p, r.lungVolume);
-    const vRelax = relaxationVolume(p);
-    const chestWallCurve = [];
-    for (let v = -50; v <= vMax; v += vMax / 32) {
-      chestWallCurve.push(chestWallPressure(p, vRelax + v / 1000), v);
-    }
-    panel.line(chestWallCurve, { color: colors.pleural, width: 1.5, dash: [4, 4], alpha: 0.75 });
-
-    // The lung is not. Its relaxation line is the pressure–volume curve itself,
-    // drawn by sweeping transpulmonary pressure and reading the volume off it —
-    // the same function the integrator uses, so the curve on the plot and the
-    // spring in the model cannot be different springs. In a recruitable lung it
-    // has the lower inflection that a bedside manoeuvre draws; in a normal one it
-    // is nearly straight, which is why this looked like a line for so long.
-    // The lung's own pressure-volume relation, swept. With hysteresis on it has
-    // two recruitment branches. They illustrate retained recruitment, but not
-    // the area of a measured respiratory-system P-V loop: tissue and surfactant
-    // hysteresis are deliberately absent. Without recruitment hysteresis the
-    // two branches coincide and one line is the whole construction.
-    const branches = p.hysteresis === 'on'
-      ? [{ phi: 'up', dash: [2, 4] }, { phi: 'down', dash: [5, 3] }]
-      : [{ phi: null, dash: [2, 4] }];
-    const rsCurve = [];
-    const drawn = [];
-    for (const branch of branches) {
-      const curve = [];
-      let recruited = branch.phi === 'down' ? recruitmentBand(p, 45).lo : null;
-      for (let i = 0; i <= 60; i++) {
-        const pl = branch.phi === 'down' ? 45 - (i * 47) / 60 : -2 + (i * 47) / 60;
-        if (branch.phi) {
-          recruited = stepRecruitedFraction(
-            p, recruited ?? recruitmentBand(p, pl).lo, pl,
-          );
-        }
-        const openFraction = branch.phi
-          ? openFractionFromRecruitmentState(p, pl, recruited)
-          : null;
-        const vMlHere = (lungVolumeAtPl(p, pl, openFraction) - vRelax) * 1000;
-        if (vMlHere < -60 || vMlHere > vMax * 1.1) continue;
-        curve.push(-pl, vMlHere); // back from the alveolus toward the pleural space
-        if (branch === branches[0]) {
-          rsCurve.push(pl + chestWallPressure(p, vRelax + vMlHere / 1000), vMlHere);
-        }
-      }
-      drawn.push({ curve, dash: branch.dash });
-    }
-    panel.line(rsCurve, { color: colors.airway, width: 1.5, dash: [4, 4], alpha: 0.75 });
-    for (const d of drawn) {
-      panel.line(d.curve, { color: colors.inkMuted, width: 1.5, dash: d.dash, alpha: 0.7 });
-    }
-    const lungCurve = drawn[0].curve;
-
-    // The breath before this one, underneath and faded.
-    panel.line(prev.ppl, { color: colors.pleural, width: 1.4, alpha: 0.22 });
-    panel.line(prev.palv, { color: colors.flow, width: 1.3, alpha: 0.2 });
-    panel.line(prev.paw, { color: colors.airway, width: 1.4, alpha: 0.22 });
-
-    panel.line(pplLoop, { color: colors.pleural, width: 2 });
-    // Alveolar pressure, between the other two. The airway loop is square in
-    // volume control and that is arithmetic rather than a fault: expiration is
-    // passive against a constant PEEP, so airway pressure does not move at all
-    // while the volume falls, and the limb has to be vertical. Alveolar pressure
-    // is the one that traces a loop, and the gap between the two curves is the
-    // pressure spent on resistance — which is what a Campbell diagram is read
-    // for.
-    panel.line(palvLoop, { color: colors.flow, width: 1.8, alpha: 0.9 });
-    panel.line(pawLoop, { color: colors.airway, width: 2 });
-
-    panel.unclip();
-
-    panel.label('Ppl', r.ppl, vMl, { color: colors.text.pleural, dx: -6, align: 'right', halo: colors.surface });
-    panel.label('Paw', r.paw, vMl, { color: colors.text.airway, dx: 6, halo: colors.surface });
-    if (Math.abs(r.paw - r.palv) > 0.4) {
-      panel.label('Palv', r.palv, vMl, {
-        color: colors.text.flow, dx: -6, align: 'right', halo: colors.surface,
+    panel.line([xMin, reference.vRelax, xMax, reference.vRelax], {
+      color: colors.inkMuted, width: 1, dash: [3, 5], alpha: 0.45,
+    });
+    panel.line(reference.chestWall, {
+      color: colors.pleural, width: 1.8, dash: [2, 4], alpha: 0.85,
+    });
+    for (const branch of reference.lungCurves) {
+      panel.line(branch.points, {
+        color: colors.inkMuted, width: 1.7, dash: branch.dash, alpha: 0.82,
       });
     }
-    // The three relaxation lines converge near the top of the plot, so each
-    // label is anchored at a different height on its own line.
-    panel.label('Ccw', chestWallPressure(p, vRelax + (vMax * 0.92) / 1000), vMax * 0.92, {
+
+    // Only the Ppl-volume trajectory is a Campbell loop. The previous breath is
+    // retained faintly so a parameter change remains visible without tangling
+    // several old breaths over the current one.
+    panel.line(previousLoop, { color: colors.pleural, width: 1.5, alpha: 0.22 });
+    panel.line(pplLoop, { color: colors.pleural, width: 2.4 });
+
+    const relaxedPpl = chestWallPressure(p, r.lungVolume);
+    const musclePressure = relaxedPpl - r.ppl;
+    if (musclePressure > 0.25) {
+      panel.line([r.ppl, r.lungVolume, relaxedPpl, r.lungVolume], {
+        color: colors.airway, width: 1.6, dash: [4, 3], alpha: 0.9,
+      });
+    }
+    panel.unclip();
+
+    const wallLabel = closestPoint(reference.chestWall, yMax * 0.75);
+    const lungLabel = closestPoint(reference.lungCurves[0].points, yMax * 0.72);
+    panel.label('relaxed chest wall', wallLabel[0], wallLabel[1], {
       color: colors.text.pleural, dx: -5, align: 'right', halo: colors.surface,
     });
-    const labelOn = (curve, frac) => {
-      const i = Math.min(curve.length - 2, Math.floor((curve.length / 2) * frac) * 2);
-      return [curve[i], curve[i + 1]];
-    };
-    if (rsCurve.length >= 4) {
-      const [lx, ly] = labelOn(rsCurve, 0.72);
-      panel.label('Crs', lx, ly, { color: colors.text.airway, dx: 5, halo: colors.surface });
+    panel.label('−P_L · lung recoil', lungLabel[0], lungLabel[1], {
+      color: colors.inkMuted, dx: -5, align: 'right', halo: colors.surface,
+    });
+    const relaxationLabel = p.peep === 0 && sim.metrics.autoPeep < 0.2 ? 'FRC = Vrel' : 'Vrel';
+    panel.label(relaxationLabel, xMin, reference.vRelax, {
+      color: colors.inkMuted, dx: 5, dy: -5, halo: colors.surface,
+    });
+    if (musclePressure > 0.25) {
+      panel.label(`Pmus ${musclePressure.toFixed(1)}`, (r.ppl + relaxedPpl) / 2, r.lungVolume, {
+        color: colors.text.airway, dy: -7, align: 'center', halo: colors.surface,
+      });
     }
-    if (lungCurve.length >= 4) {
-      const [lx, ly] = labelOn(lungCurve, 0.25);
-      panel.label('Clung', lx, ly, { color: colors.inkMuted, dx: 5, halo: colors.surface });
-    }
+    panel.label('Ppl', r.ppl, r.lungVolume, {
+      color: colors.text.pleural, dx: -6, align: 'right', halo: colors.surface,
+    });
 
-    panel.dot(r.ppl, vMl, { color: colors.text.pleural, r: 3.5, ring: colors.surface });
-    panel.dot(r.paw, vMl, { color: colors.text.airway, r: 3.5, ring: colors.surface });
-
-    panel.title('Campbell diagram', colors, 'chest wall vs respiratory system');
+    panel.dot(reference.relaxPressure, reference.vRelax, {
+      color: colors.inkMuted, r: 3, ring: colors.surface,
+    });
+    panel.dot(r.ppl, r.lungVolume, {
+      color: colors.text.pleural, r: 3.8, ring: colors.surface,
+    });
+    panel.title('Campbell diagram', colors, 'Ppl vs lung volume');
   }
 
   function clearTrail() {
-    pplLoop.length = 0; pawLoop.length = 0; palvLoop.length = 0;
-    prev.ppl.length = 0; prev.paw.length = 0; prev.palv.length = 0;
-    breathSeen = -1; lastSample = -1;
-    volumeScale.reset();
+    pplLoop.length = 0;
+    previousLoop.length = 0;
+    breathSeen = -1;
+    lastSample = -1;
   }
 
   return { render, clearTrail };
