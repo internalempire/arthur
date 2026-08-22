@@ -137,6 +137,14 @@ The tile reports the ventilator-like breathwise ratio $VT/\Delta P$, using total
 
 Related pages: [Equation of motion](equation-of-motion.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Two-population lung](two-population-lung.md)
 
+### Airway pressure
+
+The main tile number is instantaneous Paw; its subtitle retains the peak reached during the latest completed breath. The waveform rail follows the same hierarchy and therefore continues to update through VCV, PCV, PSV and spontaneous breathing.
+
+During passive ventilation the rail adds calculated Pplat in parentheses. Pplat is omitted—not replaced by a dash—during PSV or spontaneous effort because the passive plateau interpretation is absent while instantaneous Paw remains a valid model pressure.
+
+Related pages: [The waveform panel](panel-waveforms.md) · [Equation of motion](equation-of-motion.md) · [Manoeuvres](manoeuvres.md)
+
 ### Plateau pressure
 
 The model calculates static end-inspiratory recoil at the delivered volume. The ventilator does not perform a true inspiratory pause, so this is a model plateau rather than a sampled hold waveform. Driving pressure subtracts applied plus intrinsic PEEP. The tile is withheld during spontaneous effort because the passive interpretation is absent.
