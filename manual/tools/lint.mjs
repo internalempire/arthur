@@ -64,6 +64,13 @@ for (const file of files) {
     if (/^\$\$\s*$/.test(l)) { inMath = !inMath; return; }
     if (inMath) return;
 
+    // The manual's renderer intentionally supports dollar delimiters only.
+    // MathJax-style delimiters otherwise survive as ordinary text while still
+    // looking superficially valid in source review.
+    if (/\\(?:\(|\)|\[|\])/.test(bare)) {
+      err(file, n, 'unsupported math delimiter; use $...$ inline or $$ on separate lines for display maths');
+    }
+
     if (!structural(l) && !structural(lines[i + 1] ?? '')) {
       warn(file, n, 'paragraph is hard-wrapped; one line per paragraph so it reflows');
     }
