@@ -388,8 +388,8 @@ select { min-width: 150px; }
 .grid .panel-pvr,
 .grid .panel-thorax { grid-column: span 3; height: 320px; }
 
-/* The PVR zoom changes only the vertical scale. RV, FRC and TLC therefore stay
-   visible while a user inspects the resistance values around the patient. */
+/* Compact chart zoom controls. PVR changes only its vertical scale; Campbell
+   uses the same control surface for a two-axis view around the operating point. */
 .grid .panel > .pvr-zoom {
   position: absolute;
   z-index: 1;
@@ -427,6 +427,8 @@ select { min-width: 150px; }
    opens it still expands over the whole panel and naturally covers the toolbar. */
 .panel-pvr .panel-data:not([open]) { right: 124px; }
 .panel-pvr .panel-data[open] { z-index: 2; }
+.panel-campbell .panel-data:not([open]) { right: 124px; }
+.panel-campbell .panel-data[open] { z-index: 2; }
 
 /* Explicit tracks, all `minmax(0, 1fr)`. An implicit `auto` row would be sized
    by its content — and its content is a canvas. */

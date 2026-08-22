@@ -65,7 +65,7 @@ const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.m
 const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
 const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
 const { airwayReadout } = await import(new URL('../src/ui/panels/waveforms.js', import.meta.url));
-const { classicalCampbellCurves } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
+const { classicalCampbellCurves, campbellZoomDomain } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
 const { ivcDisplayWidth } = await import(new URL('../src/ui/panels/thorax.js', import.meta.url));
 const baroreflex = PARAMETERS.find((spec) => spec.id === 'baroreflexEnabled');
 const hysteresis = PARAMETERS.find((spec) => spec.id === 'hysteresis');
@@ -110,6 +110,16 @@ check('the Campbell domain shows absolute volume and the full passive constructi
     && campbell.domain.yMax >= psvSettings.lungCapacity * 0.9
     && campbell.domain.xMin <= -40
     && campbell.vRelax > 0);
+const zoomedCampbell = campbellZoomDomain(
+  campbell.domain, { x: -5, y: campbell.vRelax }, 3,
+);
+check('Campbell zoom keeps a stable operating-point view inside the full domain',
+  zoomedCampbell.xMin >= campbell.domain.xMin
+    && zoomedCampbell.xMax <= campbell.domain.xMax
+    && zoomedCampbell.yMin >= campbell.domain.yMin
+    && zoomedCampbell.yMax <= campbell.domain.yMax
+    && zoomedCampbell.xMax - zoomedCampbell.xMin
+      < campbell.domain.xMax - campbell.domain.xMin);
 check('a plethoric IVC remains visually responsive above the reference calibre',
   ivcDisplayWidth(180) > ivcDisplayWidth(160)
     && ivcDisplayWidth(160) > ivcDisplayWidth(150));
@@ -119,4 +129,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n12 UI smoke contracts passed`);
+console.log(`\n13 UI smoke contracts passed`);
