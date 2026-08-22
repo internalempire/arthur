@@ -18,7 +18,7 @@ const PANELS = [
     title: 'Waveforms',
     summary: (sim) => {
       const m = sim.metrics;
-      return `Airway pressure ${n(m.paw)} and pleural pressure ${n(m.ppl)} cmH₂O; `
+      return `Airway pressure ${n(m.paw)}, pleural pressure ${n(m.ppl)} and transpulmonary pressure ${n(m.pl)} cmH₂O; `
         + `arterial ${n(m.sbp, 0)} over ${n(m.dbp, 0)}, pulmonary artery ${n(m.papSys, 0)} over ${n(m.papDia, 0)}, `
         + `central venous ${n(m.cvp)} mmHg; lung volume ${n((m.lungVolume - sim.resp.relaxVolume) * 1000, 0)} mL above resting.`;
     },
@@ -29,6 +29,7 @@ const PANELS = [
         ['Airway pressure, peak this breath', `${n(m.ppeak)} cmH₂O`],
         ['Pleural pressure, now', `${n(m.ppl)} cmH₂O`],
         ['Pleural pressure, swing this breath', `${n(m.pplSwing)} cmH₂O`],
+        ['Transpulmonary pressure, now', `${n(m.pl)} cmH₂O (Palv ${n(m.palv)} − Ppl ${n(m.ppl)})`],
         ['Arterial pressure', `${n(m.sbp, 0)}/${n(m.dbp, 0)}, mean ${n(m.map, 0)} mmHg`],
         ['Pulmonary artery', `${n(m.papSys, 0)}/${n(m.papDia, 0)}, mean ${n(m.papMean, 0)} mmHg`],
         ['Central venous pressure', `${n(m.cvp)} mmHg (transmural ${n(m.cvpTransmural)})`],

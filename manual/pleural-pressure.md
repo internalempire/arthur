@@ -43,6 +43,18 @@ $$
 P_{pl}=P_{cw}-P_{mus}
 $$
 
+The pressure that distends the lung is then:
+
+$$
+P_L=P_{alv}-P_{pl}
+$$
+
+- $P_L$ — transpulmonary pressure, in cmH₂O;
+- $P_{alv}$ — alveolar pressure, in cmH₂O;
+- $P_{pl}$ — pleural pressure, in cmH₂O.
+
+The interface therefore gives these pressures different visual roles. The pleural-pressure tile and waveform rail put the current Ppl in the foreground and retain the latest breath's swing as secondary context. A separate $P_L$ tile and trace show the pressure across the lung. This keeps “pressure around the circulation” distinct from “pressure distending the lung” without asking the user to subtract two moving curves mentally.
+
 The default curve is calibrated so that at the normal 2.2 L reference, $P_{cw}=-5$ cmH₂O and the local slope corresponds to 200 mL/cmH₂O. Its relaxed zero-recoil volume is higher, near 3.2 L: below that volume the wall tends outward; above it the wall tends inward. These are model reference values, not universal patient normals.
 
 `Chest wall compliance` changes the local slope. `Chest wall load` adds a pressure offset without changing that selected slope. The two controls are kept separate because they have different consequences:
@@ -88,6 +100,7 @@ A fixed airway-to-pleural transmission fraction was rejected. Pressure transmiss
 ## Limits
 
 - One pleural pressure replaces vertical and regional gradients.
+- The displayed Ppl and $P_L$ are exact internal states, not measured oesophageal or regional transpulmonary pressures.
 - There is no separate rib cage, diaphragm, abdominal wall or zone-of-apposition geometry.
 - `cwLoad` is an aggregate offset, not a body-mass or intra-abdominal-pressure model.
 - The remote curvature of the sigmoid is a didactic shape choice; it has not been fitted to an individual human relaxation manoeuvre.

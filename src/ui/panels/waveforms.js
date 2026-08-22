@@ -5,10 +5,10 @@ import { TRACE_SECONDS } from '../../model/index.js';
 // Three time-aligned strips. Respiratory and haemodynamic pressures are kept on
 // separate strips rather than sharing one plot with two y-axes: cmH2O and mmHg
 // are different scales, and a dual axis would invite reading one against the
-// other. Each strip also owns a fixed readout rail: the waveform shows change
-// through time while the rail repeats the slower clinical summary shown in the
-// numerical tiles. Keeping those two time scales explicit prevents a rapidly
-// changing sample from masquerading as a readable bedside measurement.
+// other. Each strip also owns a fixed readout rail. Beat- and breath-level
+// quantities remain summaries, while the two pressures explicitly requested as
+// live states (Ppl and PL) use the current model sample at the rail's slower,
+// readable update cadence.
 
 const WINDOW_SECONDS = TRACE_SECONDS;
 // How long the data must sit comfortably inside the current range before it is
@@ -18,7 +18,7 @@ const SHRINK_DELAY = 4;
 const STRIPS = [
   {
     id: 'resp',
-    label: 'Airway & pleural pressure',
+    label: 'Respiratory pressures',
     unit: 'cmH₂O',
     height: 1.0,
     series: [
@@ -27,8 +27,15 @@ const STRIPS = [
         summary: (m) => tilePrimaryValue('pplat', m),
       },
       {
-        channel: 'ppl', color: 'pleural', label: 'Ppl · swing',
-        summary: (m) => tilePrimaryValue('ppl', m),
+        channel: 'ppl', color: 'pleural', label: 'Ppl',
+        summary: (m) => (m.valid
+          ? `${tilePrimaryValue('ppl', m)} (Δ ${m.pplSwing.toFixed(1)})`
+          : '—'),
+      },
+      {
+        channel: 'pl', color: 'transpulmonary', label: 'Pₗ',
+        ariaLabel: 'Transpulmonary pressure',
+        summary: (m) => tilePrimaryValue('pl', m),
       },
     ],
   },
@@ -83,7 +90,7 @@ export function createWaveforms(container) {
 
     const readoutList = document.createElement('dl');
     readoutList.className = 'waveform-readouts';
-    readoutList.setAttribute('aria-label', `${spec.label}: summary values in ${spec.unit}`);
+    readoutList.setAttribute('aria-label', `${spec.label}: displayed values in ${spec.unit}`);
     const readouts = new Map();
     for (const series of spec.series) {
       const row = document.createElement('div');
@@ -96,7 +103,7 @@ export function createWaveforms(container) {
       const value = document.createElement('dd');
       const output = document.createElement('output');
       output.className = 'waveform-readout-value';
-      output.setAttribute('aria-label', `${series.label}, summary value in ${spec.unit}`);
+      output.setAttribute('aria-label', `${series.ariaLabel ?? series.label}, displayed value in ${spec.unit}`);
       output.textContent = '—';
       value.appendChild(output);
 
@@ -212,9 +219,10 @@ export function createWaveforms(container) {
   }
 
   /**
-   * Update beside the numerical tiles, not beside the animation frame. The
-   * values therefore have the same content and cadence as the boxes the user
-   * is already reading, while the canvases remain smooth.
+   * Update beside the numerical tiles, not beside every animation frame. The
+   * current Ppl and PL values therefore remain readable while retaining the
+   * same content and cadence as their tiles; beat- and breath-level summaries
+   * keep their existing measurement windows.
    */
   function renderReadouts(metrics, colors) {
     for (const strip of strips) {
