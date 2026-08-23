@@ -1,6 +1,7 @@
-# arthur
+<h2 align="center">arthur</h2>
+<p align="center"><img src="https://i.imgur.com/ywckYxf.gif" /></p>
 
-**ARTificial intelligence Heart–lUng Relationship model**
+<h3 align="center">ARTificial intelligence Heart–lUng Relationship model</h3>
 
 arthur is an interactive, browser-based teaching model of mechanical heart–lung interaction. It connects ventilation, respiratory mechanics, venous return, pulmonary vascular load, biventricular function and circulatory timing in one continuously running simulation.
 
