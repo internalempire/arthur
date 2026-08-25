@@ -14,6 +14,7 @@ const LOOP_POINTS = 900;    // roughly three normal breaths
 const PL_MIN = -5;
 const PL_MAX = 45;
 const ZOOM_LEVELS = Object.freeze([1, 1.5, 2, 3]);
+export const CAMPBELL_DEFAULT_ZOOM = 3;
 
 const roundDown = (value, step) => Math.floor(value / step) * step;
 const roundUp = (value, step) => Math.ceil(value / step) * step;
@@ -112,7 +113,9 @@ export function createCampbell(canvas, { onViewChange } = {}) {
   const previousLoop = [];
   let breathSeen = -1;
   let lastSample = -1;
-  let zoomIndex = 0;
+  // The full construction remains one click away, but the default teaching
+  // view magnifies the tidal loop enough to make Pmus visible immediately.
+  let zoomIndex = ZOOM_LEVELS.indexOf(CAMPBELL_DEFAULT_ZOOM);
   let zoomFocus = null;
 
   // Match the PVR chart's native, keyboard-operable controls. Campbell zooms

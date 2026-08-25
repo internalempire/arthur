@@ -11,7 +11,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Try.** Compare inspiratory and expiratory CVP, then compare measured CVP with transmural CVP.
 
-**Read.** Negative [pleural pressure](pleural-pressure.md) lowers the pressure measured relative to atmosphere while increasing the pressure gradient for [venous return](venous-return.md). The rise in forward flow is a respiratory-phase effect. PPV is unavailable because the patient is breathing spontaneously.
+**Read.** Negative [pleural pressure](pleural-pressure.md) lowers the pressure measured relative to atmosphere while increasing the pressure gradient for [venous return](venous-return.md). The rise in forward flow is a respiratory-phase effect. PPV is unavailable because the patient is breathing spontaneously. The preset starts with a normal-range tidal volume, arterial and pulmonary pressures, output and RV ejection, just beyond the model's steep preload limb; this keeps the landing state neutral and does not imply that a healthy person can never increase output after additional filling.
 
 ### Healthy passive volume control
 
@@ -120,7 +120,10 @@ Only values that actually differ from the reference are listed. A preset may rep
 |---|---|---:|---:|
 | Ventilation | Ventilatory mode | Volume control | Spontaneous |
 | Ventilation | PEEP | 5 cmH₂O | 0 cmH₂O |
-| Ventilation | Inspiratory effort | 0.0 cmH₂O | 8.0 cmH₂O |
+| Ventilation | Inspiratory effort | 0.0 cmH₂O | 6.0 cmH₂O |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 850 mL |
+| Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.90 mmHg·s/mL |
+| Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.35 mmHg/mL |
 
 #### Healthy, passive volume control
 

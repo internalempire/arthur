@@ -225,7 +225,19 @@ export function createDescriptions() {
     const details = document.createElement('details');
     details.className = 'panel-data';
     const toggle = document.createElement('summary');
-    toggle.textContent = `${spec.disclosureTitle ?? spec.title} — values`;
+    const disclosureName = spec.disclosureTitle ?? spec.title;
+    // The former full-width "... values" label competed with canvas titles.
+    // A compact help glyph keeps the same native details disclosure and an
+    // explicit accessible name without consuming the chart header.
+    toggle.textContent = '?';
+    const syncToggleLabel = () => {
+      const action = details.open ? 'Hide' : 'Show';
+      const label = `${action} ${disclosureName} values and description`;
+      toggle.setAttribute('aria-label', label);
+      toggle.title = label;
+    };
+    details.addEventListener('toggle', syncToggleLabel);
+    syncToggleLabel();
     const table = document.createElement('table');
     details.append(toggle, summary, table);
     section.appendChild(details);

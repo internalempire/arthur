@@ -80,7 +80,7 @@ This is not an echocardiographic diameter equation. It is a visually compressed 
 
 | state | mean IVC volume (mL) | respiratory volume swing (% of mean) | change in displayed calibre (%) |
 |---|---:|---:|---:|
-| healthy spontaneous preset | 81 | 18.4 | 19.5 |
+| healthy spontaneous preset | 97 | 15.4 | 13.5 |
 | cardiac-tamponade preset | 167 | 10.9 | 7.0 |
 | same tamponade state, capacity restored | 110 | 12.8 | 10.1 |
 <!-- END GENERATED: ivc-respiratory-calibre -->
