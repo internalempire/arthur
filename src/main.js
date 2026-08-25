@@ -75,6 +75,7 @@ function markCustom() {
 function clearTrails() {
   guyton.clearTrail();
   campbell.clearTrail();
+  pvLoops.resetView();
 }
 
 // ------------------------------------------------------------------ transport

@@ -122,11 +122,11 @@ const PANELS = [
         ['RV end-diastolic volume', `${n(m.rvEdv, 0)} mL`],
         ['RV end-systolic volume', `${n(m.rvEsv, 0)} mL`],
         ['RV end-systolic pressure (transmural)', `${n(c.rvEsp)} mmHg`],
-        ['RV contractility (Ees)', `${p.eesRv} mmHg/mL`],
+        ['Selected intrinsic RV Ees', `${p.eesRv} mmHg/mL`],
         ['LV end-diastolic volume', `${n(m.lvEdv, 0)} mL`],
         ['LV end-systolic volume', `${n(m.lvEsv, 0)} mL`],
         ['LV end-systolic pressure (transmural)', `${n(c.lvEsp)} mmHg`],
-        ['LV contractility (Ees)', `${p.eesLv} mmHg/mL`],
+        ['Selected intrinsic LV Ees', `${p.eesLv} mmHg/mL`],
         ['Stroke volume', `${n(m.sv, 0)} mL`],
         ['Ejection fraction', `${n(m.lvEf, 0)}%`],
       ];

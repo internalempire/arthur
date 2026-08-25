@@ -59,7 +59,7 @@ Mean systemic filling pressure comes from the [stressed volume](stressed-volume.
 
 The panel separates the within-breath path from the equilibrium comparison:
 
-- **respiratory inflow path**, the faint trail, plots consecutive one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. It retains respiratory movement while suppressing the atrial pressure waves;
+- **inflow path**, the faint trail, plots consecutive one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. It retains respiratory movement while suppressing the atrial pressure waves;
 - **mean venous inflow**, the filled point, plots the same two variables averaged over one complete respiratory cycle. Its flow coordinate is still venous inflow, not RV output, LV output or cardiac output;
 - **predicted equilibrium**, the hollow point, marks where predicted venous return and predicted RV output are equal on the local steady-state construction.
 - **the hollow equilibrium point** is the crossing of the respiratory-mean venous-return and local RV-function curves. It predicts where venous return and RV output become equal on that steady-state construction.
