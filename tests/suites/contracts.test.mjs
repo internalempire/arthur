@@ -326,7 +326,7 @@ section('The Guyton points remain explicitly distinguished');
       && !guytonUi.includes("panel.label('simulated mean'")
       && !guytonUi.includes("panel.label('analytic'"));
   check('the dynamic trail identifies the measured respiratory inflow path',
-    guytonUi.includes("panel.label('respiratory inflow path'")
+    guytonUi.includes("panel.label('inflow path'")
       && panel.includes('drawing a trail from successive predicted crossings would hide'));
   check('the panel separates one-heartbeat dynamics from one-breath equilibrium',
     panel.includes('one-heartbeat means')

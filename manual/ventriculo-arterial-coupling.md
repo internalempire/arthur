@@ -74,7 +74,7 @@ Its peak is approximately one, so the selected $E_{es}$ is the peak active elast
 
 Valves are represented as one-way resistances. Flow is computed from the pressure difference and forced to zero when the gradient reverses, so isovolumic phases arise from the pressure relations rather than from explicit cardiac-cycle states.
 
-The right ventricle carries two extra terms from [ventricular interdependence](ventricular-interdependence.md): a diastolic septal shift and a systolic contribution from the left ventricle.
+The right ventricle carries two extra terms from [ventricular interdependence](ventricular-interdependence.md): a diastolic septal shift and a systolic contribution from the left ventricle. Consequently, the selected intrinsic RV elastance is not always the slope from the fixed zero-pressure volume to the total end-systolic RV pressure. The PV-loop panel draws a local effective line through the actual end-systolic point and explains the distinction; the control itself still represents the intrinsic ventricular term.
 
 **The model does not compute $E_a$ or the coupling ratio as an output.** They can be derived from what it reports — mean pressure and stroke volume — but they are not tiles, because an effective arterial elastance computed from a cycle mean rather than from end-systolic pressure is a different quantity wearing the same name. See [interpretability](interpretability.md).
 
@@ -133,6 +133,7 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 - Burkhoff D, Sagawa K. Ventricular efficiency predicted by an analytical model. *Am J Physiol* 1986;250:R1021–7. [doi:10.1152/ajpregu.1986.250.6.R1021](https://doi.org/10.1152/ajpregu.1986.250.6.R1021)
 - Guarracino F, Baldassarri R, Pinsky MR. Ventriculo-arterial decoupling in acutely altered hemodynamic states. *Crit Care* 2013;17:213. [doi:10.1186/cc12522](https://doi.org/10.1186/cc12522)
 - Chantler PD, Lakatta EG, Najjar SS. Arterial–ventricular coupling: mechanistic insights into cardiovascular performance at rest and during exercise. *J Appl Physiol* 2008;105:1342–51. [doi:10.1152/japplphysiol.90600.2008](https://doi.org/10.1152/japplphysiol.90600.2008)
+- Damiano RJ Jr, La Follette P Jr, Cox JL, Lowe JE, Santamore WP. Significant left ventricular contribution to right ventricular systolic function. *Am J Physiol*. 1991;261:H1514–H1524. [doi:10.1152/ajpheart.1991.261.5.H1514](https://doi.org/10.1152/ajpheart.1991.261.5.H1514)
 
 ---
 

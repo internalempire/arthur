@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 136 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 137 unique entries.
 
 ---
 
@@ -42,6 +42,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Crotti S, Mascheroni D, Caironi P, et al. Recruitment and derecruitment during acute respiratory failure: a clinical study. *Am J Respir Crit Care Med* 2001;164:131–40. [doi:10.1164/ajrccm.164.1.2007011](https://doi.org/10.1164/ajrccm.164.1.2007011)
 ## D
 
+- Damiano RJ Jr, La Follette P Jr, Cox JL, Lowe JE, Santamore WP. Significant left ventricular contribution to right ventricular systolic function. *Am J Physiol*. 1991;261:H1514–H1524. [doi:10.1152/ajpheart.1991.261.5.H1514](https://doi.org/10.1152/ajpheart.1991.261.5.H1514)
 - Dampney RAL. Central neural control of the cardiovascular system: current perspectives. *Adv Physiol Educ*. 2016;40:283–296. [doi:10.1152/advan.00027.2016](https://doi.org/10.1152/advan.00027.2016)
 - De Backer D, Heenen S, Piagnerelli M, Koch M, Vincent JL. Pulse pressure variations to predict fluid responsiveness: influence of tidal volume. *Intensive Care Med*. 2005;31:517–523. [doi:10.1007/s00134-005-2586-4](https://doi.org/10.1007/s00134-005-2586-4)
 - Dunham-Snary KJ, Wu D, Sykes EA, et al. Hypoxic pulmonary vasoconstriction: from molecular mechanisms to medicine. *Chest*. 2017;151:181–192. [doi:10.1016/j.chest.2016.09.001](https://doi.org/10.1016/j.chest.2016.09.001)

@@ -1081,3 +1081,43 @@ arterial load fixed while right atrial pressure is swept and does not integrate
 a new closed-loop beat at every plotted pressure. Immediately after a parameter
 change, even the full-breath window contains redistribution and the points may
 remain temporarily separated.
+
+## 2026-08-25 — Stabilise haemodynamic panels and anchor the displayed ESPVR
+
+### Decision
+
+- Hold Guyton and ventricular PV-loop axes fixed within one parameter state.
+  A domain may expand when a mark would leave the panel but cannot contract
+  until a control or scenario change explicitly resets it.
+- Give RV and LV loops separate default domains, reflecting their different
+  physiological pressure ranges, and preserve headroom for ordinary states.
+- Remove the “filling helps here” text from the Guyton plot while retaining the
+  subtle highlighted part of the RV-function curve.
+- Draw each local ESPVR from the model zero-pressure volume through the actual
+  end-systolic pressure–volume point of the completed beat.
+- Keep Ea as the line joining `(EDV, 0)` to `(ESV, Pes)`.
+- Clear a beat's stored end-systolic pressure after it is consumed, preventing a
+  beat with no forward ejection from inheriting the previous beat's value.
+
+### Why
+
+Recomputing a tight domain from every animation frame made the axes move with
+the physiology and obscured the very respiratory or beat-to-beat displacement
+the panels are intended to teach. An expanding-only view preserves a spatial
+reference without clipping a genuinely new state.
+
+The former RV ESPVR used only the selected intrinsic RV Ees, while the simulated
+end-systolic RV pressure also contained LV and septal systolic support. In the
+healthy presets the stored RV point consequently sat roughly 23–31% above the
+drawn line, with larger discrepancies in some low-load states. Removing the
+interdependence term would make the picture tidy by deleting physiology. The new
+single-beat effective line instead preserves interdependence and passes through
+the point that defines it.
+
+### Deliberate limits
+
+The displayed ESPVR is a local single-beat construction anchored to the model's
+fixed V0. A physiological ESPVR is more rigorously estimated from a family of
+loops obtained while loading changes, and may be mildly nonlinear. The selected
+Ees remains the intrinsic active-elastance control; the effective displayed
+slope also reflects ventricular interdependence and end-systolic timing.

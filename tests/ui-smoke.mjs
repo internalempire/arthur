@@ -78,6 +78,10 @@ const { airwayReadout } = await import(new URL('../src/ui/panels/waveforms.js', 
 const {
   CAMPBELL_DEFAULT_ZOOM, classicalCampbellCurves, campbellZoomDomain,
 } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
+const { stableGuytonDomain } = await import(new URL('../src/ui/panels/guyton.js', import.meta.url));
+const {
+  stablePvLoopDomain, effectiveEndSystolicRelation,
+} = await import(new URL('../src/ui/panels/pvloops.js', import.meta.url));
 const { ivcDisplayWidth } = await import(new URL('../src/ui/panels/thorax.js', import.meta.url));
 const baroreflex = PARAMETERS.find((spec) => spec.id === 'baroreflexEnabled');
 const hysteresis = PARAMETERS.find((spec) => spec.id === 'hysteresis');
@@ -138,9 +142,38 @@ check('a plethoric IVC remains visually responsive above the reference calibre',
   ivcDisplayWidth(180) > ivcDisplayWidth(160)
     && ivcDisplayWidth(160) > ivcDisplayWidth(150));
 
+const guytonDomain = stableGuytonDomain(null, { xLo: -7.1, xHi: 14.2, yHi: 9.1 });
+const unchangedGuyton = stableGuytonDomain(guytonDomain, { xLo: -6, xHi: 13, yHi: 8 });
+const expandedGuyton = stableGuytonDomain(guytonDomain, { xLo: -10.1, xHi: 18.1, yHi: 12.1 });
+check('Guyton axes remain fixed inside one state and expand only for off-scale data',
+  JSON.stringify(unchangedGuyton) === JSON.stringify(guytonDomain)
+    && expandedGuyton.xLo < guytonDomain.xLo
+    && expandedGuyton.xHi > guytonDomain.xHi
+    && expandedGuyton.yHi > guytonDomain.yHi);
+const guytonSource = readFileSync(new URL('../src/ui/panels/guyton.js', import.meta.url), 'utf8');
+check('the Guyton preload limb is shown without the removed explanatory slogan',
+  !guytonSource.includes('filling helps here'));
+
+const rvDomain = stablePvLoopDomain(null, { vMax: 150, pMax: 45 }, 'rv');
+const unchangedRv = stablePvLoopDomain(rvDomain, { vMax: 190, pMax: 50 }, 'rv');
+const expandedRv = stablePvLoopDomain(rvDomain, { vMax: 240, pMax: 90 }, 'rv');
+check('PV-loop axes retain ventricle-specific headroom without following every beat',
+  JSON.stringify(unchangedRv) === JSON.stringify(rvDomain)
+    && expandedRv.vMax > rvDomain.vMax
+    && expandedRv.pMax > rvDomain.pMax);
+
+const localEspvr = effectiveEndSystolicRelation(32, 90, 0.35, 10);
+check('the local ESPVR passes through the displayed end-systolic point',
+  Math.abs(localEspvr.pressureAt(90) - 32) < 1e-12);
+
+const pvSource = readFileSync(new URL('../src/ui/panels/pvloops.js', import.meta.url), 'utf8');
+check('Ea joins end-diastolic volume at zero pressure to the end-systolic point',
+  pvSource.includes('panel.line([edv, 0, esv, Math.max(0, esp)]')
+    && pvSource.includes('Number.isFinite(esp)'));
+
 if (failures.length) {
   console.error(`\n${failures.length} UI smoke failure(s):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n16 UI smoke contracts passed`);
+console.log(`\n21 UI smoke contracts passed`);

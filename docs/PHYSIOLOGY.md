@@ -328,6 +328,13 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   to a lumped chamber with no ventricular geometry, regional wall motion,
   valvular regurgitation or imaging method, and must not be compared directly
   with an individual patient's EF.
+- **The PV panel separates intrinsic activation from effective chamber ESPVR.**
+  The selected Ees is the active term inside the ventricular pressure equation.
+  Total end-systolic pressure also contains ventricular-interdependence terms,
+  especially LV and septal support of RV pressure. The displayed local ESPVR
+  therefore passes through the actual end-systolic point and may have a steeper
+  effective slope than the selected intrinsic RV Ees. It is a single-beat visual
+  construction, not a multi-load conductance-catheter measurement.
 - **Pulmonary transit is an eight-stage aggregate approximation.** Its mean time
   now changes with represented pulmonary blood volume and RV output, but it
   still has no regional perfusion, shunt, bronchial flow or contrast kinetics.

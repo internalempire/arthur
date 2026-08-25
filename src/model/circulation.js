@@ -567,8 +567,11 @@ function closeBeat(c) {
   }
   c.edvPending = c.vLv;
   c.rvEdvPending = c.vRv;
-  c.lvEsp = c.lvEspRun ?? c.lvEsp;
-  c.rvEsp = c.rvEspRun ?? c.rvEsp;
+  c.lvEsp = c.lvEspRun ?? null;
+  c.rvEsp = c.rvEspRun ?? null;
+  // A beat without forward ejection must not reuse the previous beat's pressure
+  // as if a new end-systolic point had been measured.
+  c.lvEspRun = undefined; c.rvEspRun = undefined;
   c.lvEsvRun = 1e9; c.rvEsvRun = 1e9;
   c.beatCount++;
   c.lastLoopLv = c.loopLv; c.loopLv = [];

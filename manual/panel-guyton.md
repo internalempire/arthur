@@ -16,9 +16,11 @@ At very low right atrial pressure, venous return no longer rises linearly becaus
 
 Right atrial pressure is on the horizontal axis and flow is on the vertical axis. The venous-return curve slopes downward; the RV-function curve slopes upward. The highlighted part of the RV curve identifies the region where additional filling is predicted to raise RV output meaningfully.
 
+The axes remain fixed while one set of controls is running, so respiratory movement is movement of the curves and points rather than movement of the graph paper. The panel starts with headroom around the current state and expands only if a curve marker or measured occlusion point would otherwise leave the visible range. Selecting another scenario or changing a control starts a new fitted view.
+
 The panel shows three related but different things:
 
-- **respiratory inflow path**, the faint trail, is built from consecutive one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. Averaging over one heartbeat removes the atrial pressure waves but deliberately preserves movement through the breath;
+- **inflow path**, the faint trail, is built from consecutive one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. Averaging over one heartbeat removes the atrial pressure waves but deliberately preserves movement through the breath;
 - **mean venous inflow**, the filled point, uses the same two variables averaged over the most recent complete respiratory cycle. It is measured from the integrated circulation. Its flow coordinate is not RV output, LV output or cardiac output;
 - **predicted equilibrium**, the hollow point, is where the respiratory-mean venous-return and local RV-function curves cross. At that point, predicted venous return equals predicted RV output.
 

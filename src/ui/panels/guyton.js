@@ -10,11 +10,34 @@ import {
 
 const TRAIL_INTERVAL = 0.025; // s of simulated time between trail samples
 const TRAIL_POINTS = 480;     // about 12 s of physiology
+const DOMAIN_STEP_X = 2;
+const DOMAIN_STEP_Y = 2;
+
+const floorTo = (value, step) => Math.floor(value / step) * step;
+const ceilTo = (value, step) => Math.ceil(value / step) * step;
+
+/**
+ * Keep a Guyton view fixed while one parameter state evolves. The view may
+ * expand to rescue an off-scale mark, but never contracts until the caller
+ * explicitly resets it after a control or scenario change.
+ */
+export function stableGuytonDomain(previous, required) {
+  const next = previous ? { ...previous } : {
+    xLo: floorTo(required.xLo, DOMAIN_STEP_X),
+    xHi: ceilTo(required.xHi, DOMAIN_STEP_X),
+    yHi: ceilTo(required.yHi, DOMAIN_STEP_Y),
+  };
+  if (required.xLo < next.xLo) next.xLo = floorTo(required.xLo, DOMAIN_STEP_X);
+  if (required.xHi > next.xHi) next.xHi = ceilTo(required.xHi, DOMAIN_STEP_X);
+  if (required.yHi > next.yHi) next.yHi = ceilTo(required.yHi, DOMAIN_STEP_Y);
+  return next;
+}
 
 export function createGuyton(canvas) {
   const panel = new Panel(canvas, { padding: [22, 16, 34, 46] });
   const trail = []; // operating point over the last few seconds
   let lastSample = -1;
+  let viewDomain = null;
 
   function render(sim, colors) {
     panel.resize();
@@ -41,6 +64,7 @@ export function createGuyton(canvas) {
     // mean points remove.
     const simulated = { x: op.pra, y: op.flow };
     const equilibrium = curveIntersection(vr.points, cf.points);
+    const measured = sim.measuredPoints;
 
     // Sampled on simulated time so the trail covers a fixed span of physiology
     // regardless of frame rate, and stops growing when the model is paused.
@@ -50,9 +74,29 @@ export function createGuyton(canvas) {
       if (trail.length > TRAIL_POINTS * 2) trail.splice(0, 2);
     }
 
-    const xLo = Math.min(-6, cf.xIntercept - 3, vr.pCrit - 3);
-    const xHi = Math.max(vr.pmsf + 2, simulated.x + 6, 14);
-    const yHi = Math.max(9, (vr.points[1] ?? 8) * 1.05, simulated.y * 1.6);
+    let pointXLo = Math.min(simulated.x, equilibrium?.x ?? simulated.x, op.ppl);
+    let pointXHi = Math.max(simulated.x, equilibrium?.x ?? simulated.x, op.ppl);
+    let pointYHi = Math.max(simulated.y, equilibrium?.y ?? simulated.y);
+    for (let i = 0; i < trail.length; i += 2) {
+      pointXLo = Math.min(pointXLo, trail[i]);
+      pointXHi = Math.max(pointXHi, trail[i]);
+      pointYHi = Math.max(pointYHi, trail[i + 1]);
+    }
+    for (const mark of measured) {
+      pointXLo = Math.min(pointXLo, mark.pra);
+      pointXHi = Math.max(pointXHi, mark.pra);
+      pointYHi = Math.max(pointYHi, mark.flow);
+    }
+
+    // Headroom is computed from the current state, then frozen. Respiratory
+    // movement can therefore be read against stationary axes. A later extreme
+    // may expand the domain, but ordinary oscillation can never shrink it.
+    viewDomain = stableGuytonDomain(viewDomain, {
+      xLo: Math.min(-6, cf.xIntercept - 3, vr.pCrit - 3, pointXLo - 2),
+      xHi: Math.max(vr.pmsf + 2, simulated.x + 6, pointXHi + 2, 14),
+      yHi: Math.max(9, (vr.points[1] ?? 8) * 1.05, simulated.y * 1.6, pointYHi * 1.2),
+    });
+    const { xLo, xHi, yHi } = viewDomain;
     panel.setDomain(xLo, xHi, 0, yHi);
 
     panel.grid(colors, {
@@ -115,8 +159,8 @@ export function createGuyton(canvas) {
       for (let i = 2; i < trail.length; i += 2) {
         if (trail[i] > trail[trailLabelIdx]) trailLabelIdx = i;
       }
-      panel.label('respiratory inflow path', trail[trailLabelIdx], trail[trailLabelIdx + 1], {
-        color: colors.inkMuted, dx: -7, dy: -12, align: 'right', halo: colors.surface,
+      panel.label('inflow path', trail[trailLabelIdx], trail[trailLabelIdx + 1], {
+        color: colors.inkMuted, dx: -7, dy: -18, align: 'right', halo: colors.surface,
       });
     }
 
@@ -126,21 +170,11 @@ export function createGuyton(canvas) {
     panel.label('Ppl', pplMmHg, yHi, {
       color: colors.inkMuted, dx: 4, dy: 12, halo: colors.surface,
     });
-    // Placed at the middle of the band rather than its foot, which sits on the
-    // axis next to the Pmsf label.
-    if (limbs.steep.length >= 6) {
-      const mid = (Math.floor(limbs.steep.length / 4) * 2);
-      panel.label('filling helps here', limbs.steep[mid], limbs.steep[mid + 1], {
-        color: colors.text.arterial, align: 'right', dx: -8, dy: 4, halo: colors.surface,
-      });
-    }
-
     // Points measured during occlusion, and the line through them. This is how
     // a venous return curve can be estimated at the bedside, but its zero-flow
     // intercept is extrapolated rather than directly measured. Each hold raises
     // abdominal pressure and shifts the relation it is sampling; the label must
     // therefore not present that intercept as the model's actual Pmsf.
-    const measured = sim.measuredPoints;
     if (measured.length >= 2) {
       const n = measured.length;
       const sx = measured.reduce((a, m) => a + m.pra, 0);
@@ -194,7 +228,11 @@ export function createGuyton(canvas) {
     panel.dot(simulated.x, simulated.y, { color: colors.ink, r: 4, ring: colors.surface });
 
     panel.label('mean venous inflow', simulated.x, simulated.y, {
-      color: colors.ink, dx: 9, dy: 9, halo: colors.surface,
+      color: colors.ink,
+      dx: -9,
+      dy: 9,
+      align: 'right',
+      halo: colors.surface,
     });
     if (equilibrium
       && (Math.abs(equilibrium.x - simulated.x) > (xHi - xLo) * 0.03
@@ -207,7 +245,11 @@ export function createGuyton(canvas) {
     panel.title('Guyton diagram', colors, 'where venous return meets predicted RV output');
   }
 
-  function clearTrail() { trail.length = 0; lastSample = -1; }
+  function clearTrail() {
+    trail.length = 0;
+    lastSample = -1;
+    viewDomain = null;
+  }
 
   return { render, clearTrail };
 }
