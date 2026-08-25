@@ -147,13 +147,17 @@ Related pages: [The waveform panel](panel-waveforms.md) · [Equation of motion](
 
 ### Plateau pressure
 
-The model calculates static end-inspiratory recoil at the delivered volume. The ventilator does not perform a true inspiratory pause, so this is a model plateau rather than a sampled hold waveform. Driving pressure subtracts applied plus intrinsic PEEP. The tile is withheld during spontaneous effort because the passive interpretation is absent.
+The model calculates static end-inspiratory recoil at the delivered volume. The ventilator does not perform a true inspiratory pause, so this is a model plateau rather than a sampled hold waveform. Driving pressure subtracts applied plus intrinsic PEEP in passive ventilation. The tile is withheld during spontaneous effort because the passive interpretation is absent.
 
 Related pages: [Equation of motion](equation-of-motion.md) · [Stress index](stress-index.md) · [Manoeuvres](manoeuvres.md)
 
-### Total PEEP
+### End-expiratory pressure and total PEEP
 
-Total PEEP is applied PEEP plus intrinsic PEEP from the last breath. Dynamic trapped volume is actual end-expiratory volume above the passive equilibrium volume at the same applied PEEP; loss-of-recoil hyperinflation is therefore not automatically labelled dynamic trapping. The EFL label reports whether the expiratory choke constrained flow during that breath.
+The main number is the end-expiratory alveolar pressure from the last breath. Its name and subtitle change with the conditions under which it was produced.
+
+In a **passive patient**, the tile is labelled **Total PEEP**. It separates applied from intrinsic PEEP and calls volume above the passive equilibrium at the same applied PEEP **dynamically trapped volume**. Loss-of-recoil hyperinflation is therefore not automatically labelled dynamic trapping. The EFL label reports whether the expiratory choke constrained flow during that breath.
+
+With **spontaneous effort**, the same algebraic difference cannot identify one mechanism. Post-inspiratory activity can slow emptying and maintain end-expiratory volume even without an obstructive airway. The tile is therefore labelled **End-expiratory alveolar pressure** and reports pressure above applied PEEP plus **EELV above passive equilibrium**. It does not call either quantity intrinsic PEEP or trapped gas. A low positive value in a healthy spontaneous breath should consequently be read as a description of the model state, not as a diagnosis of dynamic hyperinflation.
 
 Related page: [Expiratory flow limitation](expiratory-flow-limitation.md)
 

@@ -131,7 +131,7 @@ These include:
 - measured and transmural CVP;
 - cardiac output, effective and baseline heart rate, stroke volume and ventricular volumes;
 - airway, alveolar, pleural and abdominal pressures;
-- total PEEP, intrinsic PEEP and trapped volume;
+- end-expiratory alveolar pressure during active breathing, or total/intrinsic PEEP and trapped volume during passive ventilation;
 - plateau pressure, driving pressure and respiratory compliance;
 - effective systemic resistance coefficient, mPAP, wedge surrogate, pulmonary resistance coefficient and derived PVR;
 - stress index, pulse pressure variation and stroke volume variation;

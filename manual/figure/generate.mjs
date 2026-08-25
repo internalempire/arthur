@@ -25,7 +25,9 @@ import {
   venousReturnCurve, cardiacFunctionCurve, curveIntersection,
   systemicVenousVolumeState, pericardialPressure, PRELOAD_STEEP,
 } from '../../src/model/circulation.js';
-import { STRESS_INDEX_BASE, STRESS_INDEX_CASES } from '../model-examples.mjs';
+import {
+  STRESS_INDEX_BASE, STRESS_INDEX_CASES, runOcclusionExample,
+} from '../model-examples.mjs';
 
 const OUT = dirname(fileURLToPath(import.meta.url));
 
@@ -609,23 +611,10 @@ ${marker(full, yReserve(full.reserve), 'var(--fig-extra, #2a9d8f)')}
 // --- Pmsf estimated from inspiratory holds --------------------------------
 
 function pmsfOcclusionFigure() {
-  const sim = settled({}, 20);
-  for (const vt of [300, 500, 700, 900]) {
-    sim.setParam('vt', vt);
-    sim.advance(10, true);
-    sim.startHold('inspiratory', 10);
-    sim.advance(16, true);
-  }
-  const points = sim.measuredPoints;
-  const n = points.length;
-  const sx = points.reduce((sum, p) => sum + p.pra, 0);
-  const sy = points.reduce((sum, p) => sum + p.flow, 0);
-  const sxx = points.reduce((sum, p) => sum + p.pra * p.pra, 0);
-  const sxy = points.reduce((sum, p) => sum + p.pra * p.flow, 0);
-  const denominator = n * sxx - sx * sx;
-  const slope = (n * sxy - sx * sy) / denominator;
-  const intercept = (sy - slope * sx) / n;
-  const estimatedPmsf = -intercept / slope;
+  const {
+    simulator: sim, points, slope, pressureIntercept: estimatedPmsf,
+  } = runOcclusionExample();
+  const intercept = -estimatedPmsf * slope;
   const trueCurve = venousReturnCurve(sim.params, sim.circ, sim.metrics.operatingPoint).points;
   const pairs = [];
   for (let i = 0; i < trueCurve.length; i += 2) pairs.push([trueCurve[i], trueCurve[i + 1]]);

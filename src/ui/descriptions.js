@@ -9,6 +9,7 @@
 import {
   RESISTANCE_TO_WOOD, pvrComponents, lungRegions, chestWallPressure,
 } from '../model/index.js';
+import { endExpiratoryPressurePresentation } from './stats.js';
 
 const n = (v, d = 1) => (Number.isFinite(v) ? v.toFixed(d) : '—');
 
@@ -82,6 +83,7 @@ const PANELS = [
       const m = sim.metrics, p = sim.params;
       const relaxedPpl = chestWallPressure(p, m.lungVolume);
       const musclePressure = Math.max(0, relaxedPpl - m.ppl);
+      const endExpiratory = endExpiratoryPressurePresentation(m);
       return [
         ['Absolute lung volume', `${n(m.lungVolume, 2)} L`],
         ['Relaxation volume (Vrel)', `${n(sim.resp.relaxVolume, 2)} L`],
@@ -99,8 +101,7 @@ const PANELS = [
           : `${n(m.riRatio, 2)} over PEEP 5 to 15 cmH₂O (target ${n(m.riTarget, 2)})`],
         ['Expiratory time constant', `${n(m.expTimeConstant, 2)} s`],
         ['Plateau pressure', `${n(m.pplat)} cmH₂O`],
-        ['Total PEEP', `${n(m.totalPeep)} cmH₂O (intrinsic ${n(m.autoPeep)})`],
-        ['Dynamic trapped volume', `${n(m.trappedVolume, 0)} mL above static equilibrium at the same PEEP`],
+        [endExpiratory.label, `${n(m.totalPeep)} cmH₂O; ${endExpiratory.detail}`],
         ['Expiratory flow limitation', m.expiratoryFlowLimited ? 'active during the last expiration' : 'not active'],
       ];
     },

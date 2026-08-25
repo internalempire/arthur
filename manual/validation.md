@@ -39,7 +39,7 @@ The tests change one variable and require a direction: passive PEEP raises measu
 
 These tests demonstrate that the encoded mechanism has not reversed. They do not specify how large the response should be in a patient.
 
-Interpretability is also executable physiology. A zone-3 state must leave the [wedge surrogate](pulmonary-artery-wedge-pressure.md) and derived PVR unqualified; when the pressure-margin heuristic fails, both must carry the same caution. This prevents a valid division from concealing an uncertain downstream pressure.
+Interpretability is also executable physiology. A zone-3 state must leave the [wedge surrogate](pulmonary-artery-wedge-pressure.md) and derived PVR unqualified; when the pressure-margin heuristic fails, both must carry the same caution. This prevents a valid division from concealing an uncertain downstream pressure. Likewise, the same end-expiratory volume and pressure fields must be described as active-breath EELV when inspiratory effort is present, while the intrinsic-PEEP and trapped-gas labels remain reserved for passive emptying.
 
 ### Published literature rows
 
