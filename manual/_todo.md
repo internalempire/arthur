@@ -18,6 +18,5 @@ Open since the J-curve work. Cappio Borlino's within-group R/I values and Table 
 
 ## Manual
 
-- Full-text search. The viewer currently searches page titles and summaries only; a generated index over page text would make 56 pages navigable.
+- Full-text search. The viewer currently searches page titles and summaries only; a generated index over page text would make the complete manual easier to navigate.
 - A lint pass for contradictions between pages. The current linter checks that a page renders and that its links resolve; it cannot tell whether two pages disagree, or whether a number has gone stale since the model changed.
-- Fix in-page table-of-contents links. The current hash router treats a URL such as `#/hysteresis#a-reproducible-experiment` as the slug of a new page and renders “Not found” instead of scrolling within the current page. This was reproduced in the local viewer during the hysteresis-page QA.

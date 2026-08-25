@@ -90,6 +90,7 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/pulmonary-transit.md', ids: ['pulmonary-transit'] },
   { file: 'manual/cardiac-tamponade.md', ids: ['cardiac-tamponade'] },
   { file: 'manual/inferior-vena-cava.md', ids: ['ivc-respiratory-calibre'] },
+  { file: 'manual/pmsf-and-occlusions.md', ids: ['pmsf-occlusions'] },
   { file: 'manual/scenarios.md', ids: ['scenario-overrides'] },
 ];
 
@@ -261,6 +262,55 @@ function pulmonaryTransitBlock() {
   ].join('\n');
 }
 
+export const OCCLUSION_EXAMPLE = Object.freeze({
+  tidalVolumes: [300, 500, 700, 900],
+  holdSeconds: 10,
+  settlingBeforeProtocol: 20,
+  settlingBetweenHolds: 10,
+  advanceAfterHold: 16,
+});
+
+export function runOcclusionExample() {
+  const simulator = new Simulator();
+  simulator.advance(OCCLUSION_EXAMPLE.settlingBeforeProtocol, true);
+  for (const tidalVolume of OCCLUSION_EXAMPLE.tidalVolumes) {
+    simulator.setParam('vt', tidalVolume);
+    simulator.advance(OCCLUSION_EXAMPLE.settlingBetweenHolds, true);
+    simulator.startHold('inspiratory', OCCLUSION_EXAMPLE.holdSeconds);
+    simulator.advance(OCCLUSION_EXAMPLE.advanceAfterHold, true);
+  }
+
+  const points = simulator.measuredPoints;
+  const n = points.length;
+  const sx = points.reduce((sum, point) => sum + point.pra, 0);
+  const sy = points.reduce((sum, point) => sum + point.flow, 0);
+  const sxx = points.reduce((sum, point) => sum + point.pra ** 2, 0);
+  const sxy = points.reduce((sum, point) => sum + point.pra * point.flow, 0);
+  const denominator = n * sxx - sx ** 2;
+  const slope = (n * sxy - sx * sy) / denominator;
+  const flowIntercept = (sy - slope * sx) / n;
+  return {
+    simulator,
+    points,
+    slope,
+    pressureIntercept: -flowIntercept / slope,
+    internalPmsf: simulator.metrics.pmsf,
+  };
+}
+
+function pmsfOcclusionBlock() {
+  const result = runOcclusionExample();
+  return [
+    `*Executable setup: inspiratory holds lasting ${OCCLUSION_EXAMPLE.holdSeconds} s follow delivered tidal volumes of ${OCCLUSION_EXAMPLE.tidalVolumes.join(', ')} mL. Only the final 40% of each hold is averaged.*`,
+    '',
+    '| delivered VT (mL) | hold airway pressure (cmH₂O) | mean right atrial pressure (mmHg) | venous return (L/min) |',
+    '|---:|---:|---:|---:|',
+    ...result.points.map((point, index) => `| ${OCCLUSION_EXAMPLE.tidalVolumes[index]} | ${fixed(point.airwayPressure, 2)} | ${fixed(point.pra, 2)} | ${fixed(point.flow, 2)} |`),
+    '',
+    `The fitted pressure–flow line has a slope of ${fixed(result.slope, 2)} L/min/mmHg and reaches zero flow at ${fixed(result.pressureIntercept, 1)} mmHg. The model's internal Pmsf after the protocol is ${fixed(result.internalPmsf, 1)} mmHg.`,
+  ].join('\n');
+}
+
 function cardiacTamponadeBlock() {
   const scenario = SCENARIOS.find(({ id }) => id === 'cardiac-tamponade');
   const states = [
@@ -396,6 +446,7 @@ export function renderDocumentedExampleBlocks() {
     ['pv-eelv', pvEelvBlock()],
     ['lung-wall-equilibrium', lungWallEquilibriumBlock()],
     ['pulmonary-transit', pulmonaryTransitBlock()],
+    ['pmsf-occlusions', pmsfOcclusionBlock()],
     ['cardiac-tamponade', cardiacTamponadeBlock()],
     ['ivc-respiratory-calibre', ivcRespiratoryBlock()],
     ['scenario-overrides', scenarioOverridesBlock()],

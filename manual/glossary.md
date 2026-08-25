@@ -12,7 +12,7 @@
 
 **Alveolar pressure ($P_{alv}$).** Pressure inside the model's single alveolar compartment, in cmH₂O. During flow it differs from airway-opening pressure by the pressure gradient across airway resistance. At zero flow the two equilibrate unless a flow-limiting boundary condition remains active. See [the waveform panel](panel-waveforms.md).
 
-**Auto-PEEP / intrinsic PEEP.** Positive alveolar pressure remaining at end-expiration because expiration did not reach the resting equilibrium. See [expiratory flow limitation](expiratory-flow-limitation.md).
+**Auto-PEEP / intrinsic PEEP.** In a passive breath, alveolar pressure remaining above applied PEEP at end expiration because expiration did not reach the static equilibrium. During active breathing the same numerical state may also reflect post-inspiratory muscle activity, so the interface reports end-expiratory alveolar pressure without assigning the intrinsic-PEEP label. See [expiratory flow limitation](expiratory-flow-limitation.md) and [numerical tiles](numeric-tiles.md#end-expiratory-pressure-and-total-peep).
 
 **Capacitance.** The capacity of a vascular compartment to contain volume at a given pressure. The model keeps capacity shifts caused by [venous tone](venous-tone.md) separate from compliance.
 

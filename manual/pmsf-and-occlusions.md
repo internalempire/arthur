@@ -37,7 +37,18 @@ The inspiratory hold starts at end inspiration, stops gas flow and sets airway p
 
 ![Measured hold points, their extrapolated line and the current model venous-return relation](figure/pmsf-occlusions.svg)
 
-In the reproducible figure, four 10-second holds follow delivered tidal volumes of 300, 500, 700 and 900 mL. Plateau pressures rise from about 8.3 to 15.3 cmH₂O; measured right atrial pressure rises from 1.75 to 3.58 mmHg while flow falls from 4.77 to 4.40 L/min. The fitted line reaches zero flow near 24.7 mmHg, whereas the model's internal Pmsf after the protocol is about 10.0 mmHg.
+<!-- BEGIN GENERATED: pmsf-occlusions -->
+*Executable setup: inspiratory holds lasting 10 s follow delivered tidal volumes of 300, 500, 700, 900 mL. Only the final 40% of each hold is averaged.*
+
+| delivered VT (mL) | hold airway pressure (cmH₂O) | mean right atrial pressure (mmHg) | venous return (L/min) |
+|---:|---:|---:|---:|
+| 300 | 8.06 | 1.56 | 5.15 |
+| 500 | 10.14 | 2.19 | 5.00 |
+| 700 | 12.24 | 2.84 | 4.85 |
+| 900 | 14.37 | 3.53 | 4.71 |
+
+The fitted pressure–flow line has a slope of -0.22 L/min/mmHg and reaches zero flow at 24.5 mmHg. The model's internal Pmsf after the protocol is 10.3 mmHg.
+<!-- END GENERATED: pmsf-occlusions -->
 
 The discrepancy is not a plotting error. Each larger inflation pressurises the abdomen and changes the systemic reservoir while it is being sampled, so the four points belong to a family of shifted relations. The line through them is real; interpreting its intercept as the one fixed upstream pressure is not.
 

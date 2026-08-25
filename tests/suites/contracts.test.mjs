@@ -6,6 +6,7 @@ import {
 } from '../support/model.mjs';
 import { pvrZoomDomain } from '../../src/ui/panels/pvrcurve.js';
 import { fallbackTitle, manualHash, parseManualHash } from '../../manual/navigation.mjs';
+import { endExpiratoryPressurePresentation } from '../../src/ui/stats.js';
 
 section('Manual navigation and clinical titles');
 {
@@ -81,6 +82,25 @@ section('Public model API');
   check('main and UI use the public API and every UI module resolves',
     forbidden.length === 0 && unloadable.length === 0,
     [...forbidden, ...unloadable].join(', '));
+}
+
+section('End-expiratory pressure is named by mechanism');
+{
+  const healthy = SCENARIOS.find(({ id }) => id === 'healthy-spont');
+  const copd = SCENARIOS.find(({ id }) => id === 'copd');
+  const active = endExpiratoryPressurePresentation(settled(healthy.params, 45).metrics);
+  const passive = endExpiratoryPressurePresentation(settled(copd.params, 45).metrics);
+
+  check('a healthy active breath is not labelled intrinsic PEEP or trapped gas',
+    active.label === 'End-expiratory alveolar pressure'
+      && /EELV .* above passive equilibrium/.test(active.detail)
+      && !/intrinsic|trapp/i.test(`${active.label} ${active.detail}`),
+    `${active.label}: ${active.detail}`);
+  check('passive obstructive emptying retains the conventional labels',
+    passive.label === 'Total PEEP'
+      && /intrinsic/.test(passive.detail)
+      && /dynamically trapped/.test(passive.detail),
+    `${passive.label}: ${passive.detail}`);
 }
 
 section('PVR chart vertical zoom');

@@ -41,7 +41,7 @@ Baseline (70 kg adult, passive volume control, VT 450 mL, PEEP 5, RR 14):
 | CVP | 0.9 mmHg | 0–6 |
 | Pulmonary artery | 19/9, mean 14 | 15–25 / 8–15 |
 | Wedge surrogate | 7 mmHg | 6–12 |
-| Mean systemic filling pressure | 9.1 mmHg | 8–12 |
+| Mean systemic filling pressure | approximately 9 mmHg | 8–12 |
 | PVR coefficient | 1.2 Wood units | 0.3–2.0 |
 | LV ejection fraction | 56% | 55–70 (see limitations) |
 | Plateau pressure | 9.6 cmH₂O | — |
@@ -129,8 +129,9 @@ shock data support the “fluid-like” increase in stressed volume and mean
 systemic pressure produced by norepinephrine. The model does not claim that 200
 mL is a measured universal value: it was selected to preserve the prior
 macroscopic response while correcting the mechanism. In the shipped septic
-phenotype, reflex outflow around 0.42 mobilises about 83 mL at unchanged total
-blood volume and venous compliance.
+phenotype, the optional reflex mobilises part of that reserve at unchanged
+total blood volume and venous compliance. Exact scenario values belong to the
+executable scenario checks rather than this mechanistic summary.
 
 ---
 
@@ -216,11 +217,12 @@ them draws an extrapolated venous return relation. The points are measured; its
 zero-flow intercept is not.
 
 The model reproduces the method's known confound rather than hiding it. Four
-inspiratory holds at 300, 500, 700 and 900 mL (plateau pressures around
-8.3–15.3 cmH₂O) give a fitted slope near 0.21 L/min per mmHg where the model's
-effective resistance to venous return implies roughly 0.76, and an extrapolated
-intercept around 24.7 mmHg where the model's Pmsf is about 10.0. Both protocols
-behave the same way — varying tidal volume at fixed PEEP, or varying PEEP between holds —
+inspiratory holds at increasing tidal volumes produce a much flatter fitted
+pressure–flow relation than the model's effective resistance to venous return
+would predict, and the extrapolated zero-flow intercept lies far above the
+internal Pmsf. The current values and exact protocol are generated directly in
+the [manual page](../manual/pmsf-and-occlusions.md). Both protocols behave the
+same way — varying tidal volume at fixed PEEP, or varying PEEP between holds —
 so it is not merely a plotting artefact.
 
 The mechanism is the abdominal coupling: an occlusion holds the lung inflated,

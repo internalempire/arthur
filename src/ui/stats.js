@@ -27,6 +27,27 @@ const signed = (value, decimals = 0) => {
   return `${rounded > 0 ? '+' : ''}${rounded.toFixed(decimals)}`;
 };
 
+// Active expiratory braking and passive dynamic hyperinflation can both leave
+// the lung above its static equilibrium at the next breath. The state is real
+// in either case, but only the passive case can be named intrinsic PEEP and
+// trapped gas without assigning a mechanism the model cannot isolate.
+export function endExpiratoryPressurePresentation(metrics) {
+  if (metrics.spontaneousEffort) {
+    return {
+      label: 'End-expiratory alveolar pressure',
+      detail: `above applied PEEP ${metrics.autoPeep.toFixed(1)} · EELV ${metrics.trappedVolume.toFixed(0)} mL above passive equilibrium`,
+      status: metrics.autoPeep > 1.5
+        ? ['warning', 'expiration remains incomplete during active breathing'] : null,
+    };
+  }
+  return {
+    label: 'Total PEEP',
+    detail: `intrinsic ${metrics.autoPeep.toFixed(1)} · dynamically trapped ${metrics.trappedVolume.toFixed(0)} mL`
+      + (metrics.expiratoryFlowLimited ? ' · EFL active' : ''),
+    status: metrics.autoPeep > 1.5 ? ['warning', 'gas trapping'] : null,
+  };
+}
+
 const TILES = [
   {
     id: 'co', label: 'Cardiac output', unit: 'L/min', kind: 'measured',
@@ -162,10 +183,10 @@ const TILES = [
   },
   {
     id: 'peep', label: 'Total PEEP', unit: 'cmH₂O', kind: 'measured',
+    liveLabel: (m) => endExpiratoryPressurePresentation(m).label,
     get: (m) => m.totalPeep.toFixed(1),
-    sub: (m) => `intrinsic ${m.autoPeep.toFixed(1)} · dynamically trapped ${m.trappedVolume.toFixed(0)} mL`
-      + (m.expiratoryFlowLimited ? ' · EFL active' : ''),
-    status: (m) => (m.autoPeep > 1.5 ? ['warning', 'gas trapping'] : null),
+    sub: (m) => endExpiratoryPressurePresentation(m).detail,
+    status: (m) => endExpiratoryPressurePresentation(m).status,
   },
   {
     id: 'ppl', label: 'Pleural pressure', unit: 'cmH₂O', kind: 'measured',
@@ -343,6 +364,8 @@ export function createStats(container, { banner } = {}) {
     return {
       tile,
       el,
+      label: el.querySelector('.tile-label'),
+      remove: el.querySelector('.tile-remove'),
       number: el.querySelector('.tile-number'),
       sub: el.querySelector('.tile-sub'),
       flag: el.querySelector('.tile-flag'),
@@ -363,6 +386,9 @@ export function createStats(container, { banner } = {}) {
   // --- Render a single tile's values ------------------------------------------
   function renderTile(n, metrics) {
     if (!metrics) return; // not yet available — tiles show placeholders
+    const liveLabel = n.tile.liveLabel?.(metrics) ?? n.tile.label;
+    n.label.textContent = liveLabel;
+    n.remove.setAttribute('aria-label', `Hide ${liveLabel}`);
     const q = n.tile.quality?.(metrics) ?? { level: 'ok', reasons: [] };
     const suppress = !metrics.valid || q.level === 'unavailable';
 
