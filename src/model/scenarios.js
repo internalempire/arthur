@@ -46,7 +46,12 @@ export const SCENARIOS = [
     note: 'The same patient after resuscitation, now making vigorous efforts against a relatively stiff chest wall. Pleural pressure swings by about 20 cmH₂O, but the operating point has limited local preload reserve: pressure swing and fluid responsiveness are not the same quantity. PPV is deliberately unavailable because the patient is breathing spontaneously; inspect the Guyton construction instead.',
     params: {
       mode: 'spont', pmus: 30, peep: 6, rr: 24, ccw: 150,
-      stressedVolume: 950, svr: 0.75, hr: 100,
+      // The respiratory-mean Guyton construction requires slightly fuller
+      // systemic veins than the former phase-selected beat calculation to sit
+      // beyond the steep limb. A lower resting rate keeps output and pressure
+      // in a compensated teaching range rather than creating a hyperdynamic
+      // artefact from that extra filling.
+      stressedVolume: 1200, svr: 0.75, hr: 70,
     },
   },
   {

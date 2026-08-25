@@ -48,11 +48,11 @@
 <line class="axis" x1="72" y1="284" x2="72" y2="466"/>
 <line class="axis" x1="72" y1="466" x2="580" y2="466"/>
 <path class="total" d="M72.0 163.6 L94.1 170.2 L116.2 176.3 L138.3 177.9 L160.3 140.1 L182.4 98.3 L226.6 66.7 L270.8 117.3 L315.0 168.7 L359.1 206.0 L403.3 176.1 L447.5 138.3 L491.7 117.6 L535.8 114.9 L580.0 117.6"/>
-<path class="extra" style="stroke-dasharray:none;stroke-width:2.5" d="M72.0 312.1 L94.1 321.1 L116.2 329.8 L138.3 337.7 L160.3 345.7 L182.4 353.6 L226.6 368.7 L270.8 382.6 L315.0 394.3 L359.1 404.0 L403.3 411.6 L447.5 417.4 L491.7 421.9 L535.8 425.5 L580.0 428.3"/>
+<path class="extra" style="stroke-dasharray:none;stroke-width:2.5" d="M72.0 302.0 L94.1 311.8 L116.2 320.9 L138.3 329.0 L160.3 336.8 L182.4 344.2 L226.6 358.4 L270.8 371.6 L315.0 383.7 L359.1 394.9 L403.3 404.7 L447.5 413.1 L491.7 419.9 L535.8 425.4 L580.0 429.8"/>
 <circle cx="94.1" cy="170.2" r="3.5" style="fill:var(--fig-total, #1f6feb);stroke:none"/>
-<circle cx="94.1" cy="321.1" r="3.5" style="fill:var(--fig-extra, #2a9d8f);stroke:none"/>
+<circle cx="94.1" cy="311.8" r="3.5" style="fill:var(--fig-extra, #2a9d8f);stroke:none"/>
 <circle cx="580.0" cy="117.6" r="3.5" style="fill:var(--fig-total, #1f6feb);stroke:none"/>
-<circle cx="580.0" cy="428.3" r="3.5" style="fill:var(--fig-extra, #2a9d8f);stroke:none"/>
+<circle cx="580.0" cy="429.8" r="3.5" style="fill:var(--fig-extra, #2a9d8f);stroke:none"/>
 <text class="label" x="72" y="35">PPV (%) — respiratory waveform variation</text>
 <text class="label" x="72" y="275">Preload reserve (% of output per mmHg)</text>
 <text class="label" x="326" y="513" text-anchor="middle">Selected stressed volume (mL)</text>
@@ -62,10 +62,10 @@
 <text class="label" x="635" y="90">preload reserve</text>
 <text class="tick" x="598" y="123">At 300 mL:</text>
 <text class="tick" x="598" y="139">2.5% PPV,</text>
-<text class="tick" x="598" y="155">15.9%/mmHg reserve</text>
+<text class="tick" x="598" y="155">17.0%/mmHg reserve</text>
 <text class="tick" x="598" y="183">At 1400 mL:</text>
 <text class="tick" x="598" y="199">4.8% PPV,</text>
-<text class="tick" x="598" y="215">4.1%/mmHg reserve</text>
+<text class="tick" x="598" y="215">4.0%/mmHg reserve</text>
 <text class="tick" x="598" y="312">Same passive breath</text>
 <text class="tick" x="598" y="328">at every point.</text>
 <text class="tick" x="598" y="356">Model example;</text>

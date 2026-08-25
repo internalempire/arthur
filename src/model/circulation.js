@@ -576,9 +576,11 @@ function closeBeat(c) {
 }
 
 // ---------------------------------------------------------------------------
-// Curves derived from the live parameters, for the Guyton diagram. These are
-// computed from the same constants the integrator uses, so the intersection of
-// the two curves lands on the operating point the simulation actually reaches.
+// Curves derived from the live parameters, for the Guyton diagram. With a full-
+// breath mean, the local RV relation is anchored to the integrated chamber
+// volumes and can be compared with the respiratory-mean venous inflow. Callers
+// without those anchors retain the older parameter-only construction used by
+// legacy generated counterfactuals.
 // ---------------------------------------------------------------------------
 
 /**
@@ -641,24 +643,52 @@ export function curveIntersection(vr, cf) {
 }
 
 export function cardiacFunctionCurve(p, c, mean, nPoints = 90) {
-  // Both terms are cycle-averaged. Sliding this curve along the pressure axis
-  // with each breath is the phenomenon the diagram exists to show, and averaging
-  // over one cardiac cycle leaves the respiratory swing intact while removing
-  // the beat-to-beat ripple that would otherwise jitter the intercept.
-  const pExt = (mean?.ppl ?? c.p.ppl) + (mean?.pPeri ?? c.p.pPeri);
-  const svRv = Math.max(4, c.svRv ?? c.sv);
-  const ea = Math.max(0.02, c.rvEsp / svRv); // both transmural, same beat
   const { edA, edB, v0d, v0s } = { ...CHAMBER.rv, v0s: CHAMBER.rv.v0s };
+  const ees = mean?.eesRv ?? p.eesRv;
+  const hr = mean?.hr ?? p.hr;
+
+  // When a respiratory-cycle mean is available, construct a *local* RV
+  // function curve around the chamber state that generated that mean flow.
+  // Mean RA pressure is not identical to RV end-diastolic transmural pressure:
+  // atrial contraction, the tricuspid gradient and pericardial pressure sit
+  // between them. Inverting the EDPVR from RA pressure alone therefore displaced
+  // the curve even in a settled passive subject. The measured mean EDV supplies
+  // the physiologically relevant filling anchor instead.
+  const anchored = Number.isFinite(mean?.pra)
+    && Number.isFinite(mean?.rvEdv) && Number.isFinite(mean?.rvEsv)
+    && mean.rvEdv > mean.rvEsv;
+
+  let pressureZero;
+  let ea;
+  if (anchored) {
+    const referenceSv = Math.max(4, mean.rvEdv - mean.rvEsv);
+    const referencePtm = edA * (Math.exp(edB * Math.max(0, mean.rvEdv - v0d)) - 1);
+
+    // Effective arterial elastance is reconstructed from the actual ESV and
+    // the selected end-systolic elastance. This is the volume-consistent form
+    // of Ea = Pes/SV: Pes = Ees(ESV - V0). It avoids mixing a respiratory mean
+    // EDV with the pressure from one arbitrarily phased beat.
+    ea = Math.max(0.02, (ees * Math.max(0, mean.rvEsv - v0s)) / referenceSv);
+    pressureZero = mean.pra - referencePtm;
+  } else {
+    // The fallback keeps generated figures and callers without chamber means
+    // backward compatible. Here the external pressure is the only available
+    // horizontal anchor and Ea comes from the most recent completed beat.
+    pressureZero = (mean?.ppl ?? c.p.ppl) + (mean?.pPeri ?? c.p.pPeri);
+    const svRv = Math.max(4, c.svRv ?? c.sv);
+    ea = Math.max(0.02, c.rvEsp / svRv);
+  }
+
   const pts = [];
   for (let i = 0; i < nPoints; i++) {
-    const pra = pExt - 4 + (i * 22) / (nPoints - 1);
-    const ptm = pra - pExt;
+    const pra = pressureZero - 4 + (i * 22) / (nPoints - 1);
+    const ptm = pra - pressureZero;
     // Invert the exponential EDPVR.
     const edv = ptm <= 0 ? v0d : v0d + Math.log(ptm / edA + 1) / edB;
-    const sv = Math.max(0, (p.eesRv * (edv - v0s)) / (p.eesRv + ea));
-    pts.push(pra, (sv * p.hr) / 1000);
+    const sv = Math.max(0, (ees * (edv - v0s)) / (ees + ea));
+    pts.push(pra, (sv * hr) / 1000);
   }
-  return { points: pts, xIntercept: pExt };
+  return { points: pts, xIntercept: pressureZero, anchored };
 }
 
 /**

@@ -159,11 +159,11 @@ function transmuralBlock(rows) {
 
 function venousReturnBlock(rows) {
   return [
-    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. The displayed right atrial pressure is averaged over one cardiac cycle, as in the moving Guyton point; this suppresses cardiac pulsation but preserves respiratory movement.*',
+    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure is averaged over the most recent complete respiratory cycle, as in the filled simulated-mean point on the Guyton panel.*',
     '',
     '| PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |',
     '|---:|---:|---:|---:|',
-    ...rows.map(({ peep, metrics }) => `| ${peep} | ${fixed(metrics.pmsf, 1)} | ${fixed(metrics.operatingPoint.pra, 1)} | ${fixed(metrics.co, 2)} |`),
+    ...rows.map(({ peep, metrics }) => `| ${peep} | ${fixed(metrics.pmsf, 1)} | ${fixed(metrics.respiratoryOperatingPoint.pra, 1)} | ${fixed(metrics.co, 2)} |`),
   ].join('\n');
 }
 

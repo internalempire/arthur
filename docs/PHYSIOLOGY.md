@@ -240,7 +240,27 @@ patient's Pmsf.
 
 ---
 
-## 7. Limitations
+## 7. The Guyton panel uses two time scales
+
+The explicit IVC is a compliant compartment, so venous inflow into the right
+atrium can briefly differ from RV output even during passive ventilation. A
+one-heartbeat mean removes atrial pulsation but does not remove that respiratory
+storage. It is therefore retained as the moving trail, not used as the settled
+operating point.
+
+The filled simulated-mean point averages right atrial pressure and IVC inflow
+over one complete breath. In a settled periodic circulation, every compartment
+returns to its starting volume over that interval, so mean venous return, RV
+output and LV output must agree. The hollow crossing is evaluated from curves
+using the same respiratory mean.
+
+The local RV-function curve is anchored to respiratory-mean RV end-diastolic
+and end-systolic volumes. This avoids assuming that mean right atrial pressure
+is the same as RV end-diastolic transmural pressure. The resulting overlap is an
+internal conservation and curve-consistency check; it is not an independent
+validation against human cardiac-function data.
+
+## 8. Limitations
 
 Stated plainly, because a simulator that hides these teaches the wrong lesson.
 

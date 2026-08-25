@@ -162,9 +162,9 @@ function guytonFigure() {
     { label: 'PEEP 15', peep: 15, cls: 'alv' },
   ].map((s) => {
     const sim = settled({ mode: 'vcv', pmus: 0, vt: 500, rr: 14, peep: s.peep });
-    // The curves must be evaluated on the same clock as the point they cross:
-    // `operatingPoint` is the cycle-mean state the app itself plots against.
-    const mean = sim.metrics.operatingPoint;
+    // The curves and equilibrium points use the same full-breath clock as the
+    // running panel; the separate one-heartbeat means form its dynamic trail.
+    const mean = sim.metrics.respiratoryOperatingPoint;
     const vr = venousReturnCurve(sim.params, sim.circ, mean).points;
     const cf = cardiacFunctionCurve(sim.params, sim.circ, mean).points;
     return { ...s, vr, cf, cross: curveIntersection(vr, cf) };
@@ -447,7 +447,7 @@ function baroreflexFigure() {
 
 function preloadReserveFigure() {
   const sim = settled({ mode: 'vcv', pmus: 0, vt: 560, rr: 14, peep: 5, baroreflex: 0 }, 45);
-  const mean = sim.metrics.operatingPoint;
+  const mean = sim.metrics.respiratoryOperatingPoint;
   const cf = cardiacFunctionCurve(sim.params, sim.circ, mean).points;
   const samples = [];
   for (let pmsf = 4; pmsf <= 16; pmsf += 0.1) {

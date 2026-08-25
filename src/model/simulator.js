@@ -32,15 +32,15 @@ class Ring {
 
 const CHANNELS = ['paw', 'ppl', 'pl', 'palv', 'art', 'cvp', 'pap', 'paop', 'flow', 'volume', 'co', 'insp'];
 
-// The Guyton diagram is a steady-state analysis: its axes are mean pressure and
-// mean flow. Cardiac pulsatility does not belong on it — right atrial pressure
-// swings several mmHg every beat through its a, c and v waves, which is a third
-// of the width of the plot — but the respiratory excursion is the whole point
-// and must survive. A boxcar exactly one cardiac cycle long is the right filter:
-// it nulls the cardiac fundamental completely while passing the much slower
-// respiratory cycle almost untouched.
+// The Guyton panel needs two clocks. A one-heartbeat boxcar removes atrial
+// pulsatility while preserving the respiratory excursion used for the trail.
+// A one-breath boxcar describes the periodic mean state that can legitimately
+// be compared with the analytic steady-state crossing. Keeping both in one ring
+// guarantees that the two summaries use identical raw samples.
 const CYCLE_HZ = 250;
-const CYCLE_SECONDS = 2; // enough for a full cycle down to 30 beats/min
+// The cascaded cardiac-then-respiratory boxcars need one breath plus one beat
+// of raw history. Thirteen seconds covers RR 6/min and the lowest effective HR.
+const CYCLE_SECONDS = 13;
 
 class CycleRing {
   constructor() {
@@ -62,6 +62,30 @@ class CycleRing {
     let sum = 0;
     for (let k = 1; k <= n; k++) sum += this.buf[(this.i - k + this.buf.length) % this.buf.length];
     return sum / n;
+  }
+
+  /**
+   * Mean of consecutive `innerSamples` moving means over `outerSamples` ends.
+   * This is a two-stage boxcar without allocating a second history or doing an
+   * O(inner × outer) convolution on every animation frame.
+   */
+  meanOfMeans(innerSamples, outerSamples) {
+    const inner = Math.min(innerSamples, this.filled);
+    const outer = Math.min(outerSamples, this.filled - inner + 1);
+    if (inner < 1 || outer < 1) return this.mean(innerSamples);
+
+    const at = (ago) => this.buf[(this.i - ago + this.buf.length) % this.buf.length];
+    let innerSum = 0;
+    for (let k = 1; k <= inner; k++) innerSum += at(k);
+
+    let total = 0;
+    for (let end = 0; end < outer; end++) {
+      total += innerSum / inner;
+      if (end + 1 < outer) {
+        innerSum += at(end + inner + 1) - at(end + 1);
+      }
+    }
+    return total / outer;
   }
 }
 
@@ -101,6 +125,11 @@ export class Simulator {
     this.cycle = {
       ra: new CycleRing(), flow: new CycleRing(), pmsf: new CycleRing(),
       peri: new CycleRing(), ppl: new CycleRing(), pCrit: new CycleRing(),
+      // End-diastolic and end-systolic volumes are latched once per beat by the
+      // integrator. Their respiratory means anchor the local RV-function curve
+      // to the chamber state actually producing the simulated flow.
+      rvEdv: new CycleRing(), rvEsv: new CycleRing(),
+      hr: new CycleRing(), eesRv: new CycleRing(),
     };
     this.cycleTick = 0;
     // Occlusion manoeuvres, and the (pressure, flow) pairs they measure.
@@ -258,6 +287,10 @@ export class Simulator {
       this.cycle.peri.push(c.p.pPeri);
       this.cycle.ppl.push(c.p.ppl);
       this.cycle.pCrit.push(c.p.pCrit);
+      this.cycle.rvEdv.push(c.rvEdv);
+      this.cycle.rvEsv.push(c.rvEsv);
+      this.cycle.hr.push(this.effective.hr);
+      this.cycle.eesRv.push(this.effective.eesRv);
     }
 
     if (c.beatCount !== this.beatSeen) {
@@ -402,7 +435,7 @@ export class Simulator {
     if (!Number.isFinite(co) || !Number.isFinite(map)) reasons.push('non-finite result');
 
     // One cardiac cycle's worth of samples: the cardiac ripple averages out, the
-    // respiratory swing survives.
+    // respiratory swing survives. This is the dynamic point used for the trail.
     const window = Math.round((60 / p.hr) * CYCLE_HZ);
     const operatingPoint = {
       pra: this.cycle.ra.mean(window),
@@ -416,6 +449,25 @@ export class Simulator {
       pCrit: this.cycle.pCrit.mean(window),
     };
 
+    // A complete respiratory cycle is the shortest window over which a settled
+    // serial circulation must return every compliant compartment — including
+    // the IVC and right heart — to the same volume. This is therefore the point
+    // that can be compared with a Guyton steady-state crossing. It deliberately
+    // coexists with, rather than replaces, the beat-mean point above.
+    const respiratoryWindow = Math.round((60 / p.rr) * CYCLE_HZ);
+    const respiratoryOperatingPoint = {
+      pra: this.cycle.ra.meanOfMeans(window, respiratoryWindow),
+      flow: this.cycle.flow.meanOfMeans(window, respiratoryWindow),
+      pmsf: this.cycle.pmsf.meanOfMeans(window, respiratoryWindow),
+      pPeri: this.cycle.peri.meanOfMeans(window, respiratoryWindow),
+      ppl: this.cycle.ppl.meanOfMeans(window, respiratoryWindow),
+      pCrit: this.cycle.pCrit.meanOfMeans(window, respiratoryWindow),
+      rvEdv: this.cycle.rvEdv.meanOfMeans(window, respiratoryWindow),
+      rvEsv: this.cycle.rvEsv.meanOfMeans(window, respiratoryWindow),
+      hr: this.cycle.hr.meanOfMeans(window, respiratoryWindow),
+      eesRv: this.cycle.eesRv.meanOfMeans(window, respiratoryWindow),
+    };
+
     const spontaneousEffort = p.mode === 'spont' || p.pmus > 0.5;
     const beatsPerBreath = p.hr / p.rr;
 
@@ -425,7 +477,10 @@ export class Simulator {
     // needs no particular breath, no passive patient and no regular rhythm — it
     // is read off the two curves rather than off the arterial waveform, so it
     // stays available exactly where the dynamic indices are withheld.
-    const preload = preloadSensitivity(p, c, operatingPoint);
+    // Preload reserve is a perturbation of the same steady construction shown
+    // by the Guyton curves, so it must use the respiratory equilibrium clock,
+    // not one arbitrarily phased heartbeat from the dynamic trail.
+    const preload = preloadSensitivity(p, c, respiratoryOperatingPoint);
     const preloadReasons = [];
     if (!preload) preloadReasons.push('the curves do not cross in this state');
     else if (!Number.isFinite(preload.relative)) preloadReasons.push('no finite operating point');
@@ -527,9 +582,13 @@ export class Simulator {
       lvEdv: c.lvEdv, lvEsv: c.lvEsv, lvEf,
       rvEdv: c.rvEdv, rvEsv: c.rvEsv,
       rvLvRatio: c.lvEdv > 0 ? c.rvEdv / c.lvEdv : 1,
-      pmsf: ema.pmsf, pCrit: ema.pCrit, pPeri: ema.peri, operatingPoint,
+      pmsf: ema.pmsf, pCrit: ema.pCrit, pPeri: ema.peri,
+      operatingPoint, respiratoryOperatingPoint,
       // Same collapse law as the integrator, same averaging window as its terms.
       gradientVr: ema.pmsf - venousReturnBackPressure(cvp, ema.pCrit),
+      respiratoryGradientVr: respiratoryOperatingPoint.pmsf
+        - venousReturnBackPressure(respiratoryOperatingPoint.pra,
+          respiratoryOperatingPoint.pCrit),
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
       lungVolume: r.lungVolume, pab: r.pab,
       openFraction: regions.openFraction,

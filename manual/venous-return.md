@@ -47,24 +47,24 @@ The plateau of the venous return curve is often attributed to the heart. It is n
 
 ## In the model
 
-Venous return has **one definition**, used by both the integrator and the drawn curve:
+The integrated circulation and the analytic curve describe the same pathway at different resolutions.
 
-```
-venousReturnFlow(pmsf, pra, pCrit, rvr)
-```
+The integrator separates the systemic venous reservoir, a compliant IVC and the right atrium. The selected resistance to venous return is divided into an upstream segment and a collapsible downstream segment. This allows the IVC to store a small amount of blood and delay transmission during a breath.
 
-This matters more than it sounds. When the plot computed the curve independently, the two drifted apart, and the diagram showed a construction the model was not obeying. The panel and the integrator now call the same function, so the curve cannot lie about the model.
+The analytic venous-return curve reduces those two resistances back to their steady-state sum and uses the same critical closing-pressure law. Once IVC volume is no longer changing, the detailed pathway and the reduced curve give the same mean flow. During inspiration or expiration they need not give the same instantaneous flow because the IVC is filling or emptying.
 
 Mean systemic filling pressure comes from the [stressed volume](stressed-volume.md) of the venous reservoir divided by its compliance, plus the [abdominal](abdominal-pressure.md) contribution where the reservoir is distended enough to have one.
 
 ### The two marks on the diagram
 
-The panel combines a measurement from the running circulation with a theoretical steady-state construction:
+The panel separates the within-breath path from the equilibrium comparison:
 
-- **the filled simulated point** plots right atrial pressure against IVC-to-right-atrial venous inflow. Both are averaged over the most recent heartbeat. Its flow coordinate is not RV output, LV output or cardiac output;
-- **the hollow equilibrium point** is the crossing of the analytic venous-return and RV-function curves. It predicts where venous return and RV output would become equal if the current conditions were held constant long enough. It becomes a prediction of systemic cardiac output only under the additional steady-state assumption that RV and LV output have also equilibrated.
+- **respiratory inflow path**, the faint trail, plots consecutive one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. It retains respiratory movement while suppressing the atrial pressure waves;
+- **mean venous inflow**, the filled point, plots the same two variables averaged over one complete respiratory cycle. Its flow coordinate is still venous inflow, not RV output, LV output or cardiac output;
+- **predicted equilibrium**, the hollow point, marks where predicted venous return and predicted RV output are equal on the local steady-state construction.
+- **the hollow equilibrium point** is the crossing of the respiratory-mean venous-return and local RV-function curves. It predicts where venous return and RV output become equal on that steady-state construction.
 
-The one-heartbeat averaging window removes cardiac pulsation while deliberately preserving respiratory movement. The filled point therefore follows venous inflow through the breath; the hollow point does not claim to be a second measurement of the same instantaneous flow.
+The end of a heartbeat is not an equilibrium event. Cardiac and respiratory cycles are not synchronized, and the IVC, right heart and pulmonary circulation do not all return to their starting volumes after every beat. A complete breath is the shortest periodic window over which a settled model must restore every compartment to the same volume. The filled and hollow mean points should therefore lie close together in a settled passive simulation, while the one-heartbeat trail remains visible.
 
 At steady state, mean venous return and cardiac output must be equal. Within a breath they may differ because the right heart can temporarily store blood:
 
@@ -76,24 +76,24 @@ $$
 - $\dot{Q}_{vr}$ — venous inflow entering the right heart, mL/s
 - $\dot{Q}_{rv}$ — flow ejected by the RV, mL/s
 
-If venous inflow rises before the RV can eject it, right-heart volume increases temporarily. If inflow later falls below RV output, that stored volume is released. The pulmonary circulation adds a second store between RV output and LV inflow. The diagram shows venous inflow but does not display actual RV output as a separate point, so the distance between the filled and hollow points is not a direct measure of either store.
+If venous inflow rises before the RV can eject it, right-heart volume increases temporarily. If inflow later falls below RV output, that stored volume is released. The pulmonary circulation adds a second store between RV output and LV inflow. The respiratory trail shows the combined dynamic consequence but cannot identify how much blood sits in each store.
 
-This distinction is especially important in pulmonary embolism. A spontaneous inspiration can increase venous return immediately, while a pressure-loaded RV and the pulmonary circulation transmit a much smaller or delayed change to LV output. A broad filled-point path can therefore be physiologically coherent. A persistent mean separation can also expose the limits of the simplified analytic cardiac curve under severe RV pressure loading; it must not automatically be interpreted as physiology.
+This distinction is especially important in pulmonary embolism. A spontaneous inspiration can increase venous return immediately, while a pressure-loaded RV and the pulmonary circulation transmit a smaller or delayed change to LV output. A broad trail can therefore be physiologically coherent even when the two respiratory-mean points agree.
 
 ### What the model shows
 
 A passive patient at 500 mL, 14 breaths per minute:
 
 <!-- BEGIN GENERATED: venous-return-peep -->
-*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. The displayed right atrial pressure is averaged over one cardiac cycle, as in the moving Guyton point; this suppresses cardiac pulsation but preserves respiratory movement.*
+*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure is averaged over the most recent complete respiratory cycle, as in the filled simulated-mean point on the Guyton panel.*
 
 | PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |
 |---:|---:|---:|---:|
-| 0 | 7.5 | -0.9 | 5.45 |
-| 5 | 9.0 | 0.7 | 5.36 |
-| 10 | 10.2 | 2.2 | 4.99 |
-| 15 | 11.3 | 3.8 | 4.61 |
-| 20 | 12.4 | 5.4 | 4.32 |
+| 0 | 7.5 | -0.6 | 5.45 |
+| 5 | 9.0 | 1.0 | 5.36 |
+| 10 | 10.2 | 2.6 | 4.99 |
+| 15 | 11.3 | 4.2 | 4.61 |
+| 20 | 12.4 | 5.8 | 4.32 |
 <!-- END GENERATED: venous-return-peep -->
 
 Mean systemic filling pressure *rises* with PEEP — the abdominal contribution and the compression of the reservoir see to that — and output falls anyway, because right atrial pressure rises faster than the head does. The gradient is what matters, not either end of it.
@@ -102,7 +102,9 @@ Mean systemic filling pressure *rises* with PEEP — the abdominal contribution 
 
 ## Why this and not something else
 
-The model integrates a closed loop and *derives* the Guyton diagram from it, rather than using the diagram as the model. A pure Guyton model — two curves and their intersection — is a useful teaching device but cannot show breath-by-breath behaviour or temporary blood storage. Here, separating the measured point from the calculated crossing makes both the dynamic physiology and the approximation visible. A small separation may reflect a circulation in motion; a large or persistent separation may also reveal that the local analytic RV curve is inadequate for the current state.
+The model integrates a closed loop and *derives* the Guyton diagram from it, rather than using the diagram as the model. A pure Guyton model — two curves and their intersection — cannot show breath-by-breath storage. The trail therefore retains one-heartbeat means, while the equilibrium comparison uses a full respiratory cycle.
+
+The local RV-function curve is anchored to respiratory-mean RV end-diastolic and end-systolic volumes. This avoids treating mean right atrial pressure as if it were identical to RV end-diastolic transmural pressure. It also means that agreement between the filled and hollow points is an internal consistency check, not independent validation of the integrated heart.
 
 Venous return uses a soft collapse law rather than a hard `max()`, for reasons given under [vascular waterfalls](vascular-waterfalls.md).
 
@@ -117,8 +119,8 @@ The resistance to venous return is a single control. Splitting it into the sever
 - **One venous reservoir.** No splanchnic, cutaneous or muscular capacitance beds, and therefore no redistribution between fast and slow compartments. A fluid bolus arrives instantaneously in one place.
 - **No stress relaxation, no transcapillary escape, no distribution kinetics.** Volume added stays where it is put.
 - **The resistance to venous return is a constant** apart from the abdominal term. It does not vary with flow, tone or vessel calibre.
-- **The Guyton diagram is a steady-state construction** applied to a non-steady state. Respiratory variation and temporary blood storage can separate the filled point from the crossing.
-- **The analytic curve represents the RV, not an independent biventricular or LV function curve.** It does not reproduce every consequence of RV dilation, ventricular interdependence, pulmonary transit, LV limitation or volume history. In severe RV pressure loading, including pulmonary embolism, a persistent gap may be a construction error as well as a dynamic physiological signal.
+- **The Guyton diagram is a steady-state construction placed under a dynamic trail.** The one-heartbeat trail preserves respiratory storage, whereas the two equilibrium points use a complete respiratory cycle.
+- **The analytic curve represents a local RV relation, not an independent biventricular or LV function curve.** It is anchored to the model’s current respiratory-mean RV volumes and does not reproduce a new closed-loop beat at every pressure on the curve.
 - **The filled point is venous inflow, not cardiac output.** Its height must not be read as simultaneous RV or LV forward flow.
 - Mean systemic filling pressure here is computed from the model's own state. It is an internal quantity, not the thing an occlusion manoeuvre measures — see [Pmsf and occlusions](pmsf-and-occlusions.md).
 

@@ -5,7 +5,7 @@ export const SNAPSHOTS = {
   'healthy-vcv': { co: 5.19, map: 100.9, cvp: 1.06, papMean: 14.3, paop: 7.42, pvr: 1.18 },
   'peep-escalation': { co: 4.67, map: 92.2, cvp: 3.89, papMean: 15.9, paop: 8.31, pvr: 1.25 },
   'septic-responder': { co: 4.17, map: 80.4, cvp: 2.26, papMean: 11.4, paop: 4.69, pvr: 1.20 },
-  'swing-limited-reserve': { co: 6.83, map: 98.4, cvp: -1.62, papMean: 14.6, paop: 4.40, pvr: 1.20 },
+  'swing-limited-reserve': { co: 6.61, map: 98.0, cvp: 0.34, papMean: 22.1, paop: 12.65, pvr: 1.20 },
   'ards-rv': { co: 4.34, map: 82.7, cvp: -0.71, papMean: 21.6, paop: 0.36, pvr: 3.99 },
   'pulmonary-embolism': { co: 4.91, map: 109.4, cvp: 2.34, papMean: 39.2, paop: 2.69, pvr: 7.42 },
   'cardiac-tamponade': { co: 5.18, map: 96.6, cvp: 6.17, papMean: 16.5, paop: 10.01, pvr: 1.18 },
