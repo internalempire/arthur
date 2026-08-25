@@ -6,7 +6,14 @@ export const SCENARIOS = [
     id: 'healthy-spont',
     name: 'Healthy, breathing spontaneously',
     note: 'Watch central venous pressure fall during inspiration while venous inflow rises modestly. The measured pressure drops, but transmural pressure — the pressure that distends the atrium — rises. Post-inspiratory muscle activity then brakes early expiration rather than disappearing at the neural switch.',
-    params: { mode: 'spont', pmus: 8, peep: 0, rr: 14 },
+    // A physiological resting effort gives a roughly 420 mL spontaneous tidal
+    // volume. Moderate filling and low-normal RV elastance place the resting
+    // circulation beyond the model's steep preload limb while retaining normal
+    // output, RV ejection fraction and systemic/pulmonary pressures.
+    params: {
+      mode: 'spont', pmus: 6, peep: 0, rr: 14,
+      stressedVolume: 850, svr: 0.9, eesRv: 0.35,
+    },
   },
   {
     id: 'healthy-vcv',

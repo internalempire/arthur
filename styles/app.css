@@ -637,12 +637,11 @@ input[type="range"]:disabled { cursor: not-allowed; }
 /* ------------------------------------------------ readout interpretability */
 
 /* A readout whose validity conditions are not met is dimmed and its value
-   withheld; the reason is stated in place of the number's usual subtitle. */
-.tile[data-quality="caution"] { border-style: dashed; }
-
+   withheld; the reason is stated in place of the number's usual subtitle.
+   Border style is deliberately not another code: every tile keeps the same
+   one-pixel solid outline, while the explicit quality text carries meaning. */
 .tile[data-quality="unavailable"] {
   opacity: 0.62;
-  border-style: dashed;
 }
 
 .tile-quality {
@@ -655,10 +654,6 @@ input[type="range"]:disabled { cursor: not-allowed; }
 .tile-quality:empty { display: none; }
 
 .tile[data-quality="unavailable"] .tile-number { color: var(--ink-muted); }
-
-/* What kind of number this is, marked with a hairline down the left edge. */
-.tile[data-kind="derived"] { border-left: 3px solid var(--axis); }
-.tile[data-kind="coefficient"] { border-left: 3px dotted var(--axis); }
 
 .invalid-banner {
   margin: 0;
@@ -686,9 +681,6 @@ input[type="range"]:disabled { cursor: not-allowed; }
   white-space: nowrap;
 }
 
-.legend-key[data-kind="derived"] { border-left: 3px solid var(--axis); padding-left: 5px; }
-.legend-key[data-kind="coefficient"] { border-left: 3px dotted var(--axis); padding-left: 5px; }
-
 /* ------------------------------------------- text equivalents for the canvas */
 
 /* Every chart carries a live one-sentence summary for assistive technology and
@@ -708,15 +700,19 @@ input[type="range"]:disabled { cursor: not-allowed; }
 .panel-data > summary {
   cursor: pointer;
   list-style: none;
-  padding: 2px 5px;
-  border-radius: 5px;
-  width: fit-content;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 50%;
   background: var(--surface);
+  color: var(--ink-secondary);
+  font: 700 12px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 .panel-data > summary::-webkit-details-marker { display: none; }
-.panel-data > summary::before { content: '▸ '; }
-.panel-data[open] > summary::before { content: '▾ '; }
 .panel-data > summary:hover { color: var(--ink); background: var(--wash); }
 .panel-data > summary:focus-visible { outline: 2px solid var(--venous); outline-offset: 1px; }
 
@@ -725,11 +721,19 @@ input[type="range"]:disabled { cursor: not-allowed; }
   left: 8px;
   bottom: 8px;
   overflow-y: auto;
+  overflow-x: hidden;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 6px 8px;
   z-index: 2;
+}
+
+.panel-data[open] > summary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin-left: auto;
 }
 
 .panel-summary {
@@ -751,6 +755,7 @@ input[type="range"]:disabled { cursor: not-allowed; }
 
 .panel-data table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 11px;
 }
@@ -759,13 +764,18 @@ input[type="range"]:disabled { cursor: not-allowed; }
   padding: 2px 0;
   border-bottom: 1px solid var(--grid);
   color: var(--ink-secondary);
+  vertical-align: top;
+  overflow-wrap: anywhere;
 }
 
+.panel-data td:first-child { width: 58%; }
+
 .panel-data td:last-child {
+  width: 42%;
   text-align: right;
   color: var(--ink);
   font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  white-space: normal;
 }
 
 /* Status words use the contrast-corrected text tokens, not the stroke colours. */

@@ -55,9 +55,9 @@ During passive mechanical ventilation, inspiratory muscle pressure is absent. In
 
 ## Zooming the diagram
 
-The `+` and `−` controls enlarge or reduce the view around the current pleural-pressure–volume point. Both axes are magnified so that the tidal trajectory and its distance from the passive curves remain readable. The centre is fixed when zoom is activated: the axes do not chase the moving point during the breath.
+The diagram opens at **300%** around the current pleural-pressure–volume point, making the tidal trajectory and the muscle-pressure separation visible without an initial adjustment. The `+` and `−` controls enlarge or reduce this view. Both axes are magnified, and the centre remains fixed: the axes do not chase the moving point during the breath.
 
-The middle button reports the selected magnification. **Fit** restores the complete static construction. Zoom changes only the view; it does not alter respiratory mechanics, ventilator settings or model state. Selecting a scenario or changing a control recentres the magnified view on the new operating point.
+The middle button reports the selected magnification. **Fit** restores the complete 100% static construction when a wider physiological overview is useful. Zoom changes only the view; it does not alter respiratory mechanics, ventilator settings or model state. Selecting a scenario or changing a control recentres the magnified view on the new operating point.
 
 ## What happens after spontaneous inspiration
 

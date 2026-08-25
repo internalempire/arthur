@@ -99,7 +99,17 @@ section('Scenario teaching mechanisms');
 
 {
   const phase = phaseMeans('healthy-spont');
-  const metrics = scenarioMetrics('healthy-spont');
+  const initial = scenarioSimulator('healthy-spont');
+  const metrics = initial.metrics;
+  let maxReserve = metrics.preload.relative;
+  let reserveAlarmed = metrics.preload.steep;
+  // The landing tile is live, so one reassuring sample is insufficient: the
+  // complete respiratory cycle must remain outside the alarm classification.
+  for (let i = 0; i < 12 / 0.05; i++) {
+    initial.advance(0.05, true);
+    maxReserve = Math.max(maxReserve, initial.metrics.preload.relative);
+    reserveAlarmed ||= initial.metrics.preload.steep;
+  }
   demonstrates['healthy-spont'] = phase.cvpIn < phase.cvpOut - 1
     && phase.flowIn > phase.flowOut + 0.05
     && metrics.cvpTransmural > metrics.cvp
@@ -108,6 +118,10 @@ section('Scenario teaching mechanisms');
     demonstrates['healthy-spont'],
     `CVP ${phase.cvpOut.toFixed(1)} → ${phase.cvpIn.toFixed(1)}, `
       + `flow ${phase.flowOut.toFixed(1)} → ${phase.flowIn.toFixed(1)} L/min`);
+  check('the initial healthy state is compensated without alarm-coloured preload reserve',
+    !reserveAlarmed && metrics.map >= 70 && metrics.map <= 110
+      && metrics.vtDelivered >= 350 && metrics.vtDelivered <= 500,
+    `MAP ${metrics.map.toFixed(0)} mmHg, maximum reserve ${(maxReserve * 100).toFixed(1)}%/mmHg`);
 }
 
 {

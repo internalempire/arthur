@@ -46,6 +46,8 @@ check('UI imports the model only through its public boundary',
   forbidden.length === 0, forbidden.join(', '));
 
 const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+const css = readFileSync(new URL('../styles/app.css', import.meta.url), 'utf8');
+const descriptions = readFileSync(new URL('../src/ui/descriptions.js', import.meta.url), 'utf8');
 const anchors = [
   'scenario', 'speed', 'playpause', 'hold-exp', 'hold-insp', 'reset', 'theme',
   'sidebar-toggle', 'scenario-note', 'controls', 'invalid-banner', 'stats',
@@ -59,13 +61,23 @@ check('the browser entry point remains an ES module',
 check('the header exposes accessible repository and manual links',
   /id=["']project-repository["'][^>]+href=["']https:\/\/github\.com\/internalempire\/arthur["'][^>]+aria-label=/.test(html)
     && /id=["']project-manual["'][^>]+href=["']manual\/["'][^>]+aria-label=/.test(html));
+check('numerical tiles retain one thin solid outline across kinds and quality states',
+  /\.tile\s*\{[^}]*border:\s*1px solid var\(--border\)/s.test(css)
+    && !/\.tile\[data-kind=[^\]]+\][^\n{]*\{[^}]*border-left/s.test(css)
+    && !/\.tile\[data-quality=[^\]]+\][^\n{]*\{[^}]*border-style/s.test(css));
+check('chart data disclosures use a compact help glyph with an explicit name',
+  /toggle\.textContent\s*=\s*'\?'/.test(descriptions)
+    && /values and description/.test(descriptions)
+    && /\.panel-data > summary\s*\{[^}]*border-radius:\s*50%/s.test(css));
 
 const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8');
 const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.meta.url));
 const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
 const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
 const { airwayReadout } = await import(new URL('../src/ui/panels/waveforms.js', import.meta.url));
-const { classicalCampbellCurves, campbellZoomDomain } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
+const {
+  CAMPBELL_DEFAULT_ZOOM, classicalCampbellCurves, campbellZoomDomain,
+} = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
 const { ivcDisplayWidth } = await import(new URL('../src/ui/panels/thorax.js', import.meta.url));
 const baroreflex = PARAMETERS.find((spec) => spec.id === 'baroreflexEnabled');
 const hysteresis = PARAMETERS.find((spec) => spec.id === 'hysteresis');
@@ -120,6 +132,8 @@ check('Campbell zoom keeps a stable operating-point view inside the full domain'
     && zoomedCampbell.yMax <= campbell.domain.yMax
     && zoomedCampbell.xMax - zoomedCampbell.xMin
       < campbell.domain.xMax - campbell.domain.xMin);
+check('Campbell opens at the magnification that exposes the tidal loop',
+  CAMPBELL_DEFAULT_ZOOM === 3);
 check('a plethoric IVC remains visually responsive above the reference calibre',
   ivcDisplayWidth(180) > ivcDisplayWidth(160)
     && ivcDisplayWidth(160) > ivcDisplayWidth(150));
@@ -129,4 +143,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n13 UI smoke contracts passed`);
+console.log(`\n16 UI smoke contracts passed`);
