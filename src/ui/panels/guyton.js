@@ -1,14 +1,12 @@
 import { Panel, niceTicks } from '../plot.js';
 import {
   venousReturnCurve, cardiacFunctionCurve, curveIntersection, preloadLimbs,
-  cmH2OtoMmHg,
 } from '../../model/index.js';
 
 // The Guyton diagram. Both curves share right atrial pressure as their abscissa,
-// so their intersection is the operating point. Intrathoracic pressure slides
-// the model RV-function curve along that axis while leaving the venous return
-// curve where it is — which is the entire mechanism by which a breath changes
-// the predicted right-sided steady flow.
+// so their intersection is the predicted respiratory-mean operating point. A
+// separate trail retains the within-breath venous-inflow path; this prevents an
+// IVC storage transient from being compared as if it were a steady crossing.
 
 const TRAIL_INTERVAL = 0.025; // s of simulated time between trail samples
 const TRAIL_POINTS = 480;     // about 12 s of physiology
@@ -23,26 +21,24 @@ export function createGuyton(canvas) {
     const ctx = panel.begin();
     const { params: p, circ: c, metrics: m } = sim;
 
-    // Everything on this plot is a cycle mean. Plotting the instantaneous right
-    // atrial pressure against a beat-averaged output — which is what this used
-    // to do — pairs two quantities measured over different windows, and sends
-    // the marker skidding back and forth across a third of the axis at heart
-    // rate while its height barely moves. The operating point of a Guyton
-    // diagram is a mean pressure against a mean flow.
-    const op = m.operatingPoint;
+    // The curves and the two equilibrium marks use a complete respiratory-cycle
+    // mean. That is the shortest interval over which a settled serial circuit
+    // must return every compliant compartment to the same volume. The separate
+    // one-heartbeat mean remains below as the dynamic respiratory trail.
+    const op = m.respiratoryOperatingPoint;
+    const beat = m.operatingPoint;
     const vr = venousReturnCurve(p, c, op);
     const cf = cardiacFunctionCurve(p, c, op);
 
-    // Two different things, drawn as two different marks.
+    // Two different quantities, drawn as two different marks. Their labels name
+    // the physiology rather than the calculation method: otherwise "simulated"
+    // and "analytic" can be mistaken for two estimates of the same output.
     //
-    // `simulated` is where the integrated model actually is: the cycle-mean
-    // right atrial pressure against the cycle-mean venous return. `equilibrium`
-    // is where the graphical analysis says it should be — the crossing of the
-    // two curves. They are close but not identical, because the cardiac
-    // function curve is a single-beat approximation and because averaging a
-    // nonlinear venous return relation over a cycle is not the same as
-    // evaluating it at the mean pressure. Showing only the crossing, as this
-    // panel used to, presents a derived equilibrium as if it were the patient.
+    // `simulated` is the respiratory mean measured from the integrated model.
+    // `equilibrium` is the crossing predicted by the local venous-return and RV-
+    // function constructions on that same clock. The trail is intentionally
+    // different: it preserves the within-breath storage and phase lag that the
+    // mean points remove.
     const simulated = { x: op.pra, y: op.flow };
     const equilibrium = curveIntersection(vr.points, cf.points);
 
@@ -50,7 +46,7 @@ export function createGuyton(canvas) {
     // regardless of frame rate, and stops growing when the model is paused.
     if (sim.time - lastSample >= TRAIL_INTERVAL) {
       lastSample = sim.time;
-      trail.push(simulated.x, simulated.y);
+      trail.push(beat.pra, beat.flow);
       if (trail.length > TRAIL_POINTS * 2) trail.splice(0, 2);
     }
 
@@ -69,8 +65,10 @@ export function createGuyton(canvas) {
 
     panel.clip();
 
-    // Pleural pressure marker: where the model RV-function curve is anchored.
-    const pplMmHg = cmH2OtoMmHg(sim.resp.ppl);
+    // Respiratory-mean pleural pressure remains a useful external-pressure
+    // reference. It is not labelled as the curve intercept: the locally
+    // anchored RV relation also contains the RA-to-RV filling offset.
+    const pplMmHg = op.ppl;
     ctx.save();
     ctx.strokeStyle = colors.inkMuted;
     ctx.setLineDash([2, 3]);
@@ -81,7 +79,9 @@ export function createGuyton(canvas) {
     ctx.stroke();
     ctx.restore();
 
-    // The loop the operating point walks over a breath.
+    // The loop measured venous inflow walks over a breath. This remains tied to
+    // the integrated circulation: moving it to the predicted crossing would
+    // replace real storage and phase lag with a sequence of constructions.
     panel.line(trail, { color: colors.ink, width: 1.4, alpha: 0.3 });
 
     panel.line(vr.points, { color: colors.venous, width: 2 });
@@ -107,6 +107,18 @@ export function createGuyton(canvas) {
     panel.label('RV function', cf.points[cfLabelIdx], cf.points[cfLabelIdx + 1], {
       color: colors.text.arterial, dx: -6, dy: -10, align: 'right', halo: colors.surface,
     });
+    if (trail.length >= 12) {
+      // Put the label at the right-most part of the measured path, away from
+      // most of the loop and without implying that the trail belongs to either
+      // analytic curve.
+      let trailLabelIdx = 0;
+      for (let i = 2; i < trail.length; i += 2) {
+        if (trail[i] > trail[trailLabelIdx]) trailLabelIdx = i;
+      }
+      panel.label('respiratory inflow path', trail[trailLabelIdx], trail[trailLabelIdx + 1], {
+        color: colors.inkMuted, dx: -7, dy: -12, align: 'right', halo: colors.surface,
+      });
+    }
 
     panel.label(`Pmsf ${vr.pmsf.toFixed(1)}`, vr.pmsf, 0, {
       color: colors.text.venous, dx: -4, dy: -8, align: 'right', halo: colors.surface,
@@ -165,7 +177,7 @@ export function createGuyton(canvas) {
       ctx.restore();
     }
 
-    // The analytic equilibrium: hollow, because it is a construction.
+    // The predicted equilibrium: hollow, because it is a construction.
     if (equilibrium) {
       ctx.save();
       ctx.beginPath();
@@ -176,14 +188,18 @@ export function createGuyton(canvas) {
       ctx.stroke();
       ctx.restore();
     }
-    // The simulated state: filled, because it is what the model is doing.
+    // Mean venous inflow: filled, because it is measured from the integrated
+    // circulation. When the two agree, the smaller filled disc leaves the
+    // hollow predicted-equilibrium ring visible around it.
     panel.dot(simulated.x, simulated.y, { color: colors.ink, r: 4, ring: colors.surface });
 
-    panel.label('simulated', simulated.x, simulated.y, {
+    panel.label('mean venous inflow', simulated.x, simulated.y, {
       color: colors.ink, dx: 9, dy: 9, halo: colors.surface,
     });
-    if (equilibrium && Math.abs(equilibrium.y - simulated.y) > yHi * 0.03) {
-      panel.label('analytic', equilibrium.x, equilibrium.y, {
+    if (equilibrium
+      && (Math.abs(equilibrium.x - simulated.x) > (xHi - xLo) * 0.03
+        || Math.abs(equilibrium.y - simulated.y) > yHi * 0.03)) {
+      panel.label('predicted equilibrium', equilibrium.x, equilibrium.y, {
         color: colors.inkMuted, dx: 9, dy: -9, halo: colors.surface,
       });
     }

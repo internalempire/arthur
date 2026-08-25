@@ -194,7 +194,7 @@ for (const sc of SCENARIOS) {
   const s = new Simulator();
   s.applyScenario(sc);
   s.advance(30, true);
-  const op = s.metrics.operatingPoint;
+  const op = s.metrics.respiratoryOperatingPoint;
   const curve = venousReturnCurve(s.params, s.circ, op);
   // Read the curve at the simulated pressure and compare with the simulated flow.
   let drawn = NaN;
@@ -207,10 +207,9 @@ for (const sc of SCENARIOS) {
       break;
     }
   }
-  // The analytic construction is steady-state while the filled point retains
-  // respiratory motion. Keep a tight absolute tolerance at ordinary flow, but
-  // allow the documented local approximation about 12% during very vigorous
-  // spontaneous effort rather than forcing the scenario back toward passivity.
+  // Averaging a nonlinear collapse law over a breath is not exactly the same as
+  // evaluating it at mean pressure. Keep a tight absolute tolerance at ordinary
+  // flow, but allow about 12% during very vigorous spontaneous effort.
   const tolerance = Math.max(0.45, Math.abs(op.flow) * 0.12);
   check(`${sc.id}: simulated state lies on the venous return curve`,
     Number.isFinite(drawn) && Math.abs(drawn - op.flow) < tolerance,
@@ -220,7 +219,7 @@ for (const sc of SCENARIOS) {
 section('The venous return curve uses the integrator\'s own collapse law');
 {
   const s = settled({});
-  const op = s.metrics.operatingPoint;
+  const op = s.metrics.respiratoryOperatingPoint;
   const direct = (venousReturnFlow(op.pmsf, op.pra, op.pCrit, s.circ.p.rvrEff) * 60) / 1000;
   const curve = venousReturnCurve(s.params, s.circ, op);
   let drawn = NaN;
@@ -317,20 +316,31 @@ section('The Guyton points remain explicitly distinguished');
   const examples = readFileSync(new URL('../../manual/model-examples.mjs', import.meta.url), 'utf8');
   const guytonUi = readFileSync(new URL('../../src/ui/panels/guyton.js', import.meta.url), 'utf8');
 
-  check('the filled point is identified as venous inflow rather than cardiac output',
+  check('the filled respiratory mean is identified as venous inflow rather than cardiac output',
     panel.includes('venous inflow from the inferior vena cava into the right atrium')
-      && panel.includes('It is **not** RV output, LV output or cardiac output'));
-  check('the averaging window is one heartbeat and preserves respiratory motion',
-    panel.includes('Using one cardiac cycle')
-      && panel.includes('without averaging away the respiratory change'));
+      || (panel.includes('IVC-to-right-atrial venous inflow')
+        && panel.includes('not RV output, LV output or cardiac output')));
+  check('the canvas labels the two central marks by quantity rather than calculation method',
+    guytonUi.includes("panel.label('mean venous inflow'")
+      && guytonUi.includes("panel.label('predicted equilibrium'")
+      && !guytonUi.includes("panel.label('simulated mean'")
+      && !guytonUi.includes("panel.label('analytic'"));
+  check('the dynamic trail identifies the measured respiratory inflow path',
+    guytonUi.includes("panel.label('respiratory inflow path'")
+      && panel.includes('drawing a trail from successive predicted crossings would hide'));
+  check('the panel separates one-heartbeat dynamics from one-breath equilibrium',
+    panel.includes('one-heartbeat means')
+      && panel.includes('most recent complete respiratory cycle')
+      && panel.includes('whole breath')
+      && guytonUi.includes('const pplMmHg = op.ppl'));
   check('temporary right-heart storage is explained',
     venousReturn.includes('dV_{right}')
       && venousReturn.includes('temporarily store blood'));
-  check('high RV afterload is documented as an analytic limitation',
-    venousReturn.includes('severe RV pressure loading')
-      && venousReturn.includes('construction error as well as a dynamic physiological signal'));
+  check('high RV afterload is documented as a dynamic trail rather than failed convergence',
+    panel.includes('pulmonary embolism or severe RV pressure loading')
+      && panel.includes('trail can be broad while the respiratory-mean points remain close'));
   check('the ascending curve is explicitly RV rather than LV function',
-    panel.includes('implements it more specifically as an **RV-function curve**')
+    panel.includes('labels it **RV function**')
       && panel.includes('It is not an independently calculated LV-function curve')
       && guytonUi.includes("panel.label('RV function'"));
   check('preload reserve does not claim to test LV reserve independently',

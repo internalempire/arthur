@@ -135,7 +135,7 @@ fluid kinetics.
 fluid responsiveness?
 
 **What the model produces.** Pleural pressure swings by about 20 cmH2O while the
-local preload reserve is about 7.7% of output per mmHg of filling pressure,
+local preload reserve is about 7.4% of output per mmHg of filling pressure,
 below the model's 8%/mmHg steep-limb threshold. The preset is spontaneously
 breathing, so the model correctly labels PPV **unavailable**.
 
@@ -143,7 +143,7 @@ breathing, so the model correctly labels PPV **unavailable**.
 settled Guyton operating point, not an arterial waveform index. That preserves
 the spontaneous-breathing phenotype and makes the intended distinction
 internally coherent: pressure transmission is not preload reserve. The
-7.7%/mmHg value and the 8%/mmHg boundary are model teaching constructs, not a
+7.4%/mmHg value and the 8%/mmHg boundary are model teaching constructs, not a
 validated bedside fluid-responsiveness threshold.
 
 **Not represented.** Irregular effort, tidal-volume variability, reverse

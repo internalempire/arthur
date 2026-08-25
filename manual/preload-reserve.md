@@ -20,7 +20,7 @@ The clinically familiar fluid challenge is a finite volume intervention. The mod
 
 ## In the model
 
-The simulator raises and lowers model Pmsf by 0.5 mmHg around the current state, recomputes the intersection of the same venous-return and RV-function curves drawn in the panel, and estimates the central slope:
+The simulator first averages the Guyton state over one complete respiratory cycle. It then raises and lowers model Pmsf by 0.5 mmHg around that mean state, recomputes the intersection of the same venous-return and RV-function curves drawn in the panel, and estimates the central slope:
 
 $$
 R_{preload} = \frac{1}{Q}\frac{\Delta Q}{\Delta P_{msf}}
@@ -48,7 +48,7 @@ With passive volume control, VT 560 mL, RR 14/min, PEEP 5 and baroreflex disable
 
 The exact gains are properties of these model states. The point is the separation: the same added volume raises output much more on the steep limb.
 
-Unlike PPV, preload reserve remains available during spontaneous breathing and low tidal volume because it is not read from a respiratory waveform. It can still become unavailable if the two analytical curves have no finite crossing.
+Unlike PPV, preload reserve remains available during spontaneous breathing and low tidal volume because it is not read from respiratory amplitude. Using a complete-breath mean prevents one arbitrarily phased heartbeat from changing the classification. It can still become unavailable if the two analytical curves have no finite crossing.
 
 ### What changes it — and what it changes
 
@@ -82,7 +82,7 @@ The calculation is expressed per mmHg rather than per millilitre. Converting pre
 
 ### Of the construction
 
-- The reserve is derived from a steady-state analytical construction applied to a breathing closed-loop simulation.
+- The reserve is derived from a steady-state analytical construction anchored to the most recent complete respiratory cycle of a breathing closed-loop simulation.
 - The 8%/mmHg split is a didactic classifier with broad, not exact, agreement with the model's 500 mL experiment.
 - The slope is local; a finite intervention can leave the steep limb and yield less benefit than the derivative suggests.
 - The ascending relation is an RV-function approximation. It uses current RV afterload and external pressures and does not simulate a full new biventricular steady state at every perturbed point.

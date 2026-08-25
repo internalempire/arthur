@@ -157,9 +157,9 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | PEEP | 5 cmH₂O | 6 cmH₂O |
 | Ventilation | Inspiratory effort | 0.0 cmH₂O | 30.0 cmH₂O |
 | Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 150 mL/cmH₂O |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 950 mL |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 1200 mL |
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.75 mmHg·s/mL |
-| Cardiac function | Baseline heart rate | 75 /min | 100 /min |
+| Cardiac function | Baseline heart rate | 75 /min | 70 /min |
 
 #### ARDS with right ventricular failure
 

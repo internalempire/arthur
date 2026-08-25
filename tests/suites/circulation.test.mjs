@@ -51,12 +51,46 @@ section('Shared pericardial constraint');
     pericardialPressure({ ...tight, pericardium: 0 }, 500) === 0);
 }
 
+section('Guyton respiratory equilibrium');
+{
+  const s = settled({ mode: 'vcv', pmus: 0, vt: 450, peep: 5, rr: 14 }, 45);
+  const beatPra = [];
+  const respiratoryPra = [];
+  const period = 60 / s.params.rr;
+  for (let elapsed = 0; elapsed < period; elapsed += 0.05) {
+    s.advance(0.05, true);
+    beatPra.push(s.metrics.operatingPoint.pra);
+    respiratoryPra.push(s.metrics.respiratoryOperatingPoint.pra);
+  }
+
+  const op = s.metrics.respiratoryOperatingPoint;
+  const vr = venousReturnCurve(s.params, s.circ, op);
+  const cf = cardiacFunctionCurve(s.params, s.circ, op);
+  const analytic = curveIntersection(vr.points, cf.points);
+  const span = (xs) => Math.max(...xs) - Math.min(...xs);
+
+  check('the one-heartbeat point retains the passive respiratory excursion',
+    span(beatPra) > 0.5, `${span(beatPra).toFixed(2)} mmHg`);
+  check('the one-breath point removes respiratory phase from the equilibrium comparison',
+    span(respiratoryPra) < 0.08, `${span(respiratoryPra).toFixed(3)} mmHg`);
+  check('the local RV curve is anchored to respiratory-mean chamber mechanics',
+    cf.anchored === true);
+  check('a settled healthy passive circulation converges on the analytic crossing',
+    analytic
+      && Math.abs(op.pra - analytic.x) < 0.15
+      && Math.abs(op.flow - analytic.y) < 0.12,
+    analytic
+      ? `pressure gap ${Math.abs(op.pra - analytic.x).toFixed(3)} mmHg, `
+        + `flow gap ${Math.abs(op.flow - analytic.y).toFixed(3)} L/min`
+      : 'no curve crossing');
+}
+
 section('Preload reserve on the Guyton construction');
 {
   const vcv = { mode: 'vcv', pmus: 0, vt: 450, peep: 5, rr: 14 };
   const at = (over) => {
     const s = settled({ ...vcv, ...over }, 45);
-    return { sim: s, r: preloadSensitivity(s.params, s.circ, s.metrics.operatingPoint) };
+    return { sim: s, r: preloadSensitivity(s.params, s.circ, s.metrics.respiratoryOperatingPoint) };
   };
 
   const dry = at({ stressedVolume: 300 });
@@ -107,7 +141,7 @@ section('Preload reserve on the Guyton construction');
   {
     const agrees = (which) => {
       const s = which.sim;
-      const op = s.metrics.operatingPoint;
+      const op = s.metrics.respiratoryOperatingPoint;
       const { steep, plateau } = preloadLimbs(s.params, s.circ, op);
       const here = curveIntersection(
         venousReturnCurve(s.params, s.circ, op).points,
@@ -123,7 +157,7 @@ section('Preload reserve on the Guyton construction');
     check('the drawn steep limb agrees with the reported reserve, dry', agrees(dry));
     check('and agrees with it when full', agrees(wet));
     check('both limbs together are non-empty',
-      (() => { const l = preloadLimbs(dry.sim.params, dry.sim.circ, dry.sim.metrics.operatingPoint);
+      (() => { const l = preloadLimbs(dry.sim.params, dry.sim.circ, dry.sim.metrics.respiratoryOperatingPoint);
         return l.steep.length + l.plateau.length >= 40; })());
   }
 

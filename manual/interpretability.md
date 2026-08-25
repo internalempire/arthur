@@ -47,7 +47,7 @@ The list is intentionally inspectable rather than hidden in scenario-specific pr
 
 The pulmonary circulation reports both the model's resistance coefficient and $(mPAP-P_{LA})/CO$. The first is what the integrator uses; the second is the catheter-like aggregate resulting from resistance, waterfall conditions and flow. They need not change by the same percentage.
 
-The Guyton panel reports a simulated point and an analytic crossing separately. The simulated point is one-cardiac-cycle mean right atrial pressure against IVC-to-right-atrial venous inflow, not cardiac output. The crossing is the steady state predicted by two simplified analytic curves. Respiratory storage and delay can separate them, but a persistent gap may also reflect the limits of the analytic cardiac curve, especially during severe RV pressure loading.
+The Guyton panel separates a dynamic trail from an equilibrium comparison. The trail uses one-heartbeat mean right atrial pressure against IVC-to-right-atrial venous inflow and therefore preserves respiratory storage and delay. The filled point averages the same variables over a complete breath; the hollow point is the crossing of the respiratory-mean venous-return and local RV-function curves. In a settled periodic state those two mean points should be close, but their agreement is an internal consistency check because the RV curve is anchored to simulated chamber volumes. None of these venous-inflow values is a direct measurement of cardiac output.
 
 The pulmonary-transit page separates represented blood volume, the central-volume estimate and the bounded staged-buffer time. None is labelled as a contrast-bolus measurement.
 

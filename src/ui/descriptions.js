@@ -44,26 +44,28 @@ const PANELS = [
     match: 'Guyton diagram',
     title: 'Guyton diagram',
     summary: (sim) => {
-      const m = sim.metrics, op = m.operatingPoint;
-      return `The simulated state sits at a right atrial pressure of ${n(op.pra)} mmHg and a flow of `
-        + `${n(op.flow, 2)} L/min. Mean systemic filling pressure is ${n(m.pmsf)} mmHg, so the gradient `
-        + `driving venous return is ${n(m.gradientVr)} mmHg. The model RV-function curve is anchored at a `
-        + `pleural pressure of ${n(op.ppl)} mmHg.`;
+      const m = sim.metrics, op = m.respiratoryOperatingPoint;
+      return `Over the most recent breath, mean venous inflow is ${n(op.flow, 2)} L/min at a mean right atrial pressure of ${n(op.pra)} mmHg. `
+        + `Mean systemic filling pressure is ${n(op.pmsf)} mmHg, so the gradient `
+        + `driving venous return on the same respiratory clock is ${n(m.respiratoryGradientVr)} mmHg. `
+        + `The faint trail retains the one-heartbeat means that move through the breath.`;
     },
     rows: (sim) => {
-      const m = sim.metrics, op = m.operatingPoint;
+      const m = sim.metrics, op = m.respiratoryOperatingPoint, beat = m.operatingPoint;
       return [
-        ['Right atrial pressure (cycle mean)', `${n(op.pra)} mmHg`],
-        ['Venous return (cycle mean)', `${n(op.flow, 2)} L/min`],
-        ['Mean systemic filling pressure', `${n(m.pmsf)} mmHg`],
-        ['Gradient for venous return', `${n(m.gradientVr)} mmHg`],
+        ['Right atrial pressure (respiratory mean)', `${n(op.pra)} mmHg`],
+        ['Venous inflow (respiratory mean)', `${n(op.flow, 2)} L/min`],
+        ['Right atrial pressure (latest heartbeat)', `${n(beat.pra)} mmHg`],
+        ['Venous inflow (latest heartbeat)', `${n(beat.flow, 2)} L/min`],
+        ['Mean systemic filling pressure', `${n(op.pmsf)} mmHg`],
+        ['Gradient for venous return', `${n(m.respiratoryGradientVr)} mmHg`],
         ['Systemic venous stressed volume', `${n(m.stressedVenous, 0)} mL`],
         ['Mobilised by venous tone', `${n(m.venousToneVolume, 0)} mL`],
         ['Systemic venous unstressed volume', `${n(m.unstressedVenous, 0)} mL`],
         ['Venous compliance (slope)', `${n(m.effectiveCsv, 0)} mL/mmHg`],
         ['Critical closing pressure of the great veins', `${n(m.pCrit)} mmHg`],
         ['Resistance to venous return', `${n(sim.circ.p.rvrEff, 3)} mmHg·s/mL`],
-        ['Pleural pressure (curve x-intercept)', `${n(op.ppl)} mmHg`],
+        ['Pleural pressure (respiratory mean)', `${n(op.ppl)} mmHg`],
         ['Pericardial pressure', `${n(op.pPeri)} mmHg`],
       ];
     },

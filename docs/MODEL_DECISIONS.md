@@ -75,7 +75,7 @@ less forward flow prolong delivery to the left heart.
 - Preserve the vigorous spontaneous effort and full circulation, but use the
   local slope of the Guyton operating point as the demonstrating readout.
 - Require the preset to generate a pleural swing above 15 cmH2O, remain below
-  the model's 10%/mmHg steep-limb threshold and label PPV unavailable.
+  the model's 8%/mmHg steep-limb threshold and label PPV unavailable.
 
 ### Why
 
@@ -1035,3 +1035,49 @@ elliptical collapse, separate thoracic and abdominal segments or deep-inspiratio
 manoeuvre. The displayed percentage must therefore be read only as the direction
 and relative ordering of calibre change. It is not an IVC collapsibility index
 and is not compared with the bedside 50% threshold.
+
+## 2026-08-25 — Separate Guyton respiratory dynamics from equilibrium
+
+### Decision
+
+- Keep one-heartbeat means of right atrial pressure and IVC-to-RA inflow as the
+  moving respiratory trail.
+- Add a separate one-breath mean for the filled simulated equilibrium point and
+  evaluate the displayed venous-return and RV-function curves on that same
+  clock.
+- Evaluate the preload-reserve tile and highlighted limb on the same full-breath
+  construction rather than retaining a phase-selected heartbeat.
+- Anchor the local RV curve to respiratory-mean RV EDV and ESV. Reconstruct its
+  effective arterial elastance as `Ees × (ESV - V0) / SV`, rather than pairing a
+  mean filling pressure with one arbitrarily phased end-systolic pressure.
+- Require a settled healthy passive state to retain a respiratory trail while
+  its full-breath simulated mean converges on the analytic crossing.
+- Retune the `swing-limited-reserve` preset from 950 mL/100 min⁻¹ to 1200 mL/70
+  min⁻¹ selected stressed volume/heart rate. This preserves a non-steep reserve
+  (about 7.4%/mmHg), an approximately 20 cmH₂O pleural swing and compensated
+  output and pressure after the time-base correction.
+
+### Why
+
+The explicit compliant IVC introduced a real short-term store between the
+systemic reservoir and right atrium. After that change, IVC inflow and RV output
+could differ over one heartbeat even in passive ventilation. The former filled
+point therefore compared a dynamic one-beat measurement with a steady-state
+crossing and no longer converged as the panel implied.
+
+A complete respiratory cycle is the shortest interval over which a settled
+periodic circulation must return every compliant compartment to its starting
+volume. Using that interval restores a like-for-like comparison without erasing
+the within-breath path. Anchoring the RV curve to measured chamber volumes also
+removes the false assumption that mean right atrial pressure directly equals RV
+end-diastolic transmural pressure.
+
+### Deliberate limits
+
+The analytic RV curve is now explicitly local and partly anchored to integrated
+model state. Its agreement with the filled point is therefore a consistency
+check, not independent validation. It holds contractility and effective
+arterial load fixed while right atrial pressure is swept and does not integrate
+a new closed-loop beat at every plotted pressure. Immediately after a parameter
+change, even the full-breath window contains redistribution and the points may
+remain temporarily separated.
