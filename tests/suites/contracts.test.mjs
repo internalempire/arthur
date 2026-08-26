@@ -33,7 +33,7 @@ section('Public model API');
   // without bypassing this model boundary and importing lung.js directly.
   const expected = [
     'CHAMBER', 'EXPIRATORY_FLOW_LIMIT', 'GROUPS', 'IVC', 'PARAMETERS', 'PPL_FRC', 'RESISTANCE_TO_WOOD',
-    'SCENARIOS', 'SCENARIO_BY_ID', 'Simulator', 'TRACE_SECONDS',
+    'SCENARIOS', 'SCENARIO_BY_ID', 'Simulator', 'TRACE_SAMPLE_HZ', 'TRACE_SECONDS',
     'cardiacFunctionCurve', 'clamp', 'cmH2OtoMmHg', 'curveIntersection',
     'chestWallComplianceAt', 'chestWallNeutralVolume', 'chestWallPressure',
     'lungRegions', 'lungVolumeAtPl', 'openBand', 'openFractionFromRecruitmentState',

@@ -7,7 +7,7 @@
 // directly. This is a plain ES module; it adds no runtime dependency or build
 // step.
 
-export { Simulator, TRACE_SECONDS } from './simulator.js';
+export { Simulator, TRACE_SECONDS, TRACE_SAMPLE_HZ } from './simulator.js';
 export { SCENARIOS, SCENARIO_BY_ID } from './scenarios.js';
 export { PARAMETERS, GROUPS } from './parameters.js';
 

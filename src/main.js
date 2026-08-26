@@ -73,6 +73,7 @@ function markCustom() {
 }
 
 function clearTrails() {
+  waveforms.resetView(sim);
   guyton.clearTrail();
   campbell.clearTrail();
   pvLoops.resetView();
