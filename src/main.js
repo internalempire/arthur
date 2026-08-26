@@ -1,4 +1,6 @@
-import { Simulator, SCENARIOS, SCENARIO_BY_ID } from './model/index.js';
+import {
+  Simulator, SCENARIOS, SCENARIO_BY_ID, createPatientState, parsePatientState,
+} from './model/index.js';
 import { theme } from './ui/theme.js';
 import { createControls } from './ui/controls.js';
 import { createStats } from './ui/stats.js';
@@ -62,6 +64,84 @@ function applyScenario(id) {
 }
 
 scenarioSelect.addEventListener('change', () => applyScenario(scenarioSelect.value));
+
+// ------------------------------------------------------------- patient state
+// Patient files are portable parameter prescriptions, not integrator dumps.
+// Loading one therefore starts and settles a fresh simulation, so sharing the
+// JSON reproduces the same patient without depending on the exact frame at
+// which Save was clicked.
+const stateStatus = el('patient-state-status');
+const stateFile = el('patient-state-file');
+let stateStatusTimer = null;
+
+function showStateStatus(message, kind = 'ok') {
+  clearTimeout(stateStatusTimer);
+  stateStatus.textContent = message;
+  stateStatus.dataset.kind = kind;
+  stateStatus.hidden = false;
+  stateStatusTimer = setTimeout(() => { stateStatus.hidden = true; }, kind === 'error' ? 9000 : 5500);
+}
+
+function applyLoadedPatientState(parsed) {
+  sim.applyPatientParameters(parsed.params);
+  sim.advance(20, true);
+  controls.sync();
+  scenarioSelect.value = '';
+  scenarioNote.textContent = '';
+  clearTrails();
+  dirty = true;
+
+  const count = Object.keys(parsed.overrides).length;
+  if (parsed.ignored.length) {
+    const names = parsed.ignored.slice(0, 3).join(', ');
+    const remainder = parsed.ignored.length > 3 ? ` and ${parsed.ignored.length - 3} more` : '';
+    showStateStatus(
+      `Patient loaded with ${count} modified parameter${count === 1 ? '' : 's'}. `
+        + `Unavailable setting${parsed.ignored.length === 1 ? '' : 's'} ignored: ${names}${remainder}.`,
+    );
+  } else {
+    showStateStatus(`Patient loaded with ${count} modified parameter${count === 1 ? '' : 's'}.`);
+  }
+  return parsed;
+}
+
+el('save-patient').addEventListener('click', () => {
+  const state = createPatientState(sim.params);
+  const json = `${JSON.stringify(state, null, 2)}\n`;
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const stamp = state.savedAt.replace(/[:.]/g, '-');
+  link.href = url;
+  link.download = `arthur-patient-${stamp}.json`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+
+  const count = state.modified.length;
+  showStateStatus(`Patient downloaded with ${count} modified parameter${count === 1 ? '' : 's'}.`);
+});
+
+el('load-patient').addEventListener('click', () => {
+  // Clearing the input permits loading the same file twice, which is useful
+  // when returning to the same baseline after a debugging intervention.
+  stateFile.value = '';
+  stateFile.click();
+});
+
+stateFile.addEventListener('change', async () => {
+  const file = stateFile.files?.[0];
+  if (!file) return;
+  if (file.size > 256 * 1024) {
+    showStateStatus('Could not load patient: the JSON file is unexpectedly large.', 'error');
+    return;
+  }
+  try {
+    const candidate = JSON.parse(await file.text());
+    applyLoadedPatientState(parsePatientState(candidate));
+  } catch (error) {
+    showStateStatus(`Could not load patient: ${error.message}`, 'error');
+  }
+});
 
 // Touching any control means the state is no longer the preset, so say so
 // rather than leaving a scenario name attached to a patient it no longer
@@ -235,6 +315,10 @@ window.heartLung = {
   draw,
   /** Advance the model by `seconds` of simulated time and repaint. */
   step(seconds = 1) { sim.advance(seconds); draw(); return sim.metrics; },
+  /** Return the same portable object written by the Save patient control. */
+  patientState() { return createPatientState(sim.params); },
+  /** Load a parsed patient-state object from a console or embedding page. */
+  loadPatientState(candidate) { return applyLoadedPatientState(parsePatientState(candidate)); },
 };
 
 scenarioSelect.value = 'healthy-spont';

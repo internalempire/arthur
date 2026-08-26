@@ -64,6 +64,7 @@ Controls do not represent drug dose. Fluid is placed instantaneously in the veno
 - Plateau pressure is calculated rather than measured during a zero-flow pause.
 - The model-wide validity flag catches encoded numerical failures, not every physiologically impossible combination.
 - Different parameter combinations can produce similar outputs; controls are not identifiable patient estimates.
+- A saved patient stores the complete control vector, not dynamic integrator state. Loading it reproduces the selected inputs from a newly settled simulation; it does not resume the same beat, breath, waveform history or occlusion measurement.
 
 ## Limits of indices and scenarios
 

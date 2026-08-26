@@ -49,7 +49,8 @@ const html = readFileSync(new URL('../index.html', import.meta.url), 'utf8');
 const css = readFileSync(new URL('../styles/app.css', import.meta.url), 'utf8');
 const descriptions = readFileSync(new URL('../src/ui/descriptions.js', import.meta.url), 'utf8');
 const anchors = [
-  'scenario', 'speed', 'playpause', 'hold-exp', 'hold-insp', 'reset', 'theme',
+  'scenario', 'speed', 'playpause', 'hold-exp', 'hold-insp', 'reset',
+  'save-patient', 'load-patient', 'patient-state-file', 'patient-state-status', 'theme',
   'sidebar-toggle', 'scenario-note', 'controls', 'invalid-banner', 'stats',
   'waveforms', 'guyton', 'campbell', 'pvloops', 'pvr', 'thorax',
 ];
@@ -76,7 +77,10 @@ check('waveform values expose pressure-support trigger and early-cycling timing'
 
 const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8');
 const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.meta.url));
-const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
+const {
+  PARAMETERS, PATIENT_STATE_FORMAT, PATIENT_STATE_VERSION,
+  createPatientState, parsePatientState,
+} = await import(new URL('../src/model/index.js', import.meta.url));
 const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
 const {
   airwayReadout, waveformScaleStart,
@@ -183,10 +187,48 @@ const pvSource = readFileSync(new URL('../src/ui/panels/pvloops.js', import.meta
 check('Ea joins end-diastolic volume at zero pressure to the end-systolic point',
   pvSource.includes('panel.line([edv, 0, esv, Math.max(0, esp)]')
     && pvSource.includes('Number.isFinite(esp)'));
+check('both cardiac PV-loop axes and passive relations are named without a lone point marker',
+  pvSource.includes("yLabel: 'Pressure (mmHg)'")
+    && pvSource.includes("xLabel: 'Volume (mL)'")
+    && pvSource.includes("panel.label('ESPVR'")
+    && pvSource.includes("panel.label('EDPVR'")
+    && !pvSource.includes('panel.dot('));
+
+const defaultPatient = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
+const customPatient = { ...defaultPatient, mode: 'pcv', peep: 12, clung: 85 };
+const savedPatient = createPatientState(customPatient, '2026-08-26T12:00:00.000Z');
+check('a patient-state file stores the complete vector and identifies modified settings',
+  savedPatient.format === PATIENT_STATE_FORMAT
+    && savedPatient.version === PATIENT_STATE_VERSION
+    && Object.keys(savedPatient.parameters).length === PARAMETERS.length
+    && savedPatient.modified.join(',') === 'mode,peep,clung');
+
+const loadedPatient = parsePatientState(JSON.parse(JSON.stringify(savedPatient)));
+check('a patient-state JSON round trip reproduces typed parameters',
+  loadedPatient.params.mode === 'pcv'
+    && loadedPatient.params.peep === 12
+    && loadedPatient.params.clung === 85
+    && loadedPatient.overrides.mode === 'pcv'
+    && loadedPatient.ignored.length === 0);
+
+const olderPatient = JSON.parse(JSON.stringify(savedPatient));
+olderPatient.parameters.retiredSetting = 1;
+const compatiblePatient = parsePatientState(olderPatient);
+check('retired patient settings are reported and ignored without losing known values',
+  compatiblePatient.ignored.join(',') === 'retiredSetting'
+    && compatiblePatient.params.peep === 12);
+
+let invalidPatientRejected = false;
+try {
+  parsePatientState({ ...savedPatient, parameters: { ...savedPatient.parameters, peep: 99 } });
+} catch (error) {
+  invalidPatientRejected = /PEEP/.test(error.message);
+}
+check('an out-of-range patient setting is rejected rather than clipped', invalidPatientRejected);
 
 if (failures.length) {
   console.error(`\n${failures.length} UI smoke failure(s):`);
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n22 UI smoke contracts passed`);
+console.log(`\n27 UI smoke contracts passed`);

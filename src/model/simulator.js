@@ -205,6 +205,16 @@ export class Simulator {
   }
 
   /**
+   * Recreate a saved patient from parameters and settle a fresh simulation.
+   * Dynamic state is intentionally discarded: a portable debugging case must
+   * reproduce the same inputs, not resume halfway through one particular beat.
+   */
+  applyPatientParameters(parameters) {
+    this.params = { ...defaultParams(), ...parameters };
+    this.reset();
+  }
+
+  /**
    * Arm an occlusion. It engages at the matching point of the next breath and
    * releases after `seconds`, contributing one measured (right atrial pressure,
    * flow) pair — which is how a venous return curve is built at the bedside:
