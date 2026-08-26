@@ -69,6 +69,8 @@ Volume control imposes inspiratory flow and lets pressure emerge. Pressure contr
 
 The neural command and effective muscle pressure are not treated as the same instantaneous signal. One internal activation state rises rapidly during neural inspiration and decays more slowly after neural switch-off. The residual pressure lowers pleural and alveolar pressure during early expiration, reducing outward flow. Volume then changes more slowly, which feeds back through both nonlinear recoil relations. This is the model's aggregate representation of post-inspiratory expiratory braking; the [Campbell diagram](panel-campbell.md#what-happens-during-active-expiration) shows its pressure–volume consequence.
 
+In pressure support, the ventilator acts only after patient effort produces 1 L/min of inspiratory flow at the airway. Before that point Paw remains at PEEP, so intrinsic PEEP must be overcome by muscle pressure rather than bypassed by a neural trigger. Support rises over 100 ms and ends when flow falls below 25% of its peak. Neural inspiration and ventilator inflation remain separate clocks: a restrictive, rapidly emptying system can therefore cycle early while muscle pressure is still increasing.
+
 The simulator stores respiratory volume as displacement from the current passive equilibrium for numerical convenience, but lung and wall pressure are always calculated from absolute volume. When an elastic control changes, the gas already in the lung is preserved and only this internal reference is updated.
 
 ---
@@ -91,10 +93,10 @@ The simulator stores respiratory volume as displacement from the current passive
 - The wall curve is a calibrated teaching relation, not a patient-specific oesophageal pressure–volume fit.
 - Rib cage, diaphragm and abdominal wall are not separate compartments.
 - The `Chest wall load` is an aggregate pressure offset; it is not calculated from body mass, ascites volume or a fixed fraction of abdominal pressure.
-- Post-inspiratory inspiratory activity is represented by one regular decay, but there is no separately recruited expiratory-muscle pressure, inspiratory threshold load, respiratory-drive controller or respiratory-muscle fatigue.
-- Pressure support has simplified flow cycling; the model does not reproduce the full range of patient–ventilator dyssynchrony.
+- Post-inspiratory inspiratory activity is represented by one regular decay, but there is no separately recruited expiratory-muscle pressure, respiratory-drive controller or respiratory-muscle fatigue.
+- Pressure support represents one fixed flow trigger, pressure rise and flow-cycling rule. It can expose intrinsic-PEEP trigger delay, ineffective effort and early cycling, not the full range of patient–ventilator dyssynchrony.
 - Airway resistance is linear except for the separate [expiratory flow-limitation](expiratory-flow-limitation.md) choke.
-- The ventilator has no circuit compliance, leak, trigger delay or rise-time control.
+- The ventilator has no circuit compliance, leak or selectable trigger, rise-time or cycling controls.
 
 ---
 
@@ -105,6 +107,8 @@ The simulator stores respiratory volume as displacement from the current passive
 - Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med*. 2014;189:520–531. [doi:10.1164/rccm.201312-2193CI](https://doi.org/10.1164/rccm.201312-2193CI)
 - Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
+- MacIntyre NR, Cheng KC, McConnell R. Applied PEEP during pressure support reduces the inspiratory threshold load of intrinsic PEEP. *Chest*. 1997;111:188–193. [doi:10.1378/chest.111.1.188](https://doi.org/10.1378/chest.111.1.188)
+- Mojoli F, Pozzi M, Orlando A, et al. Timing of inspiratory muscle activity detected from airway pressure and flow during pressure support ventilation: the waveform method. *Crit Care*. 2022;26:32. [doi:10.1186/s13054-022-03895-4](https://doi.org/10.1186/s13054-022-03895-4)
 
 ---
 

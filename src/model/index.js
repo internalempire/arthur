@@ -22,7 +22,9 @@ export {
   pvrComponents, lungRegions, chestWallPressure, chestWallComplianceAt,
   chestWallNeutralVolume, staticEndExpiratoryVolume,
 } from './lung.js';
-export { PPL_FRC, EXPIRATORY_FLOW_LIMIT, respiratorySystemCompliance } from './respiratory.js';
+export {
+  PPL_FRC, EXPIRATORY_FLOW_LIMIT, PRESSURE_SUPPORT, respiratorySystemCompliance,
+} from './respiratory.js';
 
 // Unit conversion and small numerical helpers shared by model-bound drawings.
 export { cmH2OtoMmHg, RESISTANCE_TO_WOOD, clamp } from './units.js';

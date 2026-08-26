@@ -53,7 +53,7 @@ export const PARAMETERS = [
   {
     id: 'ti', group: 'ventilation', label: 'Inspiratory time', unit: 's',
     min: 0.4, max: 2.5, step: 0.05, default: 1.2,
-    help: 'Short expiratory time relative to the expiratory time constant traps gas and generates intrinsic PEEP.',
+    help: 'In volume and pressure control this is the ventilator inflation time. In spontaneous breathing and pressure support it is the patient’s neural inspiratory time; pressure support remains flow-cycled. Short expiratory time relative to the expiratory time constant traps gas and generates intrinsic PEEP.',
   },
   {
     id: 'pmus', group: 'ventilation', label: 'Inspiratory effort', unit: 'cmH₂O',

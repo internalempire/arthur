@@ -17,7 +17,7 @@ Absolute outputs are useful for orientation and internal consistency, especially
 - One aggregate lung without lobes, gravitational gradients, pendelluft, regional stress, regional time constants or spatial ventilation–perfusion matching.
 - One pleural pressure and one aggregate sigmoid chest wall, without regional gradients, separate rib-cage/diaphragm mechanics or oesophageal-pressure artefact.
 - Chest-wall load is an independently selected pressure offset, not a prediction from anthropometry, posture or abdominal pressure.
-- No airway leak, gas compression, secretions, airway closure, bronchodilator response, trigger delay or patient–ventilator dyssynchrony.
+- No airway leak, gas compression, secretions, airway closure or bronchodilator response. Pressure support has a fixed pneumatic trigger, 100 ms rise and 25% flow-cycling rule; it can show intrinsic-PEEP trigger delay, ineffective effort and early cycling, but not the full range of patient–ventilator dyssynchrony.
 - EFL is one collapsible-airway choke, not a regional COPD model.
 - Recruitment uses two unit populations and one distributed opening range; tissue and surfactant hysteresis are absent.
 - No capillary filtration, lymphatic drainage or time-dependent pulmonary oedema.

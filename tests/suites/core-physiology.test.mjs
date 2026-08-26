@@ -1,6 +1,6 @@
 // Directional heart-lung relations and the aggregate COPD/EFL teaching model.
 import {
-  Simulator, defaultParams, chestWallPressure,
+  Simulator, defaultParams, chestWallPressure, PRESSURE_SUPPORT,
   staticEndExpiratoryVolume, section, check, near, settled,
 } from '../support/model.mjs';
 
@@ -82,6 +82,87 @@ section('Post-inspiratory activity');
     passive.resp.inspiratoryActivation === 0
       && passive.resp.pmus === 0
       && near(passive.resp.ppl, passiveWall, 1e-9));
+}
+
+section('Pressure-support trigger and cycling');
+{
+  const settings = {
+    mode: 'psv', rr: 14, pinsp: 14, peep: 5, ti: 1.2, pmus: 8,
+    position: 'supine', clung: 85, raw: 5,
+  };
+  const sim = new Simulator({ dt: 0.0005 });
+  sim.params = { ...defaultParams(), ...settings };
+  sim.reset();
+
+  // Start at a fresh neural cycle. Until the patient's effort creates the
+  // pneumatic trigger flow, a conventional PSV ventilator can provide only
+  // PEEP; it cannot act directly on a neural state known only to the model.
+  let previousCycle = sim.resp.tCycle;
+  for (let i = 0; i < Math.ceil((60 / settings.rr) / sim.dt) * 2; i++) {
+    sim.advance(sim.dt, true);
+    if (sim.resp.tCycle < previousCycle) break;
+    previousCycle = sim.resp.tCycle;
+  }
+  const pplAtNeuralOnset = sim.resp.ppl;
+  let lowestPreTriggerPpl = pplAtNeuralOnset;
+  let highestPreTriggerPaw = sim.resp.paw;
+  const breathsBefore = sim.resp.breathCount;
+  for (let i = 0; i < Math.ceil(settings.ti / sim.dt); i++) {
+    sim.advance(sim.dt, true);
+    if (sim.resp.phase === 'insp') break;
+    lowestPreTriggerPpl = Math.min(lowestPreTriggerPpl, sim.resp.ppl);
+    highestPreTriggerPaw = Math.max(highestPreTriggerPaw, sim.resp.paw);
+  }
+
+  check('patient effort precedes pressure-support delivery',
+    sim.resp.breathCount === breathsBefore + 1
+      && lowestPreTriggerPpl < pplAtNeuralOnset - 0.1
+      && near(highestPreTriggerPaw, settings.peep, 1e-6)
+      && sim.resp.lastPsvTriggerFlow >= PRESSURE_SUPPORT.triggerFlow,
+    `Ppl ${pplAtNeuralOnset.toFixed(2)} -> ${lowestPreTriggerPpl.toFixed(2)}, `
+      + `pre-trigger Paw ${highestPreTriggerPaw.toFixed(2)}, `
+      + `trigger flow ${(sim.resp.lastPsvTriggerFlow * 60).toFixed(2)} L/min`);
+
+  const pawAtTrigger = sim.resp.paw;
+  sim.advance(PRESSURE_SUPPORT.riseTime * 1.05, true);
+  check('pressure support rises over a finite interval',
+    pawAtTrigger > settings.peep
+      && pawAtTrigger < settings.peep + settings.pinsp
+      && near(sim.resp.paw, settings.peep + settings.pinsp, 0.1),
+    `Paw ${pawAtTrigger.toFixed(2)} at trigger -> ${sim.resp.paw.toFixed(2)} cmH2O`);
+
+  const restrictive = settled(settings, 45);
+  check('flow cycling can expose an inspiratory timing mismatch',
+    restrictive.metrics.pressureSupportTiming.cycleStatus === 'early'
+      && restrictive.metrics.pressureSupportTiming.cycleTime < settings.ti
+      && restrictive.metrics.pressureSupportTiming.neuralDriveAtCycle
+        > PRESSURE_SUPPORT.earlyCycleDriveThreshold,
+    `cycled at ${restrictive.metrics.pressureSupportTiming.cycleTime.toFixed(2)} s `
+      + `with neural drive ${restrictive.metrics.pressureSupportTiming.neuralDriveAtCycle.toFixed(2)}`);
+
+  const obstructed = {
+    mode: 'psv', pinsp: 14, pmus: 10, rr: 26, ti: 0.9,
+    raw: 24, clung: 300, efl: 'on',
+  };
+  const noExternalPeep = settled({ ...obstructed, peep: 0 }, 45);
+  const externalPeep = settled({ ...obstructed, peep: 5 }, 45);
+  check('external PEEP reduces the pre-trigger load in the obstructed phenotype',
+    noExternalPeep.metrics.autoPeep > 5
+      && noExternalPeep.metrics.pressureSupportTiming.triggerDelay
+        > externalPeep.metrics.pressureSupportTiming.triggerDelay + 0.05,
+    `trigger delay ${noExternalPeep.metrics.pressureSupportTiming.triggerDelay.toFixed(2)} -> `
+      + `${externalPeep.metrics.pressureSupportTiming.triggerDelay.toFixed(2)} s`);
+
+  // Once the obstructed lung is dynamically inflated, a much weaker effort
+  // cannot bypass its stored threshold load merely because neural inspiration
+  // has begun. It remains an ineffective effort for the following cycle.
+  const weak = noExternalPeep;
+  weak.setParam('pmus', 1);
+  const weakBreaths = weak.resp.breathCount;
+  weak.advance(60 / obstructed.rr, true);
+  check('an effort that does not overcome intrinsic PEEP remains ineffective',
+    weak.resp.breathCount === weakBreaths && near(weak.resp.paw, 0, 1e-6),
+    `${weak.resp.breathCount - weakBreaths} assisted breaths after effort was reduced`);
 }
 
 section('Physiological relations');

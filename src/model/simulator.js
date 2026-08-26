@@ -169,6 +169,23 @@ export class Simulator {
     if (id === 'mode' && (value === 'vcv' || value === 'pcv')) {
       this.params.pmus = 0;
     }
+    if (id === 'mode') {
+      // A pressure-support boundary must never be inherited from the phase of
+      // another mode. Enter PSV at PEEP and wait for a fresh pneumatic trigger;
+      // leaving it removes any partially risen support pressure immediately.
+      this.resp.supportPressure = 0;
+      if (value === 'psv') {
+        this.resp.phase = 'exp';
+        this.resp.prevPhase = 'exp';
+        this.resp.tPhase = 0;
+        this.resp.canTrigger = true;
+        this.resp.lastPsvTriggerDelay = null;
+        this.resp.lastPsvTriggerFlow = null;
+        this.resp.lastPsvCycleStatus = null;
+        this.resp.lastPsvCycleDrive = null;
+        this.resp.lastPsvCycleTime = null;
+      }
+    }
     if (mechanicsChanged) {
       const after = relaxationVolume(resolveParams(this.params));
       this.resp.v = Math.max(-after * 0.9, absoluteVolume - after);
@@ -590,6 +607,13 @@ export class Simulator {
         - venousReturnBackPressure(respiratoryOperatingPoint.pra,
           respiratoryOperatingPoint.pCrit),
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
+      pressureSupportTiming: p.mode === 'psv' ? {
+        triggerDelay: r.lastPsvTriggerDelay,
+        triggerFlow: r.lastPsvTriggerFlow === null ? null : r.lastPsvTriggerFlow * 60,
+        cycleStatus: r.lastPsvCycleStatus,
+        neuralDriveAtCycle: r.lastPsvCycleDrive,
+        cycleTime: r.lastPsvCycleTime,
+      } : null,
       lungVolume: r.lungVolume, pab: r.pab,
       openFraction: regions.openFraction,
       // Result of the same static 5 -> 15 cmH2O calculation used to translate
