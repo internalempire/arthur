@@ -13,9 +13,9 @@ import {
 import { cmH2OtoMmHg, RESISTANCE_TO_DYN, RESISTANCE_TO_WOOD } from './units.js';
 
 export const DEFAULT_DT = 0.00025; // 0.25 ms — small enough for the low valve resistances
-const SAMPLE_HZ = 250;
+export const TRACE_SAMPLE_HZ = 250;
 export const TRACE_SECONDS = 12;
-const TRACE_LEN = SAMPLE_HZ * TRACE_SECONDS;
+const TRACE_LEN = TRACE_SAMPLE_HZ * TRACE_SECONDS;
 const MEAN_TIME_CONSTANT = 3; // s, for the mean-pressure moving averages
 const COMPARTMENTS = ['vSa', 'vSv', 'vIVC', 'vRa', 'vRv', 'vPa', 'vPt', 'vPv', 'vLa', 'vLv'];
 
@@ -215,7 +215,7 @@ export class Simulator {
   advance(seconds, silent = false) {
     const dt = this.dt;
     const steps = Math.min(Math.round(seconds / dt), 240000 * (DEFAULT_DT / dt));
-    const sampleEvery = Math.max(1, Math.round(1 / (SAMPLE_HZ * dt)));
+    const sampleEvery = Math.max(1, Math.round(1 / (TRACE_SAMPLE_HZ * dt)));
     // Body position modifies chest wall compliance, abdominal pressure and
     // resting lung volume. Resolved once here — the parameters cannot change
     // mid-advance — so every consumer sees one consistent set.

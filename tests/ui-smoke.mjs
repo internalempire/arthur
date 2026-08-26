@@ -74,7 +74,9 @@ const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8
 const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.meta.url));
 const { PARAMETERS } = await import(new URL('../src/model/index.js', import.meta.url));
 const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
-const { airwayReadout } = await import(new URL('../src/ui/panels/waveforms.js', import.meta.url));
+const {
+  airwayReadout, waveformScaleStart,
+} = await import(new URL('../src/ui/panels/waveforms.js', import.meta.url));
 const {
   CAMPBELL_DEFAULT_ZOOM, classicalCampbellCurves, campbellZoomDomain,
 } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
@@ -111,6 +113,13 @@ const assistedAirway = {
 check('the waveform rail keeps Paw live when plateau is unavailable',
   airwayReadout(passiveAirway) === '8.4 (Pplat 14.2)'
     && airwayReadout(assistedAirway) === '8.4');
+const mainSource = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
+const waveformSource = readFileSync(new URL('../src/ui/panels/waveforms.js', import.meta.url), 'utf8');
+check('waveform scales start a new visual state after every parameter change',
+  mainSource.includes('waveforms.resetView(sim)')
+    && waveformSource.includes('sim.time - viewEpoch')
+    && waveformScaleStart(3000, 0.2) === 2950
+    && waveformScaleStart(3000, 20) === 0);
 const psvSettings = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
 Object.assign(psvSettings, { mode: 'psv', pinsp: 14, pmus: 6, peep: 0 });
 const campbell = classicalCampbellCurves(psvSettings);
@@ -176,4 +185,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n21 UI smoke contracts passed`);
+console.log(`\n22 UI smoke contracts passed`);

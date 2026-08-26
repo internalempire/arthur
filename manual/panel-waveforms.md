@@ -16,6 +16,8 @@ The third strip shows systemic arterial, pulmonary arterial and central venous p
 
 The rail on the right mixes two kinds of readout deliberately. Paw, Palv, Ppl and $P_L$ show the current model state at the rail's readable update rate. During passive ventilation, Paw retains the calculated Pplat in parentheses as breath-level context; during PSV or spontaneous effort, Paw remains visible but Pplat is omitted because a passive plateau is not interpretable. The Ppl row similarly keeps the latest breath's swing in parentheses. Systemic and pulmonary systolic/diastolic pressure, CVP and tidal volume remain the slower summaries used in the numerical tiles. $P_L$ is placed in the second rail beside its own curve. The curves themselves remain continuous at the model's trace sampling rate.
 
+Each strip fits its vertical range again when a control or scenario changes. The preceding waveform remains visible as temporal context, but its former extremes no longer determine the scale of the new state. Within one unchanged state, the range expands if a new value would otherwise be clipped and contracts only after the signal has remained comfortably inside it. This keeps clinically important changes visible without making the axes follow every sample.
+
 Respiratory and vascular pressures deliberately do not share an axis. Their units and magnitudes differ, and a dual axis would make visual crossings physiologically meaningless.
 
 ## Useful comparisons
