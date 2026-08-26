@@ -62,6 +62,11 @@ check('the browser entry point remains an ES module',
 check('the header exposes accessible repository and manual links',
   /id=["']project-repository["'][^>]+href=["']https:\/\/github\.com\/internalempire\/arthur["'][^>]+aria-label=/.test(html)
     && /id=["']project-manual["'][^>]+href=["']manual\/["'][^>]+aria-label=/.test(html));
+check('patient-state controls keep full accessible names in the compact header',
+  /id=["']save-patient["'][^>]+aria-label=["']Save patient["'][^>]*>Save pt<\/button>/.test(html)
+    && /id=["']load-patient["'][^>]+aria-label=["']Load patient["'][^>]*>Load pt<\/button>/.test(html)
+    && /#speed\s*\{[^}]*width:\s*60px/s.test(css)
+    && /#scenario\s*\{[^}]*width:\s*260px/s.test(css));
 check('numerical tiles retain one thin solid outline across kinds and quality states',
   /\.tile\s*\{[^}]*border:\s*1px solid var\(--border\)/s.test(css)
     && !/\.tile\[data-kind=[^\]]+\][^\n{]*\{[^}]*border-left/s.test(css)
@@ -231,4 +236,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n27 UI smoke contracts passed`);
+console.log(`\n28 UI smoke contracts passed`);

@@ -136,6 +136,19 @@ select, .btn {
 
 select { min-width: 150px; }
 
+/* Native selects otherwise size themselves from their longest option. Scenario
+   keeps enough room for the common labels without letting one long phenotype
+   consume the header; Speed has only three two-character choices. */
+#scenario {
+  width: 260px;
+  min-width: 260px;
+}
+
+#speed {
+  width: 60px;
+  min-width: 60px;
+}
+
 .btn:hover, select:hover { background: var(--wash); }
 
 .btn:focus-visible, select:focus-visible, input:focus-visible {
