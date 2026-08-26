@@ -71,6 +71,18 @@ The default curve is calibrated so that at the normal 2.2 L reference, $P_{cw}=-
 
 The wall curve is nearly linear around ordinary tidal breathing but bends at larger volume excursions. Consequently, the simple $V_T/C_{cw}$ relation remains a useful local approximation, not an identity imposed at all volumes.
 
+### Pleural pressure during pressure support
+
+PSV does not imply that absolute Ppl must be positive. The ventilator-driven increase in volume raises relaxed chest-wall pressure, while inspiratory muscle pressure lowers Ppl:
+
+$$
+P_{pl}=P_{cw}(V)-P_{mus}
+$$
+
+The net sign depends on resting chest-wall load, PEEP, delivered volume and effort. A patient with obesity, abdominal loading or a high resting oesophageal pressure may remain positive throughout the breath; the default unloaded wall can remain negative despite positive airway pressure. A completely passive patient cannot trigger conventional PSV, so “relaxed PSV” still requires a small effective effort.
+
+The timing follows the same balance. Ppl falls when muscle pressure is increasing faster than chest-wall recoil pressure. After the patient generates the pneumatic trigger, ventilator inflation can transiently flatten or partly reverse that fall by expanding the wall. If the ventilator cycles before neural inspiration ends, Ppl can continue to fall after Paw has returned to PEEP. That pattern is early cycling, not post-inspiratory braking; braking begins only after neural switch-off while effective muscle pressure decays.
+
 ### The passive reference now emerges
 
 The model no longer assigns −5 cmH₂O pleural pressure to whichever volume the selected lung reaches at 5 cmH₂O transpulmonary pressure. Instead, it solves the intersection of independent lung and wall recoil:
@@ -108,6 +120,7 @@ A fixed airway-to-pleural transmission fraction was rejected. Pressure transmiss
 - The remote curvature of the sigmoid is a didactic shape choice; it has not been fitted to an individual human relaxation manoeuvre.
 - Oesophageal pressure measurement, calibration, positional artefact and occlusion testing are absent.
 - Muscle pressure is one aggregate activation with post-inspiratory decay. Separate expiratory-muscle recruitment, variable neural drive, fatigue and a full dyssynchrony model are absent.
+- PSV uses one fixed flow trigger, pressure rise and cycling percentage; displayed Ppl is not a simulated oesophageal-balloon signal.
 - Prone coefficients are representative directional choices, not predictions for an individual patient.
 
 ---
@@ -121,6 +134,8 @@ A fixed airway-to-pleural transmission fraction was rejected. Pressure transmiss
 - Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med*. 2014;189:520–531. [doi:10.1164/rccm.201312-2193CI](https://doi.org/10.1164/rccm.201312-2193CI)
 - Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med*. 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
 - Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
+- Jonkman AH, Telias I, Spinelli E, et al. The oesophageal balloon for respiratory monitoring in ventilated patients: updated clinical review and practical aspects. *Eur Respir Rev*. 2023;32:220186. [doi:10.1183/16000617.0186-2022](https://doi.org/10.1183/16000617.0186-2022)
+- Mojoli F, Pozzi M, Orlando A, et al. Timing of inspiratory muscle activity detected from airway pressure and flow during pressure support ventilation: the waveform method. *Crit Care*. 2022;26:32. [doi:10.1186/s13054-022-03895-4](https://doi.org/10.1186/s13054-022-03895-4)
 
 ---
 

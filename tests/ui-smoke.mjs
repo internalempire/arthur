@@ -69,6 +69,10 @@ check('chart data disclosures use a compact help glyph with an explicit name',
   /toggle\.textContent\s*=\s*'\?'/.test(descriptions)
     && /values and description/.test(descriptions)
     && /\.panel-data > summary\s*\{[^}]*border-radius:\s*50%/s.test(css));
+check('waveform values expose pressure-support trigger and early-cycling timing',
+  descriptions.includes('Pressure-support trigger delay')
+    && descriptions.includes('Pressure-support cycling')
+    && descriptions.includes('early cycling'));
 
 const stats = readFileSync(new URL('../src/ui/stats.js', import.meta.url), 'utf8');
 const { tilePrimaryValue } = await import(new URL('../src/ui/stats.js', import.meta.url));

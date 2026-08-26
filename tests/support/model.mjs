@@ -25,6 +25,7 @@ import {
   staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
   recruitmentToInflation,
 } from '../../src/model/lung.js';
+import { PRESSURE_SUPPORT } from '../../src/model/respiratory.js';
 import { SNAPSHOTS } from '../snapshots.js';
 import { LITERATURE } from '../literature.mjs';
 
@@ -42,7 +43,8 @@ export {
   openFractionFromRecruitmentState,
   chestWallPressure, chestWallComplianceAt, chestWallNeutralVolume,
   staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
-  recruitmentToInflation, readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
+  recruitmentToInflation, PRESSURE_SUPPORT,
+  readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
 };
 
 let currentSection = '';

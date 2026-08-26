@@ -13,20 +13,36 @@
 | tidal volume | 150–900 mL | delivered VT in volume control only |
 | inspiratory pressure | 4–40 cmH₂O above PEEP | airway pressure target in pressure control and pressure support |
 | PEEP | 0–24 cmH₂O | external end-expiratory airway pressure |
-| inspiratory time | 0.4–2.5 s | duration of inspiration and, with rate, available expiratory time |
+| inspiratory time | 0.4–2.5 s | ventilator inspiratory time in VCV/PCV; neural inspiratory time in spontaneous breathing/PSV |
 | inspiratory effort | 0–30 cmH₂O | scale of the patient's peak inspiratory muscle pressure |
 
 ### Ventilatory mode
 
-In spontaneous mode, inspiratory muscle pressure lowers pleural and alveolar pressure and draws flow inward. In volume control, the ventilator delivers constant inspiratory flow sufficient to reach the selected VT over the selected inspiratory time. Pressure control holds the selected pressure above PEEP during inspiration. Pressure support combines positive airway pressure with patient effort.
+In spontaneous mode, inspiratory muscle pressure lowers pleural and alveolar pressure and draws flow inward. In volume control, the ventilator delivers constant inspiratory flow sufficient to reach the selected VT over the selected inspiratory time. Pressure control holds the selected pressure above PEEP during inspiration. Pressure support combines positive airway pressure with patient effort, but the ventilator does not know the internal neural command.
 
 Changing from any scenario to volume control or pressure control sets inspiratory effort to zero. The transition therefore starts with a genuinely passive patient rather than carrying hidden muscle pressure across from spontaneous breathing. This is only the initial condition: the effort slider remains available and can be raised afterwards to explore a controlled breath with superimposed patient activity. Pressure support does not clear effort because patient activity is part of that mode's represented mechanism.
 
 The sign of pleural-pressure change is central, but it is not fixed by the mode label alone. In assisted breathing, respiratory effort, chest-wall mechanics and applied pressure combine; inspect the waveform rather than assuming transmission.
 
+### What starts and ends a pressure-support breath
+
+The sequence is deliberately pneumatic, as in a conventional ventilator:
+
+1. neural inspiration begins and muscle pressure starts to lower Ppl and Palv;
+2. the ventilator continues to provide PEEP only;
+3. support begins when the patient produces 1 L/min of inspiratory trigger flow;
+4. airway pressure rises from PEEP to the selected support over 100 ms;
+5. support ends when inspiratory flow falls below 25% of that breath's peak flow.
+
+Intrinsic PEEP is therefore a real threshold load. The patient must first lower Palv below applied PEEP; an insufficient effort remains ineffective. External PEEP can reduce this pre-trigger load in a flow-limited obstructed state. The 1 L/min threshold and 100 ms rise are fixed teaching settings, not patient-specific ventilator prescriptions.
+
+The patient's neural inspiratory time remains independent of ventilator cycling. If flow decays below the cycling threshold while neural drive is still active, the model records **early cycling**. Ppl may then continue to fall after Paw has returned to PEEP because the patient is still trying to inspire. This is an emergent timing mismatch, not a curve added to the waveform. The Waveforms values panel identifies it on the latest completed PSV breath.
+
 ### Rate and inspiratory time
 
-Together they determine expiratory time. Shortening expiration in a high-resistance or flow-limited lung prevents complete emptying, raises end-expiratory volume and generates intrinsic PEEP. Rate also changes how many cardiac beats occur within one breath, affecting the interpretability of dynamic indices.
+In volume and pressure control, inspiratory time is the duration imposed by the ventilator. In spontaneous breathing and pressure support, it is the duration of the patient's neural inspiratory command; PSV itself remains flow-cycled. This distinction is why a 1.2 s neural inspiration can continue after a shorter mechanical PSV breath.
+
+Together with respiratory rate, inspiratory time also determines the time available for expiration. Shortening expiration in a high-resistance or flow-limited lung prevents complete emptying, raises end-expiratory volume and generates intrinsic PEEP. Rate changes how many cardiac beats occur within one breath, affecting the interpretability of dynamic indices.
 
 ### VT or inspiratory pressure
 
@@ -42,7 +58,7 @@ The slider sets the pressure scale of one aggregate inspiratory-muscle activatio
 
 The decay time is derived from the available expiratory time, so rate and inspiratory time change its absolute duration. There is no additional braking control: the residual pressure, its effect on alveolar pressure and the resulting expiratory flow all emerge from the same respiratory equation of motion.
 
-Non-zero effort during positive-pressure ventilation makes PPV unavailable because the passive controlled-breath assumptions are absent. Pressure support can cycle before muscle activation has disappeared, so the model can show a simplified post-inspiratory load; it does not reproduce the full range of trigger and cycling asynchronies or calculate clinical work of breathing.
+Non-zero effort during positive-pressure ventilation makes PPV unavailable because the passive controlled-breath assumptions are absent. In PSV, continued inspiratory drive after ventilator cycling is distinguished from the slower post-inspiratory decay that begins after neural switch-off. The model does not calculate clinical work of breathing.
 
 ## Why these controls
 
@@ -50,9 +66,9 @@ The set exposes the minimum respiratory inputs needed to distinguish negative- f
 
 ## Limits
 
-- No flow waveform selection, rise time, trigger sensitivity, cycling criterion, pause time, pressure ramp or patient–ventilator dyssynchrony.
+- No selectable flow waveform, trigger sensitivity, pressure rise, cycling percentage or pause time. PSV uses one fixed trigger, rise time and cycling percentage.
 - Volume control uses constant flow throughout inspiration and has no inspiratory pause.
-- Pressure support is a simplified pressure boundary combined with flow cycling and effort, not a complete trigger/cycle algorithm.
+- Pressure support can represent trigger delay from intrinsic PEEP, ineffective effort and early cycling. It does not model auto-triggering, double triggering, late-cycling classification, leaks, circuit compliance or ventilator-specific servo behaviour.
 - Post-inspiratory activity is one aggregate, regular decay. It is not diaphragm electrical activity, a patient-specific neural controller or active abdominal expiration.
 - No gas exchange, oxygen concentration, dead space, respiratory drive controller or sedation.
 - Control ranges are model operating ranges, not recommended ventilator settings.
@@ -63,6 +79,9 @@ The set exposes the minimum respiratory inputs needed to distinguish negative- f
 - Tobin MJ. *Principles and Practice of Mechanical Ventilation*. 3rd ed. McGraw-Hill; 2013.
 - Marini JJ, Gattinoni L. Management of COVID-19 respiratory distress. *JAMA*. 2020;323:2329–2330. [doi:10.1001/jama.2020.6825](https://doi.org/10.1001/jama.2020.6825)
 - Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
+- MacIntyre NR, Cheng KC, McConnell R. Applied PEEP during pressure support reduces the inspiratory threshold load of intrinsic PEEP. *Chest*. 1997;111:188–193. [doi:10.1378/chest.111.1.188](https://doi.org/10.1378/chest.111.1.188)
+- Mojoli F, Pozzi M, Orlando A, et al. Timing of inspiratory muscle activity detected from airway pressure and flow during pressure support ventilation: the waveform method. *Crit Care*. 2022;26:32. [doi:10.1186/s13054-022-03895-4](https://doi.org/10.1186/s13054-022-03895-4)
+- Jonkman AH, Telias I, Spinelli E, et al. The oesophageal balloon for respiratory monitoring in ventilated patients: updated clinical review and practical aspects. *Eur Respir Rev*. 2023;32:220186. [doi:10.1183/16000617.0186-2022](https://doi.org/10.1183/16000617.0186-2022)
 - Coiffard B, Dianti J, Telias I, et al. Dyssynchronous diaphragm contractions impair diaphragm function in mechanically ventilated patients. *Crit Care*. 2024;28:107. [doi:10.1186/s13054-024-04894-3](https://doi.org/10.1186/s13054-024-04894-3)
 
 ---

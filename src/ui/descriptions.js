@@ -19,13 +19,16 @@ const PANELS = [
     title: 'Waveforms',
     summary: (sim) => {
       const m = sim.metrics;
+      const psvTiming = m.pressureSupportTiming?.cycleStatus === 'early'
+        ? ' Pressure support cycled before neural inspiration ended.'
+        : '';
       return `Airway pressure ${n(m.paw)}, alveolar pressure ${n(m.palv)}, pleural pressure ${n(m.ppl)} and transpulmonary pressure ${n(m.pl)} cmH₂O; `
         + `arterial ${n(m.sbp, 0)} over ${n(m.dbp, 0)}, pulmonary artery ${n(m.papSys, 0)} over ${n(m.papDia, 0)}, `
-        + `central venous ${n(m.cvp)} mmHg; lung volume ${n((m.lungVolume - sim.resp.relaxVolume) * 1000, 0)} mL above resting.`;
+        + `central venous ${n(m.cvp)} mmHg; lung volume ${n((m.lungVolume - sim.resp.relaxVolume) * 1000, 0)} mL above resting.${psvTiming}`;
     },
     rows: (sim) => {
       const m = sim.metrics;
-      return [
+      const rows = [
         ['Airway pressure, now', `${n(m.paw)} cmH₂O`],
         ['Airway pressure, peak this breath', `${n(m.ppeak)} cmH₂O`],
         ['Alveolar pressure, now', `${n(m.palv)} cmH₂O (Paw − Palv ${n(m.paw - m.palv)})`],
@@ -38,6 +41,20 @@ const PANELS = [
         ['Tidal volume delivered', `${n(m.vtDelivered, 0)} mL`],
         ['Minute ventilation', `${n(m.minuteVentilation)} L/min`],
       ];
+      if (m.pressureSupportTiming) {
+        const timing = m.pressureSupportTiming;
+        const cycle = timing.cycleStatus === 'early'
+          ? `early cycling — support ended at ${n(timing.cycleTime, 2)} s while inspiratory drive persisted`
+          : timing.cycleStatus === 'not-early'
+            ? 'no early cycling detected on the latest completed breath'
+            : 'waiting for a completed pressure-support breath';
+        rows.splice(6, 0,
+          ['Pressure-support trigger delay', timing.triggerDelay === null
+            ? 'no effective trigger yet'
+            : `${n(timing.triggerDelay, 2)} s from the start of neural inspiration`],
+          ['Pressure-support cycling', cycle]);
+      }
+      return rows;
     },
   },
   {

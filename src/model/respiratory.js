@@ -42,6 +42,21 @@ export const EXPIRATORY_FLOW_LIMIT = {
   minimumTimeConstant: 4.5, // s
 };
 
+// Pressure support is patient-triggered rather than neurally commanded. A
+// conventional pneumatic ventilator cannot see the model's neural state: the
+// patient must first lower alveolar pressure enough to reverse expiratory flow
+// and create a small inspiratory signal at the airway. The fixed threshold and
+// rise time keep that bedside sequence visible without turning ventilator
+// engineering into another group of controls. Flow cycling remains independent
+// of neural inspiratory time, so a short respiratory time constant can still
+// produce genuine early cycling instead of having synchrony scripted into it.
+export const PRESSURE_SUPPORT = Object.freeze({
+  triggerFlow: 1 / 60, // L/s (1 L/min)
+  riseTime: 0.10, // s from PEEP to the selected pressure support
+  cycleFraction: 0.25, // fraction of peak inspiratory flow
+  earlyCycleDriveThreshold: 0.05, // dimensionless neural drive
+});
+
 // Effective pressure-generating activity is not identical to the neural switch.
 // Conscious adults retain inspiratory muscle pressure into expiration: Shee et
 // al. measured a mean half-decay at about 23% of expiratory time and near-complete
@@ -67,6 +82,12 @@ export function createRespiratoryState() {
     inspiratoryActivation: 0,
     prevPhase: 'exp',
     canTrigger: true,
+    supportPressure: 0,
+    lastPsvTriggerDelay: null,
+    lastPsvTriggerFlow: null,
+    lastPsvCycleStatus: null,
+    lastPsvCycleDrive: null,
+    lastPsvCycleTime: null,
     breathCount: 0,
     // Occlusion manoeuvres. `holdPending` is armed by the caller and becomes an
     // active hold at the right moment in the breath, because an end-expiratory
@@ -176,7 +197,7 @@ function airwayOpeningPressure(p, r, period) {
     case 'pcv':
       return r.phase === 'insp' ? p.peep + p.pinsp : p.peep;
     case 'psv':
-      return r.phase === 'insp' ? p.peep + p.pinsp : p.peep;
+      return p.peep + (r.phase === 'insp' ? r.supportPressure : 0);
     default:
       return p.peep;
   }
@@ -299,23 +320,45 @@ export function stepRespiratory(p, r, dt) {
 
   // --- phase machine -------------------------------------------------------
   if (p.mode === 'psv') {
-    // Patient-triggered, flow-cycled. The ventilator will not trigger again
-    // until effort has fallen away and a fresh one begins, so cycling off in
-    // the middle of an effort cannot immediately retrigger the same breath.
-    if (r.neuralDrive < 0.02) r.canTrigger = true;
-    if (r.phase === 'exp' && r.canTrigger && r.neuralDrive > 0.05) {
+    // Patient-triggered, flow-cycled. Before support begins, the patient sees
+    // only PEEP. The pressure gradient below is therefore the inspiratory flow
+    // the effort would generate at the airway opening. Intrinsic PEEP delays it
+    // automatically because Palv must first fall below applied PEEP; an effort
+    // that never reaches the trigger flow remains ineffective.
+    const palvBeforeAssist = alveolar(r.v, r.pmus);
+    const patientTriggerFlow = (p.peep - palvBeforeAssist) / p.raw;
+
+    // The ventilator will not trigger again until effort has fallen away and a
+    // fresh one begins, so cycling off during an effort cannot immediately
+    // retrigger the same breath.
+    if (r.neuralDrive < 0.02
+      && r.inspiratoryActivation < 0.05
+      && r.flow <= 0) r.canTrigger = true;
+    if (r.phase === 'exp' && r.canTrigger
+      && patientTriggerFlow >= PRESSURE_SUPPORT.triggerFlow) {
       r.phase = 'insp';
       r.tPhase = 0;
       r.peakInspFlow = 0;
       r.canTrigger = false;
+      r.supportPressure = 0;
+      r.lastPsvTriggerDelay = r.tCycle;
+      r.lastPsvTriggerFlow = patientTriggerFlow;
     } else if (r.phase === 'insp') {
       r.peakInspFlow = Math.max(r.peakInspFlow, r.flow);
-      if (r.flow < 0.25 * r.peakInspFlow && r.tPhase > 0.2) {
+      if (r.flow < PRESSURE_SUPPORT.cycleFraction * r.peakInspFlow
+        && r.tPhase > 0.2) {
+        r.lastPsvCycleStatus = r.neuralDrive > PRESSURE_SUPPORT.earlyCycleDriveThreshold
+          ? 'early'
+          : 'not-early';
+        r.lastPsvCycleDrive = r.neuralDrive;
+        r.lastPsvCycleTime = r.tCycle;
         r.phase = 'exp';
         r.tPhase = 0;
+        r.supportPressure = 0;
       }
     }
   } else if (p.mode === 'spont') {
+    r.supportPressure = 0;
     // Neural inspiration starts the breath, but mechanical inspiration ends
     // only when flow reverses. Post-inspiratory activation can therefore brake
     // expiration without making a still-inward flow count as expiration.
@@ -328,6 +371,7 @@ export function stepRespiratory(p, r, dt) {
       r.tPhase = 0;
     }
   } else {
+    r.supportPressure = 0;
     if (r.phase === 'exp' && r.tCycle >= period) {
       r.phase = 'insp';
       r.tPhase = 0;
@@ -338,6 +382,18 @@ export function stepRespiratory(p, r, dt) {
     }
   }
   if (r.tCycle >= period && p.mode !== 'vcv' && p.mode !== 'pcv') r.tCycle = 0;
+
+  // A real pressure-support breath takes finite time to pressurise. A linear
+  // 100 ms rise is intentionally simpler than a ventilator-specific servo, but
+  // it prevents an airway-pressure step from expanding the chest wall before
+  // the patient-generated trigger is visible. PCV retains its ideal pressure
+  // boundary because this timing contract is specific to assisted breaths.
+  if (p.mode === 'psv' && r.phase === 'insp') {
+    r.supportPressure = Math.min(
+      p.pinsp,
+      r.supportPressure + (p.pinsp * dt) / PRESSURE_SUPPORT.riseTime,
+    );
+  }
 
   // An armed hold engages at the phase it is named after.
   if (r.holdPending === 'expiratory' && r.prevPhase === 'exp' && r.tCycle > period * 0.9) {

@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 137 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 140 unique entries.
 
 ---
 
@@ -81,6 +81,7 @@ A citation documents the physiological or methodological claim made on its sourc
 
 - Jardin F, Farcot JC, Boisante L, et al. Influence of positive end-expiratory pressure on left ventricular performance. *N Engl J Med* 1981;304:387–92. [doi:10.1056/NEJM198102123040703](https://doi.org/10.1056/NEJM198102123040703)
 - Jardin F, Vieillard-Baron A. Right ventricular function and positive pressure ventilation in clinical practice: from hemodynamic subsets to respirator settings. *Intensive Care Med*. 2003;29:1426–1434. [doi:10.1007/s00134-003-1873-1](https://doi.org/10.1007/s00134-003-1873-1)
+- Jonkman AH, Telias I, Spinelli E, et al. The oesophageal balloon for respiratory monitoring in ventilated patients: updated clinical review and practical aspects. *Eur Respir Rev*. 2023;32:220186. [doi:10.1183/16000617.0186-2022](https://doi.org/10.1183/16000617.0186-2022)
 ## K
 
 - Kenny J-ÉS. *An Approach to Mechanical Heart–Lung Interaction*, 2020.
@@ -92,6 +93,7 @@ A citation documents the physiological or methodological claim made on its sourc
 ## M
 
 - Maas JJ, Geerts BF, van den Berg PCM, Pinsky MR, Jansen JRC. Assessment of venous return curve and mean systemic filling pressure in postoperative cardiac surgery patients. *Crit Care Med*. 2009;37:912–918. [doi:10.1097/CCM.0b013e3181961481](https://doi.org/10.1097/CCM.0b013e3181961481)
+- MacIntyre NR, Cheng KC, McConnell R. Applied PEEP during pressure support reduces the inspiratory threshold load of intrinsic PEEP. *Chest*. 1997;111:188–193. [doi:10.1378/chest.111.1.188](https://doi.org/10.1378/chest.111.1.188)
 - Magder S. Bench-to-bedside review: an approach to hemodynamic monitoring—Guyton at the bedside. *Crit Care*. 2012;16:236. [doi:10.1186/cc11395](https://doi.org/10.1186/cc11395)
 - Magder S. Central venous pressure: a useful but not so simple measurement. *Crit Care Med* 2006;34:2224–7. [doi:10.1097/01.CCM.0000227646.98423.98](https://doi.org/10.1097/01.CCM.0000227646.98423.98)
 - Magder S. Heart–lung interaction in spontaneous breathing subjects: the basics. *Ann Transl Med*. 2018;6:348. [doi:10.21037/atm.2018.06.19](https://doi.org/10.21037/atm.2018.06.19)
@@ -107,6 +109,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Mekontso Dessap A, Boissier F, Charron C, et al. [Acute cor pulmonale during protective ventilation for acute respiratory distress syndrome](https://doi.org/10.1007/s00134-015-4141-2). *Intensive Care Med* 2016;42:862–70.
 - Messina A, Longhini F, Coppo C, et al. Use of the fluid challenge in critically ill adult patients: a systematic review. *Anesth Analg*. 2017;125:1532–1543. [doi:10.1213/ANE.0000000000002103](https://doi.org/10.1213/ANE.0000000000002103)
 - Michard F, Boussat S, Chemla D, et al. Relation between respiratory changes in arterial pulse pressure and fluid responsiveness in septic patients with acute circulatory failure. *Am J Respir Crit Care Med*. 2000;162:134–138. [doi:10.1164/ajrccm.162.1.9903035](https://doi.org/10.1164/ajrccm.162.1.9903035)
+- Mojoli F, Pozzi M, Orlando A, et al. Timing of inspiratory muscle activity detected from airway pressure and flow during pressure support ventilation: the waveform method. *Crit Care*. 2022;26:32. [doi:10.1186/s13054-022-03895-4](https://doi.org/10.1186/s13054-022-03895-4)
 - Monnet X, Marik PE, Teboul JL. Prediction of fluid responsiveness: an update. *Ann Intensive Care*. 2016;6:111. [doi:10.1186/s13613-016-0216-7](https://doi.org/10.1186/s13613-016-0216-7)
 - Moreno AH, Katz AI, Gold LD, Reddy RV. Mechanics of distension of dog veins and other very thin-walled tubular structures. *Circ Res*. 1970;27:1069–1080. [doi:10.1161/01.RES.27.6.1069](https://doi.org/10.1161/01.RES.27.6.1069)
 ## N
