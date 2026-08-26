@@ -6,7 +6,7 @@
 
 ## Before touching a control
 
-The application opens on a settled, passively ventilated reference circulation. Spend one breath locating three signals: airway pressure in the waveforms, pleural pressure in the thorax and waveforms, and cardiac output in the numerical tiles. The panels show one shared simulation, not independent demonstrations.
+The application opens on the settled *Healthy, breathing spontaneously* reference circulation. Spend one breath locating three signals: airway pressure in the waveforms, pleural pressure in the thorax and waveforms, and cardiac output in the numerical tiles. The panels show one shared simulation, not independent demonstrations.
 
 ## Minute 1–3: reverse the sign of inspiration
 
@@ -52,6 +52,14 @@ This preset combines high aggregate pulmonary vascular load with a vulnerable ri
 - Reset before beginning a new comparison. Reset also clears occlusion points from the Guyton panel.
 - Use Play/Pause to inspect a frame; pausing does not create a physiological hold.
 - Absolute numbers are model outputs, not patient targets.
+
+## Save and reload a custom patient
+
+Use **Save patient** after creating a useful phenotype. The application downloads a small, readable JSON file containing the complete set of current controls and a list of those that differ from the defaults. The file remains on the local device and can be renamed, archived with a bug report or shared with another reviewer.
+
+**Load patient** validates that file, labels the result *Custom*, starts a fresh simulation and allows it to settle. The same parameter set is therefore reproduced without carrying across the arbitrary cardiac phase, respiratory phase, pressures or compartment volumes present when Save was clicked. This distinction is intentional: the feature reproduces a patient definition and experiment, not one frozen animation frame.
+
+Unknown settings from an older file are reported and ignored. A known setting outside its available range is rejected rather than silently clipped, because clipping would make a debugging case appear reproduced when it was not.
 
 ## Limits
 

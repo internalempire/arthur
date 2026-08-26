@@ -12,9 +12,9 @@ A pressure–volume loop follows ventricular filling, isovolumic contraction, ej
 
 The RV is on the left and the LV on the right. The current beat is bright; the preceding completed beat is faded, making a recent intervention visible without accumulating an unreadable trail.
 
-The dashed straight line is the local effective ESPVR for the completed beat. It passes through the model's zero-pressure volume and the end-systolic point, which is marked on the loop. The curved dashed line is the end-diastolic relation.
+The dashed straight line is the local effective ESPVR for the completed beat. It passes through the model's zero-pressure volume and the end-systolic point on the loop. The curved dashed line is labelled EDPVR: the end-diastolic pressure–volume relation. There is no separate point marker because end systole is already the upper-left corner of each completed loop.
 
-The dotted line labelled $E_a$ joins **end-diastolic volume at zero pressure**, $(EDV,0)$, to the end-systolic point, $(ESV,P_{es})$. Its slope magnitude is therefore $P_{es}/(EDV-ESV)=P_{es}/SV$. It does not start at ESV on the volume axis. The title reports loop width in mL.
+The dotted line labelled $E_a$ joins **end-diastolic volume at zero pressure**, $(EDV,0)$, to the end-systolic point, $(ESV,P_{es})$. Its slope magnitude is therefore $P_{es}/(EDV-ESV)=P_{es}/SV$. It does not start at ESV on the volume axis. Volume is on the horizontal axis and transmural pressure on the vertical axis. The title reports loop width in mL.
 
 The axes remain fixed while the same parameter settings are running. Each panel starts with a clinically useful RV- or LV-specific range and expands only when a loop would otherwise leave it. It does not repeatedly contract around the moving beat. Changing a control or scenario allows the panel to fit the new state again.
 

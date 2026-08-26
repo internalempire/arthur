@@ -79,6 +79,7 @@ function makeSide(canvas, cfg) {
     panel.grid(colors, {
       xTicks: [0, vMax / 2, vMax], xFormat: (v) => v.toFixed(0),
       yTicks: [0, pMax / 2, pMax], yFormat: (v) => v.toFixed(0),
+      yLabel: 'Pressure (mmHg)',
       xLabel: 'Volume (mL)',
     });
 
@@ -101,6 +102,17 @@ function makeSide(canvas, cfg) {
     }
     panel.line(ed, { color: colors.ink, width: 1.4, dash: [5, 4], alpha: 0.45 });
 
+    // Put the EDPVR label on a visible mid-pressure part of the exponential.
+    // Solving the relation is more stable than labelling the final sampled
+    // point, which can be far outside the panel in a stiff ventricle.
+    const edpvrTargetY = pMax * 0.56;
+    const edpvrLabelX = Math.min(
+      vMax * 0.96,
+      spec.v0d + Math.log1p(edpvrTargetY / spec.edA) / edB,
+    );
+    const edpvrLabelY = spec.edA
+      * (Math.exp(edB * Math.max(0, edpvrLabelX - spec.v0d)) - 1);
+
     // Effective arterial elastance: end-diastolic volume to the end-systolic point.
     if (esv < edv && Number.isFinite(esp)) {
       panel.line([edv, 0, esv, Math.max(0, esp)], {
@@ -110,16 +122,14 @@ function makeSide(canvas, cfg) {
 
     panel.line(prev, { color: colors[cfg.color], width: 1.6, alpha: 0.3 });
     panel.line(live, { color: colors[cfg.color], width: 2.2 });
-    if (Number.isFinite(esp)) {
-      panel.dot(esv, Math.max(0, esp), {
-        color: colors[cfg.color], r: 3.2, ring: colors.surface,
-      });
-    }
 
     panel.unclip();
 
     panel.label('ESPVR', espvrEndX, espvrEndY, {
       color: colors.inkMuted, align: 'right', dx: -4, dy: 10, halo: colors.surface,
+    });
+    panel.label('EDPVR', edpvrLabelX, edpvrLabelY, {
+      color: colors.inkMuted, align: 'right', dx: -4, dy: -7, halo: colors.surface,
     });
     if (Number.isFinite(esp) && esv < edv) {
       panel.label('Ea', (edv + esv) / 2, Math.max(0, esp) / 2, {

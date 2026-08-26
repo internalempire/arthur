@@ -167,7 +167,7 @@ Six linked visual panels show the same simulation:
 | Guyton diagram | venous return, predicted RV output and analytic operating point | [Guyton diagram](manual/panel-guyton.md) |
 | PVR–volume curve | alveolar, extra-alveolar and total pulmonary vascular load | [PVR curve](manual/panel-pvr-curve.md) |
 
-The application supports light, dark and automatic themes, keyboard-safe controls, text alternatives for canvas panels and colour-independent status labelling.
+The application supports light, dark and automatic themes, keyboard-safe controls, text alternatives for canvas panels and colour-independent status labelling. A custom patient can be downloaded as a versioned JSON parameter file and loaded again locally, allowing a teaching experiment or debugging case to be reproduced without serialising transient cardiovascular state.
 
 ---
 
@@ -292,6 +292,8 @@ heartLung.sim.setParam('peep', 12);
 heartLung.step(20);          // advance model time and repaint
 heartLung.sim.metrics;       // current derived measurements
 heartLung.sim.applyScenario(scenario);
+heartLung.patientState();    // portable object used by Save patient
+heartLung.loadPatientState(savedObject);
 ```
 
 The UI imports the model only through `src/model/index.js`; the public boundary is checked by the test suite.
