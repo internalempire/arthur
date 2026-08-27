@@ -19,7 +19,7 @@ const sim = new Simulator();
 const el = (id) => document.getElementById(id);
 
 const waveforms = createWaveforms(el('waveforms'));
-const guyton = createGuyton(el('guyton'));
+const guyton = createGuyton(el('guyton'), { onViewChange: invalidate });
 const campbell = createCampbell(el('campbell'), { onViewChange: invalidate });
 const pvLoops = createPvLoops(el('pvloops'));
 // A view-only interaction still needs to invalidate a paused canvas. Keeping

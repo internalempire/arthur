@@ -33,11 +33,40 @@ export function stableGuytonDomain(previous, required) {
   return next;
 }
 
-export function createGuyton(canvas) {
+export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
   const panel = new Panel(canvas, { padding: [22, 16, 34, 46] });
   const trail = []; // operating point over the last few seconds
   let lastSample = -1;
   let viewDomain = null;
+  let curveClock = 'mean';
+
+  // Temporary but explicit physiology-debug control. It compares two coherent
+  // venous-return constructions: all three determinants averaged over one
+  // breath, or all three read at the current instant. The former is the default
+  // Guyton equilibrium view; the latter exposes respiratory movement without
+  // recreating the old mean/live hybrid.
+  const clockToggle = document.createElement('button');
+  clockToggle.type = 'button';
+  clockToggle.className = 'guyton-clock-toggle';
+  const syncClockToggle = () => {
+    const live = curveClock === 'instant';
+    clockToggle.textContent = live ? 'VR live' : 'VR mean';
+    clockToggle.setAttribute('aria-pressed', String(live));
+    clockToggle.setAttribute('aria-label', live
+      ? 'Use respiratory-mean determinants for the venous-return curve'
+      : 'Use instantaneous determinants for the venous-return curve');
+    clockToggle.title = live
+      ? 'Venous return: Pmsf, closing pressure and resistance are instantaneous. Click for breath mean.'
+      : 'Venous return: Pmsf, closing pressure and resistance are averaged over one breath. Click for live values.';
+  };
+  syncClockToggle();
+  clockToggle.addEventListener('click', () => {
+    curveClock = curveClock === 'mean' ? 'instant' : 'mean';
+    viewDomain = null;
+    syncClockToggle();
+    onViewChange();
+  });
+  canvas.insertAdjacentElement('afterend', clockToggle);
 
   function render(sim, colors) {
     panel.resize();
@@ -50,7 +79,7 @@ export function createGuyton(canvas) {
     // one-heartbeat mean remains below as the dynamic respiratory trail.
     const op = m.respiratoryOperatingPoint;
     const beat = m.operatingPoint;
-    const vr = venousReturnCurve(p, c, op);
+    const vr = venousReturnCurve(p, c, curveClock === 'mean' ? op : null);
     const cf = cardiacFunctionCurve(p, c, op);
 
     // Two different quantities, drawn as two different marks. Their labels name
@@ -63,7 +92,12 @@ export function createGuyton(canvas) {
     // different: it preserves the within-breath storage and phase lag that the
     // mean points remove.
     const simulated = { x: op.pra, y: op.flow };
-    const equilibrium = curveIntersection(vr.points, cf.points);
+    // A live venous-return curve intentionally has no equilibrium marker: the
+    // RV relation and filled point remain complete-breath summaries, so their
+    // crossing with an instantaneous return curve would mix clocks again.
+    const equilibrium = curveClock === 'mean'
+      ? curveIntersection(vr.points, cf.points)
+      : null;
     const measured = sim.measuredPoints;
 
     // Sampled on simulated time so the trail covers a fixed span of physiology
@@ -112,7 +146,7 @@ export function createGuyton(canvas) {
     // Respiratory-mean pleural pressure remains a useful external-pressure
     // reference. It is not labelled as the curve intercept: the locally
     // anchored RV relation also contains the RA-to-RV filling offset.
-    const pplMmHg = op.ppl;
+    const pplMmHg = curveClock === 'mean' ? op.ppl : c.p.ppl;
     ctx.save();
     ctx.strokeStyle = colors.inkMuted;
     ctx.setLineDash([2, 3]);
@@ -242,7 +276,9 @@ export function createGuyton(canvas) {
       });
     }
 
-    panel.title('Guyton diagram', colors, 'where venous return meets predicted RV output');
+    panel.title('Guyton diagram', colors, curveClock === 'mean'
+      ? 'respiratory-mean venous return and predicted RV output'
+      : 'live venous-return determinants — diagnostic view');
   }
 
   function clearTrail() {
@@ -251,5 +287,5 @@ export function createGuyton(canvas) {
     viewDomain = null;
   }
 
-  return { render, clearTrail };
+  return { render, clearTrail, curveClock: () => curveClock };
 }

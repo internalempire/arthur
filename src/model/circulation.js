@@ -381,7 +381,6 @@ export function stepCirculation(p, c, resp, dt) {
   const pmsfElastic = venousVolume.elasticPressure;
   const abdZone = clamp((pmsfElastic - 2) / 8, 0, 1);
   const pmsf = pmsfElastic + ABD_VENOUS_FRACTION * pab * abdZone;
-  const rvrEff = p.rvr * (1 + 0.5 * (1 - abdZone) * Math.max(0, pab - 2) / 4);
   const pPa = (c.vPa - VASC.vuPa) / VASC.cPa + ppl;
 
   // Lung inflation squeezes the pulmonary vascular bed toward the left atrium,
@@ -398,8 +397,6 @@ export function stepCirculation(p, c, resp, dt) {
   // its pressure falls toward the abdominal closing pressure (pCrit). The IVC
   // tolerates roughly 5 cmH₂O of transmural compression before it collapses.
   const pCrit = pab - cmH2OtoMmHg(5);
-  const rvrUp = rvrEff * RVR_UP_FRACTION;
-  const rvrDown = rvrEff - rvrUp;
 
   // The IVC is a thin-walled intra-abdominal conduit. Its atmospheric pressure
   // is transmural pressure (from its own compliance volume) plus the abdominal
@@ -409,6 +406,23 @@ export function stepCirculation(p, c, resp, dt) {
   // thorax.
   const pIvcTm = (c.vIVC - IVC.vu) / IVC.c;
   const pIvcAtm = Math.max(0.01, pIvcTm + pab);
+
+  // Ordinary diaphragmatic descent should not turn a healthy spontaneous
+  // inspiration into a global increase in venous resistance. The downstream
+  // caval waterfall already carries the collapse cost through `pCrit`; the old
+  // formula also multiplied both linear series resistances and therefore
+  // counted part of that cost twice. Additional abdominal resistance is now
+  // confined to the upstream pathway and requires *both* an underfilled
+  // reservoir and a poorly distended IVC. These smooth transitions are model
+  // coefficients, not clinical thresholds.
+  const reservoirDepletion = clamp((0.60 - abdZone) / 0.30, 0, 1);
+  const cavalDepletion = clamp((1.5 - pIvcTm) / 1.5, 0, 1);
+  const abdominalObstructionRisk = reservoirDepletion * cavalDepletion;
+  const abdominalResistanceGain = 1
+    + 0.5 * abdominalObstructionRisk * Math.max(0, pab - 2) / 4;
+  const rvrUp = p.rvr * RVR_UP_FRACTION * abdominalResistanceGain;
+  const rvrDown = p.rvr * (1 - RVR_UP_FRACTION);
+  const rvrEff = rvrUp + rvrDown;
 
   // Splanchnic reservoir → IVC: no collapse, purely resistive.
   const qSvToIvc = Math.max(0, (pmsf - pIvcAtm) / rvrUp);
@@ -593,15 +607,16 @@ function closeBeat(c) {
  */
 export function venousReturnCurve(p, c, mean, nPoints = 90, pmsfOverride = null) {
   const pmsf = pmsfOverride ?? mean?.pmsf ?? c.p.pmsf;
-  const pCrit = mean?.pCrit ?? c.p.pCrit; // follows lung volume, so it moves with the breath
+  const pCrit = mean?.pCrit ?? c.p.pCrit;
+  const rvrEff = mean?.rvrEff ?? c.p.rvrEff;
   const pts = [];
   const lo = Math.min(pCrit - 6, -6);
   for (let i = 0; i < nPoints; i++) {
     const pra = lo + ((pmsf + 3 - lo) * i) / (nPoints - 1);
-    const q = venousReturnFlow(pmsf, pra, pCrit, c.p.rvrEff);
+    const q = venousReturnFlow(pmsf, pra, pCrit, rvrEff);
     pts.push(pra, (q * 60) / 1000);
   }
-  return { points: pts, pmsf, pCrit };
+  return { points: pts, pmsf, pCrit, rvrEff };
 }
 
 /**

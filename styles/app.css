@@ -477,6 +477,30 @@ select { min-width: 150px; }
 .panel-campbell .panel-data:not([open]) { right: 124px; }
 .panel-campbell .panel-data[open] { z-index: 2; }
 
+/* The Guyton debugging switch changes only the time basis of the descending
+   analytic curve. It shares the compact chart-header language without looking
+   like a physiological patient control. */
+.guyton-clock-toggle {
+  position: absolute;
+  z-index: 1;
+  top: 4px;
+  right: 8px;
+  height: 23px;
+  min-width: 64px;
+  padding: 0 7px;
+  color: var(--ink-secondary);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: 600 10.5px/1 system-ui, -apple-system, "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+.guyton-clock-toggle:hover { color: var(--ink); background: var(--wash); }
+.guyton-clock-toggle:focus-visible { outline: 2px solid var(--venous); outline-offset: 1px; }
+.guyton-clock-toggle[aria-pressed="true"] { color: var(--text-venous); }
+.panel-guyton .panel-data:not([open]) { right: 80px; }
+.panel-guyton .panel-data[open] { z-index: 2; }
+
 /* Explicit tracks, all `minmax(0, 1fr)`. An implicit `auto` row would be sized
    by its content — and its content is a canvas. */
 .pv-pair {

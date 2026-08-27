@@ -42,12 +42,12 @@ The inspiratory hold starts at end inspiration, stops gas flow and sets airway p
 
 | delivered VT (mL) | hold airway pressure (cmH₂O) | mean right atrial pressure (mmHg) | venous return (L/min) |
 |---:|---:|---:|---:|
-| 300 | 8.06 | 1.56 | 5.15 |
-| 500 | 10.14 | 2.19 | 5.00 |
-| 700 | 12.24 | 2.84 | 4.85 |
-| 900 | 14.37 | 3.53 | 4.71 |
+| 300 | 8.06 | 1.76 | 5.40 |
+| 500 | 10.14 | 2.40 | 5.27 |
+| 700 | 12.24 | 3.04 | 5.13 |
+| 900 | 14.37 | 3.71 | 4.99 |
 
-The fitted pressure–flow line has a slope of -0.22 L/min/mmHg and reaches zero flow at 24.5 mmHg. The model's internal Pmsf after the protocol is 10.3 mmHg.
+The fitted pressure–flow line has a slope of -0.21 L/min/mmHg and reaches zero flow at 27.2 mmHg. The model's internal Pmsf after the protocol is 9.8 mmHg.
 <!-- END GENERATED: pmsf-occlusions -->
 
 The discrepancy is not a plotting error. Each larger inflation pressurises the abdomen and changes the systemic reservoir while it is being sampled, so the four points belong to a family of shifted relations. The line through them is real; interpreting its intercept as the one fixed upstream pressure is not.

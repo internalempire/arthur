@@ -51,7 +51,9 @@ The integrated circulation and the analytic curve describe the same pathway at d
 
 The integrator separates the systemic venous reservoir, a compliant IVC and the right atrium. The selected resistance to venous return is divided into an upstream segment and a collapsible downstream segment. This allows the IVC to store a small amount of blood and delay transmission during a breath.
 
-The analytic venous-return curve reduces those two resistances back to their steady-state sum and uses the same critical closing-pressure law. Once IVC volume is no longer changing, the detailed pathway and the reduced curve give the same mean flow. During inspiration or expiration they need not give the same instantaneous flow because the IVC is filling or emptying.
+The analytic venous-return curve reduces those two resistances back to their steady-state sum and uses the same critical closing-pressure law. Its default construction averages all three determinants — Pmsf, critical closing pressure and effective resistance — over one complete breath. Once IVC volume is no longer changing, the detailed pathway and the reduced curve give the same mean flow. During inspiration or expiration they need not give the same instantaneous flow because the IVC is filling or emptying.
+
+For model inspection, **VR live** replaces all three mean determinants with their current values. It does not combine mean pressures with a live resistance. The predicted-equilibrium marker is withheld in this view because the displayed RV-function curve remains a respiratory-mean construction.
 
 Mean systemic filling pressure comes from the [stressed volume](stressed-volume.md) of the venous reservoir divided by its compliance, plus the [abdominal](abdominal-pressure.md) contribution where the reservoir is distended enough to have one.
 
@@ -89,11 +91,11 @@ A passive patient at 500 mL, 14 breaths per minute:
 
 | PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |
 |---:|---:|---:|---:|
-| 0 | 7.5 | -0.6 | 5.45 |
-| 5 | 9.0 | 1.0 | 5.36 |
-| 10 | 10.2 | 2.6 | 4.99 |
-| 15 | 11.3 | 4.2 | 4.61 |
-| 20 | 12.4 | 5.8 | 4.32 |
+| 0 | 7.2 | -0.5 | 5.56 |
+| 5 | 8.6 | 1.2 | 5.55 |
+| 10 | 9.7 | 2.8 | 5.30 |
+| 15 | 10.8 | 4.4 | 4.89 |
+| 20 | 11.9 | 6.0 | 4.60 |
 <!-- END GENERATED: venous-return-peep -->
 
 Mean systemic filling pressure *rises* with PEEP — the abdominal contribution and the compression of the reservoir see to that — and output falls anyway, because right atrial pressure rises faster than the head does. The gradient is what matters, not either end of it.
@@ -118,7 +120,7 @@ The resistance to venous return is a single control. Splitting it into the sever
 
 - **One venous reservoir.** No splanchnic, cutaneous or muscular capacitance beds, and therefore no redistribution between fast and slow compartments. A fluid bolus arrives instantaneously in one place.
 - **No stress relaxation, no transcapillary escape, no distribution kinetics.** Volume added stays where it is put.
-- **The resistance to venous return is a constant** apart from the abdominal term. It does not vary with flow, tone or vessel calibre.
+- **The resistance to venous return is constant in a normally filled circulation.** An additional abdominal contribution is confined to the upstream segment when both the systemic reservoir and IVC are poorly distended. It does not otherwise vary with flow, tone or vessel calibre.
 - **The Guyton diagram is a steady-state construction placed under a dynamic trail.** The one-heartbeat trail preserves respiratory storage, whereas the two equilibrium points use a complete respiratory cycle.
 - **The analytic curve represents a local RV relation, not an independent biventricular or LV function curve.** It is anchored to the model’s current respiratory-mean RV volumes and does not reproduce a new closed-loop beat at every pressure on the curve.
 - **The filled point is venous inflow, not cardiac output.** Its height must not be read as simultaneous RV or LV forward flow.
@@ -139,6 +141,7 @@ The resistance to venous return is a single control. Splitting it into the sever
 - Magder S. Volume and its relationship to cardiac output and venous return. *Crit Care* 2016;20:271. [doi:10.1186/s13054-016-1438-7](https://doi.org/10.1186/s13054-016-1438-7)
 - Berger D, Moller PW, Weber A, et al. Effect of PEEP, blood volume, and inspiratory hold maneuvers on venous return. *Am J Physiol Heart Circ Physiol* 2016;311:H794–H806. [doi:10.1152/ajpheart.00931.2015](https://doi.org/10.1152/ajpheart.00931.2015)
 - Henderson WR, Griesdale DEG, Walley KR, Sheel AW. Clinical review: Guyton — the role of mean circulatory filling pressure and right atrial pressure in controlling cardiac output. *Crit Care* 2010;14:243. [doi:10.1186/cc9247](https://doi.org/10.1186/cc9247)
+- Magder S. Heart–lung interaction in spontaneous breathing subjects: the basics. *Ann Transl Med*. 2018;6:348. [doi:10.21037/atm.2018.06.19](https://doi.org/10.21037/atm.2018.06.19)
 
 ---
 
