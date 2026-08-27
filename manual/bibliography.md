@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 140 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 143 unique entries.
 
 ---
 
@@ -22,6 +22,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Behazin N, Jones SB, Cohen RI, Loring SH. Respiratory restriction and elevated pleural and esophageal pressures in morbid obesity. *J Appl Physiol*. 2010;108:212–218. [doi:10.1152/japplphysiol.91356.2008](https://doi.org/10.1152/japplphysiol.91356.2008)
 - Belenkie I, Dani R, Smith ER, Tyberg JV. Effects of volume loading during experimental acute pulmonary embolism. *Circulation* 1989;80:178–88. [doi:10.1161/01.CIR.80.1.178](https://doi.org/10.1161/01.CIR.80.1.178)
 - Berger D, Moller PW, Weber A, et al. Effect of PEEP, blood volume, and inspiratory hold maneuvers on venous return. *Am J Physiol Heart Circ Physiol*. 2016;311:H794–H806. [doi:10.1152/ajpheart.00931.2015](https://doi.org/10.1152/ajpheart.00931.2015)
+- Bianchi I, Grassi A, Pham T, et al. Reliability of plateau pressure during patient-triggered assisted ventilation: analysis of a multicentre database. *J Crit Care*. 2022;68:96–103. [doi:10.1016/j.jcrc.2021.12.002](https://doi.org/10.1016/j.jcrc.2021.12.002)
 - Brower R, Wise RA, Hassapoyannes C, et al. Effect of lung inflation on lung blood volume and pulmonary venous flow. *J Appl Physiol*. 1985;58:954–963. [doi:10.1152/jappl.1985.58.3.954](https://doi.org/10.1152/jappl.1985.58.3.954)
 - Buda AJ, Pinsky MR, Ingels NB Jr, et al. Effect of intrathoracic pressure on left ventricular performance. *N Engl J Med*. 1979;301:453–459. <https://doi.org/10.1056/NEJM197908303010901>
 - Burkhoff D, Mirsky I, Suga H. Assessment of systolic and diastolic ventricular properties via pressure–volume analysis. *Am J Physiol Heart Circ Physiol*. 2005;289:H501–H512. [doi:10.1152/ajpheart.00138.2005](https://doi.org/10.1152/ajpheart.00138.2005)
@@ -51,9 +52,11 @@ A citation documents the physiological or methodological claim made on its sourc
 - Eckberg DL, Sleight P. *Human Baroreflexes in Health and Disease*. Oxford: Clarendon Press; 1992. [doi:10.1093/oso/9780198576938.001.0001](https://doi.org/10.1093/oso/9780198576938.001.0001)
 ## F
 
+- Foti G, Cereda M, Banfi G, Pelosi P, Fumagalli R, Pesenti A. End-inspiratory airway occlusion: a method to assess the pressure developed by inspiratory muscles in patients with acute lung injury undergoing pressure support. *Am J Respir Crit Care Med*. 1997;156:1210–1216. [doi:10.1164/ajrccm.156.4.96-02031](https://doi.org/10.1164/ajrccm.156.4.96-02031)
 - Fougères E, Teboul JL, Richard C, et al. Haemodynamic impact of a positive end-expiratory pressure setting in acute respiratory distress syndrome. *Crit Care Med*. 2010;38:802–807. [doi:10.1097/CCM.0b013e3181c587fd](https://doi.org/10.1097/CCM.0b013e3181c587fd)
 ## G
 
+- Gao R, Zhou J-X, Yang Y-L, et al. Use of pressure muscle index to predict the contribution of patient's inspiratory effort during pressure support ventilation: a prospective physiological study. *Front Med*. 2024;11:1390878. [doi:10.3389/fmed.2024.1390878](https://doi.org/10.3389/fmed.2024.1390878)
 - Gattinoni L, Caironi P, Cressoni M, et al. Lung recruitment in patients with the acute respiratory distress syndrome. *N Engl J Med* 2006;354:1775–86. [doi:10.1056/NEJMoa052052](https://doi.org/10.1056/NEJMoa052052)
 - Gattinoni L, Pesenti A. The concept of “baby lung”. *Intensive Care Med*. 2005;31:776–784. [doi:10.1007/s00134-005-2627-z](https://doi.org/10.1007/s00134-005-2627-z)
 - Grasso S, Terragni P, Mascia L, et al. Airway pressure–time curve profile (stress index) detects tidal recruitment/hyperinflation in experimental acute lung injury. *Crit Care Med* 2004;32:1018–27. [doi:10.1097/01.CCM.0000120059.94009.AD](https://doi.org/10.1097/01.CCM.0000120059.94009.AD)

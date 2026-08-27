@@ -94,6 +94,12 @@ export function createRespiratoryState() {
     // hold has to start at end-expiration to mean anything.
     holdPending: null,
     hold: null,
+    // Diagnostic state for an occlusion. These values are deliberately not
+    // exposed as a calculated PMI: during assisted ventilation the pressure
+    // change must emerge from zero flow, fixed volume and muscle relaxation.
+    holdElapsed: 0,
+    holdStartPaw: null,
+    holdStartVolume: null,
     peakInspFlow: 0,
     // Latched once per breath for the readouts.
     lastPplat: 0,
@@ -289,22 +295,17 @@ export function stepRespiratory(p, r, dt) {
     return chestWallPressure(p, absoluteVolume) - pmus + r.plSolved;
   };
 
-  r.tCycle += dt;
-  r.tPhase += dt;
-
-  r.pmus = stepInspiratoryActivation(p, r, dt, period);
-
-  // --- occlusion manoeuvres ------------------------------------------------
-  // A hold freezes the airway: no flow, so alveolar pressure equilibrates with
-  // the airway and the circulation settles at a fixed lung volume and pleural
-  // pressure. That steady state is the point of the manoeuvre.
-  if (r.hold) {
+  // Close the airway before another integration step can move gas. In an
+  // assisted breath the immediate airway pressure is therefore Palv at the
+  // end-inspiratory volume; as inspiratory activity relaxes, Ppl and Paw move
+  // toward the passive elastic pressure. That sequence is the physiology
+  // behind the pressure-muscle-index manoeuvre, without calculating an index.
+  const stepOcclusion = () => {
     r.flow = 0;
+    r.holdElapsed += dt;
     const palvHeld = alveolar(r.v, r.pmus);
     r.palv = palvHeld;
     r.ppl = chestWallPressure(p, vRelax + r.v) - r.pmus;
-    // With no flow the airway reads alveolar pressure — that is what a hold is
-    // for, and it is why a plateau is measured this way.
     r.paw = palvHeld;
     r.pl = palvHeld - r.ppl;
     r.lungVolume = vRelax + r.v;
@@ -316,7 +317,18 @@ export function stepRespiratory(p, r, dt) {
     }
     r.prevPhase = r.phase;
     return r;
-  }
+  };
+
+  r.tCycle += dt;
+  r.tPhase += dt;
+
+  r.pmus = stepInspiratoryActivation(p, r, dt, period);
+
+  // --- occlusion manoeuvres ------------------------------------------------
+  // A hold freezes the airway: no flow, so alveolar pressure equilibrates with
+  // the airway and the circulation settles at a fixed lung volume and pleural
+  // pressure. That steady state is the point of the manoeuvre.
+  if (r.hold) return stepOcclusion();
 
   // --- phase machine -------------------------------------------------------
   if (p.mode === 'psv') {
@@ -402,6 +414,16 @@ export function stepRespiratory(p, r, dt) {
   } else if (r.holdPending === 'inspiratory' && r.prevPhase === 'insp' && r.phase === 'exp') {
     r.hold = 'inspiratory';
     r.holdPending = null;
+  }
+
+  if (r.hold) {
+    // Preserve the last airway-boundary pressure for validation and debugging,
+    // but leave it out of the public metrics: a bedside PMI is meaningful only
+    // if relaxation produces a readable plateau.
+    r.holdElapsed = 0;
+    r.holdStartPaw = r.paw;
+    r.holdStartVolume = r.v;
+    return stepOcclusion();
   }
 
   // Capture end-expiratory volume before the first inspiratory integration

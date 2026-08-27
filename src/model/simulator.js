@@ -230,6 +230,9 @@ export class Simulator {
    */
   startHold(kind, seconds = 12) {
     if (this.hold || this.resp.hold || this.resp.holdPending) return false;
+    this.resp.holdElapsed = 0;
+    this.resp.holdStartPaw = null;
+    this.resp.holdStartVolume = null;
     this.resp.holdPending = kind;
     this.hold = { kind, seconds, elapsed: 0, engaged: false, sumPra: 0, sumFlow: 0, n: 0 };
     return true;
@@ -238,6 +241,9 @@ export class Simulator {
   cancelHold() {
     this.resp.hold = null;
     this.resp.holdPending = null;
+    this.resp.holdElapsed = 0;
+    this.resp.holdStartPaw = null;
+    this.resp.holdStartVolume = null;
     this.hold = null;
   }
 
@@ -402,6 +408,9 @@ export class Simulator {
         if (this.measuredPoints.length > 8) this.measuredPoints.shift();
       }
       this.resp.hold = null;
+      this.resp.holdElapsed = 0;
+      this.resp.holdStartPaw = null;
+      this.resp.holdStartVolume = null;
       this.hold = null;
     }
   }
