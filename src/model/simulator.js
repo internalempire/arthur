@@ -125,6 +125,11 @@ export class Simulator {
     this.cycle = {
       ra: new CycleRing(), flow: new CycleRing(), pmsf: new CycleRing(),
       peri: new CycleRing(), ppl: new CycleRing(), pCrit: new CycleRing(),
+      // Keep every determinant of the Guyton venous-return curve on the same
+      // clock. This supports a complete-breath construction and a genuinely
+      // instantaneous diagnostic view without mixing mean pressures with a
+      // live resistance.
+      rvrEff: new CycleRing(),
       // End-diastolic and end-systolic volumes are latched once per beat by the
       // integrator. Their respiratory means anchor the local RV-function curve
       // to the chamber state actually producing the simulated flow.
@@ -314,6 +319,7 @@ export class Simulator {
       this.cycle.peri.push(c.p.pPeri);
       this.cycle.ppl.push(c.p.ppl);
       this.cycle.pCrit.push(c.p.pCrit);
+      this.cycle.rvrEff.push(c.p.rvrEff);
       this.cycle.rvEdv.push(c.rvEdv);
       this.cycle.rvEsv.push(c.rvEsv);
       this.cycle.hr.push(this.effective.hr);
@@ -474,6 +480,7 @@ export class Simulator {
       // drifts off them during the fast part of a breath.
       ppl: this.cycle.ppl.mean(window),
       pCrit: this.cycle.pCrit.mean(window),
+      rvrEff: this.cycle.rvrEff.mean(window),
     };
 
     // A complete respiratory cycle is the shortest window over which a settled
@@ -489,6 +496,7 @@ export class Simulator {
       pPeri: this.cycle.peri.meanOfMeans(window, respiratoryWindow),
       ppl: this.cycle.ppl.meanOfMeans(window, respiratoryWindow),
       pCrit: this.cycle.pCrit.meanOfMeans(window, respiratoryWindow),
+      rvrEff: this.cycle.rvrEff.meanOfMeans(window, respiratoryWindow),
       rvEdv: this.cycle.rvEdv.meanOfMeans(window, respiratoryWindow),
       rvEsv: this.cycle.rvEsv.meanOfMeans(window, respiratoryWindow),
       hr: this.cycle.hr.meanOfMeans(window, respiratoryWindow),

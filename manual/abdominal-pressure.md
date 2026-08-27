@@ -12,7 +12,7 @@ This has two consequences that oppose each other, and the older teaching that "d
 
 **When the splanchnic bed is full**, the rise in abdominal pressure squeezes blood out of a distended reservoir toward the thorax. Abdominal pressure adds to the pressure head driving venous return — [mean systemic filling pressure](venous-return.md) rises, and the fall in venous return that positive-pressure inspiration would otherwise cause is partly defended.
 
-**When the splanchnic bed is empty**, there is nothing to squeeze. The same abdominal pressure instead compresses the capacitance vessels toward closure, and it raises the pressure at which the inferior vena cava collapses. What rises is the *resistance* to venous return, and the closing pressure of the [waterfall](vascular-waterfalls.md) — not the driving pressure.
+**When the splanchnic bed and IVC are poorly distended**, there is less blood to mobilise. Abdominal pressure can then narrow the upstream abdominal venous pathway, while the raised pressure surrounding the IVC brings the downstream segment closer to collapse. The first effect raises resistance; the second raises the closing pressure of the [waterfall](vascular-waterfalls.md). They are represented separately so the same caval obstruction is not counted twice.
 
 The balance can therefore shift with vascular filling: compression of a distended abdominal reservoir may support the pressure head, whereas compression of an underfilled or collapsible bed may predominantly impede return. This helps explain why hypovolaemia worsens tolerance of raised intra-abdominal pressure and why abdominal compression is not equivalent to volume expansion.
 
@@ -37,7 +37,7 @@ $$
 
 The pressure load transmitted to the thorax is represented separately by `cwLoad`. It shifts the independent [chest-wall relaxation curve](pleural-pressure.md) and can raise resting pleural pressure without changing the selected wall compliance. `pab0` does **not** automatically determine `cwLoad`: abdominal-to-thoracic transmission depends on posture, diaphragm configuration and abdominal compliance, none of which is resolved. The intra-abdominal-hypertension preset selects both values to construct one teaching phenotype; it does not encode a universal transmission fraction.
 
-The two opposing consequences are separated by one state variable: how distended the venous reservoir is. The model reads that from the elastic pressure the reservoir already generates, and forms a zone index between 0 and 1:
+The opposing consequences first depend on how distended the venous reservoir is. The model reads that from the elastic pressure the reservoir already generates, and forms an index between 0 and 1:
 
 $$
 z = \operatorname{clamp}\left(\frac{P_{msf,\text{elastic}} - 2}{8},\ 0,\ 1\right)
@@ -52,22 +52,41 @@ $$
 P_{ab,\mathrm{mmHg}} = 0.7356\,P_{ab,\mathrm{cmH_2O}}
 $$
 
-Abdominal pressure then acts on the two pathways in proportion:
+Abdominal pressure contributes to the pressure head in proportion to that reservoir distension:
 
 $$
 P_{msf} = P_{msf,\text{elastic}} + 0.6 \cdot P_{ab,\mathrm{mmHg}} \cdot z
 $$
 
-$$
-R_{vr,\text{eff}} = R_{vr}\left(1 + 0.5\,(1-z)\,\frac{\max(0,\ P_{ab,\mathrm{mmHg}}-2\ \mathrm{mmHg})}{4\ \mathrm{mmHg}}\right)
-$$
-
 - $P_{msf}$ — mean systemic filling pressure, mmHg
 - $P_{ab,\mathrm{mmHg}}$ — abdominal pressure after conversion to mmHg
-- $R_{vr}$ — resistance to venous return as set by its control, mmHg·s/mL
-- $R_{vr,\text{eff}}$ — the value the integrator actually uses
 
-Within this interpolation, a full reservoir ($z = 1$) contributes abdominal pressure only to the pressure head, whereas an empty reservoir ($z = 0$) contributes only to effective resistance. Intermediate states combine both effects. These are model rules, not discrete physiological zones inferred at the bedside.
+An increase in linear resistance requires two findings at the same time: an underfilled reservoir and a poorly distended IVC. The model converts each into a smooth depletion index:
+
+$$
+d_{reservoir}=\operatorname{clamp}\left(\frac{0.60-z}{0.30},0,1\right)
+$$
+
+$$
+d_{IVC}=\operatorname{clamp}\left(\frac{1.5-P_{IVC,tm}}{1.5},0,1\right)
+$$
+
+Only the upstream one-third of the selected resistance receives the abdominal multiplier:
+
+$$
+R_{up}=0.33R_{vr}\left[1+0.5\,d_{reservoir}d_{IVC}
+\frac{\max(0,P_{ab}-2)}{4}\right]
+$$
+
+$$
+R_{down}=0.67R_{vr}, \qquad R_{vr,eff}=R_{up}+R_{down}
+$$
+
+- $P_{IVC,tm}$ — IVC pressure relative to the abdominal pressure surrounding it, mmHg
+- $R_{vr}$ — resistance to venous return selected by the user, mmHg·s/mL
+- $R_{vr,eff}$ — the total linear resistance used by the integrator
+
+In a normally filled subject either depletion index is zero, so quiet inspiration does not create a global resistance penalty. At low right atrial pressure, caval flow can still reach a plateau because abdominal pressure independently raises the critical closing pressure. In severe depletion, an additional upstream resistance can appear without also multiplying the downstream segment that already contains the waterfall. The numerical transition points are model coefficients, not bedside thresholds.
 
 The coefficient 0.6 is the share of the systemic venous reservoir treated as intra-abdominal: limb and cervical veins see atmosphere, so abdominal pressure reaches mean systemic filling pressure at less than unity.
 
@@ -77,22 +96,24 @@ Abdominal pressure also sets the closing pressure of the great veins, which is w
 
 A passive patient at 500 mL, PEEP 5, with the baseline abdominal pressure raised:
 
-| `pab0` | P<sub>ab</sub> | P<sub>msf</sub> | CVP | cardiac output |
+| `pab0` | mean P<sub>ab</sub> | P<sub>msf</sub> | mean CVP | cardiac output |
 |---|---|---|---|---|
-| 0 | 1.9 cmH₂O | 7.5 mmHg | 1.3 mmHg | 5.01 L/min |
-| 5 | 6.9 | 9.2 | 1.2 | 4.91 |
-| 12 | 13.9 | 13.3 | 0.4 | 4.38 |
-| 20 | 21.9 | 18.2 | 0.0 | 3.85 |
+| 0 | 2.5 cmH₂O | 7.5 mmHg | 1.1 mmHg | 5.37 L/min |
+| 5 | 7.5 | 9.0 | 1.2 | 5.53 |
+| 12 | 14.5 | 12.9 | 0.7 | 4.94 |
+| 20 | 22.5 | 17.8 | 0.2 | 4.11 |
 
-In this model run, mean systemic filling pressure rises by more than 10 mmHg while output falls by about a quarter. The example illustrates how an increased pressure head can be outweighed by increased closing pressure and resistance. The accompanying fall in central venous pressure is a model result, not a general diagnostic pattern of intra-abdominal hypertension.
+In this filled model run, a modest rise in abdominal pressure initially mobilises blood and slightly supports output. At higher pressure, Pmsf continues to rise but the caval closing pressure rises enough for output to fall. Linear resistance remains at its selected baseline because this is not an underfilled venous reservoir. The accompanying fall in central venous pressure is a model result, not a general diagnostic pattern of intra-abdominal hypertension.
 
 ---
 
 ## Why this and not something else
 
-The simplest alternative is to make abdominal pressure add to mean systemic filling pressure with a fixed coefficient. That represents compression of a distended reservoir but omits the simultaneous increase in closing pressure and resistance, particularly relevant in an underfilled circulation.
+The simplest alternative is to make abdominal pressure add to mean systemic filling pressure with a fixed coefficient. That represents compression of a distended reservoir but omits the simultaneous increase in closing pressure and, in severe depletion, upstream resistance.
 
-Splitting the effect required one new quantity, and the model uses a state it already has rather than a new control: the elastic pressure of the venous reservoir is a direct read-out of how distended it is. The alternative, giving the abdomen its own compliant venous compartment with its own volume, would represent the zone behaviour properly. It was not done because it adds a compartment, two constants and a second reservoir to conserve volume across, for a distinction the single index already makes visible.
+Another compact alternative is to multiply the entire resistance to venous return whenever abdominal pressure rises. That was rejected because it makes quiet inspiration look obstructive in a normally filled subject and duplicates part of the downstream caval cost already represented by the waterfall.
+
+Splitting the effect uses states the model already has rather than new controls: the elastic pressure of the venous reservoir indicates whether there is blood available to mobilise, and IVC transmural pressure indicates whether the conduit is poorly distended. The alternative, giving the abdomen its own compliant venous compartment with its own volume, would represent the zone behaviour more completely. It was not done because it adds another reservoir and additional constants for a distinction these two existing states can make visible.
 
 The `0.6` splanchnic fraction, the transition window and the resistance coefficient are **didactic shape coefficients**. They set where the balance tips, and no measurement fixes them for an aggregate model with one venous reservoir.
 
@@ -103,7 +124,7 @@ The `0.6` splanchnic fraction, the transition window and the resistance coeffici
 ### Of the construction
 
 - **One venous reservoir with a fractional abdominal share.** There is no separate splanchnic compartment, no hepatic waterfall, no portal bed, and no distinction between superior and inferior caval return. A real abdomen redistributes blood between these; the model can only scale one pooled compartment.
-- **The zone index is inferred, not measured.** It is a function of the reservoir's own elastic pressure, so it is an internal coefficient in the sense used under [interpretability](interpretability.md) — never displayed as though it were a zone diagnosis.
+- **The reservoir and IVC depletion indices are inferred, not measured.** They are internal coefficients used to decide when an additional upstream resistance is allowed; they are not bedside diagnoses or thresholds.
 - **The diaphragm has no geometry.** Its descent is a coefficient on lung volume, so there is no zone of apposition, no rib cage expansion from diaphragmatic contraction, and no distinction between the abdominal pressure a passive descent produces and that of a vigorous contraction.
 - Abdominal compliance is not represented: the same volume displacement produces the same pressure rise regardless of whether the abdomen is lax or tense.
 - Thoracic wall load is selected independently from abdominal pressure. The model cannot predict how much of a measured Pab reaches pleural pressure in a particular patient.

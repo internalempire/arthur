@@ -85,6 +85,25 @@ section('Guyton respiratory equilibrium');
       : 'no curve crossing');
 }
 
+section('Selective abdominal resistance');
+{
+  const healthy = settled({
+    mode: 'spont', pmus: 6, stressedVolume: 850, pab0: 4,
+  }, 45);
+  const depleted = settled({
+    mode: 'vcv', pmus: 0, vt: 450, peep: 5, stressedVolume: 200, pab0: 12,
+  }, 45);
+  check('quiet spontaneous inspiration does not acquire a global abdominal resistance penalty',
+    Math.abs(healthy.circ.p.rvrEff - healthy.params.rvr) < 1e-9,
+    `${healthy.circ.p.rvrEff.toFixed(4)} vs selected ${healthy.params.rvr.toFixed(4)}`);
+  check('additional abdominal resistance is reserved for a depleted, poorly distended venous path',
+    depleted.circ.p.abdZone < 0.6
+      && depleted.circ.p.pIvcTm < 0
+      && depleted.circ.p.rvrEff > depleted.params.rvr * 1.04,
+    `zone ${depleted.circ.p.abdZone.toFixed(2)}, IVC transmural ${depleted.circ.p.pIvcTm.toFixed(2)}, `
+      + `Rvr ${depleted.circ.p.rvrEff.toFixed(4)}`);
+}
+
 section('Preload reserve on the Guyton construction');
 {
   const vcv = { mode: 'vcv', pmus: 0, vt: 450, peep: 5, rr: 14 };

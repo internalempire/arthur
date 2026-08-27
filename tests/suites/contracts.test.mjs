@@ -223,7 +223,7 @@ section('The venous return curve uses the integrator\'s own collapse law');
 {
   const s = settled({});
   const op = s.metrics.respiratoryOperatingPoint;
-  const direct = (venousReturnFlow(op.pmsf, op.pra, op.pCrit, s.circ.p.rvrEff) * 60) / 1000;
+  const direct = (venousReturnFlow(op.pmsf, op.pra, op.pCrit, op.rvrEff) * 60) / 1000;
   const curve = venousReturnCurve(s.params, s.circ, op);
   let drawn = NaN;
   const pts = curve.points;
@@ -235,7 +235,8 @@ section('The venous return curve uses the integrator\'s own collapse law');
       break;
     }
   }
-  check('curve and equation give the same flow', near(direct, drawn, 0.02),
+  check('the respiratory-mean curve uses one clock for all three determinants',
+    curve.rvrEff === op.rvrEff && near(direct, drawn, 0.02),
     `${direct.toFixed(4)} vs ${drawn.toFixed(4)} L/min`);
 }
 
@@ -335,7 +336,7 @@ section('The Guyton points remain explicitly distinguished');
     panel.includes('one-heartbeat means')
       && panel.includes('most recent complete respiratory cycle')
       && panel.includes('whole breath')
-      && guytonUi.includes('const pplMmHg = op.ppl'));
+      && guytonUi.includes("curveClock === 'mean' ? op.ppl : c.p.ppl"));
   check('temporary right-heart storage is explained',
     venousReturn.includes('dV_{right}')
       && venousReturn.includes('temporarily store blood'));

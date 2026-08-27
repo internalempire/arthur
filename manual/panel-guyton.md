@@ -18,6 +18,13 @@ Right atrial pressure is on the horizontal axis and flow is on the vertical axis
 
 The axes remain fixed while one set of controls is running, so respiratory movement is movement of the curves and points rather than movement of the graph paper. The panel starts with headroom around the current state and expands only if a curve marker or measured occlusion point would otherwise leave the visible range. Selecting another scenario or changing a control starts a new fitted view.
 
+The **VR mean / VR live** button changes the time basis of the venous-return curve:
+
+- **VR mean**, the default, averages mean systemic filling pressure, critical closing pressure and resistance to venous return over the same complete breath. This is the appropriate view for comparison with the respiratory-mean point and predicted equilibrium;
+- **VR live** uses the current value of all three determinants. It is a diagnostic view for seeing how inspiration changes the return relation. The equilibrium marker is withheld because the RV-function curve and filled point remain respiratory means; drawing their crossing with a live venous-return curve would mix different clocks.
+
+The choice is deliberately all-or-none. Combining mean pressures with instantaneous resistance can make a normal inspiration appear to depress venous return even when the integrated circulation shows the opposite.
+
 The panel shows three related but different things:
 
 - **inflow path**, the faint trail, is built from consecutive one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. Averaging over one heartbeat removes the atrial pressure waves but deliberately preserves movement through the breath;
@@ -95,6 +102,7 @@ End-expiratory and end-inspiratory holds add square measured points: mean right 
 - The venous-return curve represents one aggregate systemic pathway; SVC and IVC return are not modelled separately.
 - The filled point reports IVC-to-right-atrial inflow, not SVC flow or cardiac output.
 - Averaging over one breath assumes a settled, approximately periodic state. Immediately after changing a control, the filled and hollow points may separate while blood volumes redistribute.
+- The optional live venous-return curve is not a second equilibrium estimate. It exposes instantaneous changes in its three determinants while the central mean points remain on the respiratory clock.
 - The local RV curve is anchored to simulated RV volumes. Agreement between the two points is therefore an internal consistency check, not independent physiological validation.
 - The curve holds contractility and effective pulmonary arterial load fixed while right atrial pressure is swept. It does not reproduce a new closed-loop beat at every point.
 - Pmsf is exactly accessible as an internal model variable but is not directly measurable in vivo.
@@ -107,6 +115,7 @@ End-expiratory and end-inspiratory holds add square measured points: mean right 
 - Guyton AC, Lindsey AW, Abernathy B, Richardson T. Venous return at various right atrial pressures and the normal venous return curve. *Am J Physiol*. 1957;189:609–615. [doi:10.1152/ajplegacy.1957.189.3.609](https://doi.org/10.1152/ajplegacy.1957.189.3.609)
 - Henderson WR, Griesdale DEG, Walley KR, Sheel AW. Clinical review: Guyton — the role of mean circulatory filling pressure and right atrial pressure in controlling cardiac output. *Crit Care*. 2010;14:243. [doi:10.1186/cc9247](https://doi.org/10.1186/cc9247)
 - Magder S. Bench-to-bedside review: an approach to hemodynamic monitoring—Guyton at the bedside. *Crit Care*. 2012;16:236. [doi:10.1186/cc11395](https://doi.org/10.1186/cc11395)
+- Magder S. Heart–lung interaction in spontaneous breathing subjects: the basics. *Ann Transl Med*. 2018;6:348. [doi:10.21037/atm.2018.06.19](https://doi.org/10.21037/atm.2018.06.19)
 
 ---
 
