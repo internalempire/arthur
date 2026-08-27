@@ -28,6 +28,22 @@ $$
 
 A larger positive rise generally accompanies a larger patient contribution. A value near zero or below can occur when pressure support supplies most of the breath or when removal of the resistive pressure offsets the pressure revealed by muscle relaxation.
 
+### Why PMI is smaller than the effort setting
+
+PMI should not be expected to equal the *Inspiratory effort* slider. The slider sets the maximum pressure scale available to the model's inspiratory muscles. The pressure actually being generated at the moment of occlusion depends on where the patient is in the neural breath and how far muscle activation has risen or decayed. A flow-cycled PSV breath can therefore end before the selected maximum is reached, or while activity is already changing.
+
+The pressure difference also contains the effect of stopping flow. Immediately before occlusion, Paw has to supply the elastic pressure of the respiratory system and the pressure lost across the airways, while the patient's muscles reduce the airway pressure required from the ventilator. During a stable hold, flow and therefore resistive pressure are zero. At an unchanged lung volume, the relationship can be summarised as:
+
+$$
+PMI \approx P_{mus,\,occlusion}
+- P_{resistive,\,pre-occlusion}
+- P_{mus,\,residual\ at\ plateau}
+$$
+
+This explains the common finding that PMI is lower than the selected or peak Pmus. Part of the muscle contribution is masked by the simultaneous disappearance of resistive pressure, and any activity persisting during the apparent plateau reduces the measured rise further. With high support or a large resistive component, PMI can be zero or negative even though some inspiratory activity is present.
+
+In practical terms, compare the stable Paw during the hold with Paw immediately before occlusion, but do not compare that difference directly with the effort-slider number. The former is an occlusion-derived surrogate; the latter is the maximum setting of the model's muscle-pressure generator. Even a visible pressure rise is not a direct measurement of total work of breathing or pressure–time product.
+
 The model does **not** calculate or display PMI as a separate index. It closes the airway, fixes volume and continues the existing muscle-activation dynamics; the pressure change emerges from those mechanisms. This matters because the result also depends on support level, the volume reached at occlusion, airway resistance, respiratory-system recoil and whether muscle activity actually settles.
 
 The routine plateau-pressure tile is not measured from this hold. During PSV it remains unavailable because an ordinary assisted breath has no passive plateau. The hold must instead be read directly on the Paw waveform: a stable level after zero flow is the relevant observation.
