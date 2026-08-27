@@ -14,7 +14,7 @@ The separate $P_L$ strip is a graphical choice, not a different equation. On one
 
 The third strip shows systemic arterial, pulmonary arterial and central venous pressure in mmHg. The bottom strip shows lung volume above the calculated resting reference in mL. Light vertical bands identify inspiration in all four strips, allowing events to be aligned without mentally matching different time axes.
 
-The rail on the right mixes two kinds of readout deliberately. Paw, Palv, Ppl and $P_L$ show the current model state at the rail's readable update rate. During passive ventilation, Paw retains the calculated Pplat in parentheses as breath-level context; during PSV or spontaneous effort, Paw remains visible but Pplat is omitted because a passive plateau is not interpretable. The Ppl row similarly keeps the latest breath's swing in parentheses. Systemic and pulmonary systolic/diastolic pressure, CVP and tidal volume remain the slower summaries used in the numerical tiles. $P_L$ is placed in the second rail beside its own curve. The curves themselves remain continuous at the model's trace sampling rate.
+The rail on the right mixes two kinds of readout deliberately. Paw, Palv, Ppl and $P_L$ show the current model state at the rail's readable update rate. During passive ventilation, Paw retains the calculated Pplat in parentheses as breath-level context. During PSV or spontaneous effort, the routine Pplat is omitted because an ordinary assisted breath has no passive plateau. An [end-inspiratory hold](manoeuvres.md#what-an-inspiratory-hold-shows-during-pressure-support) can still reveal a plateau if flow is zero and muscle activity relaxes; that level is read directly from the live Paw trace rather than inserted into the routine tile. The Ppl row similarly keeps the latest breath's swing in parentheses. Systemic and pulmonary systolic/diastolic pressure, CVP and tidal volume remain the slower summaries used in the numerical tiles. $P_L$ is placed in the second rail beside its own curve. The curves themselves remain continuous at the model's trace sampling rate.
 
 During PSV, the help panel also reports trigger delay and whether the latest completed breath cycled before neural inspiration ended. **Early cycling** means Paw has returned to PEEP while inspiratory drive is still present; Ppl can therefore continue to fall during the ventilator's expiratory phase. “No early cycling detected” is deliberately narrower than “fully synchronous”: the model does not classify every form of asynchrony.
 
@@ -27,6 +27,7 @@ Respiratory and vascular pressures deliberately do not share an axis. Their unit
 - In spontaneous breathing at Paw zero, watch Palv become negative during inspiration and positive during expiration. This Paw–Palv gradient explains why $P_L$ is not an exact mirror of Ppl while gas is flowing.
 - In volume control, compare how Paw, Palv, Ppl and $P_L$ divide the pressure required to deliver the rising volume.
 - In pressure support, look for a small fall in Ppl before Paw rises. If Ppl continues to fall after Paw returns to PEEP, open the values panel and check for early cycling.
+- During an inspiratory hold in pressure support, follow the zero-flow Paw level as inspiratory activity relaxes: an initial resistive drop may precede a rise toward the passive plateau.
 - With flow limitation, identify incomplete return of lung volume before the next breath and compare it with auto-PEEP.
 - After changing RV load, look for the delayed left-sided arterial response over subsequent beats rather than expecting an immediate mirror image.
 
@@ -40,6 +41,7 @@ The panel shows no airflow trace. Expiratory flow limitation must be inferred fr
 
 - The traces are noise-free internal signals: no catheter resonance, damping, transducer levelling error, airway leak or monitor filtering is simulated.
 - The panel does not plot flow, so PSV trigger and cycling are reported numerically rather than marked directly on a flow waveform.
+- Because flow is not plotted, a flat assisted-hold pressure must not be treated as a complete bedside validity check; zero flow is imposed internally by the model.
 - Arterial pressure is a central model compartment, not a peripheral waveform.
 - The 12-second window can conceal slower adaptation, including the 15-second aggregate baroreflex.
 - Automatic rescaling means screen height cannot be compared between widely separated states without reading the axes.

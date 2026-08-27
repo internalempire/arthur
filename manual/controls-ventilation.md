@@ -60,6 +60,8 @@ The decay time is derived from the available expiratory time, so rate and inspir
 
 Non-zero effort during positive-pressure ventilation makes PPV unavailable because the passive controlled-breath assumptions are absent. In PSV, continued inspiratory drive after ventilator cycling is distinguished from the slower post-inspiratory decay that begins after neural switch-off. The model does not calculate clinical work of breathing.
 
+If an [end-inspiratory hold](manoeuvres.md#what-an-inspiratory-hold-shows-during-pressure-support) is applied during PSV, flow stops at the end-inspiratory volume while this same muscle state continues to evolve. Relaxation makes Ppl less negative and can raise Paw toward a passive plateau. The model displays that pressure trajectory but does not convert it into a separate pressure muscle index.
+
 ## Why these controls
 
 The set exposes the minimum respiratory inputs needed to distinguish negative- from positive-pressure breathing, volume from pressure targeting and adequate from incomplete expiration. More detailed ventilator controls would shift attention toward device engineering rather than heart–lung interaction.
@@ -69,6 +71,7 @@ The set exposes the minimum respiratory inputs needed to distinguish negative- f
 - No selectable flow waveform, trigger sensitivity, pressure rise, cycling percentage or pause time. PSV uses one fixed trigger, rise time and cycling percentage.
 - Volume control uses constant flow throughout inspiration and has no inspiratory pause.
 - Pressure support can represent trigger delay from intrinsic PEEP, ineffective effort and early cycling. It does not model auto-triggering, double triggering, late-cycling classification, leaks, circuit compliance or ventilator-specific servo behaviour.
+- Assisted inspiratory holds assume a leak-free occlusion and regular relaxation. A bedside plateau may be unreadable when muscle activity persists or recurs; the model does not reproduce agitation or irregular drive.
 - Post-inspiratory activity is one aggregate, regular decay. It is not diaphragm electrical activity, a patient-specific neural controller or active abdominal expiration.
 - No gas exchange, oxygen concentration, dead space, respiratory drive controller or sedation.
 - Control ranges are model operating ranges, not recommended ventilator settings.

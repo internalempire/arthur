@@ -229,6 +229,64 @@ section('Occlusion manoeuvres');
   check('no gas moves during a hold', maxFlow === 0, `peak |flow| ${maxFlow}`);
   check('the airway reads alveolar pressure during a hold', airwayMatchesAlveolar);
 
+  // In assisted ventilation the end-inspiratory occlusion is also a respiratory
+  // mechanics experiment. Closing the airway removes flow while preserving the
+  // end-inspiratory volume; the subsequent rise toward passive recoil must come
+  // from muscle relaxation, not from a separately scripted PMI calculation.
+  const assistedOcclusion = (effort) => {
+    const a = new Simulator({ dt: 0.001 });
+    a.params = {
+      ...defaultParams(), mode: 'psv', rr: 14, pinsp: 14, peep: 5,
+      ti: 1.2, pmus: effort, clung: 85, raw: 5,
+    };
+    a.reset();
+    a.advance(30, true);
+    a.startHold('inspiratory', 5);
+
+    let startPaw = null;
+    let immediatePaw = null;
+    let heldVolume = null;
+    let plateauPaw = null;
+    let plateauPmus = null;
+    let maxVolumeChange = 0;
+    let maxHeldFlow = 0;
+    for (let i = 0; i < 10000; i++) {
+      a.advance(0.005, true);
+      if (!a.resp.hold) continue;
+      if (startPaw === null) {
+        startPaw = a.resp.holdStartPaw;
+        immediatePaw = a.resp.paw;
+        heldVolume = a.resp.v;
+      }
+      maxVolumeChange = Math.max(maxVolumeChange, Math.abs(a.resp.v - heldVolume));
+      maxHeldFlow = Math.max(maxHeldFlow, Math.abs(a.resp.flow));
+      if (a.resp.holdElapsed >= 4) {
+        plateauPaw = a.resp.paw;
+        plateauPmus = a.resp.pmus;
+        break;
+      }
+    }
+    return {
+      startPaw, immediatePaw, plateauPaw, plateauPmus,
+      rise: plateauPaw - startPaw, maxVolumeChange, maxHeldFlow,
+    };
+  };
+
+  const moderateEffort = assistedOcclusion(6);
+  const strongEffort = assistedOcclusion(10);
+  check('an assisted inspiratory hold closes before expiratory volume loss',
+    strongEffort.maxHeldFlow === 0 && strongEffort.maxVolumeChange < 1e-12,
+    `flow ${strongEffort.maxHeldFlow}, volume drift ${strongEffort.maxVolumeChange}`);
+  check('occlusion removes the resistive pressure before muscle relaxation raises Paw',
+    strongEffort.immediatePaw < strongEffort.startPaw
+      && strongEffort.plateauPaw > strongEffort.startPaw + 4
+      && strongEffort.plateauPmus < 0.2,
+    `${strongEffort.immediatePaw.toFixed(2)} -> ${strongEffort.plateauPaw.toFixed(2)} cmH2O, `
+      + `Pmus ${strongEffort.plateauPmus.toFixed(2)} cmH2O`);
+  check('greater inspiratory effort produces a larger occlusion pressure rise',
+    strongEffort.rise > moderateEffort.rise + 2,
+    `${moderateEffort.rise.toFixed(2)} -> ${strongEffort.rise.toFixed(2)} cmH2O`);
+
   // Several holds at rising airway pressures must trace a falling line.
   const t = new Simulator();
   t.advance(20, true);
