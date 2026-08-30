@@ -26,7 +26,7 @@ A central venous catheter reports pressure referenced to atmosphere. Right ventr
 
 The measured number and the transmural estimate can therefore move in **opposite directions**. The magnitude and even the net change depend on volume status, chest-wall mechanics, pericardial constraint and the timing of measurement, so the example should be used as a mechanism rather than a universal rule.
 
-The same reasoning explains why raised intrathoracic pressure unloads the left ventricle. Left ventricular afterload is the transmural systolic pressure it must generate — aortic pressure minus pleural pressure. Raising pleural pressure lowers that difference at constant arterial pressure, which is why positive pressure can help a failing left ventricle and why removing it at extubation can precipitate failure. The model demonstrates the first mechanism in [cardiogenic pulmonary oedema](scenarios.md#cardiogenic-pulmonary-oedema); it does not retain a weaning preset because it cannot reproduce enough of the second syndrome faithfully.
+The same reasoning explains why raised intrathoracic pressure unloads the left ventricle. Left ventricular afterload is the transmural systolic pressure it must generate — aortic pressure minus pleural pressure. Raising pleural pressure lowers that difference at constant arterial pressure, which is why positive pressure can help a failing left ventricle and why removing it at extubation can precipitate failure. The model demonstrates the first mechanism in [LV failure](scenarios.md#lv-failure); it does not retain a weaning preset because it cannot reproduce enough of the second syndrome faithfully.
 
 ---
 

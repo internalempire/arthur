@@ -57,6 +57,8 @@ $$
 
 The interface therefore gives these pressures different visual roles. The pleural-pressure tile and waveform rail put the current Ppl in the foreground and retain the latest breath's swing as secondary context. A Palv tile and curve expose the pressure inside the alveolar compartment and its gradient from Paw. A separate $P_L$ tile and trace show the pressure across the lung. This keeps “pressure at the airway”, “pressure inside the alveoli”, “pressure around the circulation” and “pressure distending the lung” distinct.
 
+Because the model uses Palv and Ppl directly, its dynamic $P_L$ trace is not the same construction as the clinical surrogate $P_{aw}-P_{es}$ while gas is flowing. Paw still contains the pressure lost across airway resistance, and Pes is a regional estimate rather than the global Ppl known by the model. The two approach one another during a valid zero-flow pause. See [the waveform panel](panel-waveforms.md#why-the-model-trace-can-differ-from-bedside-dynamic-pl).
+
 The default curve is calibrated so that at the normal 2.2 L reference, $P_{cw}=-5$ cmH₂O and the local slope corresponds to 200 mL/cmH₂O. Its relaxed zero-recoil volume is higher, near 3.2 L: below that volume the wall tends outward; above it the wall tends inward. These are model reference values, not universal patient normals.
 
 `Chest wall compliance` changes the local slope. `Chest wall load` adds a pressure offset without changing that selected slope. The two controls are kept separate because they have different consequences:

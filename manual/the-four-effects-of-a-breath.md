@@ -14,7 +14,7 @@ One positive-pressure inspiration does four things at once. Taken separately eac
 
 **3 · Left ventricular preload can rise briefly before falling.** Inflation can squeeze blood out of the pulmonary vascular bed toward the left atrium — the *piston* effect — while the reduced right ventricular output arrives later. The observed sequence depends on pulmonary vascular volume, zone conditions, flow and transit time; the early rise is not obligatory in every patient.
 
-**4 · Left ventricular afterload falls.** The transmural systolic pressure the left ventricle must generate is aortic pressure minus pleural pressure — see [transmural pressure](transmural-pressure.md). Raising pleural pressure lowers it, so a given contraction can eject more. The afterload-dominant response is demonstrated in [cardiogenic pulmonary oedema](scenarios.md#cardiogenic-pulmonary-oedema); the net response still depends on the simultaneous loss of preload.
+**4 · Left ventricular afterload falls.** The transmural systolic pressure the left ventricle must generate is aortic pressure minus pleural pressure — see [transmural pressure](transmural-pressure.md). Raising pleural pressure lowers it, so a given contraction can eject more. The afterload-dominant response is demonstrated in [LV failure](scenarios.md#lv-failure); the net response still depends on the simultaneous loss of preload.
 
 ### Why the timing matters
 

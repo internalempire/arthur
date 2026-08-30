@@ -71,13 +71,15 @@ The preset's opening-range centre is 21 cmH₂O. This is not a proposed clinical
 
 **Read.** The constrained state raises a shared external pressure, brings the main diastolic pressures into a broad common range and restricts the lower-pressure RV proportionally more than the LV. Restoring capacity represents decompression: pericardial pressure and CVP fall while both ventricles refill and output rises. The capacity is not an effusion-volume estimate, and the scenario does not provide a calibrated pulsus-paradoxus threshold. See [cardiac tamponade](cardiac-tamponade.md) and [ventricular interdependence](ventricular-interdependence.md).
 
-### Cardiogenic pulmonary oedema
+### LV failure
 
 **Question.** Can positive intrathoracic pressure increase output when a failing left ventricle is more afterload-sensitive than preload-dependent?
 
 **Try.** Start from the preset at PEEP 10, set PEEP to zero and allow the model to settle, then return PEEP to 10. Compare several respiratory cycles rather than one beat. Follow the LV pressure–volume loop, end-diastolic and end-systolic volume, pleural pressure and output.
 
-**Read.** This is a deliberately severe, afterload-dominant phenotype with low LV contractility, high diastolic stiffness, high filling pressure and a stiff thoracic envelope. PEEP raises pleural pressure, reducing the [transmural pressure](transmural-pressure.md) required for LV ejection. End-diastolic volume falls slightly, but end-systolic volume falls more and respiratory-cycle-averaged output rises by about 9%. This demonstrates one possible response; a more preload-dependent patient can show no gain or a fall.
+**Read.** This is a deliberately severe, afterload-dominant phenotype with low LV contractility, high diastolic stiffness, high filling pressure and a stiff thoracic envelope. PEEP raises pleural pressure, reducing the [transmural pressure](transmural-pressure.md) required for LV ejection. End-diastolic volume falls slightly, but end-systolic volume falls more and respiratory-cycle-averaged output rises. This demonstrates one possible response; a more preload-dependent failing ventricle can show no gain or a fall.
+
+The preset isolates that mechanical competition. It does **not** create hydrostatic pulmonary oedema from the high filling pressure and does not add the associated fall in lung compliance, loss of aerated volume, rise in airway resistance, gas-exchange impairment or compensatory respiratory drive. Those variables remain independently selectable so the same cardiac phenotype can be studied with different lungs and ventilatory patterns. The name therefore describes LV failure, not a complete cardiogenic-pulmonary-oedema syndrome.
 
 ### Stiff chest wall
 
@@ -203,7 +205,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Cardiac function | Pericardial constraint | 1.0 × | 4.0 × |
 | Cardiac function | Pericardial capacity | 430 mL | 100 mL |
 
-#### Cardiogenic pulmonary oedema
+#### LV failure
 
 | domain | control | model reference | preset value |
 |---|---|---:|---:|
@@ -251,7 +253,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 
 These tables describe how each starting phenotype is assembled, not what every control means or what outcome it guarantees. The control pages explain the mechanisms in more detail: [ventilation](controls-ventilation.md), [respiratory mechanics](controls-mechanics.md), [volume and vascular tone](controls-volume.md), [heart](controls-heart.md) and [pulmonary circulation](controls-pulmonary.md).
 
-Two presets have an explicit intervention contract beyond their settled snapshot. In cardiogenic pulmonary oedema, the PEEP 0-to-10 comparison requires mean output to rise, LV transmural end-systolic pressure to fall, and end-systolic volume to fall more than end-diastolic volume. In cardiac tamponade, restoring pericardial capacity must lower pericardial pressure and CVP, increase pressure and output, and restore proportionally more RV than LV end-diastolic volume. These conditions distinguish the proposed mechanisms from a plausible-looking resting state.
+Two presets have an explicit intervention contract beyond their settled snapshot. In LV failure, the PEEP 0-to-10 comparison requires mean output to rise, LV transmural end-systolic pressure to fall, and end-systolic volume to fall more than end-diastolic volume. In cardiac tamponade, restoring pericardial capacity must lower pericardial pressure and CVP, increase pressure and output, and restore proportionally more RV than LV end-diastolic volume. These conditions distinguish the proposed mechanisms from a plausible-looking resting state.
 
 The former weaning preset was removed. A matched experiment did not reproduce the expected rise in filling pressure or fall in output, and the model lacks work of breathing, myocardial oxygen demand, sympathetic activation, ischaemia, dynamic mitral regurgitation, fluid redistribution and time-dependent pulmonary oedema. The physiology of weaning-induced pulmonary oedema is real; a preset that merely carries its name without generating enough of its mechanism is not useful teaching.
 

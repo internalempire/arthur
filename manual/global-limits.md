@@ -70,7 +70,7 @@ Controls do not represent drug dose. Fluid is placed instantaneously in the veno
 
 PPV and SVV are descriptive and deliberately not tied to a diagnostic fluid-responsiveness threshold. There is no tidal-volume challenge because the model is not quantitatively calibrated to its proposed PPV increment. R/I is a teaching analogue of a fixed PEEP manoeuvre and can be bounded by available collapsed lung. Preload reserve is the slope of an analytic model curve, not a validated bedside index.
 
-Every scenario is a phenotype designed around one question. None contains the full disease named in its title. ARDS lacks gas exchange, inflammatory and thrombotic biology; COPD lacks regional obstruction; sepsis lacks endothelial and organ physiology; LV failure lacks fluid kinetics and mitral regurgitation; pulmonary embolism lacks explicit clot; tamponade lacks pericardial fluid dynamics and diagnostic imaging. Prone position is a coarse immediate transformation. The weaning scenario was removed because too much of its causal physiology was missing.
+Every scenario is a phenotype designed around one question. None contains the full disease named in its title. ARDS lacks gas exchange, inflammatory and thrombotic biology; COPD lacks regional obstruction; sepsis lacks endothelial and organ physiology; LV failure does not generate hydrostatic pulmonary oedema from filling pressure and lacks fluid kinetics and mitral regurgitation; pulmonary embolism lacks explicit clot; tamponade lacks pericardial fluid dynamics and diagnostic imaging. Prone position is a coarse immediate transformation. The weaning scenario was removed because too much of its causal physiology was missing.
 
 ## Validation boundary
 
