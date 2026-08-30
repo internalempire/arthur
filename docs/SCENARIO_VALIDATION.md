@@ -233,18 +233,22 @@ constrictive physiology. The aggregate IVC compartment does reproduce a dilated
 conduit with a smaller but non-zero displayed respiratory excursion; this is a
 directional volume-based schematic rather than a diagnostic ultrasound sign.
 
-## Cardiogenic pulmonary oedema (`lv-failure`)
+## LV failure (`lv-failure`)
 
 **Teaching question.** Why can positive intrathoracic pressure unload a failing
 left ventricle even while it impairs venous return?
 
 **What the model produces.** This is now an intentionally severe, afterload-sensitive phenotype: low LV end-systolic elastance, high diastolic stiffness, high filling pressure and a stiff thoracic envelope that transmits airway pressure to the pleural space. In a settled, respiratory-cycle-averaged comparison, PEEP 0 → 10 cmH2O raises output by about 17%. LV end-diastolic volume falls slightly, but end-systolic volume falls more, while transmural end-systolic pressure falls by about 7.5 mmHg. The higher stroke volume therefore emerges despite less filling, which is the signature that the demonstration is intended to expose.
 
-**Assessment — qualified.** The reduction in LV transmural ejection pressure is encoded and the causal direction is physiologically sound. The phenotype was deliberately selected so afterload relief exceeds the simultaneous loss of venous return; it must not be presented as the expected response of every patient with cardiogenic pulmonary oedema. A less afterload-sensitive or more preload-dependent failing ventricle can show no output gain or a fall. Clinical improvement also comes from reduced work of breathing and improved oxygenation, neither of which is an outcome in the model.
+**Assessment — qualified.** The reduction in LV transmural ejection pressure is encoded and the causal direction is physiologically sound. The phenotype was deliberately selected so afterload relief exceeds the simultaneous loss of venous return; it must not be presented as the expected response of every failing ventricle. A less afterload-sensitive or more preload-dependent ventricle can show no output gain or a fall. The preset is an isolated mechanical LV-failure experiment, not a complete clinical syndrome.
 
-**Not represented.** Mitral regurgitation, coronary perfusion/ischaemia,
-sympathetic work of breathing, alveolar fluid clearance, oxygenation and
-drug-device interactions.
+**Not represented.** High filling pressure does not generate hydrostatic
+pulmonary oedema. The preset therefore does not acquire oedema-related loss of
+aerated volume or compliance, increased airway resistance, impaired gas
+exchange, increased respiratory drive or work of breathing. Mitral
+regurgitation, coronary perfusion/ischaemia, alveolar fluid clearance and
+drug-device interactions are also absent. Respiratory and cardiac controls
+remain independently selectable by design.
 
 ## Stiff chest wall (`obesity`)
 

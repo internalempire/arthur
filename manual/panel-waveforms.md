@@ -12,6 +12,24 @@ The strip immediately below shows transpulmonary pressure ($P_L=P_{alv}-P_{pl}$)
 
 The separate $P_L$ strip is a graphical choice, not a different equation. On one shared numerical axis, positive $P_L$ would correctly appear above a near-zero Paw and a negative Ppl. Giving it a time-aligned strip below Paw and Ppl preserves the true value while keeping the visual and numerical reading order consistent.
 
+### Why the model trace can differ from bedside dynamic $P_L$
+
+The model knows the pressure inside its alveolar compartment and therefore displays the pressure actually acting across the lung:
+
+$$
+P_L=P_{alv}-P_{pl}
+$$
+
+At the bedside, pleural pressure is commonly approximated with oesophageal pressure and alveolar pressure cannot be measured continuously. During assisted ventilation, the dynamic quantity is therefore often plotted as:
+
+$$
+P_{L,aw}=P_{aw}-P_{es}
+$$
+
+These are not identical while gas is flowing. Paw includes the pressure needed to overcome airway resistance, whereas Palv is the pressure after that resistive drop. The bedside Paw-minus-Pes trace therefore contains both lung-distending pressure and the airway-resistive component. During a valid zero-flow pause, Paw and Palv equilibrate and the two constructions approach the same static value, apart from the fact that Pes remains a regional and imperfect surrogate for Ppl.
+
+This distinction explains why a published dynamic Paw−Pes waveform need not have exactly the same contour or amplitude as the model's Palv−Ppl waveform. It is a difference in what is being plotted, not an alternative equation for the model state.
+
 The third strip shows systemic arterial, pulmonary arterial and central venous pressure in mmHg. The bottom strip shows lung volume above the calculated resting reference in mL. Light vertical bands identify inspiration in all four strips, allowing events to be aligned without mentally matching different time axes.
 
 The rail on the right mixes two kinds of readout deliberately. Paw, Palv, Ppl and $P_L$ show the current model state at the rail's readable update rate. During passive ventilation, Paw retains the calculated Pplat in parentheses as breath-level context. During PSV or spontaneous effort, the routine Pplat is omitted because an ordinary assisted breath has no passive plateau. An [end-inspiratory hold](manoeuvres.md#what-an-inspiratory-hold-shows-during-pressure-support) can still reveal a plateau if flow is zero and muscle activity relaxes; that level is read directly from the live Paw trace rather than inserted into the routine tile. The Ppl row similarly keeps the latest breath's swing in parentheses. Systemic and pulmonary systolic/diastolic pressure, CVP and tidal volume remain the slower summaries used in the numerical tiles. $P_L$ is placed in the second rail beside its own curve. The curves themselves remain continuous at the model's trace sampling rate.

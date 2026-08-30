@@ -139,4 +139,4 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 
 ## See also
 
-[Ventricular interdependence](ventricular-interdependence.md) · [The right ventricle](the-right-ventricle.md) · [Transmural pressure](transmural-pressure.md) · [The PV loop panel](panel-pv-loops.md) · [Interpretability](interpretability.md) · [Controls: heart](controls-heart.md) · [Cardiogenic pulmonary oedema](scenarios.md#cardiogenic-pulmonary-oedema)
+[Ventricular interdependence](ventricular-interdependence.md) · [The right ventricle](the-right-ventricle.md) · [Transmural pressure](transmural-pressure.md) · [The PV loop panel](panel-pv-loops.md) · [Interpretability](interpretability.md) · [Controls: heart](controls-heart.md) · [LV failure](scenarios.md#lv-failure)

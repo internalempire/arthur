@@ -198,7 +198,7 @@ $$
 - $P_{alv}$ — alveolar pressure, in cmH₂O;
 - $P_{pl}$ — pleural pressure, in cmH₂O.
 
-The subtitle prints the two pressures used in the subtraction. Keeping $P_L$ separate from Ppl distinguishes the pressure that distends the lung from the pressure surrounding the circulation. It is an exact global model state, not an oesophageal-pressure measurement and not a regional estimate of lung stress.
+The subtitle prints the two pressures used in the subtraction. Keeping $P_L$ separate from Ppl distinguishes the pressure that distends the lung from the pressure surrounding the circulation. It is an exact global model state, not an oesophageal-pressure measurement and not a regional estimate of lung stress. During flow it can differ from the bedside dynamic estimate $P_{aw}-P_{es}$ because that estimate includes the resistive Paw-to-Palv pressure drop. The [waveform page](panel-waveforms.md#why-the-model-trace-can-differ-from-bedside-dynamic-pl) explains when the two constructions converge.
 
 Related pages: [Pleural pressure](pleural-pressure.md) · [The Campbell diagram](panel-campbell.md) · [The waveform panel](panel-waveforms.md)
 

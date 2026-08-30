@@ -185,7 +185,7 @@ Scenarios are starting phenotypes built around one teaching question. They are n
 | ARDS with right ventricular failure | How does recruitability alter the haemodynamic cost of PEEP? |
 | Acute pulmonary embolism | How does aggregate pulmonary vascular load affect a vulnerable RV? |
 | Cardiac tamponade | How does lost pericardial capacity couple diastolic pressure, RV filling and output? |
-| Cardiogenic pulmonary oedema | When can reduced LV transmural afterload outweigh lost preload? |
+| LV failure | When can reduced LV transmural afterload outweigh lost preload? |
 | Stiff chest wall | How do wall stiffness and an external thoracic load differ? |
 | COPD with dynamic hyperinflation | How do expiratory time, flow limitation and external PEEP interact? |
 | Intra-abdominal hypertension | How can abdominal pressure both mobilise and obstruct venous return? |

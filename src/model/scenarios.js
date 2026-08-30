@@ -90,8 +90,8 @@ export const SCENARIOS = [
   },
   {
     id: 'lv-failure',
-    name: 'Cardiogenic pulmonary oedema',
-    note: 'Severe, afterload-sensitive left ventricular failure with high filling pressure. Set PEEP to zero, let the model settle, then return it to 10: pleural pressure rises, the transmural pressure the LV must eject against falls, end-systolic volume falls more than end-diastolic volume, and cardiac output rises. This deliberately afterload-dominant phenotype demonstrates a possible response to positive pressure, not a universal response in cardiogenic pulmonary oedema.',
+    name: 'LV failure',
+    note: 'Severe, afterload-sensitive left ventricular failure with high filling pressure. Set PEEP to zero, let the model settle, then return it to 10: pleural pressure rises, the transmural pressure the LV must eject against falls, end-systolic volume falls more than end-diastolic volume, and cardiac output rises. This is an isolated mechanical LV-failure phenotype: it does not generate pulmonary oedema or its effects on lung mechanics, gas exchange or respiratory drive. The afterload-dominant response is one possible effect of positive pressure, not a universal response in LV failure.',
     params: {
       mode: 'vcv', pmus: 0, vt: 450, peep: 10, rr: 18,
       eesLv: 0.6, lvStiff: 0.040, stressedVolume: 1050, svr: 1.25, hr: 95,
