@@ -218,6 +218,14 @@ const TILES = [
     quality: (m) => m.interpretability.wedge,
   },
   {
+    id: 'laTransmural', label: 'LA transmural pressure', unit: 'mmHg', kind: 'measured',
+    get: (m) => m.laTransmural.toFixed(1),
+    sub: () => '3 s mean · LA − Ppl − Pperi',
+    // This is an exact latent model state, not a catheter-derived value. Zone 3
+    // limits the bedside interpretation of PAWP, not the model's ability to
+    // know the pressure across its own left-atrial wall.
+  },
+  {
     id: 'ef', label: 'LV ejection fraction', unit: '%', kind: 'measured',
     get: (m) => m.lvEf.toFixed(0),
     sub: (m) => `SV ${m.sv.toFixed(0)} mL`,
@@ -234,6 +242,7 @@ const STORAGE_KEY = 'arthur.tileLayout';
 const READOUT_MIGRATION_KEY = 'arthur.tileLayout.effective-rate-and-svr';
 const TRANSPULMONARY_MIGRATION_KEY = 'arthur.tileLayout.transpulmonary-pressure';
 const ALVEOLAR_MIGRATION_KEY = 'arthur.tileLayout.alveolar-pressure';
+const LA_TRANSMURAL_MIGRATION_KEY = 'arthur.tileLayout.left-atrial-transmural-pressure';
 
 function insertAfter(ids, anchor, id) {
   if (ids.includes(id)) return;
@@ -270,12 +279,21 @@ function loadLayout() {
         localStorage.setItem(ALVEOLAR_MIGRATION_KEY, 'done');
         changed = true;
       }
+      if (localStorage.getItem(LA_TRANSMURAL_MIGRATION_KEY) !== 'done') {
+        // Place the synchronised distending pressure beside the atmospheric
+        // wedge surrogate it is meant to qualify. Add it once, then leave the
+        // user's subsequent visibility and ordering choices untouched.
+        insertAfter(saved, 'wedge', 'laTransmural');
+        localStorage.setItem(LA_TRANSMURAL_MIGRATION_KEY, 'done');
+        changed = true;
+      }
       if (changed) localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
       return saved;
     }
     localStorage.setItem(READOUT_MIGRATION_KEY, 'done');
     localStorage.setItem(TRANSPULMONARY_MIGRATION_KEY, 'done');
     localStorage.setItem(ALVEOLAR_MIGRATION_KEY, 'done');
+    localStorage.setItem(LA_TRANSMURAL_MIGRATION_KEY, 'done');
   } catch { /* ignore */ }
   return [...DEFAULT_VISIBLE];
 }

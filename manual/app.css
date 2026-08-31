@@ -233,6 +233,24 @@ main:focus { outline: none; }
 .prose thead th { background: var(--bg-soft); font-weight: 600; }
 .prose tbody tr:nth-child(even) { background: color-mix(in srgb, var(--bg-soft) 55%, transparent); }
 
+/* Worked examples remain available without interrupting the physiological
+   argument. A single rule and explicit focus state preserve the manual's quiet
+   hierarchy while keeping the native disclosure keyboard-accessible. */
+.prose details {
+  margin: 0 0 1rem;
+  border-block: 1px solid var(--rule);
+}
+.prose details + details { margin-top: -1px; }
+.prose details > summary {
+  padding: .75rem .2rem;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+.prose details > summary:hover { color: var(--accent); }
+.prose details > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.prose details[open] > summary { margin-bottom: .75rem; }
+
 .prose figure { margin: 0 0 1.6rem; }
 .prose img, .prose svg { display: block; max-width: 100%; height: auto; }
 

@@ -156,6 +156,15 @@ section('Pulmonary vascular claims exposed to the user stay qualified');
     waterfall.interpretability.wedge.level === 'caution'
       && waterfall.interpretability.pvrDerived.level === 'caution'
       && waterfall.interpretability.pvrDerived.reasons[0].includes('wedge surrogate'));
+
+  const wedgePage = readFileSync(new URL('../../manual/pulmonary-artery-wedge-pressure.md', import.meta.url), 'utf8');
+  const limitsPage = readFileSync(new URL('../../manual/global-limits.md', import.meta.url), 'utf8');
+  check('wedge teaching examples remain executable and use a synchronised transmural readout',
+    wedgePage.includes('BEGIN GENERATED: wedge-peep-examples')
+      && wedgePage.includes('LA transmural pressure')
+      && wedgePage.includes('same three-second interval'));
+  check('the corrected ventricular activation retired the old systematic EF warning',
+    !limitsPage.includes('5–10 percentage points lower'));
 }
 
 section('PPV remains descriptive rather than a filling-state verdict');

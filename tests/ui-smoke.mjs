@@ -109,12 +109,13 @@ check('baroreflex uses the same Off/On selector as recruitment hysteresis',
 check('effective heart rate and systemic resistance remain available as tiles',
   /id: 'hr'/.test(stats) && /id: 'svr'/.test(stats));
 const pressureMetrics = {
-  valid: true, ppl: -5.2, pplSwing: 7.8, pl: 6.1, palv: 0.9,
+  valid: true, ppl: -5.2, pplSwing: 7.8, pl: 6.1, palv: 0.9, laTransmural: 8.7,
 };
-check('respiratory-pressure tiles expose instantaneous Ppl, Palv and PL',
+check('pressure tiles expose instantaneous respiratory pressures and mean LA transmural pressure',
   tilePrimaryValue('ppl', pressureMetrics) === '-5.2'
     && tilePrimaryValue('palv', pressureMetrics) === '0.9'
-    && tilePrimaryValue('pl', pressureMetrics) === '6.1');
+    && tilePrimaryValue('pl', pressureMetrics) === '6.1'
+    && tilePrimaryValue('laTransmural', pressureMetrics) === '8.7');
 const passiveAirway = {
   valid: true, paw: 8.4, pplat: 14.2,
   interpretability: { plateau: { level: 'ok' } },

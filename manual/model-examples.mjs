@@ -91,6 +91,7 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/cardiac-tamponade.md', ids: ['cardiac-tamponade'] },
   { file: 'manual/inferior-vena-cava.md', ids: ['ivc-respiratory-calibre'] },
   { file: 'manual/pmsf-and-occlusions.md', ids: ['pmsf-occlusions'] },
+  { file: 'manual/pulmonary-artery-wedge-pressure.md', ids: ['wedge-peep-examples'] },
   { file: 'manual/scenarios.md', ids: ['scenario-overrides'] },
 ];
 
@@ -164,6 +165,76 @@ function venousReturnBlock(rows) {
     '| PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |',
     '|---:|---:|---:|---:|',
     ...rows.map(({ peep, metrics }) => `| ${peep} | ${fixed(metrics.pmsf, 1)} | ${fixed(metrics.respiratoryOperatingPoint.pra, 1)} | ${fixed(metrics.co, 2)} |`),
+  ].join('\n');
+}
+
+function wedgeExampleState(overrides, peep) {
+  const simulator = settledSimulator({ ...overrides, peep });
+  return {
+    metrics: simulator.metrics,
+    meanPpl: simulator.ema.ppl,
+    laVolume: simulator.circ.vLa,
+  };
+}
+
+function wedgeExampleDetails(title, setup, overrides, peepLevels, conclusion) {
+  const states = peepLevels.map((peep) => ({
+    peep,
+    ...wedgeExampleState(overrides, peep),
+  }));
+  return [
+    '<details>',
+    `<summary>${title}</summary>`,
+    '',
+    `*${setup} Each PEEP level is settled independently for ${SETTLING_SECONDS} s.*`,
+    '',
+    '| PEEP (cmH₂O) | wedge surrogate (mmHg) | mean Ppl (mmHg) | mean Pperi (mmHg) | LA transmural (mmHg) | LA volume (mL) | LVEDV (mL) | CO (L/min) | zone 3 index |',
+    '|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
+    ...states.map(({ peep, metrics, meanPpl, laVolume }) => `| ${peep} | ${fixed(metrics.paop, 1)} | ${fixed(meanPpl, 1)} | ${fixed(metrics.pPeri, 1)} | ${fixed(metrics.laTransmural, 1)} | ${Math.round(laVolume)} | ${Math.round(metrics.lvEdv)} | ${fixed(metrics.co, 2)} | ${Math.round(metrics.zone3 * 100)}% |`),
+    '',
+    conclusion(states),
+    '',
+    '</details>',
+  ].join('\n');
+}
+
+function wedgePeepExamplesBlock() {
+  const passive = { mode: 'vcv', pmus: 0, vt: 450, rr: 14 };
+  const lvFailure = SCENARIOS.find(({ id }) => id === 'lv-failure');
+  if (!lvFailure) throw new Error('wedge examples: LV failure scenario is missing');
+
+  return [
+    wedgeExampleDetails(
+      'Example 1 — normal passive circulation: the wedge rises while filling falls',
+      'Passive volume control, VT 450 mL and 14/min.',
+      passive,
+      [0, 15],
+      ([zero, high]) => `The wedge surrogate rises by ${fixed(high.metrics.paop - zero.metrics.paop, 1)} mmHg, but LA transmural pressure falls by ${fixed(zero.metrics.laTransmural - high.metrics.laTransmural, 1)} mmHg and LVEDV falls by ${Math.round(zero.metrics.lvEdv - high.metrics.lvEdv)} mL. The higher atmospheric pressure therefore reflects external pressure transmission, not greater left-heart filling. At PEEP 15 the zone 3 index also removes an unqualified catheter-like interpretation.`,
+    ),
+    '',
+    wedgeExampleDetails(
+      'Example 2 — stiff chest wall: stronger pressure transmission and preload loss',
+      'The same passive breath with chest-wall compliance reduced to 75 mL/cmH₂O.',
+      { ...passive, ccw: 75 },
+      [0, 15],
+      ([zero, high]) => `The stiffer thoracic envelope transmits a larger pressure rise around the heart. LA transmural pressure falls by ${fixed(zero.metrics.laTransmural - high.metrics.laTransmural, 1)} mmHg, LVEDV by ${Math.round(zero.metrics.lvEdv - high.metrics.lvEdv)} mL and output by ${fixed(zero.metrics.co - high.metrics.co, 2)} L/min despite the higher wedge surrogate.`,
+    ),
+    '',
+    wedgeExampleDetails(
+      'Example 3 — LV failure: PEEP can lower congestion and raise output',
+      'The LV-failure preset, compared at PEEP 0 and 10 cmH₂O.',
+      lvFailure.params,
+      [0, 10],
+      ([zero, high]) => `Here the wedge surrogate falls by ${fixed(zero.metrics.paop - high.metrics.paop, 1)} mmHg while output rises by ${fixed(high.metrics.co - zero.metrics.co, 2)} L/min. This is not recruitment of preload: it is the preset's intended afterload-dominant response, in which higher pleural pressure reduces the transmural load faced by the failing LV.`,
+    ),
+    '',
+    wedgeExampleDetails(
+      'Example 4 — severe underfilling: the number remains visible after its catheter meaning weakens',
+      'The normal passive setup with stressed volume reduced to 300 mL.',
+      { ...passive, stressedVolume: 300 },
+      [0, 15],
+      ([zero, high]) => `The wedge surrogate rises by ${fixed(high.metrics.paop - zero.metrics.paop, 1)} mmHg while LA transmural pressure, LVEDV and output all fall. The zone 3 index is already ${Math.round(zero.metrics.zone3 * 100)}% at zero PEEP and falls further with PEEP, so both wedge and derived PVR must be read with caution throughout this comparison.`,
+    ),
   ].join('\n');
 }
 
@@ -447,6 +518,7 @@ export function renderDocumentedExampleBlocks() {
     ['lung-wall-equilibrium', lungWallEquilibriumBlock()],
     ['pulmonary-transit', pulmonaryTransitBlock()],
     ['pmsf-occlusions', pmsfOcclusionBlock()],
+    ['wedge-peep-examples', wedgePeepExamplesBlock()],
     ['cardiac-tamponade', cardiacTamponadeBlock()],
     ['ivc-respiratory-calibre', ivcRespiratoryBlock()],
     ['scenario-overrides', scenarioOverridesBlock()],

@@ -47,8 +47,6 @@ The pulmonary-embolism scenario therefore raises one aggregate vascular load. It
 - One systemic arterial and one venous reservoir replace organ beds, regional autoregulation, capillary exchange and microcirculation.
 - No renal fluid balance, hormonal control, vascular stress relaxation or long-term remodelling.
 
-Ejection fraction is typically around 5–10 percentage points lower than intended even when stroke volume, output and loop shape are plausible. Treat it as a model measurement, not an echocardiographic calibration.
-
 ## Autonomic and therapeutic limits
 
 One bounded 15-second sympathetic signal senses filtered systemic MAP and changes heart rate, SVR, venous tone and contractility together. There is no separate vagal limb, chemoreflex, cardiopulmonary receptor, afferent response to mPAP/PVR/RV stretch, or effector-specific kinetics.
