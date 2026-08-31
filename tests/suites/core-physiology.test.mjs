@@ -193,6 +193,11 @@ section('Physiological relations');
   check('transmural filling pressure exceeds the measured one when breathing in',
     spont.metrics.cvpTransmural > spont.metrics.cvp,
     `${spont.metrics.cvp.toFixed(1)} vs ${spont.metrics.cvpTransmural.toFixed(1)} mmHg`);
+  check('left atrial transmural pressure uses the wedge averaging interval for every term',
+    near(spont.metrics.laTransmural,
+      spont.metrics.paop - spont.ema.ppl - spont.metrics.pPeri, 1e-9),
+    `${spont.metrics.laTransmural.toFixed(3)} vs `
+      + `${(spont.metrics.paop - spont.ema.ppl - spont.metrics.pPeri).toFixed(3)} mmHg`);
 
   // Ppl and PL are now interrogable waveform states. Record PL explicitly on
   // the common trace clock so a future time cursor can point to one coherent

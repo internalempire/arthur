@@ -618,6 +618,10 @@ export class Simulator {
       co, sv: c.sv, hr: p.hr,
       map, sbp: last.sbp ?? c.p.sa, dbp: last.dbp ?? c.p.sa,
       cvp, cvpTransmural: cvp - ema.ppl - ema.peri,
+      // Keep every term on the wedge tile's three-second clock. Subtracting
+      // instantaneous surrounding pressure from a smoothed LA pressure would
+      // manufacture respiratory swings that belong to different moments.
+      laTransmural: paop - ema.ppl - ema.peri,
       papSys: last.papSys ?? c.p.pa, papDia: last.papDia ?? c.p.pa, papMean, paop,
       rvEdp: last.rvEdp ?? c.p.rv, lvEdp: last.lvEdp ?? c.p.lv,
       ppv, svv,

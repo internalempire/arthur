@@ -1121,3 +1121,32 @@ fixed V0. A physiological ESPVR is more rigorously estimated from a family of
 loops obtained while loading changes, and may be mildly nonlinear. The selected
 Ees remains the intrinsic active-elastance control; the effective displayed
 slope also reflects ventricular interdependence and end-systolic timing.
+
+## 2026-08-31 — Expose mean left-atrial transmural pressure on the wedge clock
+
+### Decision
+
+- Add a separate numerical tile for left-atrial transmural pressure.
+- Calculate it as the three-second mean atmospheric left-atrial pressure minus
+  the three-second mean pleural and pericardial pressures.
+- Keep it independent of the wedge zone-3 badge: the tile is an exact latent
+  chamber state, whereas zone 3 qualifies whether an occluded pulmonary branch
+  could reproduce atmospheric left-atrial pressure clinically.
+- Generate the manual's PEEP examples directly from settled simulations.
+
+### Why
+
+The wedge page asked readers to distinguish transmitted external pressure from
+true left-heart distension but exposed only the atmospheric left-atrial
+surrogate. Reconstructing the difference from a smoothed wedge tile and an
+instantaneous pleural-pressure tile mixed incompatible time intervals and could
+create a false respiratory discrepancy. Applying the same low-pass operator to
+all three terms makes the comparison algebraically and temporally coherent.
+
+### Deliberate limits
+
+Exact knowledge of transmural pressure inside the model is not a new bedside
+measurement. A patient estimate still depends on a valid PAWP and a defensible
+estimate of juxtacardiac external pressure. The tile is a three-second mean, not
+an end-expiratory value or an atrial waveform, and the model still has no
+regional wedge catheter or oesophageal-pressure measurement error.

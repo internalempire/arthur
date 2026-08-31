@@ -97,6 +97,14 @@ $$
 
 This smoothing suppresses atrial and respiratory pulsatility for a readable tile. It is not a simulated catheter waveform, an end-expiratory measurement or an automated selection between the a- and v-waves. The name `paop` in the code is historical; the user-facing label deliberately says **surrogate**.
 
+The separate **LA transmural pressure** tile uses the same three-second interval for all its terms:
+
+$$
+\overline{P}_{LA,tm}=\overline{P}_{LA}-\overline{P}_{pl}-\overline{P}_{peri}
+$$
+
+Because the averaging rule is identical and subtraction is linear, this is also the three-second mean of the instantaneous pressure across the model atrial wall. It is an exact latent model state, not a bedside measurement reconstructed from an oesophageal catheter.
+
 ### How the quality badge is decided
 
 The model cannot identify a regional catheter position. It instead builds a dimensionless **zone 3 index** from the pressure margin between the raw pulmonary venous compartment and alveolar pressure:
@@ -118,7 +126,69 @@ When PEEP rises, follow four quantities rather than the wedge tile alone:
 3. **Left atrial and ventricular volume or LV pressure–volume loop** — did chamber filling actually increase or decrease?
 4. **Zone 3 index and derived-PVR badge** — is the downstream surrogate still defensible for a catheter-like calculation?
 
-The model does not expose left atrial transmural pressure as a separate tile. It can be reconstructed internally from left atrial atmospheric pressure minus pleural and pericardial pressure, but the three-second wedge smoothing and instantaneous surrounding pressures should not be mixed as though they were synchronised bedside measurements.
+The new transmural tile makes the second and third questions easier to separate. Its lack of a zone 3 caution does not validate the wedge: the model knows its own atrial wall pressure exactly even when a real occluded pulmonary arterial branch would no longer transmit left atrial pressure reliably.
+
+### Worked examples
+
+These examples answer the four questions above with complete, reproducible model states. They are collapsed by default so the page can still be read as a physiological explanation rather than as a catalogue of numbers.
+
+<!-- BEGIN GENERATED: wedge-peep-examples -->
+<details>
+<summary>Example 1 — normal passive circulation: the wedge rises while filling falls</summary>
+
+*Passive volume control, VT 450 mL and 14/min. Each PEEP level is settled independently for 45 s.*
+
+| PEEP (cmH₂O) | wedge surrogate (mmHg) | mean Ppl (mmHg) | mean Pperi (mmHg) | LA transmural (mmHg) | LA volume (mL) | LVEDV (mL) | CO (L/min) | zone 3 index |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 7.2 | -3.4 | 0.0 | 10.6 | 71 | 132 | 5.58 | 100% |
+| 15 | 9.1 | 2.0 | 0.0 | 7.1 | 51 | 117 | 4.90 | 0% |
+
+The wedge surrogate rises by 1.9 mmHg, but LA transmural pressure falls by 3.5 mmHg and LVEDV falls by 15 mL. The higher atmospheric pressure therefore reflects external pressure transmission, not greater left-heart filling. At PEEP 15 the zone 3 index also removes an unqualified catheter-like interpretation.
+
+</details>
+
+<details>
+<summary>Example 2 — stiff chest wall: stronger pressure transmission and preload loss</summary>
+
+*The same passive breath with chest-wall compliance reduced to 75 mL/cmH₂O. Each PEEP level is settled independently for 45 s.*
+
+| PEEP (cmH₂O) | wedge surrogate (mmHg) | mean Ppl (mmHg) | mean Pperi (mmHg) | LA transmural (mmHg) | LA volume (mL) | LVEDV (mL) | CO (L/min) | zone 3 index |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 7.0 | -3.1 | 0.0 | 10.1 | 68 | 131 | 5.53 | 100% |
+| 15 | 9.1 | 4.9 | 0.0 | 4.2 | 32 | 97 | 3.99 | 0% |
+
+The stiffer thoracic envelope transmits a larger pressure rise around the heart. LA transmural pressure falls by 6.0 mmHg, LVEDV by 33 mL and output by 1.54 L/min despite the higher wedge surrogate.
+
+</details>
+
+<details>
+<summary>Example 3 — LV failure: PEEP can lower congestion and raise output</summary>
+
+*The LV-failure preset, compared at PEEP 0 and 10 cmH₂O. Each PEEP level is settled independently for 45 s.*
+
+| PEEP (cmH₂O) | wedge surrogate (mmHg) | mean Ppl (mmHg) | mean Pperi (mmHg) | LA transmural (mmHg) | LA volume (mL) | LVEDV (mL) | CO (L/min) | zone 3 index |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 39.0 | -2.8 | 2.3 | 39.5 | 245 | 131 | 1.61 | 100% |
+| 10 | 37.1 | 2.6 | 0.6 | 33.9 | 209 | 127 | 1.88 | 100% |
+
+Here the wedge surrogate falls by 1.9 mmHg while output rises by 0.27 L/min. This is not recruitment of preload: it is the preset's intended afterload-dominant response, in which higher pleural pressure reduces the transmural load faced by the failing LV.
+
+</details>
+
+<details>
+<summary>Example 4 — severe underfilling: the number remains visible after its catheter meaning weakens</summary>
+
+*The normal passive setup with stressed volume reduced to 300 mL. Each PEEP level is settled independently for 45 s.*
+
+| PEEP (cmH₂O) | wedge surrogate (mmHg) | mean Ppl (mmHg) | mean Pperi (mmHg) | LA transmural (mmHg) | LA volume (mL) | LVEDV (mL) | CO (L/min) | zone 3 index |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 | 2.3 | -3.4 | 0.0 | 5.7 | 42 | 107 | 4.42 | 51% |
+| 15 | 5.1 | 2.0 | 0.0 | 3.0 | 26 | 83 | 3.24 | 0% |
+
+The wedge surrogate rises by 2.8 mmHg while LA transmural pressure, LVEDV and output all fall. The zone 3 index is already 51% at zero PEEP and falls further with PEEP, so both wedge and derived PVR must be read with caution throughout this comparison.
+
+</details>
+<!-- END GENERATED: wedge-peep-examples -->
 
 ---
 

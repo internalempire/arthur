@@ -97,6 +97,14 @@ The subtitle reports a **zone 3 index**, a normalised pulmonary-venous-to-alveol
 
 Related page: [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md)
 
+### LA transmural pressure
+
+This tile asks a different question from the wedge surrogate: how much pressure is actually distending the model left atrium? It subtracts pleural and pericardial pressure from atmospheric left atrial pressure. All three terms use the same three-second averaging interval, so the comparison is not distorted by mixing a smoothed wedge value with an instantaneous respiratory pressure.
+
+Because this is an exactly known internal chamber state, it does not inherit the zone 3 caution. That does not make it a directly measured bedside quantity: estimating an equivalent patient value still requires a valid PAWP and a defensible estimate of the pressure surrounding the heart.
+
+Related pages: [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Transmural pressure](transmural-pressure.md) · [Pericardium](ventricular-interdependence.md)
+
 ### PVR, derived
 
 This tile applies the catheter form:

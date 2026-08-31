@@ -73,7 +73,7 @@ Across this sweep, measured CVP rises by 6.4 mmHg while transmural CVP falls by 
 
 A clinician reading only measured CVP would conclude that the patient was becoming better filled while the transmural filling pressure and output were moving in the opposite direction.
 
-The app reports both numbers, side by side, for exactly this reason — see [numeric tiles](numeric-tiles.md).
+The app reports measured and transmural CVP together. It also places the three-second **Wedge surrogate** beside a separately synchronised **LA transmural pressure** tile, so left-sided external pressure transmission can be inspected without subtracting an instantaneous respiratory value from a smoothed vascular value. See [numeric tiles](numeric-tiles.md) and [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md).
 
 ---
 
