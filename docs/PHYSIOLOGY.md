@@ -43,7 +43,7 @@ Baseline (70 kg adult, passive volume control, VT 450 mL, PEEP 5, RR 14):
 | Wedge surrogate | 7 mmHg | 6–12 |
 | Mean systemic filling pressure | approximately 9 mmHg | 8–12 |
 | PVR coefficient | 1.2 Wood units | 0.3–2.0 |
-| LV ejection fraction | 56% | 55–70 (see limitations) |
+| LV ejection fraction | 56% | 55–70 |
 | Plateau pressure | 9.6 cmH₂O | — |
 
 The aggregate baroreflex is off in this reference state. The selected baseline
@@ -60,12 +60,15 @@ numbers. The following all reproduce:
 - Hypovolaemia: a 500 mL stressed-volume step raises cardiac output more from an
   underfilled starting point than from the plateau of the model RV-function curve.
   PPV is displayed descriptively but is not used as the validation target.
-- ARDS with right ventricular failure: at its shipped PEEP the RV:LV
-  end-diastolic ratio is about 1.60 and the resistance coefficient is about
-  3.99 WU. Across PEEP 0 → 20 the coefficient falls 4.50 → 3.61 while derived
-  PVR rises 4.79 → 5.51 WU and output falls 4.58 → 4.05 L/min. Setting
-  `riRatio` to zero separates the response: the coefficient rises 4.52 → 4.82,
-  derived PVR 5.02 → 7.21 and output falls 4.52 → 3.83 L/min.
+- ARDS with right ventricular failure is checked as a multi-observable
+  phenotype rather than accepted because its R/I ratio alone is plausible. At
+  the shipped PEEP, end-expiratory pleural and transpulmonary pressure, plateau
+  pressure, measured respiratory compliance, filling pressures, pulmonary
+  vascular load and RV:LV size must all occupy the declared teaching range.
+  At high PEEP the recruitable and non-recruitable versions must then separate:
+  recruitment opens more lung and reduces the pulmonary vascular and RV cost.
+  Current numerical outputs are generated from the executable preset in the
+  manual and enforced by the scenario-interpretability suite.
 - COPD with expiratory flow limitation: at external PEEP 5, about 6.8 cmH₂O of
   intrinsic PEEP and 781 mL of dynamic trapped volume raise CVP while cardiac
   output falls. Slowing respiratory rate from 26 to 12/min reduces those to

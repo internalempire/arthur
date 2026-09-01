@@ -43,36 +43,41 @@ export const SCENARIOS = [
     // the Guyton operating point instead. Keeping that distinction in the
     // scenario itself prevents a hidden waveform number from becoming a
     // surrogate fluid-responsiveness test.
-    note: 'The same patient after resuscitation, now making vigorous efforts against a relatively stiff chest wall. Pleural pressure swings by about 20 cmH₂O, but the operating point has limited local preload reserve: pressure swing and fluid responsiveness are not the same quantity. PPV is deliberately unavailable because the patient is breathing spontaneously; inspect the Guyton construction instead.',
+    note: 'A well-filled patient making vigorous efforts against a stiff, resistive respiratory system. Pleural pressure swings by about 18 cmH₂O while tidal volume remains about 450 mL, but the operating point has limited local preload reserve: pressure swing and fluid responsiveness are not the same quantity. PPV is deliberately unavailable because the patient is breathing spontaneously; inspect the Guyton construction instead.',
     params: {
-      mode: 'spont', pmus: 30, peep: 6, rr: 24, ccw: 150,
-      // The respiratory-mean Guyton construction requires slightly fuller
-      // systemic veins than the former phase-selected beat calculation to sit
-      // beyond the steep limb. A lower resting rate keeps output and pressure
-      // in a compensated teaching range rather than creating a hyperdynamic
-      // artefact from that extra filling.
-      stressedVolume: 1200, svr: 0.75, hr: 70,
+      mode: 'spont', pmus: 22, peep: 6, rr: 24,
+      // The old preset generated its 20 cmH2O swing by delivering almost 1.6 L
+      // per breath. A combined elastic and resistive load now lets respiratory
+      // effort appear mainly as pleural pressure rather than implausible volume.
+      clung: 60, ccw: 120, raw: 15,
+      // Filling is deliberately high enough to keep the respiratory-mean
+      // Guyton operating point beyond the model's steep preload limb.
+      stressedVolume: 1300, svr: 0.75, hr: 70,
     },
   },
   {
     id: 'ards-rv',
     name: 'ARDS with right ventricular failure',
-    note: 'A collapsed, stiff lung and a failing right ventricle, with a high-recruiter R/I phenotype. The RV dilates, the septum bows left and the left ventricle cannot fill. Try adding volume, then taking PEEP away, then turning the patient prone. Then set R/I to zero — the same amount of collapsed lung, now consolidated rather than reopenable — and run the PEEP titration again. It goes the other way, and nothing else about the patient has changed.',
+    note: 'A collapsed, stiff lung and a failing right ventricle, with a high-recruiter R/I phenotype. The RV dilates, the septum bows left and the left ventricle cannot fill. At the starting PEEP, end-expiratory transpulmonary pressure is about 13 cmH₂O rather than being forced upward merely to preserve R/I. Compare PEEP levels, then set R/I to zero while leaving collapse, tissue stiffness and the thoracic load unchanged: the consolidated phenotype carries the greater pulmonary vascular and RV cost.',
     params: {
       mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
-      collapsed: 0.42, clung: 40, eesRv: 0.28, pvrBase: 0.17, hpv: 1.6,
-      // With an independent chest wall this lung begins at a higher
-      // transpulmonary pressure than the former fixed-reference construction.
-      // The opening distribution is therefore centred slightly higher so the
-      // selected bedside R/I remains attainable without inventing recruitable
-      // lung beyond the collapsed compartment.
-      riRatio: 0.7, pOpen: 21,
+      collapsed: 0.42, clung: 25,
+      // A supine thoracic load is explicit rather than hidden in the lung. It
+      // shifts resting pleural pressure without changing chest-wall compliance.
+      cwLoad: 10,
+      // R/I remains an independently measured 5 -> 15 cmH2O phenotype. The
+      // opening midpoint is now inside a plausible transpulmonary range instead
+      // of being raised solely to preserve that one readout.
+      riRatio: 0.7, pOpen: 14,
+      // Filling and RV/pulmonary load are co-tuned so correcting the respiratory
+      // pressures does not erase the scenario's right-heart teaching lesion.
+      stressedVolume: 900, eesRv: 0.26, pvrBase: 0.19, hpv: 1.6,
     },
   },
   {
     id: 'pulmonary-embolism',
     name: 'Acute pulmonary embolism',
-    note: 'Normal lungs, high aggregate pulmonary vascular load — the mirror image of the ARDS case. The raised PVR coefficient represents the effective bedside load without separating clot obstruction, critical closing pressure, calibre or viscosity. Central venous pressure is high while the wedge is low, the right ventricle is twice the size of the left, and the septum is holding the left ventricle shut. The selected tachycardia, systemic resistance and filling describe an already compensated phenotype: the model baroreflex senses only systemic MAP, not PVR or mPAP directly. Switch to volume control, then raise PEEP, and watch what intubating this patient costs.',
+    note: 'Normal lungs, high aggregate pulmonary vascular load — the mirror image of the ARDS case. The raised PVR coefficient represents the effective bedside load without separating clot obstruction, critical closing pressure, calibre or viscosity. The atmospheric CVP is only about 3 mmHg during spontaneous breathing, while transmural right-atrial pressure is higher; the wedge remains low, the right ventricle is almost twice the size of the left, and the septum impedes left-sided filling. The selected tachycardia, systemic resistance and filling describe an already compensated phenotype: the model baroreflex senses only systemic MAP, not PVR or mPAP directly. Switch to volume control, then raise PEEP, and watch what intubating this patient costs.',
     params: {
       mode: 'spont', pmus: 6, peep: 0, rr: 24,
       pvrBase: 0.44, eesRv: 0.32, stressedVolume: 1050, svr: 1.25, hr: 118,

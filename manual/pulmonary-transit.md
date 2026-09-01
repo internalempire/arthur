@@ -70,7 +70,7 @@ With passive ventilation, HR 75/min, RR 18/min, VT 450 mL and PEEP 5 cmH2O held 
 | congested low-output LV failure | 807 | 20.4 | 6.0 |
 <!-- END GENERATED: pulmonary-transit -->
 
-The ordering is the lesson. The embolism and LV-failure numbers are outputs of selected model phenotypes, not expected clinical values or diagnostic thresholds. The LV phenotype reaches the staged numerical ceiling, while the unbounded whole-circuit estimate remains visible.
+The ordering is the lesson. The embolism and LV-failure numbers are outputs of selected model phenotypes, not expected clinical values or diagnostic thresholds. In particular, an estimate near 20 seconds in the severe low-output LV phenotype should be read as “very slow transport in this model state”, not as a normal clinical range or a patient-level prediction. The LV phenotype reaches the staged numerical ceiling, while the unbounded whole-circuit estimate remains visible.
 
 Pressure is not delayed with blood. Pulmonary venous pressure still enters the pulmonary pressure gradient immediately, and [ventricular interdependence](ventricular-interdependence.md), pericardial interaction and the pulmonary venous piston remain immediate mechanical routes. The stages delay delivery of changing blood flow only.
 

@@ -29,8 +29,8 @@ does not tune a preset or change an equation to make a row pass.
 | `healthy-vcv` | supported | Passive inflation reverses the respiratory direction of CVP and lowers settled output relative to spontaneous breathing. |
 | `peep-escalation` | qualified | Higher PEEP raises CVP and mean systemic filling pressure while lowering output; the size is illustrative. |
 | `septic-responder` | qualified | Added stressed volume raises output and removing compensation exposes hypotension; the coefficients are didactic. |
-| `swing-limited-reserve` | qualified | An approximately 20 cmH2O pleural swing coexists with a non-steep local preload slope; PPV is correctly withheld during spontaneous effort. |
-| `ards-rv` | qualified | RV pressure overload and the recruitability interaction are present; extreme PEEP and prone responses must not be read quantitatively. |
+| `swing-limited-reserve` | qualified | An approximately 18 cmH2O pleural swing occurs at a plausible tidal volume and coexists with a non-steep local preload slope; PPV is correctly withheld during spontaneous effort. |
+| `ards-rv` | qualified | RV pressure overload and the recruitability interaction are present without requiring an excessive baseline transpulmonary-pressure window; extreme PEEP and prone responses must not be read quantitatively. |
 | `pulmonary-embolism` | qualified | The baseline pressure-flow-RV phenotype is coherent; vascular obstruction and autonomic compensation remain aggregate inputs. |
 | `cardiac-tamponade` | qualified | Reduced pericardial capacity produces shared diastolic constraint and preferential RV underfilling; decompression is directional, not a calibrated drainage model. |
 | `lv-failure` | qualified | In a deliberately afterload-dominant phenotype, PEEP lowers LV transmural end-systolic pressure and raises mean output. |
@@ -111,12 +111,13 @@ vascular stress relaxation.
 **Teaching question.** Can compensatory pressure conceal low effective filling,
 and can stressed volume change independently of venous compliance?
 
-**What the model produces.** The baseline settles near CO 4.2 L/min and MAP
-80 mmHg. Increasing stressed volume by 500 mL raises output to about 5.9 L/min.
-With the aggregate baroreflex disabled, MAP falls to about 62 mmHg and output to
-about 3.9 L/min. The fluid control adds blood to the venous reservoir; the
-baroreflex instead shifts volume from unstressed to stressed without changing
-total blood volume.
+**What the model produces.** The compensated baseline has higher output and MAP
+than the same circulation with the aggregate baroreflex disabled. Increasing
+stressed volume by 500 mL produces a further substantial rise in output. The
+fluid control adds blood to the venous reservoir; the baroreflex instead shifts
+volume from unstressed to stressed without changing total blood volume. Exact
+baroreflex-on and -off values are generated from the current executable model in
+the manual rather than copied here.
 
 **Assessment — qualified.** These directions are coherent with the physiology of
 venous recruitment and the human observation that norepinephrine can increase
@@ -134,16 +135,18 @@ fluid kinetics.
 **Teaching question.** Why does a large respiratory pressure swing not establish
 fluid responsiveness?
 
-**What the model produces.** Pleural pressure swings by about 20 cmH2O while the
-local preload reserve is about 7.4% of output per mmHg of filling pressure,
-below the model's 8%/mmHg steep-limb threshold. The preset is spontaneously
-breathing, so the model correctly labels PPV **unavailable**.
+**What the model produces.** Inspiratory effort of 22 cmH2O against reduced lung
+and chest-wall compliance plus raised airway resistance delivers approximately
+450 mL rather than the former 1.6 L tidal volume. Pleural pressure swings by
+about 18 cmH2O while local preload reserve remains below the model's 8%/mmHg
+steep-limb threshold. The preset is spontaneously breathing, so the model
+correctly labels PPV **unavailable**.
 
 **Assessment — qualified.** The demonstrating variable is now the slope of the
 settled Guyton operating point, not an arterial waveform index. That preserves
 the spontaneous-breathing phenotype and makes the intended distinction
 internally coherent: pressure transmission is not preload reserve. The
-7.4%/mmHg value and the 8%/mmHg boundary are model teaching constructs, not a
+approximately 6.4%/mmHg value and the 8%/mmHg boundary are model teaching constructs, not a
 validated bedside fluid-responsiveness threshold.
 
 **Not represented.** Irregular effort, tidal-volume variability, reverse
@@ -155,23 +158,28 @@ arterial waveform measurement error.
 **Teaching question.** How does recruitability alter the balance between
 recruitment benefit and inflation-related RV load?
 
-**What the model produces.** At PEEP 12 cmH2O the preset has mPAP about 23 mmHg,
-low left-atrial-pressure wedge surrogate, an internal hydraulic estimate of
-about 5.0 WU and RV/LV end-diastolic volume ratio about 1.6. The wedge and
-derived-PVR tiles are cautioned by the aggregate zone-3 rule. Raising PEEP opens
-more lung in the high-R/I phenotype, but output
-still falls slightly because preload and waterfall costs remain. At high PEEP,
-setting R/I to zero produces greater PVR, worse RV dilatation and lower output.
-Prone positioning modestly reduces PVR and RV/LV ratio in the current model.
+**What the model produces.** At PEEP 12 cmH2O the preset has end-expiratory Ppl
+about −1 cmH2O and PL about 13 cmH2O, plateau pressure about 22 cmH2O, measured
+respiratory-system compliance about 35 mL/cmH2O and achieved R/I 0.70. The
+circulation has mPAP about 26 mmHg, derived PVR about 5.0 WU, CVP and wedge
+surrogates around 5 mmHg, and an RV/LV end-diastolic volume ratio about 1.7. The
+wedge and derived-PVR tiles remain subject to the aggregate zone-3 rule. At PEEP
+20, removing recruitment raises derived PVR from about 5.6 to 7.2 WU, raises
+RV/LV from about 1.7 to 2.0 and lowers output. Prone positioning opens more lung
+and modestly lowers PVR, while its immediate chest-wall transformation still
+raises plateau pressure.
 
 **Assessment — qualified.** The central interaction between recruitability,
 inflation and pulmonary vascular load is supported by human in-vivo data, and
-the RV phenotype is qualitatively coherent. The preset is deliberately more
-severe than the cohort used to calibrate the PVR/recruitability relationship.
-PEEP 20 can produce plateau pressures above the range in which the result should
-be taught quantitatively, especially in the non-recruiter. Prone position is a
-single immediate parameter transformation; clinical studies describe variable
-responses after prolonged proning and cannot validate that exact transformation.
+the RV phenotype is qualitatively coherent. R/I is no longer allowed to validate
+the preset on its own: executable tests also constrain absolute Ppl and PL,
+EELV, plateau pressure, respiratory-system compliance, filling pressure and RV
+load. The preset is deliberately more severe than the cohort used for the
+PVR/recruitability comparison. PEEP 20 can produce plateau pressures above the
+range in which the result should be taught quantitatively, especially in the
+non-recruiter. Prone position remains one immediate parameter transformation;
+clinical studies describe variable responses after prolonged proning and cannot
+validate that exact transformation.
 
 **Not represented.** Hypercapnia, hypoxaemia, pulmonary microthrombi, dead-space
 heterogeneity, vasoactive pulmonary therapies, regional perfusion and time-
@@ -184,8 +192,9 @@ high aggregate pulmonary vascular load and a vulnerable RV?
 
 **What the model produces.** The baseline has mPAP about 39 mmHg, a left-atrial
 wedge surrogate about 3 mmHg, an internal $(mPAP-P_{LA})/CO$ estimate about
-7.6 WU, CVP about 2.5 mmHg and RV/LV ratio about 1.9. The aggregate zone-3
-index cautions both the wedge surrogate and derived-PVR interpretation.
+7.6 WU, atmospheric CVP about 3 mmHg, higher transmural right-atrial pressure
+and RV/LV ratio about 1.9. The aggregate zone-3 index cautions both the wedge
+surrogate and derived-PVR interpretation.
 Changing to passive volume control and raising PEEP from 0 to 10 cmH2O lowers
 output by roughly 10% and further raises right-sided pressure and RV/LV ratio.
 

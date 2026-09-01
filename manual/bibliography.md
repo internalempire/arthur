@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 143 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 144 unique entries.
 
 ---
 
@@ -169,6 +169,7 @@ A citation documents the physiological or methodological claim made on its sourc
 ## T
 
 - Takata M, Wise RA, Robotham JL. Effects of abdominal pressure on venous return: abdominal vascular zone conditions. *J Appl Physiol*. 1990;69:1961–1972. [doi:10.1152/jappl.1990.69.6.1961](https://doi.org/10.1152/jappl.1990.69.6.1961)
+- Talmor D, Sarge T, O'Donnell CR, et al. Esophageal and transpulmonary pressures in acute respiratory failure. *Crit Care Med*. 2006;34:1389–1394. <https://doi.org/10.1097/01.CCM.0000215515.49001.A2>
 - Taylor RR, Covell JW, Sonnenblick EH, Ross J. Dependence of ventricular distensibility on filling of the opposite ventricle. *Am J Physiol* 1967;213:711–8. [doi:10.1152/ajplegacy.1967.213.3.711](https://doi.org/10.1152/ajplegacy.1967.213.3.711)
 - Teboul JL, Monnet X, Chemla D, Michard F. Arterial pulse pressure variation with mechanical ventilation. *Am J Respir Crit Care Med*. 2019;199:22–31. [doi:10.1164/rccm.201801-0088CI](https://doi.org/10.1164/rccm.201801-0088CI)
 - Teboul JL, Monnet X, Richard C. Weaning failure of cardiac origin: recent advances. *Crit Care*. 2010;14:211. [doi:10.1186/cc8852](https://doi.org/10.1186/cc8852)

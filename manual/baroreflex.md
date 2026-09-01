@@ -43,7 +43,16 @@ $$
 
 The Heart rate tile displays this effective rate and states the baseline and reflex contribution underneath. The systemic-resistance tile follows the same rule: its main number is the effective SVR used by the circulation, while its subtitle separates the selected baseline from the reflex percentage change. The controls therefore remain inputs; they are not rewritten every time the compensator moves.
 
-The septic preset illustrates the difference. With the compensator disabled, settled output is about 3.8 L/min and MAP 62 mmHg. With it active, output is about 4.2 L/min and MAP 80 mmHg. The model remains preload responsive in both states: pressure defence does not manufacture volume or remove the underlying circulation problem.
+The septic preset illustrates the difference. The model remains preload responsive with the compensator either off or on: pressure defence does not manufacture volume or remove the underlying circulation problem. The current numerical comparison is generated rather than copied into the page.
+
+<!-- BEGIN GENERATED: baroreflex-septic -->
+*Executable septic-preset output after 45 s of settling; the two rows change the baroreflex switch only.*
+
+| aggregate baroreflex | cardiac output (L/min) | MAP (mmHg) | effective heart rate (/min) | effective SVR (mmHg·s/mL) |
+|---|---:|---:|---:|---:|
+| off | 4.21 | 66.9 | 105 | 0.85 |
+| on | 4.50 | 82.1 | 120 | 0.99 |
+<!-- END GENERATED: baroreflex-septic -->
 
 ---
 

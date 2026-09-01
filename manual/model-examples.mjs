@@ -92,7 +92,8 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/inferior-vena-cava.md', ids: ['ivc-respiratory-calibre'] },
   { file: 'manual/pmsf-and-occlusions.md', ids: ['pmsf-occlusions'] },
   { file: 'manual/pulmonary-artery-wedge-pressure.md', ids: ['wedge-peep-examples'] },
-  { file: 'manual/scenarios.md', ids: ['scenario-overrides'] },
+  { file: 'manual/scenarios.md', ids: ['swing-scenario', 'ards-scenario', 'scenario-overrides'] },
+  { file: 'manual/baroreflex.md', ids: ['baroreflex-septic'] },
 ];
 
 const fixed = (value, digits) => value.toFixed(digits);
@@ -505,6 +506,68 @@ function scenarioOverridesBlock() {
   ].join('\n').trimEnd();
 }
 
+function swingScenarioBlock() {
+  const scenario = SCENARIOS.find(({ id }) => id === 'swing-limited-reserve');
+  if (!scenario) throw new Error('swing example: scenario is missing');
+  const metrics = settled(scenario.params);
+  return [
+    '*Executable preset output after 45 s of settling.*',
+    '',
+    '| inspiratory effort (cmH₂O) | delivered VT (mL) | minute ventilation (L/min) | pleural swing (cmH₂O) | preload reserve (% output/mmHg) |',
+    '|---:|---:|---:|---:|---:|',
+    `| ${fixed(scenario.params.pmus, 0)} | ${Math.round(metrics.vtDelivered)} | ${fixed(metrics.minuteVentilation, 1)} | ${fixed(metrics.pplSwing, 1)} | ${fixed(metrics.preload.relative * 100, 1)} |`,
+  ].join('\n');
+}
+
+function ardsScenarioState(overrides) {
+  const scenario = SCENARIOS.find(({ id }) => id === 'ards-rv');
+  if (!scenario) throw new Error('ARDS example: scenario is missing');
+  const simulator = settledSimulator({ ...scenario.params, ...overrides });
+  const metrics = simulator.metrics;
+  const endExpiratoryPpl = chestWallPressure(
+    simulator.params, metrics.endExpiratoryVolume,
+  );
+  return {
+    metrics,
+    endExpiratoryPpl,
+    endExpiratoryPl: metrics.totalPeep - endExpiratoryPpl,
+  };
+}
+
+function ardsScenarioBlock() {
+  const states = [
+    ['recruitable baseline', { peep: 12 }],
+    ['recruitable, high PEEP', { peep: 20 }],
+    ['non-recruitable, high PEEP', { peep: 20, riRatio: 0 }],
+  ].map(([label, overrides]) => ({ label, ...ardsScenarioState(overrides) }));
+  return [
+    '*Executable preset outputs after 45 s of settling. End-expiratory Ppl is read from the selected chest-wall relation at measured EELV; PL is total PEEP minus that pressure.*',
+    '',
+    '| state | EELV (L) | end-expiratory Ppl / PL (cmH₂O) | plateau (cmH₂O) | achieved R/I | open lung | derived PVR (WU) | RV/LV | CO (L/min) |',
+    '|---|---:|---:|---:|---:|---:|---:|---:|---:|',
+    ...states.map(({ label, metrics, endExpiratoryPpl, endExpiratoryPl }) => `| ${label} | ${fixed(metrics.endExpiratoryVolume, 2)} | ${fixed(endExpiratoryPpl, 1)} / ${fixed(endExpiratoryPl, 1)} | ${fixed(metrics.pplat, 1)} | ${fixed(metrics.riRatio, 2)} | ${Math.round(metrics.openFraction * 100)}% | ${fixed(metrics.pvrDerivedWood, 1)} | ${fixed(metrics.rvLvRatio, 2)} | ${fixed(metrics.co, 2)} |`),
+  ].join('\n');
+}
+
+function baroreflexSepticBlock() {
+  const scenario = SCENARIOS.find(({ id }) => id === 'septic-responder');
+  if (!scenario) throw new Error('baroreflex example: septic scenario is missing');
+  const states = [
+    ['off', false],
+    ['on', true],
+  ].map(([label, baroreflexEnabled]) => ({
+    label,
+    metrics: settled({ ...scenario.params, baroreflexEnabled }),
+  }));
+  return [
+    '*Executable septic-preset output after 45 s of settling; the two rows change the baroreflex switch only.*',
+    '',
+    '| aggregate baroreflex | cardiac output (L/min) | MAP (mmHg) | effective heart rate (/min) | effective SVR (mmHg·s/mL) |',
+    '|---|---:|---:|---:|---:|',
+    ...states.map(({ label, metrics }) => `| ${label} | ${fixed(metrics.co, 2)} | ${fixed(metrics.map, 1)} | ${fixed(metrics.effectiveHr, 0)} | ${fixed(metrics.effectiveSvr, 2)} |`),
+  ].join('\n');
+}
+
 export function renderDocumentedExampleBlocks() {
   const rows = stressRows();
   const peepRows = peepSweepRows();
@@ -521,6 +584,9 @@ export function renderDocumentedExampleBlocks() {
     ['wedge-peep-examples', wedgePeepExamplesBlock()],
     ['cardiac-tamponade', cardiacTamponadeBlock()],
     ['ivc-respiratory-calibre', ivcRespiratoryBlock()],
+    ['swing-scenario', swingScenarioBlock()],
+    ['ards-scenario', ardsScenarioBlock()],
+    ['baroreflex-septic', baroreflexSepticBlock()],
     ['scenario-overrides', scenarioOverridesBlock()],
   ]);
 }
