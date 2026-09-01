@@ -78,7 +78,7 @@ Not every coefficient has a source. A coefficient chosen to make an established 
 
 ## Limits
 
-There is no systematic global sensitivity or uncertainty analysis, no parameter-identifiability study, no external patient dataset, no formal calibration likelihood and no blinded prospective evaluation. Several anchors are small studies or animal experiments. Ejection fraction remains approximately 5–10 percentage points lower than desired despite plausible stroke volume, output and loop shape. Extreme combinations are safety-tested more broadly than they are physiologically validated.
+There is no systematic global sensitivity or uncertainty analysis, no parameter-identifiability study, no external patient dataset, no formal calibration likelihood and no blinded prospective evaluation. Several anchors are small studies or animal experiments. Extreme combinations are safety-tested more broadly than they are physiologically validated.
 
 ## How to run the checks
 

@@ -8,6 +8,53 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-09-01 — Recalibrate ARDS and large-effort presets against multiple observables
+
+### Decision
+
+- Keep aerated-tissue compliance, maximum lung capacity, collapsed fraction and
+  the R/I-derived openable fraction separate. Do not make unit size scale with
+  `clung`; that would restore the former compliance/capacity double-counting.
+- Recalibrate `ards-rv` so requested R/I 0.70 is attainable at an opening-range
+  midpoint of 14 rather than 21 cmH2O, while independently constraining
+  end-expiratory Ppl and PL, EELV, plateau pressure, measured respiratory-system
+  compliance, filling pressures and the RV-load phenotype.
+- Represent the selected supine thoracic loading explicitly with `cwLoad = 10`
+  rather than hiding it in lung stiffness or silently translating the wall
+  curve. Retune filling, RV elastance and pulmonary vascular load together so
+  correcting respiratory pressures does not erase the intended RV failure.
+- Recalibrate `swing-limited-reserve` with a finite inspiratory effort acting
+  against combined elastic and resistive respiratory load. Require a large
+  pleural swing at a plausible tidal volume and minute ventilation, while the
+  respiratory-mean Guyton point remains outside the model's steep preload limb.
+- Correct the pulmonary-embolism note to separate atmospheric CVP from
+  transmural right-atrial pressure during spontaneous breathing.
+
+### Why
+
+After the chest wall became independent, the former ARDS preset preserved its
+R/I by moving the diseased-unit opening midpoint upward. It therefore produced
+the requested bedside ratio while the PEEP 5 -> 15 manoeuvre traversed an
+excessively high transpulmonary-pressure window. R/I is a protocol-defined
+volume comparison, not an independent measurement of pleural pressure or the
+location of the opening distribution; matching it cannot validate those other
+quantities.
+
+The former large-swing preset had the opposite problem: its pressure contrast
+was real, but it required almost 1.6 L per spontaneous breath and 38 L/min of
+minute ventilation. Making the chest wall stiffer alone reduced both volume and
+the pleural swing in this model. Adding respiratory load lets effort appear as
+pressure without scripting the desired waveform or adding a new compartment.
+
+### Validation boundary
+
+The ARDS ranges are scenario guards, not universal treatment targets or a fit to
+one patient cohort. Absolute oesophageal pressure varies widely and is not
+identical to the model's one global pleural pressure. Extreme PEEP and the
+immediate prone transformation remain qualitative. The R/I/PVR literature row
+uses a separate cohort-comparison phenotype and remains a broad compatibility
+test rather than a patient-level quantitative validation.
+
 ## 2026-08-14 — Make pulmonary transit depend on blood volume and flow
 
 ### Decision

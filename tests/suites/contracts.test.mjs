@@ -136,6 +136,10 @@ section('Pulmonary vascular claims exposed to the user stay qualified');
   check('pulmonary embolism is labelled as aggregate load',
     pe?.note.includes('aggregate pulmonary vascular load')
       && pe.note.includes('baroreflex senses only systemic MAP'));
+  check('pulmonary embolism separates atmospheric from transmural CVP',
+    pe?.note.includes('atmospheric CVP')
+      && pe.note.includes('transmural right-atrial pressure')
+      && !pe.note.includes('Central venous pressure is high'));
 
   const readme = readFileSync(new URL('../../README.md', import.meta.url), 'utf8');
   const pvrManual = readFileSync(new URL('../../manual/pulmonary-vascular-resistance.md', import.meta.url), 'utf8');

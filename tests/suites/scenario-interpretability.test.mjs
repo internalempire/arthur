@@ -8,7 +8,7 @@
 
 import {
   Simulator, SCENARIOS, defaultParams, readFileSync,
-  section, check, settled,
+  section, check, settled, chestWallPressure,
 } from '../support/model.mjs';
 
 const byId = new Map(SCENARIOS.map((scenario) => [scenario.id, scenario]));
@@ -169,30 +169,49 @@ section('Scenario teaching mechanisms');
   // teaching contrast is therefore large transmitted pressure versus the
   // local slope of the settled Guyton operating point, which remains defined
   // without passive ventilation or a regular arterial waveform.
-  demonstrates['swing-limited-reserve'] = metrics.pplSwing > 18
+  demonstrates['swing-limited-reserve'] = metrics.pplSwing > 16
+    && metrics.vtDelivered >= 350 && metrics.vtDelivered <= 650
+    && metrics.minuteVentilation >= 8 && metrics.minuteVentilation <= 16
     && !metrics.preload.steep
-    && metrics.preload.relative < 0.10
+    && metrics.preload.relative < 0.08
     && metrics.interpretability.ppv.level === 'unavailable';
   check('large pleural swings remain distinct from preload reserve',
     demonstrates['swing-limited-reserve'],
-    `${metrics.pplSwing.toFixed(1)} cmH2O swing, `
+    `${metrics.pplSwing.toFixed(1)} cmH2O swing at VT ${metrics.vtDelivered.toFixed(0)} mL, `
       + `${(metrics.preload.relative * 100).toFixed(1)}%/mmHg reserve, `
       + `PPV ${metrics.interpretability.ppv.level}`);
 }
 
 {
-  const baseline = scenarioMetrics('ards-rv');
+  const baselineSimulator = scenarioSimulator('ards-rv');
+  const baseline = baselineSimulator.metrics;
+  // R/I is not allowed to validate this preset by itself. The reference state
+  // must also occupy a defensible absolute pressure and mechanics range; this
+  // catches the former failure in which R/I 0.7 was obtained only because the
+  // PEEP manoeuvre crossed an excessively high transpulmonary-pressure window.
+  const endExpiratoryPpl = chestWallPressure(
+    baselineSimulator.params, baseline.endExpiratoryVolume,
+  );
+  const endExpiratoryPl = baseline.totalPeep - endExpiratoryPpl;
   const recruiter = scenarioMetrics('ards-rv', { peep: 20 });
   const nonRecruiter = scenarioMetrics('ards-rv', { peep: 20, riRatio: 0 });
   demonstrates['ards-rv'] = baseline.papMean > 20
     && baseline.pvrDerivedWood > 4
     && baseline.rvLvRatio > 1.5
+    && baseline.riRatio >= 0.65 && !baseline.riLimited
+    && endExpiratoryPpl >= -3 && endExpiratoryPpl <= 5
+    && endExpiratoryPl >= 8 && endExpiratoryPl <= 15
+    && baseline.pplat >= 18 && baseline.pplat <= 30
+    && baseline.crsMeasured >= 20 && baseline.crsMeasured <= 50
+    && baseline.cvp >= 3 && baseline.paop >= 3
     && recruiter.openFraction > nonRecruiter.openFraction + 0.1
     && recruiter.pvrDerivedWood < nonRecruiter.pvrDerivedWood
     && recruiter.co > nonRecruiter.co;
   check('ARDS preset couples RV failure to a recruitability-dependent PEEP response',
     demonstrates['ards-rv'],
-    `PVR at PEEP 20: R/I on ${recruiter.pvrDerivedWood.toFixed(1)}, `
+    `baseline Ppl/PL ${endExpiratoryPpl.toFixed(1)}/${endExpiratoryPl.toFixed(1)} cmH2O, `
+      + `plateau ${baseline.pplat.toFixed(1)}, R/I ${baseline.riRatio.toFixed(2)}; `
+      + `PVR at PEEP 20: R/I on ${recruiter.pvrDerivedWood.toFixed(1)}, `
       + `off ${nonRecruiter.pvrDerivedWood.toFixed(1)} WU`);
 }
 

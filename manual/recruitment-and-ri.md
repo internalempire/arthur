@@ -36,6 +36,8 @@ The user sets `riRatio`. The model does **not** use it directly. It solves for t
 
 **The result is capped by the lung.** The collapsed compartment is finite and the opening pressure is a separate control, so a patient may not be able to reach the requested ratio. The model then reports the achieved value and raises a caution rather than silently pretending.
 
+**Matching R/I does not validate the whole pressure–volume state.** The same ratio can be produced by different combinations of pleural pressure, transpulmonary pressure, opening range, tissue compliance and collapsed volume. Scenario validation must therefore check the absolute pressure window, EELV, plateau pressure and measured compliance as well as the achieved ratio. The ARDS preset is tested this way; moving `pOpen` merely to preserve R/I while those other quantities drift is explicitly rejected.
+
 | requested R/I | achieved | maximum for this patient | recruited volume | end-expiratory volume |
 |---|---|---|---|---|
 | 0 | 0.00 | — | −20 mL | 1.06 L |

@@ -310,10 +310,9 @@ section('The stress index');
 
 section('Body position');
 {
-  const ARDS = {
-    collapsed: 0.42, clung: 40, vt: 350, rr: 24, eesRv: 0.28,
-    pvrBase: 0.17, hpv: 1.6, peep: 12, riRatio: 0.7, pOpen: 21,
-  };
+  // Use the shipped scenario itself. A copied approximation previously let
+  // this test remain green after the ARDS preset had become a different lung.
+  const ARDS = SCENARIOS.find(({ id }) => id === 'ards-rv').params;
   const ardsSupine = settled(ARDS);
   const ardsProne = settled({ ...ARDS, position: 'prone' });
   check('proning a recruitable lung opens some of it',

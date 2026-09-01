@@ -43,7 +43,15 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Try.** Observe the pleural swing and the position of the operating point on the model RV-function relation; then inspect the preload-reserve readout and the PPV interpretability warning.
 
-**Read.** The preset is spontaneously breathing, so PPV is withheld even though an internal waveform variation exists. The pleural swing exceeds 20 cmH₂O while the local preload reserve remains below the model's steep-limb threshold. The useful lesson is that transmitted pressure and position on the filling curve are different quantities. Do not use the hidden PPV value as the demonstration.
+**Read.** The preset is spontaneously breathing, so PPV is withheld even though an internal waveform variation exists. Vigorous effort acts against a moderately stiff, resistive respiratory system: pleural pressure changes substantially while tidal volume remains within a plausible teaching range. The local preload reserve nevertheless remains below the model's steep-limb threshold. Transmitted pressure, respiratory load and position on the filling curve are different quantities; do not use the hidden PPV value as the demonstration.
+
+<!-- BEGIN GENERATED: swing-scenario -->
+*Executable preset output after 45 s of settling.*
+
+| inspiratory effort (cmH₂O) | delivered VT (mL) | minute ventilation (L/min) | pleural swing (cmH₂O) | preload reserve (% output/mmHg) |
+|---:|---:|---:|---:|---:|
+| 22 | 452 | 10.8 | 17.9 | 6.4 |
+<!-- END GENERATED: swing-scenario -->
 
 ### ARDS with right ventricular failure
 
@@ -51,9 +59,19 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Try.** Compare PEEP levels with the preset R/I, then set R/I to zero while keeping collapse and tissue compliance unchanged. Prone positioning can be explored as a separate, deliberately coarse transformation.
 
-**Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. The preset leaves maximum lung capacity at the 6 L default: collapse makes the accessible baby lung smaller, while reduced `clung` independently makes its aerated tissue less compliant. Follow derived PVR, its wedge-dependent quality badge, RV/LV ratio, septal interaction and output together. Extreme PEEP can generate plateau pressures outside a useful quantitative range and can invalidate the catheter interpretation of the wedge surrogate; prone response is directional rather than patient-specific. See [recruitment and R/I](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md), [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) and [ventricular interdependence](ventricular-interdependence.md).
+**Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. The preset leaves maximum lung capacity at the 6 L default: collapse makes the accessible baby lung smaller, while reduced `clung` independently makes its aerated tissue less compliant. A separate supine thoracic load shifts resting pleural pressure without changing chest-wall compliance. Follow end-expiratory Ppl and PL, plateau pressure, achieved R/I, derived PVR, its wedge-dependent quality badge, RV/LV ratio, septal interaction and output together. Extreme PEEP can still generate plateau pressures outside a useful quantitative range and can invalidate the catheter interpretation of the wedge surrogate; prone response is directional rather than patient-specific. See [recruitment and R/I](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md), [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) and [ventricular interdependence](ventricular-interdependence.md).
 
-The preset's opening-range centre is 21 cmH₂O. This is not a proposed clinical threshold: after the chest wall became independent, the collapsed stiff lung reached a higher resting transpulmonary pressure, so the internal opening distribution was retuned to preserve the selected R/I and the human in-vivo PVR–recruitability constraint.
+R/I is one constraint, not the validator of the whole preset. The current opening-range centre is 14 cmH₂O and the requested R/I remains 0.70, but the scenario tests also constrain end-expiratory Ppl and PL, EELV, plateau pressure, measured respiratory-system compliance, filling pressures and the RV phenotype. If those absolute mechanics drift, preserving R/I alone is no longer sufficient for the scenario to pass.
+
+<!-- BEGIN GENERATED: ards-scenario -->
+*Executable preset outputs after 45 s of settling. End-expiratory Ppl is read from the selected chest-wall relation at measured EELV; PL is total PEEP minus that pressure.*
+
+| state | EELV (L) | end-expiratory Ppl / PL (cmH₂O) | plateau (cmH₂O) | achieved R/I | open lung | derived PVR (WU) | RV/LV | CO (L/min) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| recruitable baseline | 1.04 | -0.9 / 12.9 | 22.1 | 0.70 | 65% | 5.0 | 1.67 | 4.07 |
+| recruitable, high PEEP | 1.34 | 0.6 / 19.4 | 39.0 | 0.70 | 77% | 5.6 | 1.73 | 3.84 |
+| non-recruitable, high PEEP | 1.03 | -0.9 / 20.9 | 46.6 | 0.00 | 58% | 7.2 | 1.97 | 3.53 |
+<!-- END GENERATED: ards-scenario -->
 
 ### Acute pulmonary embolism
 
@@ -61,7 +79,7 @@ The preset's opening-range centre is 21 cmH₂O. This is not a proposed clinical
 
 **Try.** Inspect the high mPAP, low wedge surrogate, high model hydraulic gradient and RV dilatation; then switch to passive ventilation and raise PEEP. Watch the wedge and derived-PVR caution badges rather than treating the displayed arithmetic as a valid catheter classification.
 
-**Read.** The preset uses one effective aggregate pulmonary load. It does not separate clot obstruction, calibre, viscosity, vasomotor tone or critical closing pressure. Its low downstream pressure also makes the aggregate zone-3 surrogate cautious, even though a real catheter could be deliberately placed in a dependent zone-3 region; this is a limitation of the non-regional model, not a claim that PAWP is unobtainable in pulmonary embolism. The selected tachycardia, systemic resistance and filling describe compensation already present; the model baroreflex senses systemic MAP rather than embolus, PVR or mPAP directly. Positive pressure demonstrates vulnerability, not an individual intubation-risk estimate.
+**Read.** The preset uses one effective aggregate pulmonary load. It does not separate clot obstruction, calibre, viscosity, vasomotor tone or critical closing pressure. During spontaneous breathing the atmospheric CVP is only about 3 mmHg, while transmural right-atrial pressure is higher because pleural pressure is negative; it is therefore incorrect to describe the displayed CVP simply as “high”. The low downstream pressure also makes the aggregate zone-3 surrogate cautious, even though a real catheter could be deliberately placed in a dependent zone-3 region; this is a limitation of the non-regional model, not a claim that PAWP is unobtainable in pulmonary embolism. The selected tachycardia, systemic resistance and filling describe compensation already present; the model baroreflex senses systemic MAP rather than embolus, PVR or mPAP directly. Positive pressure demonstrates vulnerability, not an individual intubation-risk estimate.
 
 ### Cardiac tamponade
 
@@ -157,9 +175,11 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | Ventilatory mode | Volume control | Spontaneous |
 | Ventilation | Respiratory rate | 14 /min | 24 /min |
 | Ventilation | PEEP | 5 cmH₂O | 6 cmH₂O |
-| Ventilation | Inspiratory effort | 0.0 cmH₂O | 30.0 cmH₂O |
-| Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 150 mL/cmH₂O |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 1200 mL |
+| Ventilation | Inspiratory effort | 0.0 cmH₂O | 22.0 cmH₂O |
+| Respiratory mechanics | Aerated-lung compliance | 200 mL/cmH₂O | 60 mL/cmH₂O |
+| Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 120 mL/cmH₂O |
+| Respiratory mechanics | Airway resistance | 5.0 cmH₂O/L/s | 15.0 cmH₂O/L/s |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 1300 mL |
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.75 mmHg·s/mL |
 | Cardiac function | Baseline heart rate | 75 /min | 70 /min |
 
@@ -170,12 +190,14 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | Respiratory rate | 14 /min | 24 /min |
 | Ventilation | Tidal volume | 450 mL | 350 mL |
 | Ventilation | PEEP | 5 cmH₂O | 12 cmH₂O |
-| Respiratory mechanics | Aerated-lung compliance | 200 mL/cmH₂O | 40 mL/cmH₂O |
+| Respiratory mechanics | Aerated-lung compliance | 200 mL/cmH₂O | 25 mL/cmH₂O |
+| Respiratory mechanics | Chest wall load | 0.0 cmH₂O | 10.0 cmH₂O |
 | Respiratory mechanics | Collapsed lung | 0% | 42% |
-| Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.28 mmHg/mL |
-| Pulmonary circulation | Open-lung PVR at FRC | 0.07 mmHg·s/mL | 0.17 mmHg·s/mL |
+| Volume & vascular tone | Baseline stressed volume | 700 mL | 900 mL |
+| Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.26 mmHg/mL |
+| Pulmonary circulation | Open-lung PVR at FRC | 0.07 mmHg·s/mL | 0.19 mmHg·s/mL |
 | Respiratory mechanics | Recruitment-to-inflation ratio | 0.50 R/I | 0.70 R/I |
-| Respiratory mechanics | Opening pressure | 20 cmH₂O | 21 cmH₂O |
+| Respiratory mechanics | Opening pressure | 20 cmH₂O | 14 cmH₂O |
 | Pulmonary circulation | Hypoxic vasoconstriction | 1.0 × | 1.6 × |
 
 #### Acute pulmonary embolism
@@ -283,6 +305,7 @@ Published manoeuvre constraints live in [the literature ranges](../docs/LITERATU
 - Fougères E, Teboul JL, Richard C, et al. Haemodynamic impact of a positive end-expiratory pressure setting in acute respiratory distress syndrome. *Crit Care Med*. 2010;38:802–807. [doi:10.1097/CCM.0b013e3181c587fd](https://doi.org/10.1097/CCM.0b013e3181c587fd)
 - Adda I, Lai C, Teboul JL, et al. Norepinephrine potentiates the efficacy of volume expansion on mean systemic pressure in septic shock. *Crit Care*. 2021;25:302. <https://doi.org/10.1186/s13054-021-03711-5>
 - Cappio Borlino S, Hagry J, Lai C, et al. The effect of PEEP on pulmonary vascular resistance depends on lung recruitability in patients with ARDS. *Am J Respir Crit Care Med*. 2024;210:900–907. <https://doi.org/10.1164/rccm.202402-0383OC>
+- Talmor D, Sarge T, O'Donnell CR, et al. Esophageal and transpulmonary pressures in acute respiratory failure. *Crit Care Med*. 2006;34:1389–1394. <https://doi.org/10.1097/01.CCM.0000215515.49001.A2>
 - Vieillard-Baron A, Charron C, Caille V, et al. Prone positioning unloads the right ventricle in severe ARDS. *Chest*. 2007;132:1440–1446. <https://doi.org/10.1378/chest.07-1013>
 - Ranieri VM, Dambrosio M, Brienza N. Intrinsic PEEP and cardiopulmonary interaction in patients with COPD and acute ventilatory failure. *Eur Respir J*. 1996;9:1283–1292. [doi:10.1183/09031936.96.09061283](https://doi.org/10.1183/09031936.96.09061283)
 - Schulz-Menger J, Collini V, Gröschel J, et al. 2025 ESC Guidelines for the management of myocarditis and pericarditis. *Eur Heart J*. 2025;46:3952–4041. <https://doi.org/10.1093/eurheartj/ehaf192>

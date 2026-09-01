@@ -14,6 +14,8 @@ The superior vena cava is surrounded by pleural pressure and the inferior by abd
 
 Open since the J-curve work. Cappio Borlino's within-group R/I values and Table 2 respiratory mechanics would let the internal openable fraction be checked against the cohort rather than solved to a target the user selects. See [recruitment and R/I](recruitment-and-ri.md).
 
+The shipped ARDS preset now constrains absolute respiratory mechanics in addition to achieved R/I, so this item no longer describes an unguarded scenario calibration. It remains open because within-group data could validate the latent openable fraction itself rather than only the observable manoeuvre it reproduces.
+
 ---
 
 ## Manual
