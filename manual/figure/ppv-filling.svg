@@ -47,12 +47,12 @@
 <line class="axis" x1="72" y1="226" x2="580" y2="226"/>
 <line class="axis" x1="72" y1="284" x2="72" y2="466"/>
 <line class="axis" x1="72" y1="466" x2="580" y2="466"/>
-<path class="total" d="M72.0 163.6 L94.1 170.2 L116.2 176.3 L138.3 177.9 L160.3 140.1 L182.4 98.3 L226.6 66.7 L270.8 117.3 L315.0 168.7 L359.1 206.0 L403.3 176.1 L447.5 138.3 L491.7 117.6 L535.8 114.9 L580.0 117.6"/>
-<path class="extra" style="stroke-dasharray:none;stroke-width:2.5" d="M72.0 302.0 L94.1 311.8 L116.2 320.9 L138.3 329.0 L160.3 336.8 L182.4 344.2 L226.6 358.4 L270.8 371.6 L315.0 383.7 L359.1 394.9 L403.3 404.7 L447.5 413.1 L491.7 419.9 L535.8 425.4 L580.0 429.8"/>
-<circle cx="94.1" cy="170.2" r="3.5" style="fill:var(--fig-total, #1f6feb);stroke:none"/>
-<circle cx="94.1" cy="311.8" r="3.5" style="fill:var(--fig-extra, #2a9d8f);stroke:none"/>
-<circle cx="580.0" cy="117.6" r="3.5" style="fill:var(--fig-total, #1f6feb);stroke:none"/>
-<circle cx="580.0" cy="429.8" r="3.5" style="fill:var(--fig-extra, #2a9d8f);stroke:none"/>
+<path class="total" d="M72.0 182.0 L94.1 187.4 L116.2 183.4 L138.3 136.7 L160.3 94.4 L182.4 71.7 L226.6 106.0 L270.8 158.2 L315.0 196.1 L359.1 193.8 L403.3 156.2 L447.5 127.2 L491.7 114.8 L535.8 115.7 L580.0 118.6"/>
+<path class="extra" style="stroke-dasharray:none;stroke-width:2.5" d="M72.0 296.3 L94.1 306.4 L116.2 315.7 L138.3 324.5 L160.3 333.0 L182.4 341.6 L226.6 357.6 L270.8 372.1 L315.0 385.1 L359.1 396.7 L403.3 406.3 L447.5 414.3 L491.7 420.8 L535.8 426.0 L580.0 430.1"/>
+<circle cx="94.1" cy="187.4" r="3.5" style="fill:var(--fig-total, #1f6feb);stroke:none"/>
+<circle cx="94.1" cy="306.4" r="3.5" style="fill:var(--fig-extra, #2a9d8f);stroke:none"/>
+<circle cx="580.0" cy="118.6" r="3.5" style="fill:var(--fig-total, #1f6feb);stroke:none"/>
+<circle cx="580.0" cy="430.1" r="3.5" style="fill:var(--fig-extra, #2a9d8f);stroke:none"/>
 <text class="label" x="72" y="35">PPV (%) — respiratory waveform variation</text>
 <text class="label" x="72" y="275">Preload reserve (% of output per mmHg)</text>
 <text class="label" x="326" y="513" text-anchor="middle">Selected stressed volume (mL)</text>
@@ -61,11 +61,11 @@
 <line class="extra" style="stroke-dasharray:none;stroke-width:2.5" x1="598" y1="86" x2="628" y2="86"/>
 <text class="label" x="635" y="90">preload reserve</text>
 <text class="tick" x="598" y="123">At 300 mL:</text>
-<text class="tick" x="598" y="139">2.5% PPV,</text>
-<text class="tick" x="598" y="155">17.0%/mmHg reserve</text>
+<text class="tick" x="598" y="139">1.7% PPV,</text>
+<text class="tick" x="598" y="155">17.5%/mmHg reserve</text>
 <text class="tick" x="598" y="183">At 1400 mL:</text>
-<text class="tick" x="598" y="199">4.8% PPV,</text>
-<text class="tick" x="598" y="215">4.0%/mmHg reserve</text>
+<text class="tick" x="598" y="199">4.7% PPV,</text>
+<text class="tick" x="598" y="215">3.9%/mmHg reserve</text>
 <text class="tick" x="598" y="312">Same passive breath</text>
 <text class="tick" x="598" y="328">at every point.</text>
 <text class="tick" x="598" y="356">Model example;</text>

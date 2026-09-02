@@ -61,15 +61,15 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. The preset leaves maximum lung capacity at the 6 L default: collapse makes the accessible baby lung smaller, while reduced `clung` independently makes its aerated tissue less compliant. A separate supine thoracic load shifts resting pleural pressure without changing chest-wall compliance. Follow end-expiratory Ppl and PL, plateau pressure, achieved R/I, derived PVR, its wedge-dependent quality badge, RV/LV ratio, septal interaction and output together. Extreme PEEP can still generate plateau pressures outside a useful quantitative range and can invalidate the catheter interpretation of the wedge surrogate; prone response is directional rather than patient-specific. See [recruitment and R/I](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md), [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) and [ventricular interdependence](ventricular-interdependence.md).
 
-R/I is one constraint, not the validator of the whole preset. The current opening-range centre is 14 cmH₂O and the requested R/I remains 0.70, but the scenario tests also constrain end-expiratory Ppl and PL, EELV, plateau pressure, measured respiratory-system compliance, filling pressures and the RV phenotype. If those absolute mechanics drift, preserving R/I alone is no longer sufficient for the scenario to pass.
+R/I is one constraint, not the validator of the whole preset. The current opening-range centre is 15.5 cmH₂O and the requested R/I remains 0.70, but the scenario tests also constrain end-expiratory Ppl and PL, EELV, plateau pressure, measured respiratory-system compliance, filling pressures and the RV phenotype. If those absolute mechanics drift, preserving R/I alone is no longer sufficient for the scenario to pass.
 
 <!-- BEGIN GENERATED: ards-scenario -->
 *Executable preset outputs after 45 s of settling. End-expiratory Ppl is read from the selected chest-wall relation at measured EELV; PL is total PEEP minus that pressure.*
 
 | state | EELV (L) | end-expiratory Ppl / PL (cmH₂O) | plateau (cmH₂O) | achieved R/I | open lung | derived PVR (WU) | RV/LV | CO (L/min) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| recruitable baseline | 1.04 | -0.9 / 12.9 | 22.1 | 0.70 | 65% | 5.0 | 1.67 | 4.07 |
-| recruitable, high PEEP | 1.34 | 0.6 / 19.4 | 39.0 | 0.70 | 77% | 5.6 | 1.73 | 3.84 |
+| recruitable baseline | 0.94 | -1.4 / 13.4 | 19.6 | 0.70 | 59% | 5.3 | 1.72 | 4.00 |
+| recruitable, high PEEP | 1.30 | 0.4 / 19.6 | 41.0 | 0.70 | 74% | 5.8 | 1.77 | 3.79 |
 | non-recruitable, high PEEP | 1.03 | -0.9 / 20.9 | 46.6 | 0.00 | 58% | 7.2 | 1.97 | 3.53 |
 <!-- END GENERATED: ards-scenario -->
 
@@ -199,7 +199,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.26 mmHg/mL |
 | Pulmonary circulation | Open-lung PVR at FRC | 0.07 mmHg·s/mL | 0.19 mmHg·s/mL |
 | Respiratory mechanics | Recruitment-to-inflation ratio | 0.50 R/I | 0.70 R/I |
-| Respiratory mechanics | Opening pressure | 20 cmH₂O | 14 cmH₂O |
+| Respiratory mechanics | Opening pressure | 20.0 cmH₂O | 15.5 cmH₂O |
 | Pulmonary circulation | Hypoxic vasoconstriction | 1.0 × | 1.6 × |
 
 #### Acute pulmonary embolism

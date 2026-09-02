@@ -14,6 +14,13 @@ import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { render } from '../render.mjs';
+import { buildSearchIndex } from './search-index.mjs';
+import { consistencyErrors } from './consistency.mjs';
+import {
+  DISEASED_RECRUITMENT_WIDTH, RI_HIGH_PEEP, RI_LOW_PEEP,
+} from '../../src/model/lung.js';
+import { REFERENCE_WEIGHT_KG, defaultParams } from '../../src/model/parameters.js';
+import { TRACE_SAMPLE_HZ, TRACE_SECONDS } from '../../src/model/simulator.js';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(readFileSync(join(ROOT, 'manifest.json'), 'utf8'));
@@ -31,10 +38,12 @@ const structural = (l) =>
   || /^!\[/.test(l) || /^\s*<!--/.test(l) || /^\s*<[^>]+>\s*$/.test(l);
 
 const files = readdirSync(ROOT).filter((f) => f.endsWith('.md')).sort();
+const documents = new Map();
 
 for (const file of files) {
   const slug = file.replace(/\.md$/, '');
   const src = readFileSync(join(ROOT, file), 'utf8');
+  documents.set(file, src);
   const lines = src.split('\n');
 
   // --- does it render, and does the maths survive? ---
@@ -100,6 +109,34 @@ for (const file of files) {
   if (!file.startsWith('_') && !planned.has(slug)) {
     warn(file, null, 'page exists but is not in the manifest, so nothing links to it');
   }
+}
+
+// --- cross-page facts and model anchors ---
+const defaults = defaultParams();
+const consistencyAnchors = {
+  'baroreflex-default': defaults.baroreflexEnabled ? 'on' : 'off',
+  'diseased-recruitment-width': `${DISEASED_RECRUITMENT_WIDTH} cmH₂O`,
+  'pericardial-capacity-default': `${defaults.pericardialCapacity} mL`,
+  'reference-weight': `${REFERENCE_WEIGHT_KG} kg`,
+  'ri-reference-step': `${RI_LOW_PEEP} → ${RI_HIGH_PEEP}`,
+  'trace-sample-rate': `${TRACE_SAMPLE_HZ} Hz`,
+  'trace-window-seconds': String(TRACE_SECONDS),
+};
+for (const message of consistencyErrors(documents, consistencyAnchors)) {
+  err('cross-page', null, message);
+}
+
+// The browser index is generated, but `manual:lint` must still reject a stale
+// checked-in file when someone runs it without rebuilding first.
+const searchable = new Map(files
+  .filter((file) => !file.startsWith('_'))
+  .map((file) => [file.replace(/\.md$/, ''), documents.get(file)]));
+const expectedSearchIndex = `${JSON.stringify(buildSearchIndex(searchable))}\n`;
+const searchIndexPath = join(ROOT, 'search-index.json');
+if (!existsSync(searchIndexPath)) {
+  err('search-index.json', null, 'missing; run npm run manual:build');
+} else if (readFileSync(searchIndexPath, 'utf8') !== expectedSearchIndex) {
+  err('search-index.json', null, 'stale; run npm run manual:build');
 }
 
 // Pages everything points at but nobody has written are expected, not errors.

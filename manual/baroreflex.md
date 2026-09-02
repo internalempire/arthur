@@ -16,7 +16,7 @@ Real baroreflex physiology is not one signal. Cardiac vagal responses can occur 
 
 ## In the model
 
-The `Baroreflex` checkbox is **off by default**. In that state the outflow is forced to zero, so a ventilatory intervention exposes the uncompensated mechanical interaction. This is a teaching reference state, not a claim that a healthy patient lacks autonomic regulation. Turning the checkbox on adds the model's aggregate pressure defence without changing the selected patient inputs.
+The `Baroreflex` checkbox is **<!-- CONSISTENCY: baroreflex-default -->off<!-- /CONSISTENCY --> by default**. In that state the outflow is forced to zero, so a ventilatory intervention exposes the uncompensated mechanical interaction. This is a teaching reference state, not a claim that a healthy patient lacks autonomic regulation. Turning the checkbox on adds the model's aggregate pressure defence without changing the selected patient inputs.
 
 The afferent signal is a low-pass mean arterial pressure, not pulsatile vessel-wall stretch. The difference between the selected set point and that mean pressure enters a saturating response. The retained `Baroreflex sensitivity` control changes how much pressure error is needed to approach the bound; it does not increase the maximum response. Sensitivity and set point remain visible but inactive while the checkbox is off, so an off/on comparison preserves their selected values.
 

@@ -10,6 +10,7 @@ import { defaultParams, REFERENCE_WEIGHT_KG } from '../src/model/parameters.js';
 import { pvrComponents, NORMAL_FRC } from '../src/model/lung.js';
 import { systemicVenousVolumeState, venousReturnFlow } from '../src/model/circulation.js';
 import { applyBaroreflex } from '../src/model/baroreflex.js';
+import { evaluateRecruitmentCohort } from './support/recruitment-cohort.mjs';
 
 function settle(overrides, seconds = 30) {
   const s = new Simulator();
@@ -33,7 +34,12 @@ const change = (before, after) => (after / before - 1) * 100;
 // catheter-derived values inside all four reported IQRs.
 const HUMAN_ARDS = {
   clung: 40, vt: 350, rr: 24, pvrBase: 0.09, hpv: 1.6,
-  collapsed: 0.42, pOpen: 21,
+  // The narrower cohort-constrained recruitment distribution moves the same
+  // mechanical transition over a shorter pressure interval. Keeping the old
+  // midpoint at 21 cmH2O would put both R/I groups on the inflation side of the
+  // PVR curve. A midpoint of 17.5 preserves the independently observed PVR
+  // separation without changing the shipped ARDS/RV-failure preset.
+  collapsed: 0.42, pOpen: 17.5,
   // The in-vivo cohort retained autonomic compensation. Keep that choice
   // explicit now that the teaching application's uncompensated default is off;
   // this does not identify a human baroreflex gain from the study.
@@ -153,6 +159,21 @@ export const LITERATURE = {
     };
   },
 
+  'ri-cohort-latent-mapping': () => {
+    const groups = evaluateRecruitmentCohort();
+    const [low, high] = groups;
+    const separation = high.wholeLungOpenableFraction
+      > low.wholeLungOpenableFraction * 1.8;
+    return {
+      pass: groups.every((group) => group.pass) && separation,
+      detail: groups.map((group) => `${group.label}: R/I ${group.calibration.achieved.toFixed(2)}, `
+        + `openable whole lung ${(group.wholeLungOpenableFraction * 100).toFixed(0)}%, `
+        + `recruited ${group.calibration.assessment.recruitedVolume.toFixed(0)} mL, `
+        + `CL ${group.lowPeepLungCompliance.toFixed(0)} → ${group.highPeepLungCompliance.toFixed(0)} mL/cmH2O`).join('; ')
+        + ' (all observed comparisons use the published group IQRs)',
+    };
+  },
+
   'transmission-chest-wall': () => {
     const compliant = settle({ ccw: 250, clung: 200, peep: 12 });
     const stiff = settle({ ccw: 70, clung: 200, peep: 12 });
@@ -220,7 +241,10 @@ export const LITERATURE = {
     // A threshold test based on a cautioned downstream pressure would only
     // verify arithmetic, not the clinical classification it claims to encode.
     const pre = settle({
-      ...HUMAN_ARDS, peep: 0, vt: 250, stressedVolume: 1700, pvrBase: 0.44, eesRv: 0.32,
+      // Classification does not require an injured lung. Keeping this fixture
+      // fully aerated isolates high pre-capillary load and prevents an R/I
+      // calibration change from deciding whether the wedge is admissible.
+      peep: 0, vt: 250, stressedVolume: 1100, pvrBase: 0.44, eesRv: 0.32,
     }, 45);
     return {
       pass: post.phClass === 'post-capillary' && pre.phClass === 'pre-capillary'

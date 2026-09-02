@@ -33,7 +33,7 @@ The simulator records systolic and diastolic pressure for each completed model b
 PPV remains a descriptive number, accompanied by [interpretability](interpretability.md):
 
 - spontaneous effort makes it **unavailable**;
-- delivered VT below 560 mL — 8 mL/kg for the fixed 70 kg reference — produces a **caution**;
+- delivered VT below 560 mL — 8 mL/kg for the fixed <!-- CONSISTENCY: reference-weight -->70 kg<!-- /CONSISTENCY --> reference — produces a **caution**;
 - fewer than 3.6 beats per breath produces a **caution**;
 - RV/LV end-diastolic volume ratio above 1.2 produces a **caution** because afterload may dominate;
 - abdominal pressure above 12 cmH₂O produces a **caution**.

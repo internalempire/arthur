@@ -25,8 +25,9 @@ work, not excuses.
 | `peep-euvolaemic-pig` | Experimental anchor, not a human clinical range: in nine anaesthetised pigs at 7.7 mL/kg, PEEP 5 → 10 raised balloon-occlusion MSFP 12.9 → 14.0 mmHg (+1.1) and changed pulmonary arterial flow 2.75 → 2.56 L/min (−6.9%, `p=0.094`). At the equivalent reference-weight tidal volume, the model allows ΔPmsf +0.5 to +1.8 mmHg and ΔCO −15% to +5%; these are model tolerances around the reported means, not study confidence intervals. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–H806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on central filling: raising PEEP from 5 to 15 reduces output more in the underfilled model than in the euvolaemic model. This is a directional teaching constraint. Fougères et al. measured a 13±9% cardiac-index fall with higher PEEP and a 14±10% restoration with passive leg raising at high PEEP; they did **not** report the former model target of a ≥1.5× between-state ratio. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
 | `pvr-recruitability-low` | At R/I 0.05 in the human ARDS calibration phenotype, PEEP 4 → 14 keeps derived PVR inside the low-recruiter trial IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | At R/I 0.50, the same manoeuvre stays inside the high-recruiter IQRs (2.31–3.61 → 2.10–3.75 WU) and changes PVR by −10% to +20%; the current model is near the upper edge at +19%, whereas the ratio of cohort medians is +5% (P = 0.55). This is broad compatibility with reported dispersion, not a close quantitative fit. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | At R/I 0.50, the same manoeuvre stays inside the high-recruiter IQRs (2.31–3.61 → 2.10–3.75 WU) and changes PVR by −10% to +20%; the current model gives +6%, while the ratio of cohort medians is +5% (P = 0.55). This is broad compatibility with reported dispersion, not a patient-level fit. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-dissociation` | Sweeping R/I from 0 to 0.8 progressively attenuates the PEEP-related PVR rise by at least 15 percentage points. No sign change is required: the measured high-recruiter median was still +5%. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `ri-cohort-latent-mapping` | In one shared mechanical phenotype, Table 2 group-median R/I values 0.35 [0.29–0.42] and 0.72 [0.68–0.77] map to progressively larger latent openable fractions while model recruited volume remains inside the reported group IQRs (90–202 and 181–421 mL) and model lung compliance at low/high PEEP remains inside the paired group IQRs (38–85/23–51 and 42–78/30–66 mL/cmH₂O). Only median R/I changes between model rows. This constrains an aggregate translation; it does not validate the unmeasured latent fraction anatomically or patient by patient. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7), Table 2 |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `pvr-human-frc-nadir` | The fully open mechanical J-curve has its minimum within 0.15 L of the model's 2.2 L human FRC. | agrees | Cecconi, Collino & Pinsky, *Intensive Care Med* 2026, Fig. 1C (clinical synthesis: minimum near FRC) |
@@ -90,7 +91,7 @@ raising absolute EELV or total PEEP; above the choke, further PEEP adds volume
 and haemodynamic cost. The row checks this direction but deliberately does not
 fit Ranieri's 85% cohort threshold or expose it as a treatment rule.
 
-## Current phase-5 R/I semantics
+## Current R/I semantics
 
 `riRatio` is the model result of a defined passive PEEP 5 → 15 cmH₂O manoeuvre,
 not a renamed fraction of units. Following Chen et al., the model subtracts the
@@ -111,6 +112,16 @@ no separate airway-opening measurement; `pOpen` is a transpulmonary alveolar
 opening pressure and must not be substituted for it. Thus the executable R/I is
 an internally consistent teaching analogue of the standard manoeuvre, not a
 claim that every bedside technical condition is represented.
+
+The diseased opening transition is 0.75 cmH₂O wide. This didactic coefficient
+was selected by a cohort-level constraint: with collapse, tissue compliance,
+capacity, chest wall and opening midpoint held fixed, the low- and high-recruiter
+median R/I values yield 118 and 263 mL recruited volume and low/high-PEEP lung
+compliances of 41/41 and 45/49 mL/cmH₂O. Each lies inside its Table 2 group IQR.
+The corresponding model openable shares are about 7% and 16% of the whole lung,
+but those percentages were not measured in the study. Group summaries also do
+not retain within-patient covariance, so this is an aggregate constraint rather
+than parameter identification or external patient validation.
 
 ## Current phase-3 volume semantics
 

@@ -204,6 +204,14 @@ the requested R/I would require more lung than is collapsed, or the selected
 opening pressure lies outside the manoeuvre, the achieved value is shown with a
 caution instead of silently changing collapse.
 
+The latent translation is constrained against the Cappio Borlino cohort with
+one shared mechanical phenotype. At group-median R/I 0.35 and 0.72, model
+recruited volume and lung compliance at low and high PEEP must remain inside the
+corresponding Table 2 IQRs. The resulting openable shares increase from about 7%
+to 16% of the whole lung. Those shares are model inferences, not measurements:
+the paper reports grouped respiratory mechanics and does not identify an
+anatomical recruitable fraction or patient-level parameter combination.
+
 The 0.5 split is retained only as the cohort median used by Chen et al. and by
 Cappio Borlino et al.; it is not a validated treatment threshold. The model also
 lacks a separate airway-opening-pressure measurement, so it cannot apply that

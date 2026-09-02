@@ -61,10 +61,16 @@ const SPREAD_EASY = 1.3; // cmH2O
 
 // Diseased units open along a distribution, rather than at one threshold. This
 // width is a didactic shape coefficient, not a claimed anatomical measurement.
-// It is deliberately narrower than the former 7 cmH2O: that broad curve made
-// even a completely openable ARDS compartment produce R/I < 0.15 during the
-// standard 5 -> 15 cmH2O manoeuvre, outside the human range the control names.
-const SPREAD_HARD = 2; // cmH2O
+// It is deliberately narrower than the former 2 cmH2O construction. With that
+// width, a shared ARDS phenotype could reproduce the observed R/I and recruited
+// volumes of the Cappio Borlino groups only by making high-PEEP local lung
+// compliance exceed the cohort IQR. A 0.75 cmH2O transition keeps both groups'
+// recruited volume and low/high-PEEP compliance inside their reported IQRs
+// without changing collapse, tissue compliance or opening pressure between
+// them. This is a cohort-constrained aggregate distribution, not an anatomical
+// alveolar threshold variance.
+export const DISEASED_RECRUITMENT_WIDTH = 0.75; // cmH2O
+const SPREAD_HARD = DISEASED_RECRUITMENT_WIDTH;
 
 // The reference manoeuvre used by Chen et al. and by the human PVR calibration:
 // R/I is protocol-dependent, so these pressures belong in the definition and

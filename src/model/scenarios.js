@@ -65,10 +65,11 @@ export const SCENARIOS = [
       // A supine thoracic load is explicit rather than hidden in the lung. It
       // shifts resting pleural pressure without changing chest-wall compliance.
       cwLoad: 10,
-      // R/I remains an independently measured 5 -> 15 cmH2O phenotype. The
-      // opening midpoint is now inside a plausible transpulmonary range instead
-      // of being raised solely to preserve that one readout.
-      riRatio: 0.7, pOpen: 14,
+      // R/I remains an independently measured 5 -> 15 cmH2O phenotype. With
+      // the cohort-constrained narrower opening transition, 15.5 cmH2O keeps
+      // the absolute mechanics in range while retaining a visible recruited
+      // versus consolidated response at high PEEP.
+      riRatio: 0.7, pOpen: 15.5,
       // Filling and RV/pulmonary load are co-tuned so correcting the respiratory
       // pressures does not erase the scenario's right-heart teaching lesion.
       stressedVolume: 900, eesRv: 0.26, pvrBase: 0.19, hpv: 1.6,

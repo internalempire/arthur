@@ -1,14 +1,16 @@
-// Regenerates the three files the manual derives from manifest.json and pages:
+// Regenerates the four files the manual derives from manifest.json and pages:
 //
 //   status.json  which pages have been written (the sidebar dims the rest)
 //   _index.md    the index page listing every page with its one-line summary
 //   bibliography.md  one deduplicated list of every page-level reference
+//   search-index.json compact full text for browser-side search
 //
 //   node manual/tools/build.mjs
 
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
+import { buildSearchIndex } from './search-index.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const manifest = JSON.parse(readFileSync(join(ROOT, 'manifest.json'), 'utf8'));
@@ -121,6 +123,15 @@ const titles = Object.fromEntries(written.map((slug) => {
 
 writeFileSync(join(ROOT, 'status.json'), JSON.stringify({ written, titles }, null, 2) + '\n');
 
+const searchDocuments = new Map(written.map((slug) => [
+  slug,
+  slug === 'bibliography'
+    ? readFileSync(join(ROOT, 'bibliography.md'), 'utf8')
+    : sources.get(`${slug}.md`),
+]));
+const searchIndex = buildSearchIndex(searchDocuments);
+writeFileSync(join(ROOT, 'search-index.json'), JSON.stringify(searchIndex) + '\n');
+
 const total = manifest.sections.reduce((a, s) => a + s.pages.length, 0);
 const lines = [
   '# Index',
@@ -142,5 +153,6 @@ for (const section of manifest.sections) {
 
 writeFileSync(join(ROOT, '_index.md'), lines.join('\n'));
 console.log(`status.json: ${written.length} written of ${total}`);
+console.log(`search-index.json: ${Object.keys(searchIndex.pages).length} pages indexed`);
 console.log('_index.md: regenerated');
 console.log(`bibliography.md: ${references.length} unique references`);

@@ -12,6 +12,9 @@ import {
   chestWallPressure, transpulmonaryAt,
 } from '../src/model/lung.js';
 import { ivcDisplayWidth } from '../src/ui/panels/thorax.js';
+import {
+  evaluateRecruitmentCohort, RECRUITMENT_COHORT_PHENOTYPE,
+} from '../tests/support/recruitment-cohort.mjs';
 
 const SETTLING_SECONDS = 45;
 
@@ -39,6 +42,17 @@ export const STRESS_INDEX_BASE = {
   mode: 'vcv', pmus: 0, rr: 14, ti: 1.2,
 };
 
+export const HYSTERESIS_EXAMPLE = Object.freeze({
+  parameters: Object.freeze({
+    mode: 'vcv', pmus: 0, vt: 250, rr: 20,
+    clung: 45, collapsed: 0.45, riRatio: 0.6,
+    hysteresis: 'on', pOpen: 25, pClose: 6,
+  }),
+  baselinePeep: 10,
+  manoeuvrePeep: 35,
+  rungs: Object.freeze([6, 8, 10, 12, 14, 18, 22, 26, 30, 34]),
+});
+
 // These cases also drive the stress-index SVG. The first comparison changes
 // maximum capacity without changing tissue compliance, so upper-limb curvature
 // is no longer manufactured by making a low-compliance lung artificially small.
@@ -64,9 +78,9 @@ export const STRESS_INDEX_CASES = [
   {
     id: 'recruiting-low',
     title: 'Tidal recruitment',
-    label: 'aerated-lung compliance 40 mL/cmH₂O, 42% collapsed, achieved R/I 0.70, transpulmonary opening midpoint 21 cmH₂O; VT 600 mL; PEEP 2',
+    label: 'aerated-lung compliance 40 mL/cmH₂O, 42% collapsed, achieved R/I 0.70, transpulmonary opening midpoint 17.6 cmH₂O; VT 600 mL; PEEP 2',
     overrides: {
-      clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 21, hysteresis: 'off',
+      clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 17.6, hysteresis: 'off',
       vt: 600, peep: 2,
     },
   },
@@ -75,7 +89,7 @@ export const STRESS_INDEX_CASES = [
     title: 'The same lung, held open',
     label: 'the same recruitable lung; VT 600 mL; PEEP 14',
     overrides: {
-      clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 21, hysteresis: 'off',
+      clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 17.6, hysteresis: 'off',
       vt: 600, peep: 14,
     },
   },
@@ -94,6 +108,8 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/pulmonary-artery-wedge-pressure.md', ids: ['wedge-peep-examples'] },
   { file: 'manual/scenarios.md', ids: ['swing-scenario', 'ards-scenario', 'scenario-overrides'] },
   { file: 'manual/baroreflex.md', ids: ['baroreflex-septic'] },
+  { file: 'manual/recruitment-and-ri.md', ids: ['ri-cohort-mapping'] },
+  { file: 'manual/hysteresis.md', ids: ['hysteresis-example'] },
 ];
 
 const fixed = (value, digits) => value.toFixed(digits);
@@ -568,6 +584,94 @@ function baroreflexSepticBlock() {
   ].join('\n');
 }
 
+function recruitmentCohortBlock() {
+  const groups = evaluateRecruitmentCohort();
+  const phenotype = RECRUITMENT_COHORT_PHENOTYPE;
+  return [
+    `*Executable shared phenotype: collapsed compartment ${Math.round(phenotype.collapsed * 100)}%, aerated-lung compliance ${phenotype.clung} mL/cmH\u2082O, maximum capacity ${fixed(phenotype.lungCapacity, 1)} L, chest-wall compliance ${phenotype.ccw} mL/cmH\u2082O, no external wall load and diseased opening midpoint ${phenotype.pOpen} cmH\u2082O. Only the cohort median R/I changes between rows.*`,
+    '',
+    '| cohort group | requested / achieved R/I | latent openable share of diseased compartment | latent openable share of whole lung | recruited volume, model / observed IQR (mL) | low-PEEP C<sub>L</sub>, model / observed IQR | high-PEEP C<sub>L</sub>, model / observed IQR |',
+    '|---|---:|---:|---:|---:|---:|---:|',
+    ...groups.map((group) => `| ${group.label} | ${fixed(group.riRatio, 2)} / ${fixed(group.calibration.achieved, 2)} | ${Math.round(group.calibration.openableFraction * 100)}% | ${Math.round(group.wholeLungOpenableFraction * 100)}% | ${Math.round(group.calibration.assessment.recruitedVolume)} / ${group.recruitedVolume[0]}\u2013${group.recruitedVolume[1]} | ${Math.round(group.lowPeepLungCompliance)} / ${group.lowPeepLungCompliance[0]}\u2013${group.lowPeepLungCompliance[1]} | ${Math.round(group.highPeepLungCompliance)} / ${group.highPeepLungCompliance[0]}\u2013${group.highPeepLungCompliance[1]} |`),
+  ].join('\n');
+}
+
+export function runHysteresisExample() {
+  const config = HYSTERESIS_EXAMPLE;
+  const manoeuvre = (tidalVolume) => {
+    const simulator = settledSimulator({
+      ...config.parameters, vt: tidalVolume, peep: config.baselinePeep,
+    });
+    const before = {
+      open: simulator.metrics.openFraction,
+      pvr: simulator.metrics.pvrCoefficientWood,
+    };
+    simulator.setParam('peep', config.manoeuvrePeep);
+    simulator.advance(30, true);
+    simulator.setParam('peep', config.baselinePeep);
+    simulator.advance(45, true);
+    return {
+      before,
+      after: {
+        open: simulator.metrics.openFraction,
+        pvr: simulator.metrics.pvrCoefficientWood,
+      },
+    };
+  };
+
+  const simulator = settledSimulator({
+    ...config.parameters, peep: config.rungs[0],
+  });
+  const incremental = new Map();
+  const decremental = new Map();
+  for (const peep of config.rungs) {
+    simulator.setParam('peep', peep);
+    simulator.advance(30, true);
+    incremental.set(peep, {
+      pl: simulator.resp.plSolved,
+      open: simulator.metrics.openFraction,
+    });
+  }
+  for (const peep of [...config.rungs].reverse()) {
+    simulator.setParam('peep', peep);
+    simulator.advance(30, true);
+    decremental.set(peep, {
+      pl: simulator.resp.plSolved,
+      open: simulator.metrics.openFraction,
+    });
+  }
+  return { held: manoeuvre(250), largerBreath: manoeuvre(400), incremental, decremental };
+}
+
+function hysteresisExampleBlock() {
+  const result = runHysteresisExample();
+  const rows = [6, 8, 10, 14, 22];
+  const gain = (result.held.after.open - result.held.before.open) * 100;
+  const largerGain = (result.largerBreath.after.open - result.largerBreath.before.open) * 100;
+  return [
+    `*Executable setup: volume control, VT 250 mL, 20/min, aerated-lung compliance 45 mL/cmH₂O, 45% collapsed, achieved R/I 0.60, opening midpoint ${HYSTERESIS_EXAMPLE.parameters.pOpen} cmH₂O and closing midpoint ${HYSTERESIS_EXAMPLE.parameters.pClose} cmH₂O. After settling at PEEP ${HYSTERESIS_EXAMPLE.baselinePeep}, PEEP is raised to ${HYSTERESIS_EXAMPLE.manoeuvrePeep} for 30 s and returned to ${HYSTERESIS_EXAMPLE.baselinePeep}.*`,
+    '',
+    '| | before | after |',
+    '|---|---:|---:|',
+    `| lung open | ${fixed(result.held.before.open * 100, 1)}% | **${fixed(result.held.after.open * 100, 1)}%** |`,
+    `| pulmonary resistance coefficient | ${fixed(result.held.before.pvr, 2)} WU | ${fixed(result.held.after.pvr, 2)} WU |`,
+    '',
+    `At the same final PEEP, ${fixed(gain, 1)} percentage points more lung remain open. Within the model, the larger aerated fraction also lowers the pulmonary resistance coefficient.`,
+    '',
+    '![Open fraction during an incremental and decremental PEEP sequence](figure/hysteresis.svg)',
+    '',
+    '| PEEP | incremental: P<sub>l</sub> / open | decremental: P<sub>l</sub> / open |',
+    '|---|---:|---:|',
+    ...rows.map((peep) => {
+      const up = result.incremental.get(peep);
+      const down = result.decremental.get(peep);
+      return `| ${peep} cmH₂O | ${fixed(up.pl, 1)} / ${fixed(up.open * 100, 1)}% | ${fixed(down.pl, 1)} / **${fixed(down.open * 100, 1)}%** |`;
+    }),
+    '',
+    `Increasing tidal volume from 250 to 400 mL leaves a ${fixed(largerGain, 1)}-point gain after the manoeuvre because the preceding breaths had already recruited more of the available compartment. This is a model illustration, not a recommendation to use a larger tidal volume.`,
+  ].join('\n');
+}
+
 export function renderDocumentedExampleBlocks() {
   const rows = stressRows();
   const peepRows = peepSweepRows();
@@ -587,6 +691,8 @@ export function renderDocumentedExampleBlocks() {
     ['swing-scenario', swingScenarioBlock()],
     ['ards-scenario', ardsScenarioBlock()],
     ['baroreflex-septic', baroreflexSepticBlock()],
+    ['ri-cohort-mapping', recruitmentCohortBlock()],
+    ['hysteresis-example', hysteresisExampleBlock()],
     ['scenario-overrides', scenarioOverridesBlock()],
   ]);
 }

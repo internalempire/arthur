@@ -8,6 +8,46 @@ from code or commit history alone.
 Historical investigations remain in the dated postmortem. This file records the
 current decision.
 
+## 2026-09-02 — Constrain the latent R/I mapping with cohort mechanics
+
+### Decision
+
+- Narrow the diseased-unit logistic opening width from 2 to 0.75 cmH2O while
+  leaving the already-aerated distribution unchanged.
+- Evaluate the published low- and high-recruiter median R/I values in one shared
+  phenotype. Collapse, aerated-lung compliance, maximum capacity, chest wall,
+  wall load and opening midpoint are identical; only requested R/I changes.
+- Require achieved R/I, recruited volume and lung compliance at both PEEP levels
+  to agree simultaneously with the Cappio Borlino Table 2 group ranges.
+- Keep the separately matched human PVR fixture separate from shipped presets.
+  Its opening midpoint moves from 21 to 17.5 cmH2O so the independently tested
+  low/high-recruitability PVR separation remains compatible after the narrower
+  opening transition; no SVC/IVC representation is changed.
+- Retune the shipped `ards-rv` midpoint from 14 to 15.5 cmH2O. This preserves
+  the existing absolute Ppl/PL, plateau, compliance, filling-pressure and RV-load
+  guards while restoring the intended recruitable-versus-consolidated response
+  at high PEEP and the directional prone RV unloading check.
+
+### Why
+
+The earlier mapping guaranteed that the selected R/I could be reproduced, but
+did not ask whether the resulting latent fraction produced plausible respiratory
+mechanics. With a 2 cmH2O transition, no shared phenotype found in the tested
+grid kept recruited volume and low/high-PEEP lung compliance inside both cohort
+IQRs. The narrower transition does: median R/I 0.35 and 0.72 produce 118 and
+263 mL recruited volume, lung compliance 41 to 41 and 45 to 49 mL/cmH2O, and
+latent openable shares of about 7% and 16% of the whole lung respectively.
+
+### Validation boundary
+
+The source reports group medians and IQRs, not the model's openable fraction and
+not patient-level covariance between all inputs and outcomes. The percentages
+are therefore inferred model states, not anatomically validated measurements.
+The shared phenotype is a cohort-level consistency check rather than a fitted
+patient or an assertion that the logistic width is biological. Scenario guards
+and the separate PVR manoeuvre remain necessary because matching R/I alone does
+not validate an absolute pressure-volume state or haemodynamic response.
+
 ## 2026-09-01 — Recalibrate ARDS and large-effort presets against multiple observables
 
 ### Decision

@@ -5,6 +5,7 @@ import {
   DOCUMENTED_EXAMPLE_TARGETS, renderDocumentedExampleBlocks,
 } from '../../manual/model-examples.mjs';
 import { section, check } from '../support/model.mjs';
+import { consistencyErrors } from '../../manual/tools/consistency.mjs';
 
 section('Numerical examples quoted in the documentation');
 {
@@ -18,4 +19,22 @@ section('Numerical examples quoted in the documentation');
         'run npm run manual:examples to regenerate it');
     }
   }
+}
+
+section('Cross-page contradiction lint');
+{
+  const aligned = new Map([
+    ['one.md', '<!-- CONSISTENCY: example -->12<!-- /CONSISTENCY -->'],
+    ['two.md', '<!-- CONSISTENCY: example -->12<!-- /CONSISTENCY -->'],
+  ]);
+  const contradictory = new Map(aligned);
+  contradictory.set('two.md', '<!-- CONSISTENCY: example -->13<!-- /CONSISTENCY -->');
+  check('matching visible facts agree with their model anchor',
+    consistencyErrors(aligned, { example: '12' }).length === 0);
+  check('a cross-page disagreement is rejected',
+    consistencyErrors(contradictory, { example: '12' })
+      .some((message) => message.includes('disagrees')));
+  check('a repeated but stale fact is rejected against its model source',
+    consistencyErrors(aligned, { example: '14' })
+      .some((message) => message.includes('model source')));
 }

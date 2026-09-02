@@ -48,6 +48,7 @@ Interpretability is also executable physiology. A zone-3 state must leave the [w
 [`LITERATURE_RANGES.md`](../docs/LITERATURE_RANGES.md) converts selected published findings into executable manoeuvres. Current rows include:
 
 - human ARDS absolute PVR and PEEP response in low- and high-recruitability calibration phenotypes;
+- human ARDS group recruited volume and low/high-PEEP lung compliance for one shared latent R/I-mapping phenotype;
 - a PVR minimum near model FRC and the correct direction of both J-curve limbs;
 - chest-wall and lung effects on pressure transmission;
 - greater haemodynamic PEEP cost at lower filling;
@@ -56,6 +57,8 @@ Interpretability is also executable physiology. A zone-3 state must leave the [w
 - withholding PPV during spontaneous breathing and pulmonary-hypertension classification logic.
 
 The source table records whether each row currently agrees. Its status field is itself tested, so documentation cannot continue to say *agrees* after the executable predicate fails.
+
+The manual has two narrower implementation guards as well. A generated search index is compared byte-for-byte with current page text, and explicitly marked repeated facts must agree across pages and with selected exported model constants. The latter catches known numerical contradictions; it is not a semantic proof that all unmarked prose agrees.
 
 ### Scenario contracts
 
