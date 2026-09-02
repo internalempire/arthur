@@ -37,7 +37,7 @@ The full reason remains on the numerical tile. Panels whose central reading depe
 |---|---|---|
 | stress index | not passive volume control, or no complete breath | — |
 | preload reserve | the Guyton curves have no finite crossing | — |
-| PPV | spontaneous effort | VT below 8 mL/kg for an assumed 70 kg reference, fewer than 3.6 beats/breath, RV/LV EDV ratio above 1.2, or abdominal pressure above 12 cmH₂O |
+| PPV | spontaneous effort | VT below 8 mL/kg for an assumed <!-- CONSISTENCY: reference-weight -->70 kg<!-- /CONSISTENCY --> reference, fewer than 3.6 beats/breath, RV/LV EDV ratio above 1.2, or abdominal pressure above 12 cmH₂O |
 | R/I | no collapsed compartment | the requested ratio exceeds what the selected lung can recruit |
 | plateau pressure | spontaneous effort | — |
 | wedge surrogate | — | the zone 3 pressure-margin index is below 0.95 |

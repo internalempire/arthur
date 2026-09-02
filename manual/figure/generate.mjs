@@ -26,7 +26,7 @@ import {
   systemicVenousVolumeState, pericardialPressure, PRELOAD_STEEP,
 } from '../../src/model/circulation.js';
 import {
-  STRESS_INDEX_BASE, STRESS_INDEX_CASES, runOcclusionExample,
+  HYSTERESIS_EXAMPLE, STRESS_INDEX_BASE, STRESS_INDEX_CASES, runOcclusionExample,
 } from '../model-examples.mjs';
 
 const OUT = dirname(fileURLToPath(import.meta.url));
@@ -906,13 +906,8 @@ ${yTicks.join('\n')}
 // would compare the limbs at different distending pressures, and `pClose` is
 // defined as a transpulmonary pressure, not as a PEEP.
 function hysteresisFigure() {
-  const base = {
-    ...defaultParams(),
-    mode: 'vcv', pmus: 0, vt: 250, rr: 20,
-    clung: 45, collapsed: 0.45, riRatio: 0.6,
-    hysteresis: 'on', pOpen: 22, pClose: 6,
-  };
-  const rungs = [6, 8, 10, 12, 14, 18, 22, 26, 30, 34];
+  const base = { ...defaultParams(), ...HYSTERESIS_EXAMPLE.parameters };
+  const rungs = HYSTERESIS_EXAMPLE.rungs;
 
   const sim = settled({ ...base, peep: rungs[0] }, 45);
   const inflating = [], deflating = [];

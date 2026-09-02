@@ -49,26 +49,30 @@ The resulting total open fraction is used by lung mechanics, strain and [pulmona
 
 ### A reproducible experiment
 
-Consider a recruitable ARDS phenotype under volume control: tidal volume 250 mL, respiratory rate 20/min, `clung` 45 mL/cmH₂O, `collapsed` 0.45, R/I 0.6, `pOpen` 22 cmH₂O and `pClose` 6 cmH₂O. After equilibration at PEEP 10, PEEP is raised to 35 for 30 seconds and then returned to 10.
+The executable example below uses one recruitable ARDS phenotype for both the manoeuvre and the incremental/decremental paths.
+
+<!-- BEGIN GENERATED: hysteresis-example -->
+*Executable setup: volume control, VT 250 mL, 20/min, aerated-lung compliance 45 mL/cmH₂O, 45% collapsed, achieved R/I 0.60, opening midpoint 25 cmH₂O and closing midpoint 6 cmH₂O. After settling at PEEP 10, PEEP is raised to 35 for 30 s and returned to 10.*
 
 | | before | after |
-|---|---|---|
-| lung open | 80.3% | **96.2%** |
-| pulmonary resistance coefficient | 1.41 WU | 1.21 WU |
+|---|---:|---:|
+| lung open | 76.9% | **87.8%** |
+| pulmonary resistance coefficient | 1.49 WU | 1.33 WU |
 
-At the same final PEEP, 15.9 percentage points more lung remain open. Within the model, the larger aerated fraction also lowers the pulmonary resistance coefficient.
-
-Walking the same simulated lung upward and then downward through a PEEP sequence produces two recruitment-state paths:
+At the same final PEEP, 10.9 percentage points more lung remain open. Within the model, the larger aerated fraction also lowers the pulmonary resistance coefficient.
 
 ![Open fraction during an incremental and decremental PEEP sequence](figure/hysteresis.svg)
 
 | PEEP | incremental: P<sub>l</sub> / open | decremental: P<sub>l</sub> / open |
-|---|---|---|
-| 6 cmH₂O | 9.2 / 69.9% | 7.9 / **87.5%** |
-| 8 | 10.6 / 75.0% | 9.3 / **92.7%** |
-| 10 | 12.0 / 80.2% | 10.8 / **96.2%** |
-| 14 | 14.7 / 90.4% | 14.0 / **99.2%** |
-| 22 | 20.9 / 99.6% | 20.9 / 100.0% |
+|---|---:|---:|
+| 6 cmH₂O | 15.7 / 65.3% | 13.8 / **87.8%** |
+| 8 cmH₂O | 16.9 / 70.8% | 15.5 / **87.8%** |
+| 10 cmH₂O | 18.1 / 76.8% | 17.1 / **87.8%** |
+| 14 cmH₂O | 20.6 / 86.3% | 20.5 / **87.8%** |
+| 22 cmH₂O | 27.2 / 87.8% | 27.2 / **87.8%** |
+
+Increasing tidal volume from 250 to 400 mL leaves a 0.8-point gain after the manoeuvre because the preceding breaths had already recruited more of the available compartment. This is a model illustration, not a recommendation to use a larger tidal volume.
+<!-- END GENERATED: hysteresis-example -->
 
 The two paths meet at high pressure, where almost all recruitable units are open, and separate as pressure falls through the range in which recruitment can be retained. The exact horizontal coordinates differ between the paths because the same PEEP does not produce the same transpulmonary pressure when aerated volume differs.
 
@@ -80,7 +84,7 @@ Three examples are useful at the bedside:
 
 **Pressure afterwards is too low.** If pressure falls through the closing range, recently opened units close again. In the example above, raising `pClose` to 14 cmH₂O leaves essentially no persistent gain after return to PEEP 10.
 
-**Ordinary breaths already reach the opening range.** Increasing tidal volume from 250 to 400 mL leaves only a 2.3-point gain after the manoeuvre because the preceding breaths had already recruited much of the available compartment. This is a model illustration, not a recommendation to use a larger tidal volume.
+**Ordinary breaths may already reach the opening range.** The generated comparison above shows how increasing tidal volume reduces the additional gain left for the manoeuvre.
 
 **The collapsed lung is poorly recruitable.** Pressure cannot retain units that the model has classified as non-openable consolidation.
 

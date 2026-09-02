@@ -4,6 +4,7 @@
 // imports and missing DOM anchors without spending minutes settling patients.
 
 import { readFileSync, readdirSync } from 'node:fs';
+import { searchPages } from '../manual/search.js';
 
 const failures = [];
 let passed = 0;
@@ -68,6 +69,16 @@ check('patient-state controls keep full accessible names in the compact header',
     && /id=["']load-patient["'][^>]+aria-label=["']Load patient["'][^>]*>Load pt<\/button>/.test(html)
     && /#speed\s*\{[^}]*width:\s*60px/s.test(css)
     && /#scenario\s*\{[^}]*width:\s*260px/s.test(css));
+const searchIndex = JSON.parse(readFileSync(new URL('../manual/search-index.json', import.meta.url), 'utf8'));
+const searchFixture = [{
+  slug: 'vascular-waterfalls',
+  title: 'Vascular waterfalls',
+  blurb: 'Flow limitation',
+  body: searchIndex.pages['vascular-waterfalls'],
+}];
+check('manual full-text search finds terms absent from title and summary',
+  searchPages(searchFixture, 'azygos rerouting')[0]?.slug === 'vascular-waterfalls'
+    && /fetch\('search-index\.json'\)/.test(readFileSync(new URL('../manual/app.js', import.meta.url), 'utf8')));
 check('numerical tiles retain one thin solid outline across kinds and quality states',
   /\.tile\s*\{[^}]*border:\s*1px solid var\(--border\)/s.test(css)
     && !/\.tile\[data-kind=[^\]]+\][^\n{]*\{[^}]*border-left/s.test(css)

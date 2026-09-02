@@ -126,8 +126,8 @@ This distinction changes the meaning of disease states. A collapsed, stiff lung 
 | phenotype | end-expiratory volume (L) |
 |---|---:|
 | normal | 2.71 |
-| 30% collapsed | 2.23 |
-| 50% collapsed | 1.81 |
+| 30% collapsed | 2.22 |
+| 50% collapsed | 1.79 |
 | emphysematous, aerated-lung compliance 400 mL/cmH₂O | 3.18 |
 | smaller 4.0 L maximum-capacity lung | 2.48 |
 <!-- END GENERATED: pv-eelv -->

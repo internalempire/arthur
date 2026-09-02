@@ -44,7 +44,7 @@ Respiratory and vascular pressures deliberately do not share an axis. Their unit
 
 Press **Pause**, then drag the time cursor above the strips or drag directly across any waveform. The vertical cursor crosses all four strips on one clock. Numerical tiles and the live point in each diagram move to the model state nearest that instant, allowing Paw, Ppl, CVP, ventricular position and lung position to be read together rather than estimated by eye.
 
-The waveform itself remains sampled at 250 Hz. The complete state needed by the other panels is retained every 50 ms, so their selected point can differ from the cursor by at most about 25 ms. This lighter presentation history does not rewind the simulator and is cleared when a scenario, patient file or reset creates a fresh simulation.
+The waveform itself remains sampled at <!-- CONSISTENCY: trace-sample-rate -->250 Hz<!-- /CONSISTENCY -->. The complete state needed by the other panels is retained every 50 ms, so their selected point can differ from the cursor by at most about 25 ms. This lighter presentation history does not rewind the simulator and is cleared when a scenario, patient file or reset creates a fresh simulation.
 
 Static relations are recalculated from the parameters stored at the selected instant. A single instant cannot define an entire respiratory or cardiac loop: the cursor therefore moves the live point, but it does not invent a historical full-cycle trace.
 

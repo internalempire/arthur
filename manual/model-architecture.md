@@ -37,7 +37,9 @@ Reset creates respiratory, reflex and circulatory state and advances the model s
 
 ## Sampling and display
 
-The integrator runs independently of visual frame rate. Traces are sampled at 250 Hz into 12-second ring buffers. Haemodynamic means use exponential or cardiac-cycle windows chosen for their intended display. Panels read these shared measurements or exported analytic functions; model-backed manual figures import the same functions.
+The integrator runs independently of visual frame rate. Traces are sampled at <!-- CONSISTENCY: trace-sample-rate -->250 Hz<!-- /CONSISTENCY --> into <!-- CONSISTENCY: trace-window-seconds -->12<!-- /CONSISTENCY -->-second ring buffers. Haemodynamic means use exponential or cardiac-cycle windows chosen for their intended display. Panels read these shared measurements or exported analytic functions; model-backed manual figures import the same functions.
+
+The manual viewer builds a compact full-text index from the authored Markdown, so search covers page content as well as titles and summaries. Documentation lint also compares explicitly marked repeated facts across pages and, where available, against exported model constants. This is a deterministic guard for selected values, not general semantic contradiction detection; unmarked prose still requires review.
 
 The application has no runtime framework and no build step. Native ES modules run in the browser; Node is used only for tests, documentation tooling and figure generation. A static HTTP server is required because browsers do not load the module graph correctly from `file://`.
 

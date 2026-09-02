@@ -46,7 +46,7 @@ Flow is positive in the forward physiological direction. Lung volume in the wave
 
 ## Time conventions
 
-Waveforms show the most recent 12 seconds. Numerical haemodynamic values are generally beat or cycle measurements smoothed for readability; the instantaneous drawing may therefore lead or lag a tile slightly. On the Guyton panel, the faint trail uses one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. The filled point averages those variables over one complete breath so it can be compared with the hollow analytic crossing. Neither venous-inflow display is a direct cardiac-output measurement.
+Waveforms show the most recent <!-- CONSISTENCY: trace-window-seconds -->12<!-- /CONSISTENCY --> seconds. Numerical haemodynamic values are generally beat or cycle measurements smoothed for readability; the instantaneous drawing may therefore lead or lag a tile slightly. On the Guyton panel, the faint trail uses one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. The filled point averages those variables over one complete breath so it can be compared with the hollow analytic crossing. Neither venous-inflow display is a direct cardiac-output measurement.
 
 Simulation speed changes wall-clock playback only. Pause freezes state; it is not an occlusion. Respiratory holds are model manoeuvres and continue according to simulated time.
 

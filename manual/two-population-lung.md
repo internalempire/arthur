@@ -23,7 +23,7 @@ One volume, two populations of units sharing it.
 **Diseased units** — a fraction $d$, the `collapsed` control — are split again. Only a fraction of them is *openable*; the rest never opens at any pressure and stands for consolidation. The openable ones follow a logistic centred on the `pOpen` control.
 
 $$
-\varphi(P_l) = (1-d)\,\sigma\!\left(\frac{P_l - 0}{1.3}\right) + d\,\omega\,\sigma\!\left(\frac{P_l - P_{open}}{2}\right)
+\varphi(P_l) = (1-d)\,\sigma\!\left(\frac{P_l - 0}{1.3}\right) + d\,\omega\,\sigma\!\left(\frac{P_l - P_{open}}{0.75}\right)
 $$
 
 This is the equilibrium relation used when hysteresis is off. With [recruitment hysteresis](hysteresis.md) enabled, only the collapsed but recruitable contribution retains memory; the already-aerated contribution continues to follow the current pressure. Their sum remains the total open fraction used elsewhere in the model.
@@ -34,9 +34,9 @@ This is the equilibrium relation used when hysteresis is off. With [recruitment 
 - $\omega$ — the openable share of the diseased compartment, **not** a user control; it is solved from the requested [R/I ratio](recruitment-and-ri.md)
 - $P_l$ — transpulmonary pressure, cmH₂O
 - $P_{open}$ — the `pOpen` control, cmH₂O
-- 1.3 and 2 cmH₂O — the widths of the two distributions
+- 1.3 and <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY --> — the widths of the two distributions
 
-The 2 cmH₂O width of the diseased distribution is a **didactic shape coefficient**. It was narrowed from 7: the broader curve made even a completely openable ARDS compartment produce an R/I below 0.15 during the standard manoeuvre, outside the human range the control is named after.
+The 0.75 cmH₂O width of the diseased distribution is a **didactic shape coefficient**, not an anatomical estimate of alveolar opening-pressure variance. It was narrowed first from 7 to make clinically observed R/I attainable, then from 2 because one shared cohort phenotype could not otherwise keep recruited volume and low/high-PEEP lung compliance inside the published low- and high-recruiter IQRs. The [R/I page](recruitment-and-ri.md#cohort-constraint-on-the-latent-mapping) shows that executable comparison and its limits.
 
 ### The sponge idealisation
 

@@ -69,8 +69,8 @@ The panels are scaled independently because their pressure excursions differ. A 
 | normal aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8 | 1.01 | 13.2 | 5.2 | 96 |
 | maximum lung capacity 4.0 L, aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 900 mL; PEEP 8 | 1.25 | 19.8 | 11.8 | 76 |
 | the same 4.0 L maximum-capacity lung; VT 350 mL; PEEP 8 | 1.05 | 12.0 | 4.0 | 87 |
-| aerated-lung compliance 40 mL/cmH₂O, 42% collapsed, achieved R/I 0.70, transpulmonary opening midpoint 21 cmH₂O; VT 600 mL; PEEP 2 | 0.62 | 15.0 | 13.0 | 46 |
-| the same recruitable lung; VT 600 mL; PEEP 14 | 1.53 | 29.9 | 15.9 | 38 |
+| aerated-lung compliance 40 mL/cmH₂O, 42% collapsed, achieved R/I 0.70, transpulmonary opening midpoint 17.6 cmH₂O; VT 600 mL; PEEP 2 | 0.58 | 10.1 | 8.1 | 74 |
+| the same recruitable lung; VT 600 mL; PEEP 14 | 1.03 | 31.8 | 17.8 | 34 |
 <!-- END GENERATED: stress-index -->
 
 The normal lung is close to linear. With the same aerated-tissue compliance but a smaller 4 L maximum capacity, a 900 mL breath moves farther up the upper limb and raises the index; reducing tidal volume to 350 mL returns the same lung close to linear. This comparison deliberately changes **capacity**, not compliance, so overdistension is not manufactured by using one control for both properties.

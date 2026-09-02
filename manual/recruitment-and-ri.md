@@ -30,7 +30,7 @@ The index is **protocol-dependent**: it is defined by a particular PEEP step, an
 
 The user sets `riRatio`. The model does **not** use it directly. It solves for the internal openable fraction that would produce that ratio under the reference manoeuvre.
 
-**The reference manoeuvre** is PEEP 5 → 15 cmH₂O, held as constants in the lung module rather than hidden in a test fixture, because the number means nothing without them.
+**The reference manoeuvre** is PEEP <!-- CONSISTENCY: ri-reference-step -->5 → 15<!-- /CONSISTENCY --> cmH₂O, held as constants in the lung module rather than hidden in a test fixture, because the number means nothing without them.
 
 **The solve.** For a candidate openable fraction, the model computes the static end-expiratory volume at both PEEP levels, takes the tangent respiratory system compliance at the low one, and applies the R/I formula. It samples twelve candidates, finds the maximum achievable ratio for this phenotype, then bisects to the requested value. This is a static analogue of the bedside method, not a simulation of its single-breath measurement protocol.
 
@@ -49,6 +49,21 @@ The user sets `riRatio`. The model does **not** use it directly. It solves for t
 The last row is the interesting one: the request is refused and the readout says so.
 
 The negative recruited volume at R/I 0 is not a bug. It means the average compliance over the step was *lower* than its low-PEEP tangent — pure inflation with a touch of overdistension. Bedside R/I is reported from zero upward, so the clinical readout is floored while the raw value stays available to the tests.
+
+### Cohort constraint on the latent mapping
+
+The internal openable fraction is not observed in the Cappio Borlino cohort. It can nevertheless be constrained indirectly: one shared mechanical phenotype is evaluated at the published median R/I of the low- and high-recruiter groups, then its recruited volume and lung compliance at low and high PEEP are required to remain inside the corresponding Table 2 interquartile ranges. Collapse, tissue compliance, maximum capacity, chest wall and opening midpoint do not change between the rows.
+
+<!-- BEGIN GENERATED: ri-cohort-mapping -->
+*Executable shared phenotype: collapsed compartment 30%, aerated-lung compliance 55 mL/cmH₂O, maximum capacity 6.0 L, chest-wall compliance 200 mL/cmH₂O, no external wall load and diseased opening midpoint 17 cmH₂O. Only the cohort median R/I changes between rows.*
+
+| cohort group | requested / achieved R/I | latent openable share of diseased compartment | latent openable share of whole lung | recruited volume, model / observed IQR (mL) | low-PEEP C<sub>L</sub>, model / observed IQR | high-PEEP C<sub>L</sub>, model / observed IQR |
+|---|---:|---:|---:|---:|---:|---:|
+| low recruiters | 0.35 / 0.35 | 24% | 7% | 118 / 90–202 | 41 / undefined–undefined | 41 / undefined–undefined |
+| high recruiters | 0.72 / 0.72 | 53% | 16% | 263 / 181–421 | 45 / undefined–undefined | 49 / undefined–undefined |
+<!-- END GENERATED: ri-cohort-mapping -->
+
+The higher median R/I therefore maps to a larger latent recruitable share without using a different lung phenotype to obtain the answer. The diseased opening transition has a <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY --> width because the previous 2 cmH₂O transition could not keep recruited volume and both compliance measurements inside the reported group ranges simultaneously. This is an aggregate cohort constraint on the translation, not direct anatomical validation of the latent percentages: the study did not measure those percentages, and its IQRs do not preserve patient-level covariance.
 
 ### What recruitment then does
 
@@ -79,7 +94,7 @@ The difference was not cosmetic. With the earlier opening distribution, the refe
 
 ### Of the construction
 
-- **R/I is protocol-dependent and the model fixes one protocol.** Its 5 → 15 step is the reference; a patient's measured value from a different step is not the same quantity.
+- **R/I is protocol-dependent and the model fixes one protocol.** Its <!-- CONSISTENCY: ri-reference-step -->5 → 15<!-- /CONSISTENCY --> step is the reference; a patient's measured value from a different step is not the same quantity.
 - **No airway opening pressure.** Chen's method corrects for the case where airway opening pressure exceeds the low PEEP; the model has no such measurement, so its 10 cmH₂O effective step cannot reproduce that correction.
 - **The solve is static.** It uses equilibrium volumes, not a single-breath manoeuvre with its flow and timing.
 - **The calibration ignores hysteretic history.** The internal mapping from requested R/I to openable fraction does not include `pClose` or the path by which the lung reached either pressure. When hysteresis is enabled, the actual decremental response can therefore differ from the static reference mapping.

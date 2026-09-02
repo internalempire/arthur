@@ -33,7 +33,7 @@ Airway resistance remains linear; EFL adds a separate expiratory choke. This dis
 | control | range | model meaning |
 |---|---:|---|
 | collapsed lung | 0–0.80 | fraction unavailable at low pressure before recruitment |
-| R/I ratio | 0–2.0 | target recruitment relative to inflation for model PEEP 5→15 |
+| R/I ratio | 0–2.0 | target recruitment relative to inflation for model PEEP <!-- CONSISTENCY: ri-reference-step -->5 → 15<!-- /CONSISTENCY --> |
 | opening pressure | 5–40 cmH₂O | centre of the opening range of recruitable diseased units |
 | recruitment hysteresis | off/on | permits recruited diseased units to remain open on falling pressure |
 | closing pressure | 2–40 cmH₂O | centre of the closing range; active only with hysteresis on |

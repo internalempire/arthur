@@ -62,7 +62,7 @@ $$
 - $P_{peri}$ — pericardial pressure, mmHg, added to pleural pressure to form the pressure surrounding every chamber
 - $k_{peri}$ — the `pericardium` control, 0 to 4
 - $V_{heart}$ — summed volume of all four chambers, mL
-- $C_{peri}$ — the `pericardialCapacity` control, 100 to 600 mL; 430 mL by default
+- $C_{peri}$ — the `pericardialCapacity` control, 100 to 600 mL; <!-- CONSISTENCY: pericardial-capacity-default -->430 mL<!-- /CONSISTENCY --> by default
 - 62 mL is the scale over which pressure steepens
 
 Its output is added to pleural pressure to form the pressure surrounding every chamber. It therefore does not act on one ventricle: it lifts all four together. Reducing capacity moves the knee leftward and represents lost space inside the sac; it is not a literal effusion volume. See [cardiac tamponade](cardiac-tamponade.md) for the full construction.
