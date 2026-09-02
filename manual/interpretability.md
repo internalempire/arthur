@@ -29,6 +29,8 @@ Each supported derived index has one of three states:
 
 This is separate from the model-wide validity flag. The global flag detects numerical or domain failures such as a compartment reaching its volume floor, non-finite output, an impossible ejection fraction or a lung clamped at capacity. An individual index may be unavailable in an otherwise valid simulation.
 
+The full reason remains on the numerical tile. Panels whose central reading depends on one of these indices also show a compact contextual warning: Guyton names preload-reserve interpretability, while the PVR–volume panel names **Derived PVR** specifically so that a wedge problem is not mistaken for failure of the mechanical J-curve.
+
 ### Current index rules
 
 | index | unavailable when | caution when |

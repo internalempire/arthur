@@ -49,8 +49,11 @@ This preset combines high aggregate pulmonary vascular load with a vulnerable ri
 - Compare a state with itself after one controlled change; do not compare unrelated presets as though they were cohorts.
 - Read trends over several breaths. The left heart receives changing RV output only after [pulmonary transit](pulmonary-transit.md).
 - A tile marked *caution* remains visible but has a known confounder. A value marked *unavailable* is intentionally withheld.
+- A small warning on a diagram qualifies the named derived interpretation, not every construction in that panel. For example, **Derived PVR: use with caution** does not invalidate the mechanical PVR–volume curve.
+- Controls with a coloured dot differ from the model's neutral reference parameter set. The mark explains how the present phenotype was constructed; it does not label that setting abnormal or unsafe.
 - Reset before beginning a new comparison. Reset also clears occlusion points from the Guyton panel.
-- Use Play/Pause to inspect a frame; pausing does not create a physiological hold.
+- Use Play/Pause and the waveform time cursor to inspect a frame; pausing does not create a physiological hold.
+- Use **Pin** to retain the tile values from one instant while inspecting another state.
 - Absolute numbers are model outputs, not patient targets.
 
 ## Save and reload a custom patient

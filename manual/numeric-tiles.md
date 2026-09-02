@@ -25,6 +25,14 @@ The category shown on each tile is part of the result:
 
 An exactly known latent model state can still be clinically unmeasurable. Conversely, a bedside-derived index can remain useful despite measurement uncertainty. [Interpretability](interpretability.md) explains the badge rules.
 
+## Pin values for a comparison
+
+**Pin** stores the values currently displayed in the numerical tiles. This can be the live state or an instant selected with the paused [waveform cursor](panel-waveforms.md#pause-and-inspect-one-instant). Each tile then keeps a small `Pinned` line while the live or selected value continues to change. Press **Unpin** to remove the comparison.
+
+Only tile values are pinned. A point from one instant is not a complete heartbeat or breath, so the interface does not draw it as a ghost pressure–volume loop, Campbell loop or Guyton path. This avoids presenting a partial trajectory as though it were a measured cycle.
+
+Pinning is visual memory, not physiological memory. It does not affect the simulator, survive a page reload or become part of a saved patient file.
+
 ---
 
 ## Systemic flow, pressure and filling

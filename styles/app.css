@@ -164,6 +164,12 @@ select { min-width: 150px; }
 
 .btn-primary:hover { opacity: 0.86; background: var(--ink); }
 
+.btn[aria-pressed="true"] {
+  color: var(--surface);
+  background: var(--ink);
+  border-color: var(--ink);
+}
+
 .btn-icon {
   width: 34px;
   padding: 6px 0;
@@ -287,6 +293,19 @@ select { min-width: 150px; }
   min-height: 1em;
 }
 
+.tile-pinned {
+  margin-top: 5px;
+  padding-top: 4px;
+  border-top: 1px solid var(--grid);
+  color: var(--ink-secondary);
+  font-size: 10.5px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.tile-pinned[hidden] { display: none; }
+
 .tile-flag {
   font-size: 10.5px;
   font-weight: 600;
@@ -341,7 +360,7 @@ select { min-width: 150px; }
 /* Four independently scaled, time-aligned strips keep PL below Paw/Ppl without
    falsifying its positive pressure on their shared numerical axis. The extra
    height preserves the previous plot density instead of squeezing each trace. */
-.panel-waves { height: 420px; }
+.panel-waves { height: 450px; }
 .panel-waves > div { height: 100%; }
 
 .waveform-stack {
@@ -349,6 +368,32 @@ select { min-width: 150px; }
   flex-direction: column;
   gap: 2px;
 }
+
+.waveform-timeline {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr) 78px;
+  gap: 9px;
+  align-items: center;
+  flex: none;
+  height: 30px;
+  padding: 0 clamp(12.5rem, 18vw, 13rem) 0 46px;
+  color: var(--ink-muted);
+  font-size: 10.5px;
+}
+
+.waveform-timeline label {
+  color: var(--ink-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.waveform-time-cursor { min-width: 0; }
+.waveform-time-status {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.waveform-timeline.is-active .waveform-time-status { color: var(--ink); }
 
 .waveform-stack .strip {
   position: relative;
@@ -365,6 +410,8 @@ select { min-width: 150px; }
   min-width: 0;
   min-height: 0;
 }
+
+.waveform-timeline.is-active ~ .strip .waveform-plot { cursor: crosshair; }
 
 /* The graph answers “how is it changing?”; the fixed rail answers “what is it
    now?”. Keeping the values out of the plotting area avoids collisions when
@@ -518,6 +565,21 @@ select { min-width: 150px; }
 
 .ctrl-group { margin-top: 14px; }
 
+.control-change-summary {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  margin: 0 -4px 6px;
+  padding: 8px 4px 6px;
+  color: var(--ink-secondary);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.control-change-summary[hidden] { display: none; }
+
 .ctrl-group h3 {
   margin: 0 0 8px;
   font-size: 10.5px;
@@ -530,6 +592,24 @@ select { min-width: 150px; }
 }
 
 .ctrl { margin-bottom: 11px; }
+
+.ctrl.modified {
+  margin-inline: -6px;
+  padding: 4px 6px;
+  background: var(--wash);
+  border-radius: 7px;
+}
+
+.ctrl.modified .ctrl-head label::before {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 6px;
+  vertical-align: 1px;
+  background: var(--venous);
+  border-radius: 50%;
+  content: '';
+}
 
 .ctrl.inactive { opacity: 0.38; }
 
@@ -677,7 +757,7 @@ input[type="range"]:disabled { cursor: not-allowed; }
 
   body.sidebar-open .sidebar { transform: none; }
 
-  .panel-waves { height: 360px; }
+  .panel-waves { height: 390px; }
 
   /* Two columns; the schematic keeps the full width. */
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -751,6 +831,27 @@ input[type="range"]:disabled { cursor: not-allowed; }
   color: var(--ink);
   white-space: nowrap;
 }
+
+.panel-warning {
+  position: absolute;
+  right: 10px;
+  bottom: 9px;
+  z-index: 1;
+  max-width: calc(100% - 20px);
+  margin: 0;
+  padding: 3px 6px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--warning);
+  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 650;
+  line-height: 1.25;
+  pointer-events: none;
+}
+
+.panel-warning[data-quality="unavailable"] { border-color: var(--critical); }
+.panel-warning[hidden] { display: none; }
 
 /* ------------------------------------------- text equivalents for the canvas */
 

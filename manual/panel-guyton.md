@@ -25,6 +25,8 @@ The **VR mean / VR live** button changes the time basis of the venous-return cur
 
 The choice is deliberately all-or-none. Combining mean pressures with instantaneous resistance can make a normal inspiration appear to depress venous return even when the integrated circulation shows the opposite.
 
+A compact warning appears when the preload-reserve construction cannot be interpreted. It qualifies that derived construction rather than declaring the measured inflow path or the entire panel invalid.
+
 The panel shows three related but different things:
 
 - **inflow path**, the faint trail, is built from consecutive one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. Averaging over one heartbeat removes the atrial pressure waves but deliberately preserves movement through the breath;

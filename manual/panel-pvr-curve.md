@@ -22,6 +22,8 @@ The grey vertical band is the lung-volume excursion already traversed during the
 
 The `+`, `−` and percentage/Fit buttons change only the vertical view. Zoom is centred on the patient point when possible and never changes model state. The full RV-to-TLC horizontal range is retained so neither limb disappears.
 
+The panel can also display **Derived PVR: use with caution**. This warning is propagated from the wedge surrogate when the zone 3 pressure margin is inadequate. It qualifies the catheter-style calculation $(mPAP-wedge)/CO$; it does not invalidate the mechanical component curves or their model patient point.
+
 ## In the model
 
 The two reference limbs are calculated with the open fraction fixed at one. Their sum is exactly the open vascular pathway used by the flow equations. The patient point is calculated separately from the parallel open and closed beds. This prevents the earlier visual error in which recruitment and HPV distorted the named alveolar and extra-alveolar curves.

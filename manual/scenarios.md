@@ -127,6 +127,8 @@ The preset isolates that mechanical competition. It does **not** create hydrosta
 
 Selecting a scenario first restores `defaultParams()` and then applies that scenario's explicit overrides. It does not inherit controls from the previously selected preset, apply a scripted sequence or force an outcome after selection. The application opens with *Healthy, breathing spontaneously*, but that opening preset is not the baseline from which the other scenarios are built. The code reference is the passive volume-control default shown below. Touching any control changes the label to *Custom* because the patient no longer matches the preset.
 
+The parameter sidebar marks every current setting that differs from this reference with a coloured dot and reports the total above the controls. The marks remain useful after the scenario label changes to *Custom*: they show which controls construct the present phenotype, not whether a value is abnormal or unsafe.
+
 ### Preset parameter changes
 
 <!-- BEGIN GENERATED: scenario-overrides -->

@@ -60,6 +60,7 @@ const PANELS = [
   {
     match: 'Guyton diagram',
     title: 'Guyton diagram',
+    quality: (sim) => ({ label: 'Preload reserve', ...sim.metrics.interpretability.preload }),
     summary: (sim) => {
       const m = sim.metrics, op = m.respiratoryOperatingPoint;
       return `Over the most recent breath, mean venous inflow is ${n(op.flow, 2)} L/min at a mean right atrial pressure of ${n(op.pra)} mmHg. `
@@ -155,6 +156,9 @@ const PANELS = [
   {
     match: 'Pulmonary vascular resistance against lung volume',
     title: 'Pulmonary vascular resistance',
+    // This warning qualifies only the catheter-style derived number. The
+    // mechanical J-curve and its patient point remain valid model constructs.
+    quality: (sim) => ({ label: 'Derived PVR', ...sim.metrics.interpretability.pvrDerived }),
     // The PVR panel also carries zoom controls in its header. The full title is
     // already the region label, so the compact disclosure name avoids covering
     // the chart title at the normal two-column panel width.
@@ -242,7 +246,12 @@ export function createDescriptions() {
     const summary = document.createElement('p');
     summary.id = id;
     summary.className = 'panel-summary';
-    section.setAttribute('aria-describedby', id);
+    const warning = document.createElement('p');
+    warning.id = `${id}-warning`;
+    warning.className = 'panel-warning';
+    warning.setAttribute('role', 'status');
+    warning.hidden = true;
+    section.setAttribute('aria-describedby', `${id} ${warning.id}`);
 
     const details = document.createElement('details');
     details.className = 'panel-data';
@@ -262,14 +271,22 @@ export function createDescriptions() {
     syncToggleLabel();
     const table = document.createElement('table');
     details.append(toggle, summary, table);
-    section.appendChild(details);
+    section.append(details, warning);
 
-    bound.push({ spec, summary, table, details });
+    bound.push({ spec, summary, table, details, warning });
   }
 
   function render(sim) {
     for (const b of bound) {
       b.summary.textContent = b.spec.summary(sim);
+      const quality = b.spec.quality?.(sim) ?? { level: 'ok', reasons: [] };
+      b.warning.hidden = quality.level === 'ok';
+      b.warning.dataset.quality = quality.level;
+      b.warning.textContent = quality.level === 'ok' ? ''
+        : `${quality.label}: ${quality.level === 'unavailable' ? 'not interpretable' : 'use with caution'}`;
+      b.warning.title = quality.reasons?.join('; ') ?? '';
+      b.warning.setAttribute('aria-label', b.warning.title
+        ? `${b.warning.textContent}. ${b.warning.title}` : b.warning.textContent);
       // The table is only rebuilt while it is open — it is a few hundred DOM
       // writes and nobody is reading it when it is closed.
       if (!b.details.open) continue;

@@ -102,13 +102,15 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
 
     // The excursion the current breath makes along the curve — reset on a
     // breath, not after a fixed number of frames.
-    if (r.breathCount !== breathSeen) {
-      breathSeen = r.breathCount;
-      vMinSeen = r.lungVolume;
-      vMaxSeen = r.lungVolume;
+    if (!sim.presentationOnly) {
+      if (r.breathCount !== breathSeen) {
+        breathSeen = r.breathCount;
+        vMinSeen = r.lungVolume;
+        vMaxSeen = r.lungVolume;
+      }
+      vMinSeen = Math.min(vMinSeen, r.lungVolume);
+      vMaxSeen = Math.max(vMaxSeen, r.lungVolume);
     }
-    vMinSeen = Math.min(vMinSeen, r.lungVolume);
-    vMaxSeen = Math.max(vMaxSeen, r.lungVolume);
 
     // The endpoints are the model's fully open low-volume landmark and the
     // independently selected maximum capacity. Unlike a pressure-derived crop,
@@ -160,7 +162,7 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
     panel.clip();
 
     // The tidal excursion along the curve.
-    if (vMaxSeen > vMinSeen) {
+    if (!sim.presentationOnly && vMaxSeen > vMinSeen) {
       const a = panel.plotArea;
       ctx.save();
       ctx.globalAlpha = 0.08;

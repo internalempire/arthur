@@ -18,6 +18,8 @@ The dotted line labelled $E_a$ joins **end-diastolic volume at zero pressure**, 
 
 The axes remain fixed while the same parameter settings are running. Each panel starts with a clinically useful RV- or LV-specific range and expands only when a loop would otherwise leave it. It does not repeatedly contract around the moving beat. Changing a control or scenario allows the panel to fit the new state again.
 
+When the simulation is paused and the waveform time cursor is moved, a small neutral point identifies the ventricular pressure and volume at the selected instant. This cursor marker is not an end-systolic marker and disappears when live playback resumes.
+
 Read both ventricles together. A pulmonary load increase may shift the RV toward larger volume and smaller stroke volume; the LV response can appear later because changing RV output crosses the [pulmonary circulation](pulmonary-transit.md) before altering LV filling.
 
 ## In the model

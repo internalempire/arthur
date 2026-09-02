@@ -123,6 +123,13 @@ function makeSide(canvas, cfg) {
     panel.line(prev, { color: colors[cfg.color], width: 1.6, alpha: 0.3 });
     panel.line(live, { color: colors[cfg.color], width: 2.2 });
 
+    // End-systole is not singled out in the running display. A paused temporal
+    // selection is different: its small neutral marker answers where the heart
+    // was at the common waveform cursor without implying a special PV landmark.
+    if (sim.presentationOnly && live.length >= 2) {
+      panel.dot(live.at(-2), live.at(-1), { color: colors.ink, r: 3.2, ring: colors.surface });
+    }
+
     panel.unclip();
 
     panel.label('ESPVR', espvrEndX, espvrEndY, {
