@@ -10,8 +10,18 @@ export function choiceIndex(spec, value) {
   return spec.options.findIndex((option) => Object.is(option.value, value));
 }
 
+/** A scenario override is a difference from the model's neutral parameter set. */
+export function parameterDiffersFromReference(current, reference, id) {
+  return !Object.is(current[id], reference[id]);
+}
+
 export function createControls(container, sim, onChange) {
   const rows = new Map();
+  const reference = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
+  const changeSummary = document.createElement('p');
+  changeSummary.className = 'control-change-summary';
+  changeSummary.setAttribute('aria-live', 'polite');
+  container.appendChild(changeSummary);
 
   for (const group of GROUPS) {
     const section = document.createElement('section');
@@ -92,6 +102,7 @@ export function createControls(container, sim, onChange) {
       // Without this, turning hysteresis on left its closing pressure greyed out
       // and unusable until the next reset.
       refreshRelevance();
+      refreshModified();
       onChange?.(spec.id, v);
     });
     row.appendChild(input);
@@ -140,6 +151,25 @@ export function createControls(container, sim, onChange) {
     }
   }
 
+  /**
+   * Highlight inputs that define the current phenotype. This is a map of
+   * departures from the neutral reference, not a judgement that a value is
+   * clinically abnormal.
+   */
+  function refreshModified() {
+    let count = 0;
+    for (const { spec, row } of rows.values()) {
+      const modified = parameterDiffersFromReference(sim.params, reference, spec.id);
+      row.classList.toggle('modified', modified);
+      row.dataset.modified = String(modified);
+      if (modified) count++;
+    }
+    changeSummary.hidden = count === 0;
+    changeSummary.textContent = count === 0
+      ? ''
+      : `${count} setting${count === 1 ? '' : 's'} differ from the reference`;
+  }
+
   /** Reflect the simulator's parameters back into the inputs. */
   function sync() {
     for (const { spec, input, value } of rows.values()) {
@@ -149,6 +179,7 @@ export function createControls(container, sim, onChange) {
       paint(spec, input, value);
     }
     refreshRelevance();
+    refreshModified();
   }
 
   sync();

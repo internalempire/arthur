@@ -317,6 +317,17 @@ export function tilePrimaryValue(id, metrics) {
   return quality.level === 'unavailable' ? '—' : tile.get(metrics);
 }
 
+/** The compact comparison line used when a state has been pinned. */
+export function pinnedTilePresentation(id, metrics) {
+  const tile = TILE_BY_ID.get(id);
+  if (!tile || !metrics) return null;
+  const value = tilePrimaryValue(id, metrics);
+  return {
+    compact: `Pinned ${value}`,
+    accessible: `Pinned ${tile.liveLabel?.(metrics) ?? tile.label}: ${value}${tile.unit ? ` ${tile.unit}` : ''}`,
+  };
+}
+
 export function createStats(container, { banner } = {}) {
   let visibleIds = loadLayout();
   const nodeMap = new Map(); // id → { tile, el, number, sub, flag, quality }
@@ -324,6 +335,7 @@ export function createStats(container, { banner } = {}) {
   // populate the values. Calling renderTile with an empty object crashes the
   // tile getters (m.co.toFixed → undefined.toFixed).
   let currentMetrics = null;
+  let pinnedMetrics = null;
 
   // --- Build a single tile element -------------------------------------------
   function buildTile(tile) {
@@ -336,6 +348,7 @@ export function createStats(container, { banner } = {}) {
       <div class="tile-label"></div>
       <div class="tile-value"><span class="tile-number"></span><span class="tile-unit"></span></div>
       <div class="tile-sub"></div>
+      <div class="tile-pinned" hidden></div>
       <div class="tile-flag"></div>
       <div class="tile-quality"></div>`;
     el.querySelector('.tile-label').textContent = tile.label;
@@ -386,6 +399,7 @@ export function createStats(container, { banner } = {}) {
       remove: el.querySelector('.tile-remove'),
       number: el.querySelector('.tile-number'),
       sub: el.querySelector('.tile-sub'),
+      pinned: el.querySelector('.tile-pinned'),
       flag: el.querySelector('.tile-flag'),
       quality: el.querySelector('.tile-quality'),
     };
@@ -412,6 +426,12 @@ export function createStats(container, { banner } = {}) {
 
     n.number.textContent = suppress ? '—' : tilePrimaryValue(n.tile.id, metrics);
     n.sub.textContent = suppress ? '' : (n.tile.sub ? n.tile.sub(metrics) : '');
+
+    const pin = pinnedTilePresentation(n.tile.id, pinnedMetrics);
+    n.pinned.hidden = !pin;
+    n.pinned.textContent = pin?.compact ?? '';
+    n.pinned.setAttribute('aria-label', pin?.accessible ?? '');
+    n.pinned.title = pin?.accessible ?? '';
 
     const status = suppress ? null : n.tile.status?.(metrics);
     n.el.dataset.status = status ? status[0] : '';
@@ -583,7 +603,12 @@ export function createStats(container, { banner } = {}) {
     }
   }
 
+  function setPinned(metrics) {
+    pinnedMetrics = metrics ? structuredClone(metrics) : null;
+    for (const n of nodeMap.values()) renderTile(n, currentMetrics);
+  }
+
   rebuild();
 
-  return { render };
+  return { render, setPinned };
 }

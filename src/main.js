@@ -11,14 +11,25 @@ import { createPvLoops } from './ui/panels/pvloops.js';
 import { createPvrCurve } from './ui/panels/pvrcurve.js';
 import { createThorax } from './ui/panels/thorax.js';
 import { createDescriptions } from './ui/descriptions.js';
+import { PresentationHistory, presentationSnapshot } from './ui/presentation-history.js';
 
 theme.init();
 
 const sim = new Simulator();
+const presentationHistory = new PresentationHistory();
+let selectedSnapshot = null;
+let pinnedSnapshot = null;
+let running = true;
+let dirty = true;
 
 const el = (id) => document.getElementById(id);
 
-const waveforms = createWaveforms(el('waveforms'));
+const waveforms = createWaveforms(el('waveforms'), {
+  onSeek(fraction) {
+    selectedSnapshot = presentationHistory.atFraction(fraction);
+    dirty = true;
+  },
+});
 const guyton = createGuyton(el('guyton'), { onViewChange: invalidate });
 const campbell = createCampbell(el('campbell'), { onViewChange: invalidate });
 const pvLoops = createPvLoops(el('pvloops'));
@@ -31,6 +42,7 @@ const stats = createStats(el('stats'), { banner: el('invalid-banner') });
 const descriptions = createDescriptions();
 const controls = createControls(el('controls'), sim, (id) => {
   if (id === 'mode') controls.sync();
+  selectedSnapshot = null;
   clearTrails();
   markCustom();
   dirty = true;
@@ -59,6 +71,7 @@ function applyScenario(id) {
   sim.advance(20, true);
   controls.sync();
   clearTrails();
+  resetPresentationHistory();
   dirty = true;
   scenarioNote.textContent = scenario.note;
 }
@@ -89,6 +102,7 @@ function applyLoadedPatientState(parsed) {
   scenarioSelect.value = '';
   scenarioNote.textContent = '';
   clearTrails();
+  resetPresentationHistory();
   dirty = true;
 
   const count = Object.keys(parsed.overrides).length;
@@ -159,17 +173,47 @@ function clearTrails() {
   pvLoops.resetView();
 }
 
+function resetPresentationHistory() {
+  presentationHistory.clear();
+  const snapshot = presentationHistory.capture(sim, { force: true });
+  selectedSnapshot = running ? null : snapshot;
+}
+
 // ------------------------------------------------------------------ transport
-let running = true;
 let speed = 1;
 let lastFrame = performance.now();
 
 const playPause = el('playpause');
 playPause.addEventListener('click', () => {
   running = !running;
+  if (running) {
+    selectedSnapshot = null;
+  } else {
+    selectedSnapshot = presentationHistory.capture(sim, { force: true });
+  }
   playPause.textContent = running ? 'Pause' : 'Play';
   playPause.classList.toggle('btn-primary', running);
   lastFrame = performance.now();
+});
+
+const pinState = el('pin-state');
+pinState.addEventListener('click', () => {
+  if (pinnedSnapshot) {
+    pinnedSnapshot = null;
+    stats.setPinned(null);
+    pinState.textContent = 'Pin';
+    pinState.setAttribute('aria-pressed', 'false');
+    pinState.title = 'Keep the displayed tile values for comparison';
+    showStateStatus('Pinned values cleared.');
+  } else {
+    pinnedSnapshot = selectedSnapshot ?? presentationSnapshot(sim);
+    stats.setPinned(pinnedSnapshot.metrics);
+    pinState.textContent = 'Unpin';
+    pinState.setAttribute('aria-pressed', 'true');
+    pinState.title = 'Remove the pinned tile values';
+    showStateStatus('State pinned. Tile values remain visible for comparison.');
+  }
+  dirty = true;
 });
 
 el('speed').addEventListener('change', (e) => { speed = parseFloat(e.target.value); });
@@ -221,7 +265,11 @@ el('reset').addEventListener('click', () => {
   sim.clearMeasuredPoints();
   sim.cancelHold();
   sim.reset();
-  if (current) applyScenario(current); else controls.sync();
+  if (current) applyScenario(current);
+  else {
+    controls.sync();
+    resetPresentationHistory();
+  }
   clearTrails();
 });
 
@@ -253,20 +301,31 @@ let statsClock = 0;
 
 function draw() {
   const colors = theme.colors;
+  const view = selectedSnapshot ?? sim;
+  syncTimeline(view);
   waveforms.render(sim, colors);
-  waveforms.renderReadouts(sim.metrics, colors);
-  guyton.render(sim, colors);
-  campbell.render(sim, colors);
-  pvLoops.render(sim, colors);
-  pvrCurve.render(sim, colors);
-  thorax.render(sim, colors);
-  stats.render(sim.metrics);
-  descriptions.render(sim);
+  waveforms.renderReadouts(view.metrics, colors);
+  guyton.render(view, colors);
+  campbell.render(view, colors);
+  pvLoops.render(view, colors);
+  pvrCurve.render(view, colors);
+  thorax.render(view, colors);
+  stats.render(view.metrics);
+  descriptions.render(view);
   dirty = false;
 }
 
+function syncTimeline(view) {
+  const newest = presentationHistory.newest;
+  waveforms.setTimeline({
+    paused: !running,
+    available: presentationHistory.size > 0,
+    fraction: selectedSnapshot ? presentationHistory.fractionOf(selectedSnapshot) : 1,
+    secondsAgo: newest ? Math.max(0, newest.time - view.time) : 0,
+  });
+}
+
 // Anything that changes what should be on screen without the model advancing.
-let dirty = true;
 export function invalidate() { dirty = true; }
 theme.onChange(() => { dirty = true; });
 new ResizeObserver(() => { dirty = true; }).observe(document.body);
@@ -277,6 +336,7 @@ function frame(now) {
 
   if (running) {
     sim.advance(dtWall * speed);
+    presentationHistory.capture(sim);
     dirty = true;
   }
 
@@ -284,18 +344,20 @@ function frame(now) {
   // frame, so this is free rather than blank.
   if (dirty) {
     const colors = theme.colors;
+    const view = selectedSnapshot ?? sim;
+    syncTimeline(view);
     waveforms.render(sim, colors);
-    guyton.render(sim, colors);
-    campbell.render(sim, colors);
-    pvLoops.render(sim, colors);
-    pvrCurve.render(sim, colors);
-    thorax.render(sim, colors);
+    guyton.render(view, colors);
+    campbell.render(view, colors);
+    pvLoops.render(view, colors);
+    pvrCurve.render(view, colors);
+    thorax.render(view, colors);
 
     statsClock += dtWall;
     if (statsClock > 0.12 || !running) {
-      waveforms.renderReadouts(sim.metrics, colors);
-      stats.render(sim.metrics);
-      descriptions.render(sim);
+      waveforms.renderReadouts(view.metrics, colors);
+      stats.render(view.metrics);
+      descriptions.render(view);
       syncManoeuvreButtons();
       statsClock = 0;
     }
@@ -314,7 +376,12 @@ window.heartLung = {
   sim,
   draw,
   /** Advance the model by `seconds` of simulated time and repaint. */
-  step(seconds = 1) { sim.advance(seconds); draw(); return sim.metrics; },
+  step(seconds = 1) {
+    sim.advance(seconds);
+    presentationHistory.capture(sim, { force: true });
+    draw();
+    return sim.metrics;
+  },
   /** Return the same portable object written by the Save patient control. */
   patientState() { return createPatientState(sim.params); },
   /** Load a parsed patient-state object from a console or embedding page. */

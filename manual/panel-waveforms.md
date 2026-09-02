@@ -40,6 +40,16 @@ Each strip fits its vertical range again when a control or scenario changes. The
 
 Respiratory and vascular pressures deliberately do not share an axis. Their units and magnitudes differ, and a dual axis would make visual crossings physiologically meaningless.
 
+## Pause and inspect one instant
+
+Press **Pause**, then drag the time cursor above the strips or drag directly across any waveform. The vertical cursor crosses all four strips on one clock. Numerical tiles and the live point in each diagram move to the model state nearest that instant, allowing Paw, Ppl, CVP, ventricular position and lung position to be read together rather than estimated by eye.
+
+The waveform itself remains sampled at 250 Hz. The complete state needed by the other panels is retained every 50 ms, so their selected point can differ from the cursor by at most about 25 ms. This lighter presentation history does not rewind the simulator and is cleared when a scenario, patient file or reset creates a fresh simulation.
+
+Static relations are recalculated from the parameters stored at the selected instant. A single instant cannot define an entire respiratory or cardiac loop: the cursor therefore moves the live point, but it does not invent a historical full-cycle trace.
+
+The parameter sidebar always remains an editor for the **current** patient. It does not move back to historical settings while the cursor is inspecting an older state; the cursor time and diagram positions identify that the displayed readouts are historical.
+
 ## Useful comparisons
 
 - In spontaneous breathing at Paw zero, watch Palv become negative during inspiration and positive during expiration. This Paw–Palv gradient explains why $P_L$ is not an exact mirror of Ppl while gas is flowing.
@@ -53,6 +63,8 @@ Respiratory and vascular pressures deliberately do not share an axis. Their unit
 
 Each trace contains the most recent 12 seconds sampled at 250 Hz. Palv and $P_L$ are stored on the same clock as Paw and Ppl, so every plotted point represents one internally consistent respiratory state. Vertical ranges expand immediately to prevent clipping but shrink only after the data have remained comfortably inside the current range for four simulated seconds. This stabilises visual amplitude while the physiology is steady.
 
+The synchronised cursor uses a separate 20 Hz presentation history containing pressures, volumes, summary measurements and the state needed by the analytical panels. It is read-only and does not enter any physiological equation.
+
 The panel shows no airflow trace. Expiratory flow limitation must be inferred from volume not returning, auto-PEEP and the EFL readout; the manifest previously described this panel as containing flow and has been corrected.
 
 ## Limits
@@ -63,6 +75,7 @@ The panel shows no airflow trace. Expiratory flow limitation must be inferred fr
 - Arterial pressure is a central model compartment, not a peripheral waveform.
 - The 12-second window can conceal slower adaptation, including the 15-second aggregate baroreflex.
 - Automatic rescaling means screen height cannot be compared between widely separated states without reading the axes.
+- The cursor selects the nearest retained 50 ms presentation sample; it is not intended for millisecond timing measurements.
 - Absence of an airflow trace limits direct evaluation of expiratory flow contour and zero-flow holds.
 
 ## References

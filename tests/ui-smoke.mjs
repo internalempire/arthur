@@ -6,8 +6,9 @@
 import { readFileSync, readdirSync } from 'node:fs';
 
 const failures = [];
+let passed = 0;
 const check = (name, condition, detail = '') => {
-  if (condition) console.log(`pass  ${name}`);
+  if (condition) { passed++; console.log(`pass  ${name}`); }
   else failures.push(`${name}${detail ? ` — ${detail}` : ''}`);
 };
 
@@ -50,7 +51,7 @@ const css = readFileSync(new URL('../styles/app.css', import.meta.url), 'utf8');
 const descriptions = readFileSync(new URL('../src/ui/descriptions.js', import.meta.url), 'utf8');
 const anchors = [
   'scenario', 'speed', 'playpause', 'hold-exp', 'hold-insp', 'reset',
-  'save-patient', 'load-patient', 'patient-state-file', 'patient-state-status', 'theme',
+  'pin-state', 'save-patient', 'load-patient', 'patient-state-file', 'patient-state-status', 'theme',
   'sidebar-toggle', 'scenario-note', 'controls', 'invalid-banner', 'stats',
   'waveforms', 'guyton', 'campbell', 'pvloops', 'pvr', 'thorax',
 ];
@@ -86,10 +87,15 @@ const {
   PARAMETERS, PATIENT_STATE_FORMAT, PATIENT_STATE_VERSION,
   createPatientState, parsePatientState,
 } = await import(new URL('../src/model/index.js', import.meta.url));
-const { choiceIndex, choiceValue } = await import(new URL('../src/ui/controls.js', import.meta.url));
 const {
-  airwayReadout, waveformScaleStart,
+  choiceIndex, choiceValue, parameterDiffersFromReference,
+} = await import(new URL('../src/ui/controls.js', import.meta.url));
+const {
+  airwayReadout, timelineFractionAt, waveformScaleStart,
 } = await import(new URL('../src/ui/panels/waveforms.js', import.meta.url));
+const {
+  PresentationHistory, presentationSnapshot,
+} = await import(new URL('../src/ui/presentation-history.js', import.meta.url));
 const {
   CAMPBELL_DEFAULT_ZOOM, classicalCampbellCurves, campbellZoomDomain,
 } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
@@ -127,8 +133,44 @@ const assistedAirway = {
 check('the waveform rail keeps Paw live when plateau is unavailable',
   airwayReadout(passiveAirway) === '8.4 (Pplat 14.2)'
     && airwayReadout(assistedAirway) === '8.4');
+check('the waveform cursor clamps pointer positions to its shared time window',
+  timelineFractionAt(100, 10, 20, 140) === 0.5
+    && timelineFractionAt(-50, 10, 20, 140) === 0
+    && timelineFractionAt(500, 10, 20, 140) === 1);
+
+const historyStub = (time, value) => ({
+  time,
+  params: { value }, effective: { value }, resp: { value },
+  circ: { value }, metrics: { valid: true, value }, measuredPoints: [],
+});
+const presentationHistory = new PresentationHistory({ duration: 1, sampleInterval: 0.05 });
+presentationHistory.capture(historyStub(0, 0), { force: true });
+presentationHistory.capture(historyStub(0.04, 1));
+presentationHistory.capture(historyStub(0.10, 2));
+presentationHistory.capture(historyStub(1.20, 3));
+const copied = presentationSnapshot(historyStub(2, 4));
+copied.params.value = 99;
+check('presentation history is read-only, sampled and limited to the waveform window',
+  presentationHistory.size === 1
+    && presentationHistory.newest.metrics.value === 3
+    && presentationHistory.atFraction(0.5).metrics.value === 3
+    && copied.presentationOnly === true
+    && copied.metrics.value === 4);
+check('control highlighting means different from reference, not clinically abnormal',
+  parameterDiffersFromReference({ peep: 8 }, { peep: 5 }, 'peep')
+    && !parameterDiffersFromReference({ peep: 5 }, { peep: 5 }, 'peep'));
 const mainSource = readFileSync(new URL('../src/main.js', import.meta.url), 'utf8');
 const waveformSource = readFileSync(new URL('../src/ui/panels/waveforms.js', import.meta.url), 'utf8');
+check('pause inspection synchronises snapshots, tiles and analytical panels',
+  mainSource.includes('selectedSnapshot = presentationHistory.atFraction(fraction)')
+    && mainSource.includes('const view = selectedSnapshot ?? sim')
+    && mainSource.includes('stats.setPinned(pinnedSnapshot.metrics)')
+    && waveformSource.includes("timelineInput.type = 'range'")
+    && waveformSource.includes("plot.addEventListener('pointerdown'"));
+check('diagram warnings name the qualified interpretation rather than the whole panel',
+  descriptions.includes("label: 'Preload reserve'")
+    && descriptions.includes("label: 'Derived PVR'")
+    && descriptions.includes('use with caution'));
 check('waveform scales start a new visual state after every parameter change',
   mainSource.includes('waveforms.resetView(sim)')
     && waveformSource.includes('sim.time - viewEpoch')
@@ -198,12 +240,12 @@ const pvSource = readFileSync(new URL('../src/ui/panels/pvloops.js', import.meta
 check('Ea joins end-diastolic volume at zero pressure to the end-systolic point',
   pvSource.includes('panel.line([edv, 0, esv, Math.max(0, esp)]')
     && pvSource.includes('Number.isFinite(esp)'));
-check('both cardiac PV-loop axes and passive relations are named without a lone point marker',
+check('both cardiac PV-loop axes and passive relations are named without a lone end-systolic marker',
   pvSource.includes("yLabel: 'Pressure (mmHg)'")
     && pvSource.includes("xLabel: 'Volume (mL)'")
     && pvSource.includes("panel.label('ESPVR'")
     && pvSource.includes("panel.label('EDPVR'")
-    && !pvSource.includes('panel.dot('));
+    && pvSource.includes('if (sim.presentationOnly && live.length >= 2)'));
 
 const defaultPatient = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
 const customPatient = { ...defaultPatient, mode: 'pcv', peep: 12, clung: 85 };
@@ -242,4 +284,4 @@ if (failures.length) {
   for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
-console.log(`\n28 UI smoke contracts passed`);
+console.log(`\n${passed} UI smoke contracts passed`);
