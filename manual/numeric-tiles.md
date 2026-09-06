@@ -79,9 +79,9 @@ Pmsf is an exactly known model state. A patient value requires an occlusion or e
 
 Related pages: [Stressed volume](stressed-volume.md) · [Venous tone](venous-tone.md) · [Venous return](venous-return.md) · [Pmsf and occlusions](pmsf-and-occlusions.md)
 
-### Preload reserve
+### RV preload reserve
 
-The model perturbs the analytic Guyton operating point and reports the local fractional gain in predicted steady flow per mmHg of additional filling pressure. The ascending relation calculates RV output from RV filling and current pulmonary arterial load; it does not independently test LV reserve. The subtitle also shows the absolute slope and whether the point lies on the steep limb or plateau. This is an internal analytic construction, not a validated bedside index or a fluid prescription.
+The model perturbs a local analytic RV/venous-return intersection and reports the fractional gain in predicted right-sided steady flow per mmHg of additional systemic filling pressure. This RV coefficient does not independently test LV reserve and is not the slope of the whole-heart curve displayed on the Guyton panel. The subtitle gives the absolute slope and local steep/plateau classification. It is not a validated bedside index or a fluid prescription.
 
 Related page: [Preload reserve](preload-reserve.md)
 

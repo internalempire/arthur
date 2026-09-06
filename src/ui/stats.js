@@ -99,7 +99,7 @@ const TILES = [
     // responsiveness decision. See docs/MODEL_DECISIONS.md.
   },
   {
-    id: 'preload', label: 'Preload reserve', unit: '%/mmHg', kind: 'coefficient',
+    id: 'preload', label: 'RV preload reserve', unit: '%/mmHg', kind: 'coefficient',
     get: (m) => (m.preload ? (m.preload.relative * 100).toFixed(1) : '—'),
     sub: (m) => (m.preload
       ? `${m.preload.steep ? 'steep limb' : 'plateau'} · ${(m.preload.slope).toFixed(2)} L/min per mmHg`

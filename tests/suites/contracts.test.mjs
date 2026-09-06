@@ -337,29 +337,32 @@ section('The Guyton points remain explicitly distinguished');
     panel.includes('venous inflow from the inferior vena cava into the right atrium')
       || (panel.includes('IVC-to-right-atrial venous inflow')
         && panel.includes('not RV output, LV output or cardiac output')));
-  check('the canvas labels the two central marks by quantity rather than calculation method',
+  check('the canvas separates venous inflow, measured LV output and the predicted crossing',
     guytonUi.includes("panel.label('mean venous inflow'")
       && guytonUi.includes("panel.label('predicted equilibrium'")
+      && guytonUi.includes("panel.label('mean LV output'")
+      && guytonUi.includes('y: op.aorticFlow')
       && !guytonUi.includes("panel.label('simulated mean'")
       && !guytonUi.includes("panel.label('analytic'"));
   check('the dynamic trail identifies the measured respiratory inflow path',
     guytonUi.includes("panel.label('inflow path'")
-      && panel.includes('drawing a trail from successive predicted crossings would hide'));
-  check('the panel separates one-heartbeat dynamics from one-breath equilibrium',
+      && panel.toLowerCase().includes('drawing a trail from successive predicted crossings would hide'));
+  check('the panel separates heartbeat dynamics, respiratory markers and settled loading windows',
     panel.includes('one-heartbeat means')
       && panel.includes('most recent complete respiratory cycle')
-      && panel.includes('whole breath')
-      && guytonUi.includes("curveClock === 'mean' ? op.ppl : c.p.ppl"));
+      && panel.includes('complete minute windows')
+      && guytonUi.includes("curveClock === 'mean' ? (reference?.ppl ?? op.ppl) : c.p.ppl"));
   check('temporary right-heart storage is explained',
     venousReturn.includes('dV_{right}')
       && venousReturn.includes('temporarily store blood'));
   check('high RV afterload is documented as a dynamic trail rather than failed convergence',
     panel.includes('pulmonary embolism or severe RV pressure loading')
       && panel.includes('trail can be broad while the respiratory-mean points remain close'));
-  check('the ascending curve is explicitly RV rather than LV function',
-    panel.includes('labels it **RV function**')
-      && panel.includes('It is not an independently calculated LV-function curve')
-      && guytonUi.includes("panel.label('RV function'"));
+  check('the ascending curve measures LV outflow through both ventricles at atmospheric RAP',
+    panel.includes('**Cardiac output (LV)**')
+      && panel.includes('Both atria, both ventricles')
+      && guytonUi.includes("panel.label('Cardiac output (LV)'")
+      && !guytonUi.includes("panel.label('RV function'"));
   check('preload reserve does not claim to test LV reserve independently',
     preloadReserve.includes('does not independently test LV reserve')
       && preloadReserve.includes('LV filling reserve and LV systolic limitation are not independently tested'));

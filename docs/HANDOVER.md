@@ -2,6 +2,18 @@
 
 Updated: 2026-09-06
 
+## Whole-heart Guyton response — September 6
+
+The clinician requested reconstruction of the RV-only choice and restoration of the classical cardiac-output view. The original August 8 implementation already calculated a fast RV relation. PR #43 / ef86743 (August 21) renamed the existing calculation for honesty rather than replacing an LV model with an RV model. The August 25 change 494b166 anchored that RV relation to measured mean RV EDV/ESV to avoid equating mean RAP with RV end-diastolic transmural pressure and to repair clock/operating-point mismatch after adding IVC storage. Its reference-point agreement was therefore explicitly not independent validation.
+
+The new displayed relation uses controlled RA inflow in disposable biventricular/pulmonary simulations. The reference supplies the same normalized inflow waveform, respiratory trajectory and systemic source-pressure trajectory. Copies retain systemic arterial impedance and all cardiac/pulmonary equations. Mean RAP is measured as the pressure needed to pass each flow; aortic and pulmonic flows are integrated independently. Inflow minus aortic outflow must equal central volume change. Only finite, settled, domain-valid points are drawn, with gaps at rejected points and no invented plateau. The panel keeps atmospheric RAP on the horizontal axis and labels the response Cardiac output (LV), meaning whole-heart output measured at the LV outlet.
+
+The worker freezes the supplied effective autonomic drive, uses paired minute windows and cancels obsolete calculations when controls change. Recalculate CO refreshes that reference. A new directly integrated aortic-flow history places a mean LV-output marker beside the distinct mean venous-inflow marker; the faint trail remains venous inflow. The fast RV preload coefficient remains analytically unchanged, now explicitly titled RV preload reserve, and is no longer highlighted on the global curve. The patient integrator's pressure, valve and volume equations and presets remain unchanged.
+
+This is a reference-conditioned loading experiment, not a universally validated patient-specific CO curve. Its scale-one reference agreement is a consistency check; sensitivity to changed LV contractility under identical boundaries is tested separately. Frozen vascular properties do not mean fixed aortic pressure: the retained arterial resistance and compliance allow pressure to respond to each flow. Curve position must not be presented as an isolated contractility measurement.
+
+The worker snapshot preserves raw posture settings and selectively freezes HR, Ees, systemic resistance and venous-tone recruitment. Reference settlement retains the sampled venous tone explicitly instead of losing it when feedback is disabled. A prone/frozen-tone regression checks these boundaries. RAP stability is checked alongside flow settlement, using a between-window tolerance of 0.05 mmHg plus 0.5% of its magnitude.
+
 ## LV afterload exploration — September 6
 
 The clinician challenged the loss of a useful sustained PEEP-output benefit in the LV-failure lesson and authorized exploration: first isolate the LV response at controlled filling, then investigate the intact circulation. Production equations, coefficients, controls and preset values are unchanged in this exploration. Future substantive changes must be explained for a clinician: mechanism, observable consequence, code implementation and remaining evidential limit. The manual describes current behavior; this handover records changes and investigative decisions.

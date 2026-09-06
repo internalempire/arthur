@@ -1,6 +1,6 @@
 # Preload reserve
 
-> Preload reserve asks how much additional steady flow the analytic Guyton construction predicts when systemic filling pressure rises. In the model, the ascending relation is an RV-function curve; the readout does not independently test LV reserve.
+> The RV preload-reserve tile estimates a local right-sided response to systemic filling pressure. It is a separate analytic coefficient and does not independently test LV reserve or give the slope of the displayed whole-heart cardiac-output curve.
 
 ---
 
@@ -10,7 +10,7 @@ Fluid responsiveness means that a reversible or actual increase in cardiac prelo
 
 The [Guyton construction](venous-return.md) makes the mechanism visible. Raising mean systemic filling pressure moves the venous-return relation and shifts the operating point. If the heart can use the added filling, flow rises; if it cannot, the new intersection moves mainly toward higher filling pressure.
 
-Classical diagrams call the ascending relation the cardiac-function curve. The model gives that general label a specific implementation: it calculates **predicted RV output** from right atrial filling pressure, RV diastolic mechanics, RV contractility and current pulmonary arterial load. The intersection is treated as whole-circuit flow only by assuming that, at steady state, venous return, RV output and LV output become equal.
+The main Guyton panel constructs a whole-heart cardiac-output response from separate simulations. The RV preload-reserve tile instead calculates predicted RV output from right atrial filling pressure, RV diastolic mechanics, RV contractility and current pulmonary arterial load. Its intersection with an analytic return relation is treated as whole-circuit flow only under the steady-state equality of venous return, RV output and LV output.
 
 ![Equilibrium output as mean systemic filling pressure is increased](figure/preload-reserve.svg)
 
@@ -20,7 +20,7 @@ The clinically familiar fluid challenge is a finite volume intervention. The mod
 
 ## In the model
 
-The simulator first averages the Guyton state over one complete respiratory cycle. It then raises and lowers model Pmsf by 0.5 mmHg around that mean state, recomputes the intersection of the same venous-return and RV-function curves drawn in the panel, and estimates the central slope:
+The simulator first averages the right-sided state over one complete respiratory cycle. It then raises and lowers model Pmsf by 0.5 mmHg, recomputes the intersection of an analytic venous-return relation and local RV-function approximation, and estimates the central slope:
 
 $$
 R_{preload} = \frac{1}{Q}\frac{\Delta Q}{\Delta P_{msf}}
@@ -35,7 +35,7 @@ The value is displayed as percent of current output per mmHg. A value of 0.10 th
 
 Here, “output” means the common steady flow predicted at the intersection. The ascending curve itself calculates RV output; it does not run a separate LV filling or LV-function calculation at each perturbed point.
 
-The panel highlights the limb at or above 8%/mmHg. This split is a model classifier, not a clinical threshold. After correction of ventricular activation, a deterministic sweep across loading, resistance, heart rate, RV function, venous compliance, PEEP and abdominal pressure found that this boundary agreed with the model's own definition of a 500 mL responder in about 87% of configurations. Discordance is expected because a finite bolus can cross the knee of the curve and because venous compliance determines how much pressure a given volume buys.
+The RV reserve tile uses 8%/mmHg to distinguish a steep local response from a flatter one. This is a model classifier, not a clinical threshold. Its analytic right-sided slope is not highlighted on the independently sampled whole-heart curve. A finite bolus can cross a knee and venous compliance changes how much pressure a volume increment produces, so the local coefficient and a finite volume response need not agree.
 
 ### A reproducible comparison
 
@@ -100,7 +100,7 @@ The calculation is expressed per mmHg rather than per millilitre. Converting pre
 
 ## Validation
 
-Executable tests require reserve to fall monotonically as selected stressed volume rises, classify low filling on the steep limb and high filling on the plateau, remain available when spontaneous breathing or low VT withholds PPV, and agree broadly with the model's own 500 mL response across the control space. The highlighted Guyton limb and numeric readout must classify the operating point identically.
+Executable tests require this RV coefficient to fall as selected stressed volume rises, remain available when spontaneous breathing or low tidal volume withholds PPV, and agree broadly with the model's own finite-volume response. These checks qualify the analytic RV coefficient; the whole-heart curve has separate loading, LV-sensitivity, conservation, phase and convergence tests.
 
 ---
 

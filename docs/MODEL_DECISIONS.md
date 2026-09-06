@@ -1,5 +1,9 @@
 # Model decisions
 
+## 2026-09-06 — Measure the whole-heart cardiac-output relation
+
+The Guyton panel samples a controlled-inflow loading experiment through both ventricles and the pulmonary circulation, plotting required atmospheric RAP against integrated aortic output. Reference respiratory/source-pressure trajectories and normalized inflow shape are shared; effective autonomic drive is fixed. Arterial impedance, atria, valves, septum, pericardium and pulmonary storage/transit remain active. This replaces the displayed analytic RV relation while retaining that separately labelled RV preload coefficient. Rejected/unsettled points are not extrapolated. Patient physiology is unchanged; the analysis operates on copies. See the handover for provenance and the panel manual for current protocol and limits.
+
 ## 2026-09-06 — Forward cardiac flow and admissible chamber phases
 
 The user authorized correction after an independent audit demonstrated late-diastolic mitral-to-aortic throughflow and disagreement between geometric SV-derived output and actual aortic flow. The corrected measurement is integrated limited valve flow divided by the measured duration of that completed beat. LV/RV forward SV, geometric volume reduction, and effective HR are separate quantities. HR changes preserve oscillator phase, and pulmonary transit uses the matched RV flow window.

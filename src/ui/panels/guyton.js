@@ -1,10 +1,11 @@
 import { Panel, niceTicks } from '../plot.js';
+import { createCardiacResponseJob } from '../cardiac-response-job.js';
 import {
-  venousReturnCurve, cardiacFunctionCurve, curveIntersection, preloadLimbs,
+  venousReturnCurve, curveIntersection, createCardiacResponseWorker, cardiacResponseParameters,
 } from '../../model/index.js';
 
 // The Guyton diagram. Both curves share right atrial pressure as their abscissa,
-// so their intersection is the predicted respiratory-mean operating point. A
+// so their intersection is the predicted steady operating point. A
 // separate trail retains the within-breath venous-inflow path; this prevents an
 // IVC storage transient from being compared as if it were a steady crossing.
 
@@ -39,12 +40,22 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
   let lastSample = -1;
   let viewDomain = null;
   let curveClock = 'mean';
+  const responseJob = createCardiacResponseJob(createCardiacResponseWorker, onViewChange);
+  const responseStatus = document.createElement('div');
+  responseStatus.className = 'guyton-response-status';
+  responseStatus.setAttribute('role', 'status');
+  responseStatus.setAttribute('aria-live', 'polite');
+  canvas.insertAdjacentElement('afterend', responseStatus);
+  const recalculate = document.createElement('button');
+  recalculate.type = 'button';
+  recalculate.className = 'guyton-recalculate';
+  recalculate.textContent = 'Recalculate CO';
+  recalculate.title = 'Recalculate the whole-heart response at the current cardiac and vascular settings';
+  recalculate.addEventListener('click', () => { responseJob.reset(); onViewChange(); });
+  canvas.insertAdjacentElement('afterend', recalculate);
 
-  // Temporary but explicit physiology-debug control. It compares two coherent
-  // venous-return constructions: all three determinants averaged over one
-  // breath, or all three read at the current instant. The former is the default
-  // Guyton equilibrium view; the latter exposes respiratory movement without
-  // recreating the old mean/live hybrid.
+  // The equilibrium view uses all three settled reference determinants; the
+  // diagnostic live view reads all three at the current instant.
   const clockToggle = document.createElement('button');
   clockToggle.type = 'button';
   clockToggle.className = 'guyton-clock-toggle';
@@ -53,11 +64,11 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     clockToggle.textContent = live ? 'VR live' : 'VR mean';
     clockToggle.setAttribute('aria-pressed', String(live));
     clockToggle.setAttribute('aria-label', live
-      ? 'Use respiratory-mean determinants for the venous-return curve'
+      ? 'Use settled reference determinants for the venous-return curve'
       : 'Use instantaneous determinants for the venous-return curve');
     clockToggle.title = live
-      ? 'Venous return: Pmsf, closing pressure and resistance are instantaneous. Click for breath mean.'
-      : 'Venous return: Pmsf, closing pressure and resistance are averaged over one breath. Click for live values.';
+      ? 'Venous return: instantaneous determinants. Click for the settled reference.'
+      : 'Venous return: settled reference determinants paired with the cardiac response; respiratory means while calculating. Click for live values.';
   };
   syncClockToggle();
   clockToggle.addEventListener('click', () => {
@@ -73,30 +84,40 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     const ctx = panel.begin();
     const { params: p, circ: c, metrics: m } = sim;
 
-    // The curves and the two equilibrium marks use a complete respiratory-cycle
-    // mean. That is the shortest interval over which a settled serial circuit
-    // must return every compliant compartment to the same volume. The separate
+    // Live markers use a respiratory-cycle mean. The cardiac response and its
+    // companion return curve use separately settled minute windows. The separate
     // one-heartbeat mean remains below as the dynamic respiratory trail.
     const op = m.respiratoryOperatingPoint;
     const beat = m.operatingPoint;
-    const vr = venousReturnCurve(p, c, curveClock === 'mean' ? op : null);
-    const cf = cardiacFunctionCurve(p, c, op);
+    responseJob.request(JSON.stringify(p), cardiacResponseParameters(p, sim.effective ?? p));
+    const job = responseJob.getState();
+    responseStatus.textContent = job.message;
+    responseStatus.dataset.status = job.status;
+    const response = job.result?.valid ? job.result : null;
+    // The two steady curves use the SAME settled reference and fixed autonomic
+    // drive. Live markers retain their own respiratory clock and can diverge
+    // during redistribution. Recalculate refreshes a compensated reference.
+    const reference = response?.reference;
+    const vrMean = reference ? { ...reference, pra: reference.ra } : op;
+    const vr = venousReturnCurve(p, c, curveClock === 'mean' ? vrMean : null);
+    const segments = response?.segments ?? [];
+    const cfPoints = segments.flat();
 
     // Two different quantities, drawn as two different marks. Their labels name
     // the physiology rather than the calculation method: otherwise "simulated"
     // and "analytic" can be mistaken for two estimates of the same output.
     //
     // `simulated` is the respiratory mean measured from the integrated model.
-    // `equilibrium` is the crossing predicted by the local venous-return and RV-
-    // function constructions on that same clock. The trail is intentionally
+    // `equilibrium` is the crossing of the reference return relation and measured
+    // whole-heart response. The trail is intentionally
     // different: it preserves the within-breath storage and phase lag that the
     // mean points remove.
     const simulated = { x: op.pra, y: op.flow };
+    const cardiacOutput = { x: op.pra, y: op.aorticFlow };
     // A live venous-return curve intentionally has no equilibrium marker: the
-    // RV relation and filled point remain complete-breath summaries, so their
-    // crossing with an instantaneous return curve would mix clocks again.
+    // steady response and instantaneous return curve would mix clocks again.
     const equilibrium = curveClock === 'mean'
-      ? curveIntersection(vr.points, cf.points)
+      ? segments.map(points => curveIntersection(vr.points, points)).find(Boolean) ?? null
       : null;
     const measured = sim.measuredPoints;
 
@@ -111,6 +132,12 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     let pointXLo = Math.min(simulated.x, equilibrium?.x ?? simulated.x, op.ppl);
     let pointXHi = Math.max(simulated.x, equilibrium?.x ?? simulated.x, op.ppl);
     let pointYHi = Math.max(simulated.y, equilibrium?.y ?? simulated.y);
+    pointYHi = Math.max(pointYHi, cardiacOutput.y);
+    for (let i = 0; i < cfPoints.length; i += 2) {
+      pointXLo = Math.min(pointXLo, cfPoints[i]);
+      pointXHi = Math.max(pointXHi, cfPoints[i]);
+      pointYHi = Math.max(pointYHi, cfPoints[i + 1]);
+    }
     for (let i = 0; i < trail.length; i += 2) {
       pointXLo = Math.min(pointXLo, trail[i]);
       pointXHi = Math.max(pointXHi, trail[i]);
@@ -126,7 +153,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     // movement can therefore be read against stationary axes. A later extreme
     // may expand the domain, but ordinary oscillation can never shrink it.
     viewDomain = stableGuytonDomain(viewDomain, {
-      xLo: Math.min(-6, cf.xIntercept - 3, vr.pCrit - 3, pointXLo - 2),
+      xLo: Math.min(-6, vr.pCrit - 3, pointXLo - 2),
       xHi: Math.max(vr.pmsf + 2, simulated.x + 6, pointXHi + 2, 14),
       yHi: Math.max(9, (vr.points[1] ?? 8) * 1.05, simulated.y * 1.6, pointYHi * 1.2),
     });
@@ -144,9 +171,9 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     panel.clip();
 
     // Respiratory-mean pleural pressure remains a useful external-pressure
-    // reference. It is not labelled as the curve intercept: the locally
-    // anchored RV relation also contains the RA-to-RV filling offset.
-    const pplMmHg = curveClock === 'mean' ? op.ppl : c.p.ppl;
+    // reference. It is not labelled as the curve intercept: the response also
+    // contains atrial, ventricular and pulmonary loading effects.
+    const pplMmHg = curveClock === 'mean' ? (reference?.ppl ?? op.ppl) : c.p.ppl;
     ctx.save();
     ctx.strokeStyle = colors.inkMuted;
     ctx.setLineDash([2, 3]);
@@ -163,16 +190,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     panel.line(trail, { color: colors.ink, width: 1.4, alpha: 0.3 });
 
     panel.line(vr.points, { color: colors.venous, width: 2 });
-    panel.line(cf.points, { color: colors.arterial, width: 2 });
-
-    // The stretch of the RV-function curve where filling would actually buy
-    // predicted RV output, drawn over it. Which side of that the marker sits on
-    // is the whole question, and this makes it a place on the picture rather
-    // than a claim.
-    const limbs = preloadLimbs(p, c, op);
-    if (limbs.steep.length >= 4) {
-      panel.line(limbs.steep, { color: colors.arterial, width: 5, alpha: 0.28 });
-    }
+    for (const points of segments) panel.line(points, { color: colors.arterial, width: 2 });
 
     panel.unclip();
 
@@ -181,10 +199,12 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     panel.label('Venous return', vr.points[vrLabelIdx], vr.points[vrLabelIdx + 1], {
       color: colors.text.venous, dx: 6, dy: -10, halo: colors.surface,
     });
-    const cfLabelIdx = Math.floor(cf.points.length * 0.82) & ~1;
-    panel.label('RV function', cf.points[cfLabelIdx], cf.points[cfLabelIdx + 1], {
-      color: colors.text.arterial, dx: -6, dy: -10, align: 'right', halo: colors.surface,
-    });
+    if (cfPoints.length) {
+      const cfLabelIdx = cfPoints.length - 2;
+      panel.label('Cardiac output (LV)', cfPoints[cfLabelIdx], cfPoints[cfLabelIdx + 1], {
+        color: colors.text.arterial, dx: -6, dy: -10, align: 'right', halo: colors.surface,
+      });
+    }
     if (trail.length >= 12) {
       // Put the label at the right-most part of the measured path, away from
       // most of the loop and without implying that the trail belongs to either
@@ -260,6 +280,10 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     // circulation. When the two agree, the smaller filled disc leaves the
     // hollow predicted-equilibrium ring visible around it.
     panel.dot(simulated.x, simulated.y, { color: colors.ink, r: 4, ring: colors.surface });
+    panel.dot(cardiacOutput.x, cardiacOutput.y, { color: colors.arterial, r: 3, ring: colors.surface });
+    panel.label('mean LV output', cardiacOutput.x, cardiacOutput.y, {
+      color: colors.text.arterial, dx: 9, dy: -9, halo: colors.surface,
+    });
 
     panel.label('mean venous inflow', simulated.x, simulated.y, {
       color: colors.ink,
@@ -277,7 +301,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     }
 
     panel.title('Guyton diagram', colors, curveClock === 'mean'
-      ? 'respiratory-mean venous return and predicted RV output'
+      ? 'whole-heart response measured at the LV outlet'
       : 'live venous-return determinants — diagnostic view');
   }
 
@@ -285,6 +309,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     trail.length = 0;
     lastSample = -1;
     viewDomain = null;
+    responseJob.reset();
   }
 
   return { render, clearTrail, curveClock: () => curveClock };

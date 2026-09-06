@@ -179,7 +179,7 @@ check('pause inspection synchronises snapshots, tiles and analytical panels',
     && waveformSource.includes("timelineInput.type = 'range'")
     && waveformSource.includes("plot.addEventListener('pointerdown'"));
 check('diagram warnings name the qualified interpretation rather than the whole panel',
-  descriptions.includes("label: 'Preload reserve'")
+  descriptions.includes("label: 'Cardiac output curve'")
     && descriptions.includes("label: 'Derived PVR'")
     && descriptions.includes('use with caution'));
 check('waveform scales start a new visual state after every parameter change',
@@ -231,7 +231,7 @@ check('the Guyton preload limb is shown without the removed explanatory slogan',
   !guytonSource.includes('filling helps here'));
 check('the Guyton debug switch compares coherent mean and live venous-return clocks',
   guytonSource.includes("clockToggle.textContent = live ? 'VR live' : 'VR mean'")
-    && guytonSource.includes("curveClock === 'mean' ? op : null")
+    && guytonSource.includes("curveClock === 'mean' ? vrMean : null")
     && guytonSource.includes('instantaneous return curve would mix clocks again')
     && /\.guyton-clock-toggle\s*\{/.test(css));
 

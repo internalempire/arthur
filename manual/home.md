@@ -46,7 +46,7 @@ The tiles combine direct model measurements, derived physiological indices and i
 | waveforms | what happened first within the breath or cardiac cycle? | [Waveforms](panel-waveforms.md) |
 | ventricular pressure–volume loops | did filling, contractility or afterload change the beat? | [PV loops](panel-pv-loops.md) |
 | Campbell diagram | how do pleural pressure, passive recoil and inspiratory muscle pressure relate to lung volume? | [Campbell diagram](panel-campbell.md) |
-| Guyton diagram | where do venous return and predicted RV output meet, and is there preload reserve? | [Guyton diagram](panel-guyton.md) |
+| Guyton diagram | where do venous return and whole-heart aortic output meet? | [Guyton diagram](panel-guyton.md) |
 | PVR against lung volume | how do alveolar and extra-alveolar vessels create the J-shaped pulmonary vascular load? | [PVR curve](panel-pvr-curve.md) |
 
 ## The physiological map

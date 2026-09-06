@@ -123,7 +123,7 @@ export class Simulator {
     this.ema = null;
     // Cycle-averaged quantities for the Guyton diagram.
     this.cycle = {
-      ra: new CycleRing(), flow: new CycleRing(), pmsf: new CycleRing(),
+      ra: new CycleRing(), flow: new CycleRing(), aorticFlow: new CycleRing(), pmsf: new CycleRing(),
       peri: new CycleRing(), ppl: new CycleRing(), pCrit: new CycleRing(),
       // Keep every determinant of the Guyton venous-return curve on the same
       // clock. This supports a complete-breath construction and a genuinely
@@ -137,6 +137,8 @@ export class Simulator {
       hr: new CycleRing(), eesRv: new CycleRing(),
     };
     this.cycleTick = 0;
+    this.cycleAorticVolume = 0;
+    this.cycleFlowDuration = 0;
     // Occlusion manoeuvres, and the (pressure, flow) pairs they measure.
     this.hold = null;
     this.pvrBreath = -1;
@@ -318,9 +320,14 @@ export class Simulator {
       this.ema.flow += alpha * ((c.q.vr * 60) / 1000 - this.ema.flow);
     }
 
+    this.cycleAorticVolume += c.q.av * this.dt;
+    this.cycleFlowDuration += this.dt;
     if (this.cycleTick++ % Math.max(1, Math.round(1 / (CYCLE_HZ * this.dt))) === 0) {
       this.cycle.ra.push(c.p.ra);
       this.cycle.flow.push((c.q.vr * 60) / 1000);
+      this.cycle.aorticFlow.push(this.cycleAorticVolume / this.cycleFlowDuration * 0.06);
+      this.cycleAorticVolume = 0;
+      this.cycleFlowDuration = 0;
       this.cycle.pmsf.push(c.p.pmsf);
       this.cycle.peri.push(c.p.pPeri);
       this.cycle.ppl.push(c.p.ppl);
@@ -506,6 +513,7 @@ export class Simulator {
     const respiratoryOperatingPoint = {
       pra: this.cycle.ra.meanOfMeans(window, respiratoryWindow),
       flow: this.cycle.flow.meanOfMeans(window, respiratoryWindow),
+      aorticFlow: this.cycle.aorticFlow.meanOfMeans(window, respiratoryWindow),
       pmsf: this.cycle.pmsf.meanOfMeans(window, respiratoryWindow),
       pPeri: this.cycle.peri.meanOfMeans(window, respiratoryWindow),
       ppl: this.cycle.ppl.meanOfMeans(window, respiratoryWindow),

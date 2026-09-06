@@ -8,6 +8,7 @@
 // step.
 
 export { Simulator, TRACE_SECONDS, TRACE_SAMPLE_HZ } from './simulator.js';
+export { createCardiacResponseWorker, cardiacResponseParameters } from './cardiac-response-client.js';
 export { SCENARIOS, SCENARIO_BY_ID } from './scenarios.js';
 export { PARAMETERS, GROUPS } from './parameters.js';
 export {

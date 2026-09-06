@@ -1,6 +1,6 @@
 # Venous return
 
-> Flow back to the heart is driven by the difference between the pressure filling the venous reservoir and the pressure in the right atrium. In the model, steady flow is predicted where venous return equals the output of the RV-function curve; systemic cardiac output becomes equal to that flow only at whole-circuit steady state.
+> Flow back to the heart depends on systemic filling pressure, right atrial pressure and resistance to return. The Guyton panel compares that return relation with a whole-heart response measured at the LV outlet; all serial mean flows agree only after the circulation settles.
 
 ---
 
@@ -27,17 +27,13 @@ Two features of this expression carry most of the clinical content.
 
 ### The Guyton construction
 
-Two relations run in opposite directions against the same variable. Venous return **falls** as right atrial pressure rises. The traditional cardiac-function relation **rises**, because a fuller heart can eject more. In the model this second relation is specifically calculated from the **right ventricle**: right atrial pressure determines RV filling, and RV contractility and pulmonary arterial load determine predicted RV output. The curves cross where predicted venous return equals predicted RV output.
+The descending relation describes return from the systemic veins. The ascending relation describes blood delivered through the whole heart and measured across the aortic valve. They share right atrial pressure as the horizontal coordinate: the curve includes the RV, pulmonary circulation and LV rather than substituting RAP for LV preload.
 
-That crossing is often labelled cardiac output in a Guyton diagram. This is valid as a steady-state shorthand: after the complete serial circulation settles, venous return, RV output and LV output must have the same mean value. It does not mean that the model's ascending curve directly calculates LV performance.
+![Venous return and whole-heart aortic output at two levels of PEEP](figure/guyton-peep.svg)
 
-![Venous return and predicted RV output at two levels of PEEP](figure/guyton-peep.svg)
+Giving volume can move the venous-return relation by raising systemic filling pressure. Whether flow rises depends on the whole-heart response and the new loading conditions. The separate [RV preload-reserve coefficient](preload-reserve.md) remains a local right-sided approximation and is not the slope of this whole-heart curve.
 
-The construction earns its place because it separates two questions that a single cardiac output number confuses. In the model, the position on the **RV-function curve** asks whether more right-sided filling can raise predicted RV output: on its ascending limb, it can; on its plateau, additional filling mainly raises filling pressure. Giving volume also shifts the venous-return curve to the right by raising mean systemic filling pressure, and the new predicted steady flow is the intersection of both relations — see [preload reserve](preload-reserve.md).
-
-This must not be confused with the **plateau of the venous return curve** at very low right atrial pressure. That plateau reflects collapse of the great veins and limits the maximum venous return; it is not the flat limb of the Frank–Starling relation.
-
-It also shows why PEEP can cost output. Raising PEEP shifts the RV-function curve rightward, because the RV now sits inside a higher surrounding pressure and needs a higher measured atrial pressure to reach the same transmural filling. The crossing moves to a lower predicted flow at a higher right atrial pressure — exactly the pattern in [transmural pressure](transmural-pressure.md), seen graphically.
+Positive pressure changes both cardiac loading and systemic return. Atmospheric right atrial pressure can rise while its transmural component falls; the direction of a plotted shift must therefore be interpreted with its pressure reference. A fall in excessive filling pressure can be useful even without increased flow. A single changed operating point does not identify an entire new cardiac-function relation.
 
 ### The venous-return plateau is not a Frank–Starling phenomenon
 
@@ -53,20 +49,15 @@ The integrator separates the systemic venous reservoir, a compliant IVC and the 
 
 The analytic venous-return curve reduces those two resistances back to their steady-state sum and uses the same critical closing-pressure law. Its default construction averages all three determinants — Pmsf, critical closing pressure and effective resistance — over one complete breath. Once IVC volume is no longer changing, the detailed pathway and the reduced curve give the same mean flow. During inspiration or expiration they need not give the same instantaneous flow because the IVC is filling or emptying.
 
-For model inspection, **VR live** replaces all three mean determinants with their current values. It does not combine mean pressures with a live resistance. The predicted-equilibrium marker is withheld in this view because the displayed RV-function curve remains a respiratory-mean construction.
+For model inspection, **VR live** uses all three instantaneous return determinants together. The default VR mean relation uses the settled reference conditions of the whole-heart response experiment. The predicted crossing is withheld in the live view because instantaneous return cannot be interpreted as an equilibrium with a separately settled cardiac response.
 
 Mean systemic filling pressure comes from the [stressed volume](stressed-volume.md) of the venous reservoir divided by its compliance, plus the [abdominal](abdominal-pressure.md) contribution where the reservoir is distended enough to have one.
 
-### The two marks on the diagram
+### The marks on the diagram
 
-The panel separates the within-breath path from the equilibrium comparison:
+The faint inflow path uses one-heartbeat mean RAP and IVC-to-right-atrial inflow. The dark mean venous-inflow marker and red mean LV-output marker average their respective measured flows over the same respiratory window. The hollow predicted-equilibrium point is the crossing of the separately settled return and cardiac-output relations. See [the Guyton panel](panel-guyton.md) for its loading protocol and calculation status.
 
-- **inflow path**, the faint trail, plots consecutive one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. It retains respiratory movement while suppressing the atrial pressure waves;
-- **mean venous inflow**, the filled point, plots the same two variables averaged over one complete respiratory cycle. Its flow coordinate is still venous inflow, not RV output, LV output or cardiac output;
-- **predicted equilibrium**, the hollow point, marks where predicted venous return and predicted RV output are equal on the local steady-state construction.
-- **the hollow equilibrium point** is the crossing of the respiratory-mean venous-return and local RV-function curves. It predicts where venous return and RV output become equal on that steady-state construction.
-
-The end of a heartbeat is not an equilibrium event. Cardiac and respiratory cycles are not synchronized, and the IVC, right heart and pulmonary circulation do not all return to their starting volumes after every beat. A complete breath is the shortest periodic window over which a settled model must restore every compartment to the same volume. The filled and hollow mean points should therefore lie close together in a settled passive simulation, while the one-heartbeat trail remains visible.
+The respiratory markers remove much of the within-breath variation but a beat or a breath need not return every compartment to exactly the same volume when the cardiac and respiratory clocks are not commensurate. The steady response uses complete minute windows and explicitly checks flow agreement and storage. During an intervention, differences between venous inflow and aortic output can be caused by redistribution.
 
 At steady state, mean venous return and cardiac output must be equal. Within a breath they may differ because the right heart can temporarily store blood:
 
@@ -104,9 +95,9 @@ Mean systemic filling pressure *rises* with PEEP — the abdominal contribution 
 
 ## Why this and not something else
 
-The model integrates a closed loop and *derives* the Guyton diagram from it, rather than using the diagram as the model. A pure Guyton model — two curves and their intersection — cannot show breath-by-breath storage. The trail therefore retains one-heartbeat means, while the equilibrium comparison uses a full respiratory cycle.
+The model integrates a closed loop and derives a separate Guyton analysis from its equations. Two curves and their intersection alone cannot show breath-by-breath storage. The trail retains one-heartbeat means, the live markers use respiratory means, and the steady relations use separately settled minute windows.
 
-The local RV-function curve is anchored to respiratory-mean RV end-diastolic and end-systolic volumes. This avoids treating mean right atrial pressure as if it were identical to RV end-diastolic transmural pressure. It also means that agreement between the filled and hollow points is an internal consistency check, not independent validation of the integrated heart.
+The displayed cardiac-output response is measured in disposable whole-heart loading experiments conditioned on a settled reference. The normalized inflow waveform and systemic source-pressure/respiratory trajectories are shared across the copies; cardiac and pulmonary dynamics remain active. Agreement at the unperturbed reference is an internal consistency check. The [panel page](panel-guyton.md) describes rejected ranges, numerical checks and the fixed-autonomic-drive boundary.
 
 Venous return uses a soft collapse law rather than a hard `max()`, for reasons given under [vascular waterfalls](vascular-waterfalls.md).
 

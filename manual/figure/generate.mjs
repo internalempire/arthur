@@ -19,6 +19,8 @@ import {
 } from '../../src/model/lung.js';
 import { RESISTANCE_TO_WOOD } from '../../src/model/units.js';
 import { Simulator } from '../../src/model/simulator.js';
+import { cardiacResponseCurve } from '../../src/model/cardiac-response.js';
+import { cardiacResponseParameters } from '../../src/model/cardiac-response-client.js';
 import { SCENARIOS } from '../../src/model/scenarios.js';
 import { createBaroreflexState, stepBaroreflex } from '../../src/model/baroreflex.js';
 import {
@@ -162,12 +164,13 @@ function guytonFigure() {
     { label: 'PEEP 15', peep: 15, cls: 'alv' },
   ].map((s) => {
     const sim = settled({ mode: 'vcv', pmus: 0, vt: 500, rr: 14, peep: s.peep });
-    // The curves and equilibrium points use the same full-breath clock as the
-    // running panel; the separate one-heartbeat means form its dynamic trail.
-    const mean = sim.metrics.respiratoryOperatingPoint;
+    const response = cardiacResponseCurve(cardiacResponseParameters(sim.params, sim.effective));
+    const mean = response.reference;
     const vr = venousReturnCurve(sim.params, sim.circ, mean).points;
-    const cf = cardiacFunctionCurve(sim.params, sim.circ, mean).points;
-    return { ...s, vr, cf, cross: curveIntersection(vr, cf) };
+    const segments = response.segments;
+    const cf = segments.flat();
+    return { ...s, vr, cf, segments,
+      cross: segments.map(points => curveIntersection(vr, points)).find(Boolean) };
   });
 
   const pairs = (a) => { const o = []; for (let i = 0; i < a.length; i += 2) o.push([a[i], a[i + 1]]); return o; };
@@ -190,7 +193,7 @@ function guytonFigure() {
   }
 
   const curves = states.map((s) => `<path class="${s.cls}" d="${path(s.vr)}"/>`
-    + `<path class="${s.cls}" style="stroke-dasharray:5 3;stroke-width:1.6" d="${path(s.cf)}"/>`
+    + s.segments.map(points => `<path class="${s.cls}" style="stroke-dasharray:5 3;stroke-width:1.6" d="${path(points)}"/>`).join('')
     + (s.cross ? `<circle class="dot" style="fill:var(--fig-${s.cls === 'total' ? 'total' : 'alv'})" cx="${x(s.cross.x).toFixed(1)}" cy="${y(s.cross.y).toFixed(1)}" r="4"/>` : '')).join('\n');
 
   const key = states.map((s, i) => {
@@ -201,10 +204,10 @@ function guytonFigure() {
   }).join('\n');
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" class="${ROOT}" role="img"
-  aria-label="Guyton construction at two levels of PEEP. Each level shows a venous return curve falling with right atrial pressure and the model RV-function curve rising with it. Raising PEEP shifts both curves rightward and the analytic intersection to a lower predicted RV output at a higher right atrial pressure.">
+  aria-label="Guyton construction at two levels of PEEP. Each level shows venous return and whole-heart output measured across the aortic valve in settled loading experiments. Only valid response segments are shown.">
 <style>${STYLE}</style>
 <rect class="bg" width="${W}" height="${H}"/>
-<text class="title" x="${PAD.l}" y="16">Venous return and model RV function, at two levels of PEEP</text>
+<text class="title" x="${PAD.l}" y="16">Venous return and cardiac output (LV), at two levels of PEEP</text>
 ${ticks.join('\n')}
 <line class="axis" x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t + plotH}"/>
 <line class="axis" x1="${PAD.l}" y1="${PAD.t + plotH}" x2="${PAD.l + plotW}" y2="${PAD.t + plotH}"/>
@@ -213,7 +216,7 @@ ${curves}
 <text class="label" x="${PAD.l + plotW / 2}" y="${H - 6}" text-anchor="middle">Right atrial pressure (mmHg)</text>
 ${key}
 <text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 112}">solid: venous return</text>
-<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: predicted RV output</text>
+<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: cardiac output (LV)</text>
 </svg>
 `;
 }
