@@ -139,7 +139,7 @@ Related pages: [The right ventricle](the-right-ventricle.md) · [Ventricular int
 
 ### LV ejection fraction
 
-EF is the geometric volume reduction, 100 × (EDV − ESV) / EDV, for the latest completed beat. EDV is sampled immediately before first forward ejection and ESV at its end. The subtitle reports independently integrated forward stroke volume. In an admissible cycle without filling during ejection these agree; the model flags throughflow and incompatible pressure relations as outside its physiological domain.
+EF is the geometric volume reduction, 100 × (EDV − ESV) / EDV, for the latest completed beat. EDV is sampled immediately before first forward ejection and ESV at its end. The subtitle reports independently integrated forward stroke volume. In an admissible cycle without filling during ejection these agree; the model flags throughflow and incompatible pressure relations as outside its physiological domain. If the geometric volumes do not define an EF within 0–100%, EF is unavailable and the state is invalid; it is not clipped to a plausible percentage.
 
 Related pages: [PV loops](panel-pv-loops.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md)
 

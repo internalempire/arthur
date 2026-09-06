@@ -103,13 +103,17 @@ section('Compartment positivity across a control-space sweep');
     for (const [, v] of Object.entries(m)) {
       if (typeof v === 'number' && !Number.isFinite(v)) nonFinite++;
     }
-    if (!(m.lvEf >= 0 && m.lvEf <= 100)) efOutOfRange++;
+    const efOK = m.lvEf === null
+      ? !m.valid && m.invalidReasons.some(reason => reason.includes('invalid geometric volume ordering'))
+      : Number.isFinite(m.lvEf) && m.lvEf >= 0 && m.lvEf <= 100;
+    if (!efOK) efOutOfRange++;
     if (!m.valid) flagged++;
   }
   check(`${trials} configurations keep every compartment positive`, worstVolume > 0,
     `smallest volume ${worstVolume.toFixed(2)} mL`);
   check('no non-finite metric anywhere in the sweep', nonFinite === 0, `${nonFinite} found`);
-  check('ejection fraction always within 0–100%', efOutOfRange === 0, `${efOutOfRange} outside`);
+  check('EF is within 0–100% or explicitly unavailable in an invalid geometric state',
+    efOutOfRange === 0, `${efOutOfRange} unexplained results`);
   check('states outside the model\'s range report themselves', flagged > 0,
     `${flagged} of ${trials} self-reported as not interpretable`);
 }

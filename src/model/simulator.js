@@ -466,7 +466,8 @@ export class Simulator {
     // Whether the numbers below mean anything at all. A model driven past the
     // range where its equations hold should say so rather than keep reporting
     // values in clinical units.
-    const lvEf = c.lvEdv > 0 ? 100 * (c.lvEdv - c.lvEsv) / c.lvEdv : 0;
+    const geometricEf = c.lvEdv > 0 ? 100 * (c.lvEdv - c.lvEsv) / c.lvEdv : NaN;
+    const lvEf = geometricEf >= 0 && geometricEf <= 100 ? geometricEf : null;
     const reasons = [];
     if (r.atCapacity) {
       reasons.push('the lung is at capacity — this tidal volume does not fit in it, '
@@ -477,7 +478,7 @@ export class Simulator {
     if (c.pressureDomainInvalid || c.pressureDomainRun) reasons.push('passive ventricular pressure exceeds the selected systolic pressure envelope');
     const emptied = COMPARTMENTS.filter((k) => c[k] <= 1.5);
     if (emptied.length) reasons.push(`${emptied.join(', ')} at the volume floor`);
-    if (!(lvEf >= 0 && lvEf <= 100)) reasons.push('ejection fraction outside 0–100%');
+    if (lvEf === null) reasons.push('ejection fraction unavailable: invalid geometric volume ordering');
     if (!Number.isFinite(co) || !Number.isFinite(map)) reasons.push('non-finite result');
 
     // One cardiac cycle's worth of samples: the cardiac ripple averages out, the

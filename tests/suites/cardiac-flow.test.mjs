@@ -59,4 +59,9 @@ for (const hr of [45, 75, 140, 170, 190, 212]) {
   const extreme = settled({ ...SCENARIOS.find(s => s.id === 'lv-failure').params, lvStiff: 0.04, peep: 0 }, 60);
   check('an atrial-throughflow state is exposed instead of valve-gated away',
     extreme.circ.cardiacPhaseInvalid && !extreme.metrics.valid);
+  s.circ.lvEdv = 80; s.circ.lvEsv = 90;
+  const invalidGeometry = s.computeMetrics();
+  check('geometrically undefined EF is unavailable with its explicit reason',
+    invalidGeometry.lvEf === null && !invalidGeometry.valid
+      && invalidGeometry.invalidReasons.some(reason => reason.includes('invalid geometric volume ordering')));
 }
