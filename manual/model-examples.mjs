@@ -23,6 +23,9 @@ function settledSimulator(overrides) {
   simulator.params = { ...defaultParams(), ...overrides };
   simulator.reset();
   simulator.advance(SETTLING_SECONDS, true);
+  if (!simulator.metrics.valid) {
+    throw new Error(`Uninterpretable manual example ${JSON.stringify(overrides)}: ${simulator.metrics.invalidReasons.join('; ')}`);
+  }
   return simulator;
 }
 
@@ -335,7 +338,7 @@ function pulmonaryTransitBlock() {
       ...common, pvrBase: 0.44, eesRv: 0.32, stressedVolume: 1050, svr: 1.25,
     }],
     ['congested low-output LV failure', {
-      ...common, eesLv: 0.8, lvStiff: 0.04, stressedVolume: 950, svr: 1.25,
+      ...common, eesLv: 0.8, lvStiff: 0.03, stressedVolume: 950, svr: 1.25,
     }],
   ];
   return [

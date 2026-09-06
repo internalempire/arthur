@@ -67,7 +67,7 @@ With passive ventilation, HR 75/min, RR 18/min, VT 450 mL and PEEP 5 cmH2O held 
 |---|---:|---:|---:|
 | reference circulation | 404 | 4.5 | 2.0 |
 | pulmonary embolism | 548 | 8.3 | 3.6 |
-| congested low-output LV failure | 807 | 20.4 | 6.0 |
+| congested low-output LV failure | 765 | 15.2 | 6.0 |
 <!-- END GENERATED: pulmonary-transit -->
 
 The ordering is the lesson. The embolism and LV-failure numbers are outputs of selected model phenotypes, not expected clinical values or diagnostic thresholds. In particular, an estimate near 20 seconds in the severe low-output LV phenotype should be read as “very slow transport in this model state”, not as a normal clinical range or a patient-level prediction. The LV phenotype reaches the staged numerical ceiling, while the unbounded whole-circuit estimate remains visible.

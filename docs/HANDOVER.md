@@ -18,6 +18,8 @@ The LV-stiffness slider uses 0.001 increments so the 0.027 preset is represented
 
 The broad control-space sweep exposed eight extreme states where filling during forward flow makes end-ejection volume exceed pre-ejection volume. Geometric EF is explicitly unavailable (`null`) with an invalid-state reason in that case, rather than clipped to zero. The sweep requires either a finite 0–100% EF or that specific unavailable/invalid contract. Normal preset EF remains numerical.
 
+The final documentation review also corrected two cross-page claims that still described an afterload-dominant output benefit. A separate pulmonary-transit example used a non-preset congested LV state with the same phase problem; its LV stiffness is 0.030 and it retains the delayed-transit lesson in a valid state. The matched transit test now requires all three states to be valid, and the shared manual settlement helper rejects invalid examples instead of publishing their clinical-looking numbers.
+
 ## Verification guardrails — September 6
 
 The user authorized verification hardening first, followed by correction of cardiac filling/ejection overlap and output accounting, with local, VPS and GitHub synchronization at each completed stage. Manual pages describe current behavior; this handover records changes and their rationale.
