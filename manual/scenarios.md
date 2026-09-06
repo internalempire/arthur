@@ -91,11 +91,11 @@ R/I is one constraint, not the validator of the whole preset. The current openin
 
 ### LV failure
 
-**Question.** Can positive intrathoracic pressure increase output when a failing left ventricle is more afterload-sensitive than preload-dependent?
+**Question.** Does reducing LV transmural ejection pressure necessarily increase cardiac output?
 
 **Try.** Start from the preset at PEEP 10, set PEEP to zero and allow the model to settle, then return PEEP to 10. Compare several respiratory cycles rather than one beat. Follow the LV pressure–volume loop, end-diastolic and end-systolic volume, pleural pressure and output.
 
-**Read.** This severe phenotype combines low LV contractility, high diastolic stiffness and high filling pressure. PEEP raises pleural pressure and reduces LV transmural ejection pressure. Its output response is not physiologically interpretable: displayed chamber-volume output disagrees with integrated aortic flow, and late-diastolic throughflow violates the intended cardiac cycle. Use the [independent audit](validation.md#independent-audit-and-unresolved-findings) to assess this boundary; an apparent output gain does not establish afterload benefit.
+**Read.** Low LV contractility and elevated filling pressure coexist with reduced EF. PEEP raises pleural pressure and lowers transmural ejection pressure, but reduced filling lowers forward output in this preset. The [independent audit](validation.md#independent-audit-and-unresolved-findings) verifies agreement with integrated aortic flow and absence of diastolic throughflow at PEEP 0 and 10 with two time steps. The clinical lesson is the competition between unloading and loss of filling; pressure unloading alone does not establish improved pumping.
 
 The preset isolates that mechanical competition. It does **not** create hydrostatic pulmonary oedema from the high filling pressure and does not add the associated fall in lung compliance, loss of aerated volume, rise in airway resistance, gas-exchange impairment or compensatory respiratory drive. Those variables remain independently selectable so the same cardiac phenotype can be studied with different lungs and ventilatory patterns. The name therefore describes LV failure, not a complete cardiogenic-pulmonary-oedema syndrome.
 
@@ -240,7 +240,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 1.25 mmHg·s/mL |
 | Cardiac function | Baseline heart rate | 75 /min | 95 /min |
 | Cardiac function | LV contractility (Ees) | 3.0 mmHg/mL | 0.6 mmHg/mL |
-| Cardiac function | LV diastolic stiffness | 0.028 1/mL | 0.040 1/mL |
+| Cardiac function | LV diastolic stiffness | 0.028 1/mL | 0.027 1/mL |
 
 #### Stiff chest wall
 
@@ -277,7 +277,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 
 These tables describe how each starting phenotype is assembled, not what every control means or what outcome it guarantees. The control pages explain the mechanisms in more detail: [ventilation](controls-ventilation.md), [respiratory mechanics](controls-mechanics.md), [volume and vascular tone](controls-volume.md), [heart](controls-heart.md) and [pulmonary circulation](controls-pulmonary.md).
 
-The LV-failure intervention has independent forward-flow and phase checks; its output lesson remains unverified while those findings are open. In cardiac tamponade, restoring pericardial capacity must lower pericardial pressure and CVP, increase pressure and output, and restore proportionally more RV than LV end-diastolic volume.
+The LV-failure intervention requires valid cardiac phases, elevated filling pressure, reduced EF, lower transmural ejection pressure and lower filling with PEEP; its modest fall in integrated forward output is part of that explicit contract. In cardiac tamponade, restoring pericardial capacity must lower pericardial pressure and CVP, increase pressure and output, and restore proportionally more RV than LV end-diastolic volume.
 
 The former weaning preset was removed. A matched experiment did not reproduce the expected rise in filling pressure or fall in output, and the model lacks work of breathing, myocardial oxygen demand, sympathetic activation, ischaemia, dynamic mitral regurgitation, fluid redistribution and time-dependent pulmonary oedema. The physiology of weaning-induced pulmonary oedema is real; a preset that merely carries its name without generating enough of its mechanism is not useful teaching.
 

@@ -166,4 +166,8 @@ The hysteresis page was rewritten clinician-first: opening and closing controls 
 
 ## 2026-09-06 — Verification evidence
 
-Every PR and publication checkout runs the complete verification command. Independent flow, phase and numerical audit measurements distinguish known unresolved findings from passing contracts. The LV-failure output lesson is unverified while its phase and forward-flow findings remain open.
+Every PR and publication checkout runs the complete verification command. Independent flow, phase and numerical audit measurements distinguish known unresolved findings from passing contracts. The LV-failure lesson requires independent phase and forward-flow acceptance.
+
+## 2026-09-06 — Cardiac flow and domain
+
+Forward SV is integrated valve volume and CO uses the measured completed-beat duration. EF uses geometric volume reduction. The LV-failure preset demonstrates pressure unloading with lower filling and mean forward output; its cardiac phases are admissible. Incompatible pressure envelopes or paired-valve throughflow suspend interpretation. Activation is continuous through high-rate cycle boundaries, with a didactic relaxation window before atrial contraction. Four independent respiratory/venous criteria remain open.

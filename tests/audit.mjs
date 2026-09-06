@@ -12,8 +12,12 @@ for (const probe of [cardiacAudit, pressureDomainAudit, activationAudit, respira
 const evaluated = evaluateAuditResults(results, expectations, { strict: args.has('--strict') });
 for (const result of evaluated.results) console.log(`${result.status} ${result.id}: ${JSON.stringify(result.measurements)}`);
 let commit = 'unavailable';
-try { commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(); } catch {}
-const report = { commit, node: process.version, ...evaluated };
+let dirty = null;
+try {
+  commit = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  dirty = execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim().length > 0;
+} catch {}
+const report = { commit, dirty, node: process.version, ...evaluated };
 if (process.env.ARTHUR_AUDIT_REPORT) writeFileSync(process.env.ARTHUR_AUDIT_REPORT, JSON.stringify(report, null, 2) + '\n');
 const known = evaluated.results.filter(r => r.status === 'KNOWN_FAILURE').length;
 console.log(`${known} known unresolved criteria; these are not passing physiological checks.`);

@@ -83,9 +83,11 @@ section('Pulmonary transit');
     stressedVolume: 1050, svr: 1.25,
   }, 45);
   const congestion = settled({
-    ...common, eesLv: 0.8, lvStiff: 0.04,
+    ...common, eesLv: 0.8, lvStiff: 0.03,
     stressedVolume: 950, svr: 1.25,
   }, 45);
+  check('matched transit examples stay inside the cardiac and respiratory domains',
+    reference.metrics.valid && embolism.metrics.valid && congestion.metrics.valid);
   check('embolism prolongs transit in a matched ventilatory experiment',
     embolism.metrics.pulmonaryTransitTime > reference.metrics.pulmonaryTransitTime + 2
       && embolism.metrics.pulmonaryBloodVolume > reference.metrics.pulmonaryBloodVolume,

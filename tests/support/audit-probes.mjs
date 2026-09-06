@@ -56,9 +56,15 @@ export function cardiacAudit() {
     const sim = settle({ ...SCENARIO_BY_ID.get('lv-failure').params, peep }, dt);
     rows.push({ dt, peep, ...observeCardiac(sim), valid: sim.computeMetrics().valid });
   }
-  const outputOK = rows.every(r => Math.abs(r.reportedOutput - r.aorticOutput)
-    / Math.max(r.aorticOutput, 0.1) < 0.005);
-  const overlapOK = rows.every(r => r.overlapFraction < 0.0001 && r.diastolicFraction < 0.0001);
+  const converged = [0, 10].every(peep => {
+    const pair = rows.filter(row => row.peep === peep);
+    return Math.abs(pair[0].aorticOutput - pair[1].aorticOutput)
+      / Math.max(pair[1].aorticOutput, 0.1) < 0.005;
+  });
+  const outputOK = converged && rows.every(r => r.valid && Math.abs(r.reportedOutput - r.aorticOutput)
+    / Math.max(r.aorticOutput, 0.1) < 0.005
+    && Math.abs(r.systemicOutput - r.aorticOutput) / Math.max(r.aorticOutput, 0.1) < 0.005);
+  const overlapOK = rows.every(r => r.valid && r.overlapFraction < 0.0001 && r.diastolicFraction < 0.0001);
   return [
     { id: 'cardiac-output', satisfied: outputOK, measurements: rows },
     { id: 'diastolic-throughflow', satisfied: overlapOK, measurements: rows },

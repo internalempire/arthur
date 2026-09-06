@@ -59,10 +59,10 @@ The atria are simpler: a linear elastance swinging between a minimum and a maxim
 For the ventricles, the duration of activation is not kept at a fixed fraction of every beat. If $T=60/HR$ is the cardiac-cycle duration, the model first defines
 
 $$
-T_{max}=0.2+0.15T, \qquad \tau=\frac{t}{T_{max}}
+T_{max}=\min(0.2+0.15T,\,0.5T), \qquad \tau=\frac{t}{T_{max}}
 $$
 
-and then uses the standard normalised double-Hill waveform
+and uses the normalised double-Hill core
 
 $$
 A(\tau)=1.55
@@ -70,9 +70,11 @@ A(\tau)=1.55
 \left[\frac{1}{1+(\tau/1.17)^{21.9}}\right].
 $$
 
-Its peak is approximately one, so the selected $E_{es}$ is the peak active elastance actually reached by the chamber. The $T_{max}$ relation also allows systole to occupy a larger fraction of a short tachycardic cycle instead of shrinking in direct proportion to the whole beat.
+Its peak is approximately one. A smooth cubic taper acts between 70% and 80% of the cycle, and activation is zero from 80% through the beat boundary. Atrial contraction occupies the final fifth. The cap and taper are explicit didactic timing boundaries: they preserve relaxation and a continuous cycle at high rates, but do not represent pathological incomplete relaxation or a calibrated force–frequency response.
 
-Valves are represented as one-way resistances. Flow is computed from the pressure difference and forced to zero when the gradient reverses, so isovolumic phases arise from the pressure relations rather than from explicit cardiac-cycle states.
+The intrinsic ventricular pressure is the passive exponential plus activation times the non-negative difference between the systolic envelope and that passive pressure. Thus activation cannot lower pressure at fixed volume. If the passive relation exceeds the selected systolic envelope, the numerical continuation remains bounded below by passive pressure and the result is flagged outside the model domain. No clinical inference is attached to that continuation.
+
+Valves are represented as one-way resistances driven by their pressure gradients. Isovolumic phases arise from those relations. There is no forced mutual exclusion of the inflow and outflow valves. A completed beat with more than 0.01% of forward volume (and at least 0.001 mL) occurring during paired-valve throughflow or ventricular activation below 0.001 is outside the intended phase domain. The check applies to both ventricles and suspends clinical readouts.
 
 The right ventricle carries two extra terms from [ventricular interdependence](ventricular-interdependence.md): a diastolic septal shift and a systolic contribution from the left ventricle. Consequently, the selected intrinsic RV elastance is not always the slope from the fixed zero-pressure volume to the total end-systolic RV pressure. The PV-loop panel draws a local effective line through the actual end-systolic point and explains the distinction; the control itself still represents the intrinsic ventricular term.
 

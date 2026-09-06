@@ -30,7 +30,8 @@ function recentLvBeatMeans(simulator, seconds = 10) {
   const beats = simulator.beatHistory.filter((beat) => beat.t > simulator.time - seconds);
   const mean = (key) => beats.reduce((total, beat) => total + beat[key], 0) / beats.length;
   return {
-    output: (mean('sv') * simulator.metrics.effectiveHr) / 1000,
+    output: beats.reduce((total, beat) => total + beat.sv, 0)
+      / beats.reduce((total, beat) => total + beat.duration, 0) * 0.06,
     edv: mean('lvEdv'),
     esv: mean('lvEsv'),
     esp: mean('lvEsp'),
@@ -274,13 +275,11 @@ section('Scenario teaching mechanisms');
   const highPeep = scenarioSimulator('lv-failure', { peep: 10 }, 45);
   const low = recentLvBeatMeans(lowPeep);
   const high = recentLvBeatMeans(highPeep);
-  const edvLoss = low.edv - high.edv;
-  const esvLoss = low.esv - high.esv;
-  demonstrates['lv-failure'] = highPeep.metrics.paop > 30
-    && high.output > low.output * 1.05
-    && high.esp < low.esp - 2
-    && esvLoss > edvLoss + 0.5;
-  check('LV-failure legacy chamber-volume response is reproducible (not physiological acceptance)',
+  demonstrates['lv-failure'] = highPeep.metrics.valid && lowPeep.metrics.valid
+    && highPeep.metrics.paop > 20 && highPeep.metrics.lvEf < 30
+    && high.output < low.output && high.esp < low.esp - 2
+    && high.edv < low.edv;
+  check('LV failure: pressure unloading coexists with lower filling and forward output',
     demonstrates['lv-failure'],
     `mean CO ${low.output.toFixed(2)} → ${high.output.toFixed(2)} L/min, `
       + `LV ESPtm ${low.esp.toFixed(1)} → ${high.esp.toFixed(1)} mmHg`);

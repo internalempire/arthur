@@ -13,7 +13,7 @@
 | RV contractility ($E_{es}$) | 0.08–1.60 mmHg/mL | RV end-systolic elastance |
 | LV diastolic stiffness | 0.010–0.080 /mL | exponent of the LV end-diastolic pressure–volume relation |
 
-Contractility changes the slope of the end-systolic relation, not arterial resistance. The ventricular activation waveform is normalised to a peak of one, so the selected $E_{es}$ is the peak active slope actually reached by the chamber. Diastolic stiffness changes how rapidly LV filling pressure rises with volume. Ejection fraction remains load-dependent, so it should not be used as a direct readout of the selected $E_{es}$.
+Contractility changes the slope of the end-systolic relation, not arterial resistance. The ventricular activation waveform is normalised to a peak of one, so the selected $E_{es}$ is the peak active slope actually reached by the chamber. Diastolic stiffness changes how rapidly LV filling pressure rises with volume. The passive pressure relation must remain below the selected systolic envelope at the observed volumes; incompatible combinations suspend interpretation. At high heart rates activation remains continuous and finishes before atrial contraction, using a didactic timing boundary rather than a calibrated relaxation model. Ejection fraction remains load-dependent, so it should not be used as a direct readout of the selected $E_{es}$.
 
 The model has no force–frequency relation: changing baseline heart rate does not automatically change contractility. Very high rate shortens filling time but does not reproduce ischaemia or rate-dependent relaxation. When the baroreflex is on, the Heart rate tile shows the effective rate used by the circulation; the control itself continues to show the selected baseline.
 
