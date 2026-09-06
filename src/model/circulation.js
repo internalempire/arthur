@@ -107,7 +107,7 @@ export function pulmonaryTransitEstimate(p, c) {
   // stroke volume during that one-beat bootstrap rather than letting an
   // undefined flow contaminate every conserved compartment with NaN.
   const rvStrokeVolume = c.svRv ?? c.sv;
-  const rvOutput = Math.max(0, (rvStrokeVolume * p.hr) / 60); // mL/s
+  const rvOutput = Math.max(0, rvStrokeVolume / (c.beatDuration ?? 60 / p.hr)); // mL/s
   const pulmonaryBloodVolume = c.vPa + c.vPt + c.vPv;
   // Keep the displayed circuit estimate finite near arrest. The staged buffer
   // has its own tighter bound below, so this reporting guardrail does not alter
@@ -179,7 +179,10 @@ export function createCirculationState(p) {
     lvEdv: 122, lvEsv: 52, rvEdv: 132, rvEsv: 62,
     lvEsvRun: 1e9, rvEsvRun: 1e9,
     lvEsp: 100, rvEsp: 25,
-    sv: 70, co: 5.2,
+    sv: 70, svRv: 70, co: 70 * p.hr / 1000,
+    beatDuration: 60 / p.hr, beatElapsed: 0, avVolumeRun: 0, pvVolumeRun: 0,
+    overlapLvRun: 0, overlapRvRun: 0, diastolicAvRun: 0, diastolicPvRun: 0,
+    cardiacPhaseInvalid: false, pressureDomainInvalid: false, pressureDomainRun: false,
     beatCount: 0,
     limitTicks: 0,
     lastLoopLv: [], lastLoopRv: [], loopLv: [], loopRv: [],
@@ -206,17 +209,18 @@ export function systemicVenousVolumeState(p, c) {
   };
 }
 
-// Canonical double-Hill ventricular activation. The previous phase-based
-// approximation claimed a unit peak but only reached 0.702, so every selected
-// Ees was silently reduced by about 30%. Normalising time to Tmax preserves the
-// established heart-rate dependence of systolic duration, while the 1.55 scale
-// makes the waveform peak at approximately one.
+// Double-Hill activation with an approximately unit peak. A high-rate time
+// scale cap and smooth terminal taper guarantee relaxation before atrial
+// systole. These are didactic timing boundaries, not a fitted relaxation law.
 export function ventricularActivation(time, period) {
-  const tMax = 0.2 + 0.15 * period;
+  if (time <= 0 || time >= period * 0.8) return 0;
+  const tMax = Math.min(0.2 + 0.15 * period, period * 0.5);
   const tn = time / tMax;
   const g1 = Math.pow(tn / 0.7, 1.9);
   const g2 = Math.pow(tn / 1.17, 21.9);
-  return 1.55 * (g1 / (1 + g1)) * (1 / (1 + g2));
+  const taper = clamp((time / period - 0.7) / 0.1, 0, 1);
+  return 1.55 * (g1 / (1 + g1)) * (1 / (1 + g2))
+    * (1 - taper * taper * (3 - 2 * taper));
 }
 
 // Atrial systole occupies the last fifth of the cardiac cycle.
@@ -229,7 +233,7 @@ function atrialActivation(tn) {
 function ventricularPressure(v, act, ees, v0s, edA, edB, v0d) {
   const passive = edA * (Math.exp(edB * Math.max(0, v - v0d)) - 1);
   const active = ees * (v - v0s);
-  return act * active + (1 - act) * passive;
+  return passive + act * Math.max(0, active - passive);
 }
 
 function valveFlow(pUp, pDown, r) {
@@ -324,6 +328,10 @@ function limitFlows(c, q, dt) {
  */
 export function stepCirculation(p, c, resp, dt) {
   const period = 60 / p.hr;
+  // Preserve phase when HR changes; elapsed beat time remains measured in
+  // seconds, so a mid-beat rate change cannot rewrite the output denominator.
+  c.tCardiac *= period / (c.cardiacPeriod ?? period);
+  c.cardiacPeriod = period;
   c.tCardiac += dt;
   if (c.tCardiac >= period) {
     c.tCardiac -= period;
@@ -332,6 +340,16 @@ export function stepCirculation(p, c, resp, dt) {
   const tn = c.tCardiac / period;
   const actV = ventricularActivation(c.tCardiac, period);
   const actA = atrialActivation(tn);
+  // The selected ESPVR must lie above the passive relation. Outside that
+  // domain contraction cannot generate negative active pressure; flag the
+  // whole beat rather than present the bounded continuation as physiology.
+  for (const [v, ees, chamber, stiffness] of [
+    [c.vLv, p.eesLv, CHAMBER.lv, p.lvStiff],
+    [c.vRv, p.eesRv, CHAMBER.rv, CHAMBER.rv.edB],
+  ]) {
+    const passive = chamber.edA * Math.expm1(stiffness * Math.max(0, v - chamber.v0d));
+    if (v > chamber.v0s && passive > ees * (v - chamber.v0s)) c.pressureDomainRun = true;
+  }
 
   const ppl = cmH2OtoMmHg(resp.ppl);
   const palv = cmH2OtoMmHg(resp.palv);
@@ -479,6 +497,16 @@ export function stepCirculation(p, c, resp, dt) {
     pul: qPul, pulTransit: qPulTransit, pulVen: qPulVen, mv: qMv,
   };
   const limited = limitFlows(c, q, dt);
+  c.beatElapsed += dt;
+  c.avVolumeRun += q.av * dt; c.pvVolumeRun += q.pv * dt;
+  if (q.mv > 1e-6 && q.av > 1e-6) c.overlapLvRun += q.av * dt;
+  if (q.tv > 1e-6 && q.pv > 1e-6) c.overlapRvRun += q.pv * dt;
+  if (actV < 0.001) {
+    c.diastolicAvRun += q.av * dt; c.diastolicPvRun += q.pv * dt;
+  }
+  // First forward ejection follows AV closure and isovolumic contraction.
+  if (q.av > 0 && c.lvEdvRun === undefined) c.lvEdvRun = c.vLv;
+  if (q.pv > 0 && c.rvEdvRun === undefined) c.rvEdvRun = c.vRv;
   // Advance every stage from the same pre-step outflows. The final outflow may
   // have been limited if the aggregate pathway approached its volume floor.
   let transitInflow = q.pul;
@@ -532,12 +560,10 @@ export function stepCirculation(p, c, resp, dt) {
   if (limited) c.limitTicks = 4000; // about a second of simulated time at the default step
   else if (c.limitTicks > 0) c.limitTicks--;
 
-  // End-systolic volume of the beat currently in progress. End-diastolic volume
-  // is read at the beat boundary itself rather than as a maximum over the
-  // window, which would otherwise pair one beat's ESV with the next beat's EDV
-  // and smooth away the respiratory variation we are trying to show.
-  c.lvEsvRun = Math.min(c.lvEsvRun, c.vLv);
-  c.rvEsvRun = Math.min(c.rvEsvRun, c.vRv);
+  // End-ejection volume, paired with the volume before this beat's first
+  // forward ejection. Neither is used as a substitute for integrated flow.
+  if (q.av > 0) c.lvEsvRun = c.vLv;
+  if (q.pv > 0) c.rvEsvRun = c.vRv;
   // Stored transmural. Two consumers used to correct these themselves and did
   // it differently: the pressure–volume loops subtracted pleural pressure only,
   // the cardiac function curve subtracted a pleural pressure from a different
@@ -571,14 +597,24 @@ function closeBeat(c) {
     c.lvEdp = c.p.lv;
   }
 
-  // Volume at this instant is end-diastolic: the beat that just finished began
-  // from `edvPending` and reached `lvEsvRun`.
+  // Finalise matched ejection endpoints; use boundary volume only for a beat
+  // with no ejection. Forward volumes and their elapsed window are independent.
   if (c.edvPending !== undefined) {
-    c.lvEdv = c.edvPending; c.lvEsv = c.lvEsvRun;
-    c.rvEdv = c.rvEdvPending; c.rvEsv = c.rvEsvRun;
-    c.sv = Math.max(0, c.lvEdv - c.lvEsv);
-    c.svRv = Math.max(0, c.rvEdv - c.rvEsv);
+    c.lvEdv = c.lvEdvRun ?? c.edvPending;
+    c.lvEsv = c.lvEdvRun === undefined ? c.lvEdv : c.lvEsvRun;
+    c.rvEdv = c.rvEdvRun ?? c.rvEdvPending;
+    c.rvEsv = c.rvEdvRun === undefined ? c.rvEdv : c.rvEsvRun;
   }
+  c.sv = c.avVolumeRun; c.svRv = c.pvVolumeRun;
+  c.beatDuration = c.beatElapsed;
+  c.co = c.sv / c.beatDuration * 0.06;
+  c.cardiacPhaseInvalid = Math.max(c.overlapLvRun, c.diastolicAvRun) > Math.max(0.001, c.sv * 0.0001)
+    || Math.max(c.overlapRvRun, c.diastolicPvRun) > Math.max(0.001, c.svRv * 0.0001);
+  c.pressureDomainInvalid = c.pressureDomainRun;
+  c.pressureDomainRun = false;
+  c.beatElapsed = 0; c.avVolumeRun = 0; c.pvVolumeRun = 0;
+  c.overlapLvRun = 0; c.overlapRvRun = 0; c.diastolicAvRun = 0; c.diastolicPvRun = 0;
+  c.lvEdvRun = undefined; c.rvEdvRun = undefined;
   c.edvPending = c.vLv;
   c.rvEdvPending = c.vRv;
   c.lvEsp = c.lvEspRun ?? null;

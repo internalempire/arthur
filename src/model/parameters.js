@@ -163,7 +163,7 @@ export const PARAMETERS = [
   },
   {
     id: 'lvStiff', group: 'heart', label: 'LV diastolic stiffness', unit: '1/mL',
-    min: 0.010, max: 0.080, step: 0.002, default: 0.028,
+    min: 0.010, max: 0.080, step: 0.001, default: 0.028,
   },
   {
     id: 'baroreflexEnabled', group: 'heart', label: 'Baroreflex',

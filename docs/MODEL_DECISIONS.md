@@ -1,5 +1,17 @@
 # Model decisions
 
+## 2026-09-06 — Forward cardiac flow and admissible chamber phases
+
+The user authorized correction after an independent audit demonstrated late-diastolic mitral-to-aortic throughflow and disagreement between geometric SV-derived output and actual aortic flow. The corrected measurement is integrated limited valve flow divided by the measured duration of that completed beat. LV/RV forward SV, geometric volume reduction, and effective HR are separate quantities. HR changes preserve oscillator phase, and pulmonary transit uses the matched RV flow window.
+
+The LV-failure preset uses Ees 0.6 and LV stiffness 0.027 with the other preset settings retained. Acceptance requires low EF, elevated filling pressure, no paired-valve/diastolic throughflow, agreement with independently integrated aortic flow, and time-step refinement. The resulting PEEP manoeuvre lowers forward output slightly despite pressure unloading. This replaces the unsupported output-benefit target. The phenotype coefficients are didactic, not fitted human estimates.
+
+The passive exponential defines a pressure floor; activation adds the non-negative distance to the selected systolic envelope. When the envelope is below passive pressure, interpretation is suspended rather than assigning negative active tension. This is a domain guard for the elastance approximation, not a new myocardial constitutive model. The physical separation of passive and active components is consistent with Zhong et al., *BioMedical Engineering OnLine* 2005;4:10, [doi:10.1186/1475-925X-4-10](https://doi.org/10.1186/1475-925X-4-10); their patient-specific formulation does not calibrate this guard or its coefficients.
+
+Ideal valves remain pressure-driven. The model monitors both ventricles and flags a completed beat when paired inflow/outflow or flow at activation below 0.001 exceeds both 0.001 mL and 0.01% of forward volume. This is a numerical/interpretive tolerance, not a clinical threshold. Extreme atrial-to-arterial pressure ordering remains observable in the simulation but cannot masquerade as an admissible cardiac cycle.
+
+The double-Hill core has Tmax=min(0.2+0.15T,0.5T), followed by a smooth cubic taper from phase 0.7 to 0.8 and zero activation through phase 1. The timing cap/taper is an explicitly didactic relaxation boundary at high HR. It preserves a continuous waveform and the final-fifth atrial window, without claiming to reproduce force-frequency behavior or incomplete relaxation in disease.
+
 This is the durable decision log for substantive physiological changes. It
 records why a behaviour was added, changed or retired so that later work — by a
 person or another language model — does not have to reconstruct the rationale

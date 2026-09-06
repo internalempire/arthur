@@ -1,8 +1,8 @@
 {
-  "cardiac-output": "open",
-  "diastolic-throughflow": "open",
-  "ventricular-pressure-domain": "open",
-  "activation-continuity": "open",
+  "cardiac-output": "resolved",
+  "diastolic-throughflow": "resolved",
+  "ventricular-pressure-domain": "resolved",
+  "activation-continuity": "resolved",
   "ri-protocol": "open",
   "hysteresis-convergence": "open",
   "patient-wall-intervention": "open",

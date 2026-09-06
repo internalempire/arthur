@@ -13,6 +13,7 @@ const SUITES = [
   './suites/core-physiology.test.mjs',
   './suites/regulation-and-transit.test.mjs',
   './suites/circulation.test.mjs',
+  './suites/cardiac-flow.test.mjs',
   './suites/lung-mechanics.test.mjs',
   './suites/recruitment.test.mjs',
   './suites/scenario-interpretability.test.mjs',

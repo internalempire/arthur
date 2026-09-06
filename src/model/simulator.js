@@ -338,6 +338,8 @@ export class Simulator {
         t: this.time,
         pp: this.sysRun - this.diaRun,
         sv: c.sv,
+        duration: c.beatDuration,
+        co: c.co,
         // Keep the matched LV beat with its stroke volume. Scenario-level
         // afterload experiments must average complete beats across respiration;
         // pairing a mean output with one phase-selected EDV, ESV or end-systolic
@@ -452,7 +454,7 @@ export class Simulator {
     };
     const { map, cvp, pap: papMean, paop } = ema;
 
-    const co = (c.sv * p.hr) / 1000;
+    const co = c.co;
     const crs = respiratorySystemCompliance(p, r.lungVolume);
     const pvrComp = pvrComponents(p, r.lungVolume, r.plSolved, r.openFraction);
     const regions = lungRegions(p, r.lungVolume, r.plSolved, r.openFraction);
@@ -464,13 +466,15 @@ export class Simulator {
     // Whether the numbers below mean anything at all. A model driven past the
     // range where its equations hold should say so rather than keep reporting
     // values in clinical units.
-    const lvEf = c.lvEdv > 0 ? (100 * c.sv) / c.lvEdv : 0;
+    const lvEf = c.lvEdv > 0 ? 100 * (c.lvEdv - c.lvEsv) / c.lvEdv : 0;
     const reasons = [];
     if (r.atCapacity) {
       reasons.push('the lung is at capacity — this tidal volume does not fit in it, '
         + 'and the airway pressure shown is a clamp rather than a result');
     }
     if (c.limitTicks > 0) reasons.push('a compartment was being drained faster than it could supply');
+    if (c.cardiacPhaseInvalid) reasons.push('cardiac flow violates the filling/ejection phase domain');
+    if (c.pressureDomainInvalid || c.pressureDomainRun) reasons.push('passive ventricular pressure exceeds the selected systolic pressure envelope');
     const emptied = COMPARTMENTS.filter((k) => c[k] <= 1.5);
     if (emptied.length) reasons.push(`${emptied.join(', ')} at the volume floor`);
     if (!(lvEf >= 0 && lvEf <= 100)) reasons.push('ejection fraction outside 0–100%');

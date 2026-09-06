@@ -1,6 +1,6 @@
 # Global limits
 
-The [independent audit](validation.md#independent-audit-and-unresolved-findings) records unresolved numerical and physiological findings separately from passing tests. In particular, the LV-failure experiment cannot currently establish an output benefit from PEEP: displayed chamber-volume output and integrated aortic flow disagree, and late-diastolic throughflow violates the intended cardiac cycle. Extreme stiffness/contractility combinations, high heart rates and narrow hysteresis thresholds also require the audit qualifications. R/I is not established as the result of a clinical finite-volume manoeuvre, and a chest-wall intervention can alter the intrinsic recruitable population.
+The [independent audit](validation.md#independent-audit-and-unresolved-findings) separates unresolved findings from passing contracts. Cardiac output uses integrated valve flow; incompatible ventricular pressure envelopes or filling/ejection throughflow suspend clinical interpretation. The LV-failure preset demonstrates pressure unloading with a modest fall in forward output. Four separate findings remain open: finite-volume R/I agreement, narrow-threshold hysteresis convergence, preservation of intrinsic recruitability during a chest-wall intervention, and reverse flow through an open caval segment.
 
 > The model is a compact mechanical argument about heart–lung interaction; it is not a complete cardiopulmonary patient, and every scenario inherits the omissions below.
 

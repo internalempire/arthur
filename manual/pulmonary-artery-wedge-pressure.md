@@ -162,16 +162,16 @@ The stiffer thoracic envelope transmits a larger pressure rise around the heart.
 </details>
 
 <details>
-<summary>Example 3 — LV failure: pressure references and an unverified output</summary>
+<summary>Example 3 — LV failure: unloading and forward flow</summary>
 
 *The LV-failure preset, compared at PEEP 0 and 10 cmH₂O. Each PEEP level is settled independently for 45 s.*
 
 | PEEP (cmH₂O) | wedge surrogate (mmHg) | mean Ppl (mmHg) | mean Pperi (mmHg) | LA transmural (mmHg) | LA volume (mL) | LVEDV (mL) | CO (L/min) | zone 3 index |
 |---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 0 | 39.0 | -2.8 | 2.3 | 39.5 | 245 | 131 | 1.61 | 100% |
-| 10 | 37.1 | 2.6 | 0.6 | 33.9 | 209 | 127 | 1.88 | 100% |
+| 0 | 29.6 | -2.8 | 1.5 | 30.9 | 191 | 181 | 2.98 | 100% |
+| 10 | 27.1 | 2.6 | 0.1 | 24.3 | 151 | 172 | 2.82 | 100% |
 
-The wedge surrogate falls by 1.9 mmHg. The displayed output is not an independently verified flow measurement in this phenotype: diastolic throughflow and disagreement with integrated aortic flow prevent an inference of improved cardiac pumping.
+The wedge surrogate falls by 2.5 mmHg. Forward output is measured from integrated aortic flow over a completed beat. In this phenotype, reduced transmural ejection pressure coexists with reduced filling and lower mean output; pressure unloading alone does not imply improved cardiac pumping.
 
 </details>
 

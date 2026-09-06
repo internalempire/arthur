@@ -6,7 +6,7 @@
 
 ## How a model state becomes a number
 
-The circulation is integrated at every time step, but most bedside quantities are not instantaneous. Systolic and diastolic pressures come from the latest completed cardiac cycle. Cardiac output uses the latest left ventricular stroke volume and current effective heart rate. Mean vascular pressures are exponential three-second averages. Most respiratory summaries come from the latest completed breath, but the alveolar, pleural and transpulmonary tiles show the current model pressure. A tile can therefore lag an animated chamber or instantaneous waveform without either being wrong.
+The circulation is integrated at every time step, but most bedside quantities are not instantaneous. Systolic and diastolic pressures come from the latest completed cardiac cycle. Cardiac output divides integrated aortic volume by the measured duration of the latest completed beat. Mean vascular pressures are exponential three-second averages. Most respiratory summaries come from the latest completed breath, but the alveolar, pleural and transpulmonary tiles show the current model pressure. A tile can therefore lag an animated chamber or instantaneous waveform without either being wrong.
 
 After measurement, the interface may apply a calculation such as $(mPAP-wedge)/CO$, $VT/\Delta P$ or respiratory variation. It then asks whether the assumptions needed to give that calculation its clinical name are present. Finally, a colour may draw attention to a teaching state. These four stages are separate:
 
@@ -39,7 +39,7 @@ Pinning is visual memory, not physiological memory. It does not affect the simul
 
 ### Cardiac output
 
-The tile multiplies the latest completed left ventricular stroke volume by effective heart rate. It is the systemic output of the closed loop, not an independently simulated thermodilution or indicator-dilution measurement. Read it with arterial pressure: baroreflex and systemic vascular resistance can preserve one while the other changes.
+The tile integrates forward aortic flow over the latest completed beat and divides by that beat’s elapsed duration, with conversion to L/min. A change in heart rate takes effect through the measured beat, rather than multiplying an older stroke volume by a new rate. It is the systemic output of the closed loop, not an independently simulated thermodilution or indicator-dilution measurement. Read it with arterial pressure: baroreflex and systemic vascular resistance can preserve one while the other changes.
 
 Related pages: [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md) · [Baroreflex](baroreflex.md) · [Pulmonary transit](pulmonary-transit.md)
 
@@ -139,7 +139,7 @@ Related pages: [The right ventricle](the-right-ventricle.md) · [Ventricular int
 
 ### LV ejection fraction
 
-The latest completed left ventricular stroke volume is divided by end-diastolic volume. The subtitle retains stroke volume because the same EF can accompany very different forward outputs and filling states. The model has no valvular regurgitation, so total and forward stroke volume are the same by construction.
+EF is the geometric volume reduction, 100 × (EDV − ESV) / EDV, for the latest completed beat. EDV is sampled immediately before first forward ejection and ESV at its end. The subtitle reports independently integrated forward stroke volume. In an admissible cycle without filling during ejection these agree; the model flags throughflow and incompatible pressure relations as outside its physiological domain.
 
 Related pages: [PV loops](panel-pv-loops.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md)
 

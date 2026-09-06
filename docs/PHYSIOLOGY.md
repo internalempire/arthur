@@ -151,7 +151,7 @@ Mean PA-to-LA transit is now estimated from the central-volume relation:
 `mean transit time = represented pulmonary blood volume / mean RV output`.
 
 Represented pulmonary blood volume is the sum of the PA, staged pathway and PV
-compartments. The last completed RV stroke volume times heart rate supplies a
+compartments. The integrated pulmonic volume divided by the measured completed-beat duration supplies a
 mean forward flow without treating the normal zero pulmonic-valve flow of
 diastole as circulatory arrest. The eight stages use the share of whole-circuit
 time corresponding to their original 160 mL allocation, bounded to 0.8–6 s and

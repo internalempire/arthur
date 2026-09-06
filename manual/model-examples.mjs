@@ -238,11 +238,11 @@ function wedgePeepExamplesBlock() {
     ),
     '',
     wedgeExampleDetails(
-      'Example 3 — LV failure: pressure references and an unverified output',
+      'Example 3 — LV failure: unloading and forward flow',
       'The LV-failure preset, compared at PEEP 0 and 10 cmH₂O.',
       lvFailure.params,
       [0, 10],
-      ([zero, high]) => `The wedge surrogate falls by ${fixed(zero.metrics.paop - high.metrics.paop, 1)} mmHg. The displayed output is not an independently verified flow measurement in this phenotype: diastolic throughflow and disagreement with integrated aortic flow prevent an inference of improved cardiac pumping.`,
+      ([zero, high]) => `The wedge surrogate falls by ${fixed(zero.metrics.paop - high.metrics.paop, 1)} mmHg. Forward output is measured from integrated aortic flow over a completed beat. In this phenotype, reduced transmural ejection pressure coexists with reduced filling and lower mean output; pressure unloading alone does not imply improved cardiac pumping.`,
     ),
     '',
     wedgeExampleDetails(

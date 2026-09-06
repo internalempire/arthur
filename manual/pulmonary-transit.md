@@ -32,7 +32,7 @@ The delay should therefore be used to understand sequence, not to assign every e
 
 ## In the model
 
-The represented pulmonary blood volume is the blood physically contained in three serial compartments: pulmonary artery, the pressureless transport pathway and pulmonary vein. Mean RV flow is obtained from the most recent complete right ventricular stroke volume multiplied by heart rate. The displayed whole-circuit estimate is their ratio.
+The represented pulmonary blood volume is the blood physically contained in three serial compartments: pulmonary artery, the pressureless transport pathway and pulmonary vein. Mean RV flow is obtained by integrating pulmonic flow over the most recent complete beat and dividing by its measured duration. The displayed whole-circuit estimate is their ratio.
 
 Eight well-mixed stages sit between pulmonary arterial inflow and pulmonary venous delivery. They distribute the delayed response in time; one reservoir would attenuate respiratory variation too strongly, while a pure time shift would return an unrealistically rigid copy of the right-sided waveform.
 
