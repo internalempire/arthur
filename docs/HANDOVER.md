@@ -2,6 +2,20 @@
 
 Updated: 2026-09-06
 
+## Dynamic Guyton view restored; deep response is opt-in — September 6
+
+The clinician rejected replacing the fast dynamic CO/VR teaching display with an automatically computed, separately settled whole-heart curve. The deep experiment answered a different question and imposed a computational/interaction cost that had not been agreed. They explicitly requested the previous UX as default while retaining the deep calculation as an opt-in.
+
+The default panel again calls the existing local `cardiacFunctionCurve` and `preloadLimbs` on every redraw, with the same respiratory-mean anchoring, VR mean/live switch, venous-inflow trail, equilibrium marker, axes and steep-limb highlight as the earlier fast view. It is honestly labelled RV function. The RV/LV pressure-volume panels retain their live behavior. The additional LV-output marker, settled whole-heart curve, loading status and deep-analysis warning appear only in the optional mode.
+
+Deep CO explicitly enables a one-prescription experiment. Live RV cancels the timer/worker and clears its result. Any parameter/scenario change or reset also revokes the opt-in, restores the fast graph and requires a new explicit choice. No worker, parameter snapshot or loading computation is created by the default rendering path. A controller gate additionally refuses unsolicited requests; stale worker replies remain rejected by the existing generation check. The selection is UI state and is not persisted in patient files or across reloads.
+
+The manual describes both present modes, and the default PEEP figure again uses the fast RV construction. The deep figure is retained separately. The figure generator accepts optional filenames so updating a fast-view illustration need not regenerate the deep loading experiment. No patient equations, presets or deep-experiment acceptance criteria were changed in this UX correction.
+
+Verification includes 42 passing UI checks. New lifecycle tests explicitly count zero workers under repeated default requests/parameter changes, one worker after opt-in, cancellation on a new prescription, rejection of late results, and cancellation both before and after worker launch. Browser checks cover immediate fast display, matching fast description, explicit opt-in, return to Live RV and automatic cancellation on a PEEP change. Manual build/lint reports 53 pages with no errors or warnings. The historical deep-analysis reports remain in remote outputs and are superseded for default-UX instructions by the opt-in report.
+
+All 81 cross-layer contracts pass after adapting the figure-generator registration check to its lazy function registry. Browser verification also completed the optional LV-failure experiment while paused, returned immediately to the fast view, and confirmed reload/scenario selection and VR live without automatic deep computation. The fast RV label is kept inside the visible pressure range in narrow panels. The full model source tree has no diff from 307a37f; this correction was verified as UI/documentation work, with the mandatory publishing pipeline providing the full model rerun.
+
 ## Whole-heart Guyton response — September 6
 
 The clinician requested reconstruction of the RV-only choice and restoration of the classical cardiac-output view. The original August 8 implementation already calculated a fast RV relation. PR #43 / ef86743 (August 21) renamed the existing calculation for honesty rather than replacing an LV model with an RV model. The August 25 change 494b166 anchored that RV relation to measured mean RV EDV/ESV to avoid equating mean RAP with RV end-diastolic transmural pressure and to repair clock/operating-point mismatch after adding IVC storage. Its reference-point agreement was therefore explicitly not independent validation.

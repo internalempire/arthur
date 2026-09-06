@@ -1,5 +1,9 @@
 # Model decisions
 
+## 2026-09-06 — Preserve the dynamic Guyton view; make deep CO opt-in
+
+The default teaching view uses the fast, continuously updated RV-function and venous-return construction. Whole-heart controlled-inflow experiments remain available only after an explicit Deep CO request. Exiting the mode, changing settings or resetting cancels computation and revokes the opt-in. This keeps default computational cost low and preserves respiratory interaction teaching without disguising the fast curve as a direct LV-function measurement. The deep method and its physiological validity criteria remain unchanged.
+
 ## 2026-09-06 — Measure the whole-heart cardiac-output relation
 
 The Guyton panel samples a controlled-inflow loading experiment through both ventricles and the pulmonary circulation, plotting required atmospheric RAP against integrated aortic output. Reference respiratory/source-pressure trajectories and normalized inflow shape are shared; effective autonomic drive is fixed. Arterial impedance, atria, valves, septum, pericardium and pulmonary storage/transit remain active. This replaces the displayed analytic RV relation while retaining that separately labelled RV preload coefficient. Rejected/unsettled points are not extrapolated. Patient physiology is unchanged; the analysis operates on copies. See the handover for provenance and the panel manual for current protocol and limits.

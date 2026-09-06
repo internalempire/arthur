@@ -164,6 +164,71 @@ function guytonFigure() {
     { label: 'PEEP 15', peep: 15, cls: 'alv' },
   ].map((s) => {
     const sim = settled({ mode: 'vcv', pmus: 0, vt: 500, rr: 14, peep: s.peep });
+    // The curves and equilibrium points use the same full-breath clock as the
+    // running panel; the separate one-heartbeat means form its dynamic trail.
+    const mean = sim.metrics.respiratoryOperatingPoint;
+    const vr = venousReturnCurve(sim.params, sim.circ, mean).points;
+    const cf = cardiacFunctionCurve(sim.params, sim.circ, mean).points;
+    return { ...s, vr, cf, cross: curveIntersection(vr, cf) };
+  });
+
+  const pairs = (a) => { const o = []; for (let i = 0; i < a.length; i += 2) o.push([a[i], a[i + 1]]); return o; };
+  const all = states.flatMap((s) => [...pairs(s.vr), ...pairs(s.cf)]);
+  const xLo = Math.min(...all.map((q) => q[0]));
+  const xHi = Math.max(...all.map((q) => q[0]));
+  const yHi = Math.max(...all.map((q) => q[1])) * 1.1;
+
+  const x = (v) => PAD.l + ((v - xLo) / (xHi - xLo)) * plotW;
+  const y = (v) => PAD.t + plotH - (v / yHi) * plotH;
+  const path = (flat) => pairs(flat).map(([a, b], i) => `${i ? 'L' : 'M'}${x(a).toFixed(1)} ${y(Math.max(0, b)).toFixed(1)}`).join(' ');
+
+  const ticks = [];
+  for (let q = 1; q < yHi; q += 1) {
+    ticks.push(`<line class="grid" x1="${PAD.l}" y1="${y(q).toFixed(1)}" x2="${PAD.l + plotW}" y2="${y(q).toFixed(1)}"/>`
+      + `<text class="tick" x="${PAD.l - 9}" y="${(y(q) + 4).toFixed(1)}" text-anchor="end">${q}</text>`);
+  }
+  for (let v = Math.ceil(xLo); v <= xHi; v += 2) {
+    ticks.push(`<text class="tick" x="${x(v).toFixed(1)}" y="${PAD.t + plotH + 18}" text-anchor="middle">${v}</text>`);
+  }
+
+  const curves = states.map((s) => `<path class="${s.cls}" style="stroke-dasharray:none" d="${path(s.vr)}"/>`
+    + `<path class="${s.cls}" style="stroke-dasharray:5 3;stroke-width:1.6" d="${path(s.cf)}"/>`
+    + (s.cross ? `<circle class="dot" style="fill:var(--fig-${s.cls === 'total' ? 'total' : 'alv'})" cx="${x(s.cross.x).toFixed(1)}" cy="${y(s.cross.y).toFixed(1)}" r="4"/>` : '')).join('\n');
+
+  const key = states.map((s, i) => {
+    const dy = PAD.t + 22 + i * 40;
+    return `<line class="${s.cls}" style="stroke-dasharray:none" x1="${PAD.l + plotW + 16}" y1="${dy}" x2="${PAD.l + plotW + 44}" y2="${dy}"/>`
+      + `<text class="label" x="${PAD.l + plotW + 50}" y="${dy + 4}">${esc(s.label)}</text>`
+      + (s.cross ? `<text class="tick" x="${PAD.l + plotW + 16}" y="${dy + 20}">${s.cross.y.toFixed(2)} L/min at ${s.cross.x.toFixed(1)} mmHg</text>` : '');
+  }).join('\n');
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" class="${ROOT}" role="img"
+  aria-label="Guyton construction at two levels of PEEP. Each level shows a venous return curve falling with right atrial pressure and the model RV-function curve rising with it. Raising PEEP shifts both curves rightward and the analytic intersection to a lower predicted RV output at a higher right atrial pressure.">
+<style>${STYLE}</style>
+<rect class="bg" width="${W}" height="${H}"/>
+<text class="title" x="${PAD.l}" y="16">Venous return and model RV function, at two levels of PEEP</text>
+${ticks.join('\n')}
+<line class="axis" x1="${PAD.l}" y1="${PAD.t}" x2="${PAD.l}" y2="${PAD.t + plotH}"/>
+<line class="axis" x1="${PAD.l}" y1="${PAD.t + plotH}" x2="${PAD.l + plotW}" y2="${PAD.t + plotH}"/>
+${curves}
+<text class="label" transform="translate(18 ${PAD.t + plotH / 2}) rotate(-90)" text-anchor="middle">Flow (L/min)</text>
+<text class="label" x="${PAD.l + plotW / 2}" y="${H - 6}" text-anchor="middle">Right atrial pressure (mmHg)</text>
+${key}
+<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 112}">solid: venous return</text>
+<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: predicted RV output</text>
+</svg>
+`;
+}
+
+
+function deepGuytonFigure() {
+  // Two states differing only in applied PEEP. Both curves come from the same
+  // functions the running app plots, so the figure cannot disagree with it.
+  const states = [
+    { label: 'PEEP 5', peep: 5, cls: 'total' },
+    { label: 'PEEP 15', peep: 15, cls: 'alv' },
+  ].map((s) => {
+    const sim = settled({ mode: 'vcv', pmus: 0, vt: 500, rr: 14, peep: s.peep });
     const response = cardiacResponseCurve(cardiacResponseParameters(sim.params, sim.effective));
     const mean = response.reference;
     const vr = venousReturnCurve(sim.params, sim.circ, mean).points;
@@ -1096,26 +1161,32 @@ ${notes}
 }
 
 const figures = {
-  'pvr-j-curve.svg': jCurveFigure(),
-  'guyton-peep.svg': guytonFigure(),
-  'pv-curve.svg': pvCurveFigure(),
-  'chest-wall.svg': chestWallFigure(),
-  'stress-index.svg': stressIndexFigure(),
-  'campbell-post-inspiratory.svg': campbellPostInspiratoryFigure(),
-  'hysteresis.svg': hysteresisFigure(),
-  'stressed-volume.svg': stressedVolumeFigure(),
-  'venous-tone.svg': venousToneFigure(),
-  'hpv-redistribution.svg': hpvRedistributionFigure(),
-  'baroreflex.svg': baroreflexFigure(),
-  'preload-reserve.svg': preloadReserveFigure(),
-  'ppv.svg': ppvFigure(),
-  'ppv-filling.svg': ppvFillingFigure(),
-  'pmsf-occlusions.svg': pmsfOcclusionFigure(),
-  'wedge-pressure.svg': wedgeFigure(),
-  'pericardial-pressure.svg': pericardialFigure(),
-  'architecture.svg': architectureFigure(),
+  'pvr-j-curve.svg': jCurveFigure,
+  'guyton-peep.svg': guytonFigure,
+  'guyton-deep.svg': deepGuytonFigure,
+  'pv-curve.svg': pvCurveFigure,
+  'chest-wall.svg': chestWallFigure,
+  'stress-index.svg': stressIndexFigure,
+  'campbell-post-inspiratory.svg': campbellPostInspiratoryFigure,
+  'hysteresis.svg': hysteresisFigure,
+  'stressed-volume.svg': stressedVolumeFigure,
+  'venous-tone.svg': venousToneFigure,
+  'hpv-redistribution.svg': hpvRedistributionFigure,
+  'baroreflex.svg': baroreflexFigure,
+  'preload-reserve.svg': preloadReserveFigure,
+  'ppv.svg': ppvFigure,
+  'ppv-filling.svg': ppvFillingFigure,
+  'pmsf-occlusions.svg': pmsfOcclusionFigure,
+  'wedge-pressure.svg': wedgeFigure,
+  'pericardial-pressure.svg': pericardialFigure,
+  'architecture.svg': architectureFigure,
 };
-for (const [name, svg] of Object.entries(figures)) {
+// Optional filenames regenerate only selected figures; no arguments builds all.
+const selected = new Set(process.argv.slice(2));
+for (const name of selected) if (!figures[name]) throw new Error('Unknown figure: ' + name);
+for (const [name, generate] of Object.entries(figures)) {
+  if (selected.size && !selected.has(name)) continue;
+  const svg = generate();
   writeFileSync(join(OUT, name), svg);
   console.log('wrote manual/figure/' + name);
 }

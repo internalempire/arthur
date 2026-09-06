@@ -164,7 +164,7 @@ Six linked visual panels show the same simulation:
 | waveforms | respiratory and haemodynamic timing | [Waveforms](manual/panel-waveforms.md) |
 | ventricular PV loops | filling, ejection, contractility and load | [PV loops](manual/panel-pv-loops.md) |
 | Campbell diagram | lung, chest-wall and airway mechanics | [Campbell diagram](manual/panel-campbell.md) |
-| Guyton diagram | venous return, whole-heart response measured at the LV outlet, and operating point | [Guyton diagram](manual/panel-guyton.md) |
+| Guyton diagram | dynamic venous return, RV function and operating point; optional deep LV-output analysis | [Guyton diagram](manual/panel-guyton.md) |
 | PVR–volume curve | alveolar, extra-alveolar and total pulmonary vascular load | [PVR curve](manual/panel-pvr-curve.md) |
 
 The application supports light, dark and automatic themes, keyboard-safe controls, text alternatives for canvas panels and colour-independent status labelling. A custom patient can be downloaded as a versioned JSON parameter file and loaded again locally, allowing a teaching experiment or debugging case to be reproduced without serialising transient cardiovascular state.

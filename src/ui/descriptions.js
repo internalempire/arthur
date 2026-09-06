@@ -60,22 +60,26 @@ const PANELS = [
   {
     match: 'Guyton diagram',
     title: 'Guyton diagram',
-    quality: () => ({ label: 'Cardiac output curve', level: 'caution', reasons: ['Loading experiment at fixed autonomic drive; only settled, valid responses are drawn'] }),
-    summary: (sim) => {
+    quality: (sim, view) => view.guytonMode === 'deep'
+      ? { label: 'Cardiac output curve', level: 'caution', reasons: ['Loading experiment at fixed autonomic drive; only settled, valid responses are drawn'] }
+      : { label: 'RV preload reserve', ...sim.metrics.interpretability.preload },
+    summary: (sim, view) => {
       const m = sim.metrics, op = m.respiratoryOperatingPoint;
       return `Over the most recent breath, mean venous inflow is ${n(op.flow, 2)} L/min at a mean right atrial pressure of ${n(op.pra)} mmHg. `
-        + (m.valid ? `Mean LV output is ${n(op.aorticFlow, 2)} L/min. ` : 'Mean LV output is unavailable outside the model domain. ')
-        + `The ascending curve measures aortic output in separate whole-heart loading experiments. `
+        + (view.guytonMode === 'deep'
+          ? (m.valid ? `Mean LV output is ${n(op.aorticFlow, 2)} L/min. ` : 'Mean LV output is unavailable outside the model domain. ')
+            + 'The optional deep curve measures aortic output in separate whole-heart loading experiments. '
+          : 'The ascending RV-function curve updates continuously from the displayed circulation. No deep loading experiment is running. ')
         + `Mean systemic filling pressure is ${n(op.pmsf)} mmHg, so the gradient `
         + `driving venous return on the same respiratory clock is ${n(m.respiratoryGradientVr)} mmHg. `
         + `The faint trail retains the one-heartbeat means that move through the breath.`;
     },
-    rows: (sim) => {
+    rows: (sim, view) => {
       const m = sim.metrics, op = m.respiratoryOperatingPoint, beat = m.operatingPoint;
       return [
         ['Right atrial pressure (respiratory mean)', `${n(op.pra)} mmHg`],
         ['Venous inflow (respiratory mean)', `${n(op.flow, 2)} L/min`],
-        ['LV output (respiratory mean)', `${n(m.valid ? op.aorticFlow : null, 2)} L/min`],
+        ...(view.guytonMode === 'deep' ? [['LV output (respiratory mean)', `${n(m.valid ? op.aorticFlow : null, 2)} L/min`]] : []),
         ['Right atrial pressure (latest heartbeat)', `${n(beat.pra)} mmHg`],
         ['Venous inflow (latest heartbeat)', `${n(beat.flow, 2)} L/min`],
         ['Mean systemic filling pressure (respiratory mean)', `${n(op.pmsf)} mmHg`],
@@ -238,7 +242,7 @@ const PANELS = [
   },
 ];
 
-export function createDescriptions() {
+export function createDescriptions({ getGuytonMode = () => 'fast' } = {}) {
   const bound = [];
 
   for (const spec of PANELS) {
@@ -280,9 +284,10 @@ export function createDescriptions() {
   }
 
   function render(sim) {
+    const view = { guytonMode: getGuytonMode() };
     for (const b of bound) {
-      b.summary.textContent = b.spec.summary(sim);
-      const quality = b.spec.quality?.(sim) ?? { level: 'ok', reasons: [] };
+      b.summary.textContent = b.spec.summary(sim, view);
+      const quality = b.spec.quality?.(sim, view) ?? { level: 'ok', reasons: [] };
       b.warning.hidden = quality.level === 'ok';
       b.warning.dataset.quality = quality.level;
       b.warning.textContent = quality.level === 'ok' ? ''
@@ -293,7 +298,7 @@ export function createDescriptions() {
       // The table is only rebuilt while it is open — it is a few hundred DOM
       // writes and nobody is reading it when it is closed.
       if (!b.details.open) continue;
-      const rows = b.spec.rows(sim);
+      const rows = b.spec.rows(sim, view);
       if (b.table.rows.length !== rows.length) {
         b.table.textContent = '';
         for (const [k] of rows) {

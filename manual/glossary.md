@@ -60,7 +60,7 @@
 
 **Post-inspiratory activity.** Persistence of inspiratory-muscle activation into early expiration. It slows the initial expiratory fall in lung volume and shifts the active Campbell loop away from the relaxed chest-wall curve. The model represents this as a gradual decay of the same aggregate inspiratory activation, not as a separate expiratory muscle. See [the Campbell diagram](panel-campbell.md).
 
-**RV preload reserve.** Local change in an analytic RV/venous-return intersection when mean systemic filling pressure rises. It does not independently test LV reserve and is separate from the displayed whole-heart curve. It is an internal coefficient, not a validated bedside index.
+**RV preload reserve.** Local change in an analytic RV/venous-return intersection when mean systemic filling pressure rises. It does not independently test LV reserve and belongs to the fast RV construction and is distinct from the optional deep whole-heart curve. It is an internal coefficient, not a validated bedside index.
 
 **Pulmonary vascular resistance (PVR).** Clinically, $(mPAP-PAWP)/CO$, reported in Wood units. The model separately reports this derived aggregate and the coefficient used in its pulmonary flow law. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 

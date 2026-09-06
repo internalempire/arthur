@@ -1,7 +1,8 @@
 import { Panel, niceTicks } from '../plot.js';
-import { createCardiacResponseJob } from '../cardiac-response-job.js';
+import { createOptInCardiacResponseJob } from '../cardiac-response-job.js';
 import {
-  venousReturnCurve, curveIntersection, createCardiacResponseWorker, cardiacResponseParameters,
+  venousReturnCurve, cardiacFunctionCurve, preloadLimbs, curveIntersection,
+  createCardiacResponseWorker, cardiacResponseParameters,
 } from '../../model/index.js';
 
 // The Guyton diagram. Both curves share right atrial pressure as their abscissa,
@@ -46,19 +47,21 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
   let lastSample = -1;
   let viewDomain = null;
   let curveClock = 'mean';
-  const responseJob = createCardiacResponseJob(createCardiacResponseWorker, onViewChange);
+  const responseJob = createOptInCardiacResponseJob(createCardiacResponseWorker, onViewChange);
   const responseStatus = document.createElement('div');
   responseStatus.className = 'guyton-response-status';
   responseStatus.setAttribute('role', 'status');
   responseStatus.setAttribute('aria-live', 'polite');
   canvas.insertAdjacentElement('afterend', responseStatus);
-  const recalculate = document.createElement('button');
-  recalculate.type = 'button';
-  recalculate.className = 'guyton-recalculate';
-  recalculate.textContent = 'Recalculate CO';
-  recalculate.title = 'Recalculate the whole-heart response at the current cardiac and vascular settings';
-  recalculate.addEventListener('click', () => { responseJob.reset(); onViewChange(); });
-  canvas.insertAdjacentElement('afterend', recalculate);
+  const responseToggle = document.createElement('button');
+  responseToggle.type = 'button';
+  responseToggle.className = 'guyton-response-toggle';
+  responseToggle.addEventListener('click', () => {
+    responseJob.setEnabled(!responseJob.isEnabled());
+    viewDomain = null;
+    onViewChange();
+  });
+  canvas.insertAdjacentElement('afterend', responseToggle);
 
   // The equilibrium view uses all three settled reference determinants; the
   // diagnostic live view reads all three at the current instant.
@@ -70,11 +73,13 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     clockToggle.textContent = live ? 'VR live' : 'VR mean';
     clockToggle.setAttribute('aria-pressed', String(live));
     clockToggle.setAttribute('aria-label', live
-      ? 'Use settled reference determinants for the venous-return curve'
+      ? 'Use mean determinants for the venous-return curve'
       : 'Use instantaneous determinants for the venous-return curve');
     clockToggle.title = live
-      ? 'Venous return: instantaneous determinants. Click for the settled reference.'
-      : 'Venous return: settled reference determinants paired with the cardiac response; respiratory means while calculating. Click for live values.';
+      ? 'Venous return: instantaneous determinants. Click for mean values.'
+      : responseJob.isEnabled()
+        ? 'Venous return: settled reference paired with the deep cardiac response. Click for live values.'
+        : 'Venous return: Pmsf, closing pressure and resistance averaged over one breath. Click for live values.';
   };
   syncClockToggle();
   clockToggle.addEventListener('click', () => {
@@ -95,19 +100,31 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     // one-heartbeat mean remains below as the dynamic respiratory trail.
     const op = m.respiratoryOperatingPoint;
     const beat = m.operatingPoint;
-    responseJob.request(JSON.stringify(p), cardiacResponseParameters(p, sim.effective ?? p));
+    if (responseJob.isEnabled()) {
+      responseJob.request(JSON.stringify(p), cardiacResponseParameters(p, sim.effective ?? p));
+      if (!responseJob.isEnabled()) viewDomain = null;
+    }
+    const deep = responseJob.isEnabled();
+    responseToggle.textContent = deep ? 'Live RV' : 'Deep CO';
+    responseToggle.setAttribute('aria-pressed', String(deep));
+    responseToggle.setAttribute('aria-label', deep ? 'Stop deep calculation and use the fast RV curve' : 'Compute the deep LV output curve');
+    responseToggle.title = deep ? 'Stop this experiment and return to the continuously updated RV curve'
+      : 'Optional, computationally intensive whole-heart loading experiment for these settings';
+    syncClockToggle();
     const job = responseJob.getState();
+    responseStatus.hidden = !deep;
     responseStatus.textContent = job.message;
     responseStatus.dataset.status = job.status;
-    const response = job.result?.valid ? job.result : null;
+    const response = deep && job.result?.valid ? job.result : null;
     // The two steady curves use the SAME settled reference and fixed autonomic
     // drive. Live markers retain their own respiratory clock and can diverge
     // during redistribution. Recalculate refreshes a compensated reference.
     const reference = response?.reference;
     const vrMean = reference ? { ...reference, pra: reference.ra } : op;
     const vr = venousReturnCurve(p, c, curveClock === 'mean' ? vrMean : null);
-    const segments = response?.segments ?? [];
-    const cfPoints = segments.flat();
+    const cf = deep ? null : cardiacFunctionCurve(p, c, op);
+    const segments = deep ? response?.segments ?? [] : [cf.points];
+    const cfPoints = cf?.points ?? segments.flat();
 
     // Two different quantities, drawn as two different marks. Their labels name
     // the physiology rather than the calculation method: otherwise "simulated"
@@ -119,7 +136,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     // different: it preserves the within-breath storage and phase lag that the
     // mean points remove.
     const simulated = { x: op.pra, y: op.flow };
-    const cardiacOutput = measuredLVOutput(m);
+    const cardiacOutput = deep ? measuredLVOutput(m) : null;
     // A live venous-return curve intentionally has no equilibrium marker: the
     // steady response and instantaneous return curve would mix clocks again.
     const equilibrium = curveClock === 'mean'
@@ -139,7 +156,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     let pointXHi = Math.max(simulated.x, equilibrium?.x ?? simulated.x, op.ppl);
     let pointYHi = Math.max(simulated.y, equilibrium?.y ?? simulated.y);
     pointYHi = Math.max(pointYHi, cardiacOutput?.y ?? 0);
-    for (let i = 0; i < cfPoints.length; i += 2) {
+    for (let i = 0; deep && i < cfPoints.length; i += 2) {
       pointXLo = Math.min(pointXLo, cfPoints[i]);
       pointXHi = Math.max(pointXHi, cfPoints[i]);
       pointYHi = Math.max(pointYHi, cfPoints[i + 1]);
@@ -159,7 +176,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     // movement can therefore be read against stationary axes. A later extreme
     // may expand the domain, but ordinary oscillation can never shrink it.
     viewDomain = stableGuytonDomain(viewDomain, {
-      xLo: Math.min(-6, vr.pCrit - 3, pointXLo - 2),
+      xLo: Math.min(-6, (cf?.xIntercept ?? vr.pCrit) - 3, vr.pCrit - 3, pointXLo - 2),
       xHi: Math.max(vr.pmsf + 2, simulated.x + 6, pointXHi + 2, 14),
       yHi: Math.max(9, (vr.points[1] ?? 8) * 1.05, simulated.y * 1.6, pointYHi * 1.2),
     });
@@ -198,6 +215,13 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     panel.line(vr.points, { color: colors.venous, width: 2 });
     for (const points of segments) panel.line(points, { color: colors.arterial, width: 2 });
 
+    if (!deep) {
+      const limbs = preloadLimbs(p, c, op);
+      if (limbs.steep.length >= 4) {
+        panel.line(limbs.steep, { color: colors.arterial, width: 5, alpha: 0.28 });
+      }
+    }
+
     panel.unclip();
 
     // Direct labels rather than a legend box.
@@ -206,8 +230,9 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
       color: colors.text.venous, dx: 6, dy: -10, halo: colors.surface,
     });
     if (cfPoints.length) {
-      const cfLabelIdx = cfPoints.length - 2;
-      panel.label('Cardiac output (LV)', cfPoints[cfLabelIdx], cfPoints[cfLabelIdx + 1], {
+      let cfLabelIdx = deep ? cfPoints.length - 2 : Math.floor(cfPoints.length * 0.82) & ~1;
+      while (!deep && cfLabelIdx > 0 && cfPoints[cfLabelIdx] > xHi - 1) cfLabelIdx -= 2;
+      panel.label(deep ? 'Cardiac output (LV)' : 'RV function', cfPoints[cfLabelIdx], cfPoints[cfLabelIdx + 1], {
         color: colors.text.arterial, dx: -6, dy: -10, align: 'right', halo: colors.surface,
       });
     }
@@ -309,7 +334,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     }
 
     panel.title('Guyton diagram', colors, curveClock === 'mean'
-      ? 'whole-heart response measured at the LV outlet'
+      ? deep ? 'whole-heart response measured at the LV outlet' : 'venous return and RV function'
       : 'live venous-return determinants — diagnostic view');
   }
 
@@ -320,5 +345,6 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     responseJob.reset();
   }
 
-  return { render, clearTrail, curveClock: () => curveClock };
+  return { render, clearTrail, curveClock: () => curveClock,
+    responseMode: () => responseJob.isEnabled() ? 'deep' : 'fast' };
 }

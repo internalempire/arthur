@@ -185,7 +185,8 @@ section('PPV remains descriptive rather than a filling-state verdict');
       && page.includes('neither a low nor a high model PPV identifies filling state'));
   check('the filling comparison is generated from the model rather than drawn by hand',
     page.includes('figure/ppv-filling.svg')
-      && figures.includes("'ppv-filling.svg': ppvFillingFigure()"));
+      && figures.includes("'ppv-filling.svg': ppvFillingFigure,")
+      && figures.includes('const svg = generate();'));
 }
 
 section('Tamponade IVC remains plethoric without being drawn as immobile');
@@ -359,11 +360,12 @@ section('The Guyton points remain explicitly distinguished');
   check('high RV afterload is documented as a dynamic trail rather than failed convergence',
     panel.includes('pulmonary embolism or severe RV pressure loading')
       && panel.includes('trail can be broad while the respiratory-mean points remain close'));
-  check('the ascending curve measures LV outflow through both ventricles at atmospheric RAP',
+  check('the fast RV view and optional deep LV-output view keep their physiological meanings explicit',
     panel.includes('**Cardiac output (LV)**')
       && panel.includes('Both atria, both ventricles')
-      && guytonUi.includes("panel.label('Cardiac output (LV)'")
-      && !guytonUi.includes("panel.label('RV function'"));
+      && panel.includes('No deep-response worker')
+      && guytonUi.includes("deep ? 'Cardiac output (LV)' : 'RV function'")
+      && guytonUi.includes('cardiacFunctionCurve(p, c, op)'));
   check('preload reserve does not claim to test LV reserve independently',
     preloadReserve.includes('does not independently test LV reserve')
       && preloadReserve.includes('LV filling reserve and LV systolic limitation are not independently tested'));

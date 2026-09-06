@@ -51,3 +51,25 @@ export function createCardiacResponseJob(createWorker, onChange = () => {}, dela
   }
   return { request, reset, getState: () => state };
 }
+// A loading experiment is a one-prescription opt-in, never an automatic cost
+// of displaying the panel. Changing prescriptions revokes the opt-in.
+export function createOptInCardiacResponseJob(createWorker, onChange = () => {}, delay = 500) {
+  const job = createCardiacResponseJob(createWorker, onChange, delay);
+  let enabled = false;
+  function reset() { enabled = false; job.reset(); }
+  return {
+    reset,
+    setEnabled(value) { reset(); enabled = Boolean(value); },
+    isEnabled: () => enabled,
+    getState: job.getState,
+    request(key, params) {
+      if (!enabled) return;
+      if (job.getState().key !== null && job.getState().key !== key) {
+        reset();
+        onChange();
+        return;
+      }
+      job.request(key, params);
+    },
+  };
+}

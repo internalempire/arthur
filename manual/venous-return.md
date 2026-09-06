@@ -1,6 +1,6 @@
 # Venous return
 
-> Flow back to the heart depends on systemic filling pressure, right atrial pressure and resistance to return. The Guyton panel compares that return relation with a whole-heart response measured at the LV outlet; all serial mean flows agree only after the circulation settles.
+> Flow back to the heart depends on systemic filling pressure, right atrial pressure and resistance to return. The default Guyton panel compares that return relation with a continuously updated local RV-function curve. Optional Deep CO measures whole-heart output at the LV outlet; all serial mean flows agree only after the circulation settles.
 
 ---
 
@@ -27,11 +27,11 @@ Two features of this expression carry most of the clinical content.
 
 ### The Guyton construction
 
-The descending relation describes return from the systemic veins. The ascending relation describes blood delivered through the whole heart and measured across the aortic valve. They share right atrial pressure as the horizontal coordinate: the curve includes the RV, pulmonary circulation and LV rather than substituting RAP for LV preload.
+The descending relation describes return from the systemic veins. The default ascending relation estimates RV output from right atrial filling, RV mechanics and pulmonary load. Both formulas update continuously from the displayed circulation. They share right atrial pressure as the horizontal coordinate. The optional Deep CO analysis includes both ventricles and measures aortic output in separate loading simulations; it is not required to use the dynamic diagram.
 
-![Venous return and whole-heart aortic output at two levels of PEEP](figure/guyton-peep.svg)
+![Venous return and local RV function at two levels of PEEP](figure/guyton-peep.svg)
 
-Giving volume can move the venous-return relation by raising systemic filling pressure. Whether flow rises depends on the whole-heart response and the new loading conditions. The separate [RV preload-reserve coefficient](preload-reserve.md) remains a local right-sided approximation and is not the slope of this whole-heart curve.
+Giving volume can move the venous-return relation by raising systemic filling pressure. Whether flow rises depends on the whole-heart response and the new loading conditions. The [RV preload-reserve coefficient](preload-reserve.md) uses the local right-sided approximation highlighted in the fast view. It does not independently test LV reserve.
 
 Positive pressure changes both cardiac loading and systemic return. Atmospheric right atrial pressure can rise while its transmural component falls; the direction of a plotted shift must therefore be interpreted with its pressure reference. A fall in excessive filling pressure can be useful even without increased flow. A single changed operating point does not identify an entire new cardiac-function relation.
 
@@ -49,15 +49,15 @@ The integrator separates the systemic venous reservoir, a compliant IVC and the 
 
 The analytic venous-return curve reduces those two resistances back to their steady-state sum and uses the same critical closing-pressure law. Its default construction averages all three determinants — Pmsf, critical closing pressure and effective resistance — over one complete breath. Once IVC volume is no longer changing, the detailed pathway and the reduced curve give the same mean flow. During inspiration or expiration they need not give the same instantaneous flow because the IVC is filling or emptying.
 
-For model inspection, **VR live** uses all three instantaneous return determinants together. The default VR mean relation uses the settled reference conditions of the whole-heart response experiment. The predicted crossing is withheld in the live view because instantaneous return cannot be interpreted as an equilibrium with a separately settled cardiac response.
+For model inspection, **VR live** uses all three instantaneous return determinants together. In the fast view, VR mean uses respiratory means that update with the displayed circulation. In optional deep mode it uses the separately settled reference conditions. The predicted crossing is withheld in the live view because instantaneous return cannot be interpreted as an equilibrium with a separately settled cardiac response.
 
 Mean systemic filling pressure comes from the [stressed volume](stressed-volume.md) of the venous reservoir divided by its compliance, plus the [abdominal](abdominal-pressure.md) contribution where the reservoir is distended enough to have one.
 
 ### The marks on the diagram
 
-The faint inflow path uses one-heartbeat mean RAP and IVC-to-right-atrial inflow. The dark mean venous-inflow marker and red mean LV-output marker average their respective measured flows over the same respiratory window. The hollow predicted-equilibrium point is the crossing of the separately settled return and cardiac-output relations. See [the Guyton panel](panel-guyton.md) for its loading protocol and calculation status.
+The faint inflow path uses one-heartbeat mean RAP and IVC-to-right-atrial inflow. The dark mean venous-inflow marker uses the same respiratory clock as the default RV relation. Their crossing is the hollow predicted-equilibrium point. Optional Deep CO adds a red mean LV-output marker and replaces the ascending relation with a separately settled whole-heart response. See [the Guyton panel](panel-guyton.md) for its loading protocol and calculation status.
 
-The respiratory markers remove much of the within-breath variation but a beat or a breath need not return every compartment to exactly the same volume when the cardiac and respiratory clocks are not commensurate. The steady response uses complete minute windows and explicitly checks flow agreement and storage. During an intervention, differences between venous inflow and aortic output can be caused by redistribution.
+The respiratory markers remove much of the within-breath variation but a beat or a breath need not return every compartment to exactly the same volume when the cardiac and respiratory clocks are not commensurate. The optional deep response uses complete minute windows and explicitly checks flow agreement and storage. During an intervention, differences between venous inflow and aortic output can be caused by redistribution.
 
 At steady state, mean venous return and cardiac output must be equal. Within a breath they may differ because the right heart can temporarily store blood:
 
@@ -95,9 +95,9 @@ Mean systemic filling pressure *rises* with PEEP — the abdominal contribution 
 
 ## Why this and not something else
 
-The model integrates a closed loop and derives a separate Guyton analysis from its equations. Two curves and their intersection alone cannot show breath-by-breath storage. The trail retains one-heartbeat means, the live markers use respiratory means, and the steady relations use separately settled minute windows.
+The model integrates a closed loop and derives a separate Guyton analysis from its equations. Two curves and their intersection alone cannot show breath-by-breath storage. The trail retains one-heartbeat means, the live markers use respiratory means, and the fast relations use the current respiratory summaries; optional deep relations use separately settled minute windows.
 
-The displayed cardiac-output response is measured in disposable whole-heart loading experiments conditioned on a settled reference. The normalized inflow waveform and systemic source-pressure/respiratory trajectories are shared across the copies; cardiac and pulmonary dynamics remain active. Agreement at the unperturbed reference is an internal consistency check. The [panel page](panel-guyton.md) describes rejected ranges, numerical checks and the fixed-autonomic-drive boundary.
+The default RV curve is a local analytic relation anchored to respiratory-mean RV volumes. Optional Deep CO measures a whole-heart response in disposable loading experiments conditioned on a settled reference. The normalized inflow waveform and systemic source-pressure/respiratory trajectories are shared across the copies; cardiac and pulmonary dynamics remain active. Agreement at the unperturbed reference is an internal consistency check. The [panel page](panel-guyton.md) describes rejected ranges, numerical checks and the fixed-autonomic-drive boundary.
 
 Venous return uses a soft collapse law rather than a hard `max()`, for reasons given under [vascular waterfalls](vascular-waterfalls.md).
 

@@ -295,6 +295,40 @@ try {
 }
 check('an out-of-range patient setting is rejected rather than clipped', invalidPatientRejected);
 
+const { createOptInCardiacResponseJob } = await import('../src/ui/cardiac-response-job.js');
+const responseWorkers = [];
+const optionalResponse = createOptInCardiacResponseJob(() => {
+  const worker = { terminate() { this.terminated = true; }, postMessage() {} };
+  responseWorkers.push(worker);
+  return worker;
+}, () => {}, 0);
+const responseTick = () => new Promise(resolve => setTimeout(resolve, 10));
+for (let i = 0; i < 10; i++) optionalResponse.request(`default-${i}`, { peep: i });
+await responseTick();
+check('default rendering and parameter changes never create a deep-response worker',
+  responseWorkers.length === 0 && !optionalResponse.isEnabled());
+optionalResponse.setEnabled(true);
+optionalResponse.request('chosen', { peep: 5 });
+await responseTick();
+check('explicit opt-in starts exactly one deep-response worker', responseWorkers.length === 1);
+optionalResponse.request('changed', { peep: 10 });
+await responseTick();
+responseWorkers[0].onmessage({ data: { type: 'result', result: { valid: true } } });
+check('a new prescription cancels the experiment, discards late results and requires fresh opt-in',
+  responseWorkers.length === 1 && responseWorkers[0].terminated
+    && !optionalResponse.isEnabled() && optionalResponse.getState().result === null);
+optionalResponse.setEnabled(true);
+optionalResponse.request('cancelled-before-start', {});
+optionalResponse.reset();
+await responseTick();
+check('returning to fast mode cancels even a pending worker launch', responseWorkers.length === 1);
+optionalResponse.setEnabled(true);
+optionalResponse.request('another-choice', {});
+await responseTick();
+optionalResponse.setEnabled(false);
+check('returning to fast mode terminates an active worker immediately',
+  responseWorkers.length === 2 && responseWorkers[1].terminated && !optionalResponse.isEnabled());
+
 if (failures.length) {
   console.error(`\n${failures.length} UI smoke failure(s):`);
   for (const failure of failures) console.error(`- ${failure}`);

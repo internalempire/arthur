@@ -545,7 +545,7 @@ select { min-width: 150px; }
 .guyton-clock-toggle:hover { color: var(--ink); background: var(--wash); }
 .guyton-clock-toggle:focus-visible { outline: 2px solid var(--venous); outline-offset: 1px; }
 .guyton-clock-toggle[aria-pressed="true"] { color: var(--text-venous); }
-.guyton-recalculate {
+.guyton-response-toggle {
   position: absolute;
   z-index: 1;
   top: 4px;
@@ -559,7 +559,7 @@ select { min-width: 150px; }
   font: 600 10.5px/1 system-ui, sans-serif;
   cursor: pointer;
 }
-.guyton-recalculate:focus-visible { outline: 2px solid var(--arterial); outline-offset: 1px; }
+.guyton-response-toggle:focus-visible { outline: 2px solid var(--arterial); outline-offset: 1px; }
 .guyton-response-status {
   position: absolute;
   top: 31px;
@@ -570,7 +570,7 @@ select { min-width: 150px; }
   pointer-events: none;
 }
 .guyton-response-status[data-status="ready"] { opacity: 0.8; }
-.panel-guyton .panel-data:not([open]) { right: 183px; }
+.panel-guyton .panel-data:not([open]) { right: 155px; }
 .panel-guyton .panel-data[open] { z-index: 2; }
 
 /* Explicit tracks, all `minmax(0, 1fr)`. An implicit `auto` row would be sized

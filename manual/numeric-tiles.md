@@ -81,7 +81,7 @@ Related pages: [Stressed volume](stressed-volume.md) · [Venous tone](venous-ton
 
 ### RV preload reserve
 
-The model perturbs a local analytic RV/venous-return intersection and reports the fractional gain in predicted right-sided steady flow per mmHg of additional systemic filling pressure. This RV coefficient does not independently test LV reserve and is not the slope of the whole-heart curve displayed on the Guyton panel. The subtitle gives the absolute slope and local steep/plateau classification. It is not a validated bedside index or a fluid prescription.
+The model perturbs a local analytic RV/venous-return intersection and reports the fractional gain in predicted right-sided steady flow per mmHg of additional systemic filling pressure. This RV coefficient does not independently test LV reserve and belongs to the fast Guyton construction, not the optional deep whole-heart curve. The subtitle gives the absolute slope and local steep/plateau classification. It is not a validated bedside index or a fluid prescription.
 
 Related page: [Preload reserve](preload-reserve.md)
 
