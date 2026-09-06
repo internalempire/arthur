@@ -1,0 +1,15 @@
+import assert from 'node:assert/strict';
+import { evaluateAuditResults as evaluate } from './support/audit-status.mjs';
+const failed = [{ id: 'example', satisfied: false }];
+const passed = [{ id: 'example', satisfied: true }];
+assert.equal(evaluate(failed, { example: 'open' }).results[0].status, 'KNOWN_FAILURE');
+assert.equal(evaluate(failed, { example: 'open' }, { strict: true }).ok, false);
+assert.equal(evaluate(passed, { example: 'open' }).ok, false);
+assert.equal(evaluate(failed, { example: 'resolved' }).ok, false);
+assert.equal(evaluate(passed, { example: 'resolved' }).ok, true);
+assert.throws(() => evaluate([], { example: 'open' }));
+assert.throws(() => evaluate(failed, {}));
+assert.throws(() => evaluate([...failed, ...failed], { example: 'open' }));
+assert.throws(() => evaluate([{ id: 'example', satisfied: NaN }], { example: 'open' }));
+assert.throws(() => evaluate([{ id: 'example', satisfied: false, measurements: { value: Infinity } }], { example: 'open' }));
+console.log('10 verification-runner failure-path checks passed');

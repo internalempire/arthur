@@ -9,3 +9,6 @@
 ### Separate superior and inferior caval closing pressures
 
 The superior vena cava is surrounded by pleural pressure and the inferior by abdominal pressure, and the model uses one closing pressure derived from the abdomen alone. The consequences, and why this survived while the analogous pulmonary simplification did not, are set out under [vascular waterfalls](vascular-waterfalls.md).
+
+- Resolve cardiac phase, forward-output, activation-continuity and pressure-domain audit findings; acceptance requires independent flow integration and time-step refinement.
+- Resolve the separately tracked finite-volume R/I, hysteresis convergence, chest-wall intervention and open-caval reversal findings. See the audit registry and handover.

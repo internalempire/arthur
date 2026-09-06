@@ -162,7 +162,7 @@ The stiffer thoracic envelope transmits a larger pressure rise around the heart.
 </details>
 
 <details>
-<summary>Example 3 — LV failure: PEEP can lower congestion and raise output</summary>
+<summary>Example 3 — LV failure: pressure references and an unverified output</summary>
 
 *The LV-failure preset, compared at PEEP 0 and 10 cmH₂O. Each PEEP level is settled independently for 45 s.*
 
@@ -171,7 +171,7 @@ The stiffer thoracic envelope transmits a larger pressure rise around the heart.
 | 0 | 39.0 | -2.8 | 2.3 | 39.5 | 245 | 131 | 1.61 | 100% |
 | 10 | 37.1 | 2.6 | 0.6 | 33.9 | 209 | 127 | 1.88 | 100% |
 
-Here the wedge surrogate falls by 1.9 mmHg while output rises by 0.27 L/min. This is not recruitment of preload: it is the preset's intended afterload-dominant response, in which higher pleural pressure reduces the transmural load faced by the failing LV.
+The wedge surrogate falls by 1.9 mmHg. The displayed output is not an independently verified flow measurement in this phenotype: diastolic throughflow and disagreement with integrated aortic flow prevent an inference of improved cardiac pumping.
 
 </details>
 

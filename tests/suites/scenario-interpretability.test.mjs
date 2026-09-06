@@ -280,10 +280,14 @@ section('Scenario teaching mechanisms');
     && high.output > low.output * 1.05
     && high.esp < low.esp - 2
     && esvLoss > edvLoss + 0.5;
-  check('LV-failure preset converts transmural afterload relief into higher output',
+  check('LV-failure legacy chamber-volume response is reproducible (not physiological acceptance)',
     demonstrates['lv-failure'],
     `mean CO ${low.output.toFixed(2)} → ${high.output.toFixed(2)} L/min, `
       + `LV ESPtm ${low.esp.toFixed(1)} → ${high.esp.toFixed(1)} mmHg`);
+  // Independent phase/flow findings supersede this older directional predicate.
+  const audit = JSON.parse(readFileSync(new URL('../audit-expectations.json', import.meta.url), 'utf8'));
+  demonstrates['lv-failure'] &&= audit['cardiac-output'] === 'resolved'
+    && audit['diastolic-throughflow'] === 'resolved';
 }
 
 {
