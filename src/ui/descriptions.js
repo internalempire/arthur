@@ -64,7 +64,8 @@ const PANELS = [
     summary: (sim) => {
       const m = sim.metrics, op = m.respiratoryOperatingPoint;
       return `Over the most recent breath, mean venous inflow is ${n(op.flow, 2)} L/min at a mean right atrial pressure of ${n(op.pra)} mmHg. `
-        + `Mean LV output is ${n(op.aorticFlow, 2)} L/min. The ascending curve measures aortic output in separate whole-heart loading experiments. `
+        + (m.valid ? `Mean LV output is ${n(op.aorticFlow, 2)} L/min. ` : 'Mean LV output is unavailable outside the model domain. ')
+        + `The ascending curve measures aortic output in separate whole-heart loading experiments. `
         + `Mean systemic filling pressure is ${n(op.pmsf)} mmHg, so the gradient `
         + `driving venous return on the same respiratory clock is ${n(m.respiratoryGradientVr)} mmHg. `
         + `The faint trail retains the one-heartbeat means that move through the breath.`;
@@ -74,7 +75,7 @@ const PANELS = [
       return [
         ['Right atrial pressure (respiratory mean)', `${n(op.pra)} mmHg`],
         ['Venous inflow (respiratory mean)', `${n(op.flow, 2)} L/min`],
-        ['LV output (respiratory mean)', `${n(op.aorticFlow, 2)} L/min`],
+        ['LV output (respiratory mean)', `${n(m.valid ? op.aorticFlow : null, 2)} L/min`],
         ['Right atrial pressure (latest heartbeat)', `${n(beat.pra)} mmHg`],
         ['Venous inflow (latest heartbeat)', `${n(beat.flow, 2)} L/min`],
         ['Mean systemic filling pressure (respiratory mean)', `${n(op.pmsf)} mmHg`],

@@ -18,6 +18,8 @@ Validation: 11 focused response/worker/marker checks, 36 UI checks, 10 verificat
 
 The reproducible `tools/experiments/guyton-response.mjs` probe was replayed on VPS Node 22 against local Node 24: identical model-source hashes and accepted/rejected points, maximum CO difference 9.33e-15 L/min and RAP difference 7.82e-14 mmHg. The weak-LV matched-boundary comparison passes at 40% reference inflow; its 60% point is outside the domain and is not used to claim an effect magnitude. The LV-failure curve accepts seven of eight sampled loads and excludes the invalid 140% tail. The Italian clinician report and both numerical reports are saved in VPS `outputs/` as `Arthur-Guyton-LV-*2026-09-06.*`. This change does not establish a sustained PEEP-output benefit in LV failure.
 
+Final presentation review extended the patient-domain guard to the new LV-output marker and its text equivalents: raw aortic flow from an invalid state cannot be labelled as interpretable output. A direct valid/invalid/non-finite presentation check brings the UI suite to 37 checks. The independent loading curve retains its separate reference validity checks.
+
 ## LV afterload exploration — September 6
 
 The clinician challenged the loss of a useful sustained PEEP-output benefit in the LV-failure lesson and authorized exploration: first isolate the LV response at controlled filling, then investigate the intact circulation. Production equations, coefficients, controls and preset values are unchanged in this exploration. Future substantive changes must be explained for a clinician: mechanism, observable consequence, code implementation and remaining evidential limit. The manual describes current behavior; this handover records changes and investigative decisions.

@@ -17,6 +17,12 @@ const DOMAIN_STEP_Y = 2;
 const floorTo = (value, step) => Math.floor(value / step) * step;
 const ceilTo = (value, step) => Math.ceil(value / step) * step;
 
+export function measuredLVOutput(metrics) {
+  const op = metrics.respiratoryOperatingPoint;
+  return metrics.valid && Number.isFinite(op.pra) && Number.isFinite(op.aorticFlow)
+    ? { x: op.pra, y: op.aorticFlow } : null;
+}
+
 /**
  * Keep a Guyton view fixed while one parameter state evolves. The view may
  * expand to rescue an off-scale mark, but never contracts until the caller
@@ -113,7 +119,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     // different: it preserves the within-breath storage and phase lag that the
     // mean points remove.
     const simulated = { x: op.pra, y: op.flow };
-    const cardiacOutput = { x: op.pra, y: op.aorticFlow };
+    const cardiacOutput = measuredLVOutput(m);
     // A live venous-return curve intentionally has no equilibrium marker: the
     // steady response and instantaneous return curve would mix clocks again.
     const equilibrium = curveClock === 'mean'
@@ -132,7 +138,7 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     let pointXLo = Math.min(simulated.x, equilibrium?.x ?? simulated.x, op.ppl);
     let pointXHi = Math.max(simulated.x, equilibrium?.x ?? simulated.x, op.ppl);
     let pointYHi = Math.max(simulated.y, equilibrium?.y ?? simulated.y);
-    pointYHi = Math.max(pointYHi, cardiacOutput.y);
+    pointYHi = Math.max(pointYHi, cardiacOutput?.y ?? 0);
     for (let i = 0; i < cfPoints.length; i += 2) {
       pointXLo = Math.min(pointXLo, cfPoints[i]);
       pointXHi = Math.max(pointXHi, cfPoints[i]);
@@ -280,10 +286,12 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     // circulation. When the two agree, the smaller filled disc leaves the
     // hollow predicted-equilibrium ring visible around it.
     panel.dot(simulated.x, simulated.y, { color: colors.ink, r: 4, ring: colors.surface });
-    panel.dot(cardiacOutput.x, cardiacOutput.y, { color: colors.arterial, r: 3, ring: colors.surface });
-    panel.label('mean LV output', cardiacOutput.x, cardiacOutput.y, {
-      color: colors.text.arterial, dx: 9, dy: -9, halo: colors.surface,
-    });
+    if (cardiacOutput) {
+      panel.dot(cardiacOutput.x, cardiacOutput.y, { color: colors.arterial, r: 3, ring: colors.surface });
+      panel.label('mean LV output', cardiacOutput.x, cardiacOutput.y, {
+        color: colors.text.arterial, dx: 9, dy: -9, halo: colors.surface,
+      });
+    }
 
     panel.label('mean venous inflow', simulated.x, simulated.y, {
       color: colors.ink,

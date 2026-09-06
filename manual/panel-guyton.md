@@ -16,7 +16,7 @@ Reduced venous inflow can relieve excessive distension. That may be useful even 
 
 - **Cardiac output (LV)** is the red response curve from separate loading experiments. Only settled, physiologically admissible segments are drawn. An ending line means the tested range has ended; it is not an extrapolated plateau or a prediction of arrest.
 - **Venous return** is the descending relation determined by systemic filling pressure, caval closing pressure and resistance to return.
-- **mean LV output**, the red marker, is integrated aortic flow averaged over the most recent complete respiratory cycle after heartbeat smoothing. Its horizontal coordinate is the matching mean right atrial pressure.
+- **mean LV output**, the red marker, is integrated aortic flow averaged over the most recent complete respiratory cycle after heartbeat smoothing. Its horizontal coordinate is the matching mean right atrial pressure. The marker and its numerical description are withheld when the displayed patient is outside the model domain.
 - **mean venous inflow**, the dark marker, uses IVC-to-right-atrial venous inflow on the same respiratory clock. It is not RV output, LV output or cardiac output.
 - **predicted equilibrium**, the hollow marker, is the crossing of the two steady relations when a valid crossing exists.
 - **inflow path**, the faint trail, retains one-heartbeat means of venous inflow and right atrial pressure. It displays temporary storage and respiratory timing.

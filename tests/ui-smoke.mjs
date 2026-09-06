@@ -110,7 +110,12 @@ const {
 const {
   CAMPBELL_DEFAULT_ZOOM, classicalCampbellCurves, campbellZoomDomain,
 } = await import(new URL('../src/ui/panels/campbell.js', import.meta.url));
-const { stableGuytonDomain } = await import(new URL('../src/ui/panels/guyton.js', import.meta.url));
+const { stableGuytonDomain, measuredLVOutput } = await import(new URL('../src/ui/panels/guyton.js', import.meta.url));
+const lvMarkerMetrics = { valid: true, respiratoryOperatingPoint: { pra: 4, aorticFlow: 3 } };
+check('the LV marker preserves valid measured output and withholds invalid or non-finite flow',
+  measuredLVOutput(lvMarkerMetrics)?.y === 3
+    && measuredLVOutput({ ...lvMarkerMetrics, valid: false }) === null
+    && measuredLVOutput({ ...lvMarkerMetrics, respiratoryOperatingPoint: { pra: 4, aorticFlow: NaN } }) === null);
 const {
   stablePvLoopDomain, effectiveEndSystolicRelation,
 } = await import(new URL('../src/ui/panels/pvloops.js', import.meta.url));
