@@ -93,7 +93,15 @@ npm run manual:lint
 
 Snapshot regeneration is intentionally separate: `npm run snapshots`. A changed snapshot must be reviewed as a model change, not automatically accepted as a test fix.
 
-Pull requests use three verification profiles. Documentation-only changes rebuild and lint the manual; application-shell and UI-only changes run syntax plus a small module-and-mount-point smoke suite; any change to the physiological model, scenarios, tests, generated numerical examples or workflow runs the full suite. A weekly scheduled run also executes the full profile. This avoids repeating slow settling experiments for prose-only work without allowing a model change to bypass them.
+`npm run verify` is the single complete verification command. Every pull request runs syntax checks, verification-harness tests, UI smoke checks, independent audit probes, the model suite, generated-example checks, and manual build and lint. The weekly scheduled run uses the same command. Publication waits for this verification on the exact checkout being published. Missing Git history cannot select a reduced test profile. Generated files must agree with the committed source.
+
+### Independent audit and unresolved findings
+
+`npm run test:audit` measures flows and pressure responses independently of the quantities whose correctness it assesses. Its explicit registry distinguishes `PASS`, `KNOWN_FAILURE`, `REGRESSION` and `UNEXPECTED_PASS`. A known failure is an unresolved defect, never evidence of physiological validity. Unexpected passes require review and promotion to a permanent regression check. Missing probes, malformed results, non-finite measurements and flow-volume imbalance fail verification regardless of the registry.
+
+`npm run test:audit:strict` fails while any finding remains unresolved. The normal verification command accepts only the specifically registered known failures; CI preserves their numerical measurements as an artifact. This separates a reproducible development checkpoint from physiological acceptance.
+
+The current audit tracks eight findings: agreement of displayed cardiac output with integrated aortic flow; diastolic mitral-to-aortic throughflow; ventricular pressure increasing with activation at fixed volume; activation continuity at high heart rates; agreement of R/I with a finite-volume ventilator manoeuvre; hysteresis time-step convergence; preservation of intrinsic lung recruitability during a chest-wall intervention; and reverse flow through an open caval segment. Their executable status is recorded in [`audit-expectations.json`](https://github.com/internalempire/arthur/blob/main/tests/audit-expectations.json). These findings limit interpretation of affected experiments even when the development checks complete.
 
 ## References
 

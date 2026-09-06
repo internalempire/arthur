@@ -1,0 +1,10 @@
+{
+  "cardiac-output": "open",
+  "diastolic-throughflow": "open",
+  "ventricular-pressure-domain": "open",
+  "activation-continuity": "open",
+  "ri-protocol": "open",
+  "hysteresis-convergence": "open",
+  "patient-wall-intervention": "open",
+  "venous-reversal": "open"
+}

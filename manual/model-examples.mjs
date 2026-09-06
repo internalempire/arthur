@@ -238,11 +238,11 @@ function wedgePeepExamplesBlock() {
     ),
     '',
     wedgeExampleDetails(
-      'Example 3 — LV failure: PEEP can lower congestion and raise output',
+      'Example 3 — LV failure: pressure references and an unverified output',
       'The LV-failure preset, compared at PEEP 0 and 10 cmH₂O.',
       lvFailure.params,
       [0, 10],
-      ([zero, high]) => `Here the wedge surrogate falls by ${fixed(zero.metrics.paop - high.metrics.paop, 1)} mmHg while output rises by ${fixed(high.metrics.co - zero.metrics.co, 2)} L/min. This is not recruitment of preload: it is the preset's intended afterload-dominant response, in which higher pleural pressure reduces the transmural load faced by the failing LV.`,
+      ([zero, high]) => `The wedge surrogate falls by ${fixed(zero.metrics.paop - high.metrics.paop, 1)} mmHg. The displayed output is not an independently verified flow measurement in this phenotype: diastolic throughflow and disagreement with integrated aortic flow prevent an inference of improved cardiac pumping.`,
     ),
     '',
     wedgeExampleDetails(

@@ -250,7 +250,7 @@ npm run snapshots
 
 A changed snapshot is a model change that requires review, not an automatic test repair. A green suite demonstrates numerical and mechanistic contracts; it does not establish patient-level quantitative validation. See **[Validation](manual/validation.md)**.
 
-Pull-request verification is change-aware: documentation-only changes rebuild and lint the manual, UI-only changes run syntax and mount-point smoke contracts, and any model, scenario, test, generated numerical example or workflow change runs the full suite. A scheduled weekly run exercises the full suite independently of pull requests.
+Every pull request, scheduled run and publication checkout uses `npm run verify`, which runs the complete verification path. Independent audit findings are explicitly reported as unresolved; `npm run test:audit:strict` fails until all are resolved. See [Validation](manual/validation.md) for the distinction between a development checkpoint and physiological acceptance.
 
 ---
 

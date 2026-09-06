@@ -16,6 +16,9 @@
     "teaching"
   ],
   "scripts": {
+    "verify": "node tools/verify.mjs",
+    "test:audit": "node tests/audit.mjs",
+    "test:audit:strict": "node tests/audit.mjs --strict",
     "test": "node tests/run.mjs",
     "test:ui": "node tests/ui-smoke.mjs",
     "snapshots": "node tests/generate-snapshots.mjs",
