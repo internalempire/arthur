@@ -10,6 +10,8 @@ Steady flow through the circulation must satisfy two conditions at the same time
 
 In classical diagrams the ascending relation is often called the **cardiac-function** or **cardiac-output** curve. The model labels it **RV function** because its horizontal input is right atrial pressure and its calculation concerns the right ventricle. It estimates how RV output changes with filling, contractility and the pulmonary arterial load currently facing the RV. It is not an independently calculated LV-function curve.
 
+For an intervention intended to relieve congestion, distinguish movement of the operating point from a change in the cardiac-function relation. Less venous inflow can reduce distension without demonstrating greater pumping capability. A better function relation means more output at comparable filling pressure, or less filling pressure for comparable output, under explicitly comparable loading conditions. The pressure reference matters: raising external cardiac pressure can raise atmospheric right atrial pressure while lowering transmural right atrial pressure. A horizontal displacement on this panel therefore cannot, by itself, establish better LV performance. The local RV curve is reconstructed from the current state; it is not a family of independently simulated full-circulation loading experiments.
+
 At very low right atrial pressure, venous return no longer rises linearly because the great intrathoracic veins begin to collapse. The model therefore draws a vascular-waterfall plateau rather than extending the descending curve indefinitely.
 
 ## How to read the panel

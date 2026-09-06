@@ -171,3 +171,5 @@ Every PR and publication checkout runs the complete verification command. Indepe
 ## 2026-09-06 — Cardiac flow and domain
 
 Forward SV is integrated valve volume and CO uses the measured completed-beat duration. EF uses geometric volume reduction. The LV-failure preset demonstrates pressure unloading with lower filling and mean forward output; its cardiac phases are admissible. Incompatible pressure envelopes or paired-valve throughflow suspend interpretation. Activation is continuous through high-rate cycle boundaries, with a didactic relaxation window before atrial contraction. Four independent respiratory/venous criteria remain open.
+
+**2026-09-06 — LV afterload exploration.** Added a reproducible research probe separating fixed-volume LV ejection, settled closed-loop responses, a thoracic-pressure-only counterfactual and the paired PEEP transient. The scenario page distinguishes a functioning isolated mechanism from the unresolved sustained-output teaching objective. No production physiology or preset changed. Handover records protocols and investigative limits.
