@@ -39,7 +39,7 @@ const pvLoops = createPvLoops(el('pvloops'));
 const pvrCurve = createPvrCurve(el('pvr'), { onViewChange: invalidate });
 const thorax = createThorax(el('thorax'));
 const stats = createStats(el('stats'), { banner: el('invalid-banner') });
-const descriptions = createDescriptions({ getGuytonMode: guyton.responseMode });
+const descriptions = createDescriptions({ getGuytonMode: guyton.responseMode, getGuytonClock: guyton.curveClock });
 const controls = createControls(el('controls'), sim, (id) => {
   if (id === 'mode') controls.sync();
   selectedSnapshot = null;

@@ -524,9 +524,8 @@ select { min-width: 150px; }
 .panel-campbell .panel-data:not([open]) { right: 124px; }
 .panel-campbell .panel-data[open] { z-index: 2; }
 
-/* The Guyton debugging switch changes only the time basis of the descending
-   analytic curve. It shares the compact chart-header language without looking
-   like a physiological patient control. */
+/* The Guyton clock switches both fast curves between breathing and mean views.
+   Deep CO retains a separate VR diagnostic clock. */
 .guyton-clock-toggle {
   position: absolute;
   z-index: 1;

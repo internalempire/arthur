@@ -35,7 +35,7 @@ The value is displayed as percent of current output per mmHg. A value of 0.10 th
 
 Here, “output” means the common steady flow predicted at the intersection. The ascending curve itself calculates RV output; it does not run a separate LV filling or LV-function calculation at each perturbed point.
 
-The RV reserve tile uses 8%/mmHg to distinguish a steep local response from a flatter one. This is a model classifier, not a clinical threshold. The corresponding steep segment is highlighted in the default RV view. It is not highlighted on the optional, independently sampled whole-heart curve. A finite bolus can cross a knee and venous compliance changes how much pressure a volume increment produces, so the local coefficient and a finite volume response need not agree.
+The RV reserve tile uses 8%/mmHg to distinguish a steep local response from a flatter one. This is a model classifier, not a clinical threshold. The fast RV view highlights the steep segment on its selected clock: heartbeat summaries in Live, respiratory summaries in Mean. The tile always uses the respiratory mean, so the moving highlight need not match that mean classification at each breathing phase. It is not highlighted on the optional, independently sampled whole-heart curve. A finite bolus can cross a knee and venous compliance changes how much pressure a volume increment produces, so the local coefficient and a finite volume response need not agree.
 
 ### A reproducible comparison
 

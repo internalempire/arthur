@@ -49,7 +49,7 @@ The integrator separates the systemic venous reservoir, a compliant IVC and the 
 
 The analytic venous-return curve reduces those two resistances back to their steady-state sum and uses the same critical closing-pressure law. Its default construction averages all three determinants — Pmsf, critical closing pressure and effective resistance — over one complete breath. Once IVC volume is no longer changing, the detailed pathway and the reduced curve give the same mean flow. During inspiration or expiration they need not give the same instantaneous flow because the IVC is filling or emptying.
 
-For model inspection, **VR live** uses all three instantaneous return determinants together. In the fast view, VR mean uses respiratory means that update with the displayed circulation. In optional deep mode it uses the separately settled reference conditions. The predicted crossing is withheld in the live view because instantaneous return cannot be interpreted as an equilibrium with a separately settled cardiac response.
+The fast **Live** view uses one-heartbeat averages for both RV and venous-return determinants, preserving respiratory movement. **Mean** uses respiratory averages for both. In optional deep mode, VR mean uses the separately settled reference conditions and VR live uses instantaneous return determinants. The predicted crossing is withheld in live views because storage during a breath prevents interpreting it as instantaneous whole-circuit equilibrium.
 
 Mean systemic filling pressure comes from the [stressed volume](stressed-volume.md) of the venous reservoir divided by its compliance, plus the [abdominal](abdominal-pressure.md) contribution where the reservoir is distended enough to have one.
 
@@ -95,7 +95,7 @@ Mean systemic filling pressure *rises* with PEEP — the abdominal contribution 
 
 ## Why this and not something else
 
-The model integrates a closed loop and derives a separate Guyton analysis from its equations. Two curves and their intersection alone cannot show breath-by-breath storage. The trail retains one-heartbeat means, the live markers use respiratory means, and the fast relations use the current respiratory summaries; optional deep relations use separately settled minute windows.
+The model integrates a closed loop and derives a separate Guyton analysis from its equations. Two curves and their intersection alone cannot show breath-by-breath storage. The trail retains one-heartbeat means and the measured mean markers use respiratory means. The fast relations share the selected heartbeat (Live) or respiratory (Mean) clock; optional deep relations use separately settled minute windows.
 
 The default RV curve is a local analytic relation anchored to respiratory-mean RV volumes. Optional Deep CO measures a whole-heart response in disposable loading experiments conditioned on a settled reference. The normalized inflow waveform and systemic source-pressure/respiratory trajectories are shared across the copies; cardiac and pulmonary dynamics remain active. Agreement at the unperturbed reference is an internal consistency check. The [panel page](panel-guyton.md) describes rejected ranges, numerical checks and the fixed-autonomic-drive boundary.
 

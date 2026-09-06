@@ -502,6 +502,13 @@ export class Simulator {
       ppl: this.cycle.ppl.mean(window),
       pCrit: this.cycle.pCrit.mean(window),
       rvrEff: this.cycle.rvrEff.mean(window),
+      // The live RV curve uses the same heartbeat window as venous return.
+      // Chamber endpoints are already latched at completed beats; averaging
+      // them here preserves respiratory motion without cardiac pressure ripple.
+      rvEdv: this.cycle.rvEdv.mean(window),
+      rvEsv: this.cycle.rvEsv.mean(window),
+      hr: this.cycle.hr.mean(window),
+      eesRv: this.cycle.eesRv.mean(window),
     };
 
     // A complete respiratory cycle is the shortest window over which a settled

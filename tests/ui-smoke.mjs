@@ -234,11 +234,32 @@ check('Guyton axes remain fixed inside one state and expand only for off-scale d
 const guytonSource = readFileSync(new URL('../src/ui/panels/guyton.js', import.meta.url), 'utf8');
 check('the Guyton preload limb is shown without the removed explanatory slogan',
   !guytonSource.includes('filling helps here'));
-check('the Guyton debug switch compares coherent mean and live venous-return clocks',
-  guytonSource.includes("clockToggle.textContent = live ? 'VR live' : 'VR mean'")
-    && guytonSource.includes("curveClock === 'mean' ? vrMean : null")
-    && guytonSource.includes('instantaneous return curve would mix clocks again')
+check('the Guyton clock defaults to respiratory motion with a separate deep clock',
+  guytonSource.includes('let curveClock = DEFAULT_GUYTON_CLOCK')
+    && guytonSource.includes("let deepClock = 'mean'")
+    && guytonSource.includes('fastGuytonCurves(sim, curveClock)')
     && /\.guyton-clock-toggle\s*\{/.test(css));
+
+const { fastGuytonCurves, DEFAULT_GUYTON_CLOCK } = await import('../src/ui/panels/guyton.js');
+const { Simulator, SCENARIOS } = await import('../src/model/index.js');
+const breathingPatient = new Simulator();
+breathingPatient.applyScenario(SCENARIOS.find(s => s.id === 'healthy-vcv'));
+breathingPatient.advance(60, true);
+const respiratoryViews = [];
+for (let i = 0; i < 180; i++) {
+  breathingPatient.advance(0.05, true);
+  respiratoryViews.push({ live: fastGuytonCurves(breathingPatient), mean: fastGuytonCurves(breathingPatient, 'mean') });
+}
+const excursion = values => Math.max(...values) - Math.min(...values);
+const liveRvSwing = excursion(respiratoryViews.map(v => v.live.cf.xIntercept));
+const meanRvSwing = excursion(respiratoryViews.map(v => v.mean.cf.xIntercept));
+check('healthy passive breathing moves the RV curve and the mean selector suppresses its excursion',
+  DEFAULT_GUYTON_CLOCK === 'live' && liveRvSwing > 0.2 && meanRvSwing < liveRvSwing * 0.2,
+  `live ${liveRvSwing.toFixed(3)} mmHg; mean ${meanRvSwing.toFixed(3)} mmHg`);
+check('both fast curves use the selected heartbeat or respiratory state, including RV chamber anchors',
+  respiratoryViews.every(v => v.live.cf.anchored && v.mean.cf.anchored
+    && v.live.vr.pmsf === v.live.state.pmsf && v.mean.vr.pmsf === v.mean.state.pmsf)
+    && excursion(respiratoryViews.map(v => v.live.vr.pmsf)) > 0.05);
 
 const rvDomain = stablePvLoopDomain(null, { vMax: 150, pMax: 45 }, 'rv');
 const unchangedRv = stablePvLoopDomain(rvDomain, { vMax: 190, pMax: 50 }, 'rv');

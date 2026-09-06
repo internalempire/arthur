@@ -69,7 +69,10 @@ const PANELS = [
         + (view.guytonMode === 'deep'
           ? (m.valid ? `Mean LV output is ${n(op.aorticFlow, 2)} L/min. ` : 'Mean LV output is unavailable outside the model domain. ')
             + 'The optional deep curve measures aortic output in separate whole-heart loading experiments. '
-          : 'The ascending RV-function curve updates continuously from the displayed circulation. No deep loading experiment is running. ')
+            : (view.guytonClock === 'mean'
+              ? 'Both RV and venous-return curves use determinants averaged over one breath. '
+              : 'Both RV and venous-return curves follow respiration, smoothed over one heartbeat. ')
+              + 'No deep loading experiment is running. ')
         + `Mean systemic filling pressure is ${n(op.pmsf)} mmHg, so the gradient `
         + `driving venous return on the same respiratory clock is ${n(m.respiratoryGradientVr)} mmHg. `
         + `The faint trail retains the one-heartbeat means that move through the breath.`;
@@ -242,7 +245,7 @@ const PANELS = [
   },
 ];
 
-export function createDescriptions({ getGuytonMode = () => 'fast' } = {}) {
+export function createDescriptions({ getGuytonMode = () => 'fast', getGuytonClock = () => 'live' } = {}) {
   const bound = [];
 
   for (const spec of PANELS) {
@@ -284,7 +287,7 @@ export function createDescriptions({ getGuytonMode = () => 'fast' } = {}) {
   }
 
   function render(sim) {
-    const view = { guytonMode: getGuytonMode() };
+    const view = { guytonMode: getGuytonMode(), guytonClock: getGuytonClock() };
     for (const b of bound) {
       b.summary.textContent = b.spec.summary(sim, view);
       const quality = b.spec.quality?.(sim, view) ?? { level: 'ok', reasons: [] };

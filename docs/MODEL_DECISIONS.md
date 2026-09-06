@@ -1,5 +1,9 @@
 # Model decisions
 
+## 2026-09-06 — Show respiratory movement of both fast Guyton curves
+
+Live is the default and uses one-heartbeat averages for both RV and VR determinants, including the RV chamber-volume anchor. Mean uses full-breath summaries for both. This restores respiratory teaching movement without changing the patient equations or using a deep loading experiment. Only the mean view presents an equilibrium marker; storage during a breath prevents the live crossing from being treated as measured instantaneous output. Deep CO remains opt-in with its own reference clock. The healthy PEEP 5-to-15 probe changes only PEEP and reports pressure references, reservoir pressure components and integrated flows separately.
+
 ## 2026-09-06 — Preserve the dynamic Guyton view; make deep CO opt-in
 
 The default teaching view uses the fast, continuously updated RV-function and venous-return construction. Whole-heart controlled-inflow experiments remain available only after an explicit Deep CO request. Exiting the mode, changing settings or resetting cancels computation and revokes the opt-in. This keeps default computational cost low and preserves respiratory interaction teaching without disguising the fast curve as a direct LV-function measurement. The deep method and its physiological validity criteria remain unchanged.

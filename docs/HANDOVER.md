@@ -2,6 +2,16 @@
 
 Updated: 2026-09-06
 
+## Restore respiratory RV excursion and inspect healthy PEEP 5 to 15 — September 6
+
+The previous fast-view restoration retained a respiratory-mean RV curve while VR live alone oscillated. The clinician explicitly requested restoring RV respiratory movement as the default, with a mean selector at most. The fast display now defaults to Live and switches both RV and VR together to Mean. Both live relations use one-heartbeat averages. The existing anchored RV formula is retained; `operatingPoint` now additionally exposes RV EDV/ESV, HR and Ees on that same heartbeat window. This prevents the live path from falling back to a different, pleural-pressure-only filling anchor. Patient integration equations, coefficients, preset parameters and deep experiments are unchanged.
+
+Deep mode has a separate mean/live VR clock; its opt-in and cancellation behavior is retained. The mean venous-inflow marker and breath-resolving trail remain distinct, and the equilibrium marker is restricted to mean mode because within-breath storage prevents an instantaneous equilibrium interpretation. The RV preload tile remains a respiratory-mean coefficient; the fast highlight follows the chosen curve clock. Help text documents both views. Curve labels remain below the header controls.
+
+The reproducible `tools/experiments/healthy-peep.mjs` performs a sequential intervention in the same closed circulation, with every prescription field checked unchanged except PEEP. Baseline settles for 135 s, and the PEEP step settles for 120 s; each condition then has two 60 s windows (75 beats, 14 breaths). Direct flow integration, volume conservation, finite state, phase/domain and repeated-window agreement are checked. Respiratory trace samples measure live and mean curve excursion. Local PEEP 5/15 output is about 5.514/4.884 L/min; RAP 1.180/4.310 mmHg; transmural RAP 2.562/2.131; Pmsf 8.585/10.802. The elastic Pmsf contribution rises 6.846 to 7.607 and its abdominal contribution 1.738 to 3.195 mmHg. Venous resistance stays 0.072 mmHg·s/mL, pericardial excess pressure zero and reflex off. This separates blood redistribution and abdominal pressure from an unsupported reflex explanation. The model's single abdominal caval closing-pressure approximation remains a known limitation.
+
+UI regressions exercise the actual healthy simulator and require visible RV excursion in Live, strong suppression in Mean and consistent RV/VR clocks with valid chamber anchors, alongside zero default deep workers and opt-in cancellation. The full model suite is rerun because the shared metrics object gains four heartbeat summaries. The dated Italian explanation, numerical reports and verification logs are saved locally and on VPS.
+
 ## Dynamic Guyton view restored; deep response is opt-in — September 6
 
 The clinician rejected replacing the fast dynamic CO/VR teaching display with an automatically computed, separately settled whole-heart curve. The deep experiment answered a different question and imposed a computational/interaction cost that had not been agreed. They explicitly requested the previous UX as default while retaining the deep calculation as an opt-in.
