@@ -353,7 +353,9 @@ section('The Guyton points remain explicitly distinguished');
     panel.includes('one-heartbeat means')
       && panel.includes('most recent complete respiratory cycle')
       && panel.includes('complete minute windows')
-      && guytonUi.includes("curveClock === 'mean' ? (reference?.ppl ?? op.ppl) : c.p.ppl"));
+      && guytonUi.includes("deepClock === 'mean' ? (reference?.ppl ?? op.ppl) : c.p.ppl")
+      && guytonUi.includes(': fast.state.ppl')
+      && guytonUi.includes("const equilibrium = activeClock === 'mean'"));
   check('temporary right-heart storage is explained',
     venousReturn.includes('dV_{right}')
       && venousReturn.includes('temporarily store blood'));
@@ -365,7 +367,10 @@ section('The Guyton points remain explicitly distinguished');
       && panel.includes('Both atria, both ventricles')
       && panel.includes('No deep-response worker')
       && guytonUi.includes("deep ? 'Cardiac output (LV)' : 'RV function'")
-      && guytonUi.includes('cardiacFunctionCurve(p, c, op)'));
+      && guytonUi.includes('cardiacFunctionCurve(sim.params, sim.circ, state)')
+      && guytonUi.includes('fastGuytonCurves(sim, curveClock)')
+      && panel.includes('**Live** is the default')
+      && panel.includes('**Mean** switches both curves'));
   check('preload reserve does not claim to test LV reserve independently',
     preloadReserve.includes('does not independently test LV reserve')
       && preloadReserve.includes('LV filling reserve and LV systolic limitation are not independently tested'));
