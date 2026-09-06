@@ -192,13 +192,13 @@ function guytonFigure() {
     ticks.push(`<text class="tick" x="${x(v).toFixed(1)}" y="${PAD.t + plotH + 18}" text-anchor="middle">${v}</text>`);
   }
 
-  const curves = states.map((s) => `<path class="${s.cls}" d="${path(s.vr)}"/>`
+  const curves = states.map((s) => `<path class="${s.cls}" style="stroke-dasharray:none" d="${path(s.vr)}"/>`
     + s.segments.map(points => `<path class="${s.cls}" style="stroke-dasharray:5 3;stroke-width:1.6" d="${path(points)}"/>`).join('')
     + (s.cross ? `<circle class="dot" style="fill:var(--fig-${s.cls === 'total' ? 'total' : 'alv'})" cx="${x(s.cross.x).toFixed(1)}" cy="${y(s.cross.y).toFixed(1)}" r="4"/>` : '')).join('\n');
 
   const key = states.map((s, i) => {
     const dy = PAD.t + 22 + i * 40;
-    return `<line class="${s.cls}" x1="${PAD.l + plotW + 16}" y1="${dy}" x2="${PAD.l + plotW + 44}" y2="${dy}"/>`
+    return `<line class="${s.cls}" style="stroke-dasharray:none" x1="${PAD.l + plotW + 16}" y1="${dy}" x2="${PAD.l + plotW + 44}" y2="${dy}"/>`
       + `<text class="label" x="${PAD.l + plotW + 50}" y="${dy + 4}">${esc(s.label)}</text>`
       + (s.cross ? `<text class="tick" x="${PAD.l + plotW + 16}" y="${dy + 20}">${s.cross.y.toFixed(2)} L/min at ${s.cross.x.toFixed(1)} mmHg</text>` : '');
   }).join('\n');
