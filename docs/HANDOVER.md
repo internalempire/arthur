@@ -2,6 +2,44 @@
 
 Updated: 2026-09-07
 
+## Pulmonary distensibility experiments remain private — September 7
+
+The clinician authorized an isolated comparison, then assessment of how
+distensibility could be assigned to different vascular phenotypes. No candidate
+has been adopted in the production model, presets or interface. The audited
+runtime is `5424125`; reports are in
+`codex-notes/Arthur-distensibilita-polmonare-esperimento-2026-09-07.md` and
+`codex-notes/Arthur-distensibilita-fenotipi-2026-09-07.md`, with reproducible
+copies, runners and numerical results under the corresponding private
+`outputs/Arthur-distensibility-*` prefixes.
+
+A minimal pressure-sensitive factor on the aerated resistive pathway changes
+whole-circuit responses most in the high-pulmonary-load experiment. Limiting
+the pressure-responsive share attenuates those effects. That share is a
+sensitivity parameter, not an anatomical embolization fraction. Elevated PVR
+alone cannot identify residual vessel distensibility: loss of parallel paths,
+serial obstruction, tone and vascular remodeling are different assumptions.
+Exercise-derived human coefficients must not be assigned to embolism or
+positive-pressure ventilation without matching the law and measurement
+conditions. The midpoint PA/PV approximation for local vascular pressure and
+the phenotype-specific reference anchors remain experimental limitations.
+
+Targeted probes preserve blood volume, finite positive states, settlement and
+timestep agreement. Ordinary numerical updates remain inexpensive in the VPS
+benchmarks, which exclude browser rendering. The existing optional Deep
+experiment can change its admissible upper loading point; numerical acceptance
+does not validate a human cardiac reserve. No new Deep solve, timestep or state
+variable is needed by these algebraic prototypes. Long calculations for a small
+teaching benefit remain explicitly unacceptable to the clinician.
+
+Keep reference resistance and pressure sensitivity conceptually independent;
+do not add a slider for every uncertain mechanism or silently promote these
+trials to calibrated presets. Further substantive adoption still requires
+confirmation. Pulmonary flow directionality, pressureless transit stages and
+the open respiratory audit findings retain their prior status. This entry
+records research conclusions only; the current manual, generated examples and
+production source are unchanged. Windows has not been verified.
+
 ## Conservative caval backflow adopted — September 7
 
 The clinician explicitly authorized adoption and documentation after the
