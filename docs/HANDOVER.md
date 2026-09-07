@@ -2,6 +2,69 @@
 
 Updated: 2026-09-07
 
+## Test caval backflow alternatives without adopting them — September 7
+
+The clinician authorized comparing the computational and teaching consequences
+of a limited caval-backflow correction. All candidate equations remain in
+private copies under `outputs/Arthur-caval-trials-2026-09-07/`; production model,
+presets, curve formulas and UI are unchanged. No candidate has been adopted.
+The private report is `codex-notes/Arthur-prova-reflusso-cavale-2026-09-07.md`;
+runner, manifests, measurements and logs share the `Arthur-caval-trials` prefix.
+
+Simply removing the zero clamp fails the equal-pressure/no-flow requirement
+because the original downstream softplus exceeds actual pressure. Two bounded
+alternatives were tested on the IVC-to-RA segment only. The conservative mirror
+law preserves the original forward branch exactly and swaps endpoints for
+reverse flow; it retains the original small zero-flow region near equilibrium.
+A difference of two softplus pressures instead smooths both directions but
+also changes forward collapse behavior and permits small subthreshold leakage.
+Neither adds a state variable, coefficient, worker or UI control. The upstream
+systemic clamp, separate SVC/IVC question and pulmonary directionality are not
+silently included in this experiment.
+
+The 12 presets plus healthy passive PEEP 15 were compared in all three versions
+after 135 s preparation and two 60 s observation windows. The conservative law
+changes mean output only in ARDS/RV, embolism and tamponade (about -0.19%,
+-0.42% and -0.003%); the other ten comparisons are identical. Five conditions
+repeated at half the timestep differ by at most 0.017% in mean CO across all
+versions, with conserved positive blood volumes and no cardiac-domain or
+volume-limit flags in the sampled windows. Measured heartbeat/breath inflow
+remains positive. In embolism, the mean VR-curve-minus-measured-inflow gap grows
+from about 0.024 to 0.149 L/min; it is distinct from CO error and from the much
+smaller flow gap at the RV/VR crossing. Do not conceal it by moving a measured
+marker onto the analytic curve.
+
+A sequential VPS Node benchmark includes integration, metrics and both fast
+curve constructions; other audit computation was suspended during measurement.
+Five rotated timing blocks per condition show roughly 0.66–0.72 ms per call,
+with conservative median changes from -3.4% to +0.9%. This is no meaningful
+observed overhead in these probes, not a browser rendering benchmark or proof
+of a speed improvement. Source copies preserve numerical-step and state count.
+The full conservative-copy `npm test` run exits 1 with 373 passed and three
+numerical-reference mismatches: the embolism snapshot and the pulmonary-transit
+and ARDS manual examples. All mechanism/stability checks pass. Official
+`npm run snapshots` and `npm run manual:examples` regenerate those references
+only in the private copy. The reviewed diff changes three snapshot rows, the
+embolism example's pulmonary volume by 2 mL and high-PEEP ARDS example outputs
+by 0.01/0.03 L/min. A bounded rerun of the original snapshot contract passes
+all 12 cases with unchanged tolerances; private `npm run manual:build` and
+`npm run manual:lint` pass, including all 18 numerical blocks and 57 files.
+Do not describe this as a second full-suite run. The 44 UI smoke contracts
+also pass in the private copy; no new visual browser check is claimed.
+
+Optional Deep CO was compared at all eight default loads in both affected
+phenotypes. Embolism accepts six points at 180 s, rejects 140% for domain and
+leaves 120% unsettled at five minutes; ARDS/RV accepts seven at 180 s and rejects
+140%. Acceptance, rejection reasons and window counts are identical before and
+after the conservative change. Completed points include rejections: an interim
+statement calling seven completed embolism points accepted was corrected.
+
+Production documentation build/lint also passes (53 pages, 18 generated blocks,
+57 files, no errors/warnings); production snapshots and numerical examples are
+unchanged. `git diff --check` passes. The source hash remains that of the audited
+runtime. Substantive adoption still requires the clinician's confirmation;
+Windows has not been verified.
+
 ## Cardiorespiratory review before respiratory revision — September 7
 
 The clinician authorized reviewing pulmonary transit, pulmonary vascular load
