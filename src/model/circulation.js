@@ -269,17 +269,14 @@ const FLOW_EDGES = [
 ];
 const VOLUME_FLOOR = 1; // mL a compartment may never be drained below
 
-// Collapse of the great veins is progressive rather than a hard knee: as right
-// atrial pressure approaches the closing pressure the vessel flutters, so
-// sensitivity to Pra fades over roughly a millimetre of mercury instead of
-// vanishing at a point.
+// Aggregate smoothing of the closing-pressure transition. This coefficient
+// does not model vessel-wall motion or flutter kinetics.
 const COLLAPSE_KNEE = 1.1; // mmHg
 
 /**
- * Venous return, in mL/s. The single definition — the integrator and the curve
- * drawn on the Guyton diagram both call this, so the plot cannot drift away
- * from the model the way it did when the curve used a hard `max()` against a
- * softplus in the integrator.
+ * Shared forward-return law. The Guyton curve reduces the whole pathway to
+ * mean determinants; the integrator applies this law locally in either
+ * direction. A curve evaluated at mean pressures need not equal mean flow.
  */
 export function venousReturnBackPressure(pra, pCrit) {
   return pCrit + COLLAPSE_KNEE * Math.log1p(Math.exp((pra - pCrit) / COLLAPSE_KNEE));
@@ -287,6 +284,18 @@ export function venousReturnBackPressure(pra, pCrit) {
 
 export function venousReturnFlow(pmsf, pra, pCrit, rvr) {
   return Math.max(0, (pmsf - venousReturnBackPressure(pra, pCrit)) / rvr);
+}
+
+/**
+ * Signed caval flow, mL/s; positive from IVC to RA. All pressures are mmHg
+ * relative to atmosphere, resistance is mmHg·s/mL. Preserve the forward law
+ * and mirror it for a reversed pressure gradient. Equal pressures give zero;
+ * the original softplus/clamp zero-flow region near equilibrium is retained.
+ */
+export function cavalFlow(pIvc, pRa, pCrit, resistance) {
+  return pIvc >= pRa
+    ? venousReturnFlow(pIvc, pRa, pCrit, resistance)
+    : -venousReturnFlow(pRa, pIvc, pCrit, resistance);
 }
 
 /**
@@ -445,10 +454,9 @@ export function stepCirculation(p, c, resp, dt) {
   // Splanchnic reservoir → IVC: no collapse, purely resistive.
   const qSvToIvc = Math.max(0, (pmsf - pIvcAtm) / rvrUp);
 
-  // IVC → RA: the Starling resistor lives here. The collapse law uses pIvcAtm
-  // as the upstream pressure (where the IVC enters the thorax) against the same
-  // softplus backpressure the Guyton diagram draws.
-  const qVr = Math.max(0, (pIvcAtm - venousReturnBackPressure(pRa, pCrit)) / rvrDown);
+  // IVC ↔ RA: a collapsible conduit, not a one-way valve. The existing signed
+  // flow limiter selects RA as donor during backflow and conserves volume.
+  const qVr = cavalFlow(pIvcAtm, pRa, pCrit, rvrDown);
 
   const qSys = (pSa - pmsf) / p.svr;
 

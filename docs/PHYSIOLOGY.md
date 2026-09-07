@@ -277,6 +277,22 @@ two respiratory-mean curves. Once storage has settled, mean flows should agree
 and the measured inflow marker should be close to that local crossing. Their
 agreement is an internal consistency check, not independent clinical validation.
 
+The caval segment permits pressure-driven reversal: its original forward law
+is mirrored with the IVC and atrial endpoints exchanged when atrial pressure
+is higher. Positive flow enters the atrium and negative flow returns blood to
+the IVC; beat and breath averages report the net transfer. Equal pressures give
+zero flow, with the existing small zero-flow interval near equilibrium retained.
+No new compartment, coefficient or valve is introduced. The upstream
+reservoir-to-IVC segment remains forward-only.
+
+The descending Guyton curve remains the forward analytic reduction of the
+combined pathway. Nonlinear collapse and brief reversal mean that evaluating
+it at mean RAP need not give measured mean net inflow, even after net storage
+settles. This curve-to-marker gap is distinct from the distance between the
+measured marker and the predicted crossing, particularly in pulmonary embolism.
+See [vascular waterfalls](../manual/vascular-waterfalls.md) for equations,
+pressure references and the remaining anatomical and mathematical limits.
+
 **Deep CO** is an optional loading experiment in separate copies containing both
 ventricles and the pulmonary circulation. It imposes eight levels of right
 atrial inflow and plots the resulting mean atmospheric right atrial pressure

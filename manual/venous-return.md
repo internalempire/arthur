@@ -25,6 +25,8 @@ Two features of this expression carry most of the clinical content.
 
 **Raising right atrial pressure reduces flow.** This is the sense in which "the heart limits its own filling". A ventricle that fails and backs up raises the pressure it must fill against.
 
+**Caval flow can briefly reverse.** A rise in atrial pressure can send blood back towards the veins. Doppler recordings in 40 healthy adults found small backward components around atrial contraction and after the second heart sound; these were least frequent in the IVC (Maeda et al., 1991). This supports allowing reversal, but does not calibrate its volume in Arthur. Caval backflow is distinct from tricuspid regurgitation. Over a measurement window, **net venous inflow is forward volume minus backward volume, divided by elapsed time**.
+
 ### The Guyton construction
 
 The descending relation describes return from the systemic veins. The default ascending relation estimates RV output from right atrial filling, RV mechanics and pulmonary load. Both formulas update continuously from the displayed circulation. They share right atrial pressure as the horizontal coordinate. The optional Deep CO analysis includes both ventricles and measures aortic output in separate loading simulations; it is not required to use the dynamic diagram.
@@ -47,7 +49,9 @@ The integrated circulation and the analytic curve describe the same pathway at d
 
 The integrator separates the systemic venous reservoir, a compliant IVC and the right atrium. The selected resistance to venous return is divided into an upstream segment and a collapsible downstream segment. This allows the IVC to store a small amount of blood and delay transmission during a breath.
 
-The analytic venous-return curve reduces those two resistances back to their steady-state sum and uses the same critical closing-pressure law. Its default construction averages all three determinants — Pmsf, critical closing pressure and effective resistance — over one complete breath. Once IVC volume is no longer changing, the detailed pathway and the reduced curve give the same mean flow. During inspiration or expiration they need not give the same instantaneous flow because the IVC is filling or emptying.
+The caval segment permits flow in either direction. Forward flow retains the original collapse law; when right atrial pressure exceeds IVC pressure, the same law is applied with the ends exchanged and the resulting flow counted as negative. The upstream reservoir-to-IVC segment remains forward-only. The [waterfall page](vascular-waterfalls.md) gives the equations and the retained zero-flow region near pressure equality.
+
+The analytic venous-return curve reduces the two resistances to their sum and uses the shared forward closing-pressure law. It is a forward-return approximation constructed from mean determinants. In a pulsatile circulation, applying a nonlinear law to mean pressures need not reproduce the mean of actual signed flow, even after net storage has settled. The curve therefore need not pass through the measured mean inflow marker. This distinction is particularly visible with pulmonary embolism and brief caval backflow.
 
 The fast **Live** view uses one-heartbeat averages for both RV and venous-return determinants, preserving respiratory movement. **Mean** uses respiratory averages for both. In optional deep mode, VR mean uses the separately settled reference conditions and VR live uses instantaneous return determinants. The predicted crossing is withheld in live views because storage during a breath prevents interpreting it as instantaneous whole-circuit equilibrium.
 
@@ -55,7 +59,7 @@ Mean systemic filling pressure comes from the [stressed volume](stressed-volume.
 
 ### The marks on the diagram
 
-The faint inflow path uses one-heartbeat mean RAP and IVC-to-right-atrial inflow. The dark mean venous-inflow marker uses the same respiratory clock as the default RV relation. Their crossing is the hollow predicted-equilibrium point. Optional Deep CO adds a red mean LV-output marker and replaces the ascending relation with a separately settled whole-heart response. See [the Guyton panel](panel-guyton.md) for its loading protocol and calculation status.
+The faint inflow path uses one-heartbeat mean RAP and net IVC-to-right-atrial inflow. The dark mean venous-inflow marker uses a complete respiratory cycle in both Live and Mean. The hollow predicted-equilibrium point is the crossing of the two analytic curves, displayed only in Mean. Optional Deep CO adds a red mean LV-output marker and replaces the ascending relation with a separately settled whole-heart response. See [the Guyton panel](panel-guyton.md) for its loading protocol and calculation status.
 
 The respiratory markers remove much of the within-breath variation but a beat or a breath need not return every compartment to exactly the same volume when the cardiac and respiratory clocks are not commensurate. The optional deep response uses complete minute windows and explicitly checks flow agreement and storage. During an intervention, differences between venous inflow and aortic output can be caused by redistribution.
 
@@ -97,7 +101,7 @@ Mean systemic filling pressure *rises* with PEEP — the abdominal contribution 
 
 The model integrates a closed loop and derives a separate Guyton analysis from its equations. Two curves and their intersection alone cannot show breath-by-breath storage. The trail retains one-heartbeat means and the measured mean markers use respiratory means. The fast relations share the selected heartbeat (Live) or respiratory (Mean) clock; optional deep relations use separately settled minute windows.
 
-The default RV curve is a local analytic relation anchored to respiratory-mean RV volumes. Optional Deep CO measures a whole-heart response in disposable loading experiments conditioned on a settled reference. The normalized inflow waveform and systemic source-pressure/respiratory trajectories are shared across the copies; cardiac and pulmonary dynamics remain active. Agreement at the unperturbed reference is an internal consistency check. The [panel page](panel-guyton.md) describes rejected ranges, numerical checks and the fixed-autonomic-drive boundary.
+The default RV curve is a local analytic relation anchored to RV volumes on the selected heartbeat (Live) or respiratory (Mean) clock. Optional Deep CO measures a whole-heart response in disposable loading experiments conditioned on a settled reference. The normalized inflow waveform and systemic source-pressure/respiratory trajectories are shared across the copies; cardiac and pulmonary dynamics remain active. Agreement at the unperturbed reference is an internal consistency check. The [panel page](panel-guyton.md) describes rejected ranges, numerical checks and the fixed-autonomic-drive boundary.
 
 Venous return uses a soft collapse law rather than a hard `max()`, for reasons given under [vascular waterfalls](vascular-waterfalls.md).
 
@@ -112,8 +116,9 @@ The resistance to venous return is a single control. Splitting it into the sever
 - **One venous reservoir.** No splanchnic, cutaneous or muscular capacitance beds, and therefore no redistribution between fast and slow compartments. A fluid bolus arrives instantaneously in one place.
 - **No stress relaxation, no transcapillary escape, no distribution kinetics.** Volume added stays where it is put.
 - **The resistance to venous return is constant in a normally filled circulation.** An additional abdominal contribution is confined to the upstream segment when both the systemic reservoir and IVC are poorly distended. It does not otherwise vary with flow, tone or vessel calibre.
-- **The Guyton diagram is a steady-state construction placed under a dynamic trail.** The one-heartbeat trail preserves respiratory storage, whereas the two equilibrium points use a complete respiratory cycle.
-- **The analytic curve represents a local RV relation, not an independent biventricular or LV function curve.** It is anchored to the model’s current respiratory-mean RV volumes and does not reproduce a new closed-loop beat at every pressure on the curve.
+- **The Guyton curves are local approximations placed under a dynamic trail.** Live uses heartbeat determinants and Mean uses respiratory determinants. The measured respiratory-mean inflow and the Mean-only predicted crossing have different definitions and need not coincide.
+- **The ascending analytic curve represents a local RV relation, not an independent biventricular or LV function curve.** Its RV-volume anchor follows the selected clock and does not reproduce a new closed-loop beat at every pressure on the curve.
+- **Caval reversal is an aggregate pressure-driven extension.** It adds no vessel-wall dynamics or separate superior caval route. The remaining zero-flow region is a mathematical limitation, not a measured physiological threshold.
 - **The filled point is venous inflow, not cardiac output.** Its height must not be read as simultaneous RV or LV forward flow.
 - Mean systemic filling pressure here is computed from the model's own state. It is an internal quantity, not the thing an occlusion manoeuvre measures — see [Pmsf and occlusions](pmsf-and-occlusions.md).
 
@@ -127,6 +132,7 @@ The resistance to venous return is a single control. Splitting it into the sever
 
 ## References
 
+- Maeda T, Matsuzaki M, Shiomi K, et al. Characteristics of blood flow velocity patterns of central systemic veins in healthy adults assessed by Doppler echocardiography. *Jpn Circ J*. 1991;55:535–542. [doi:10.1253/jcj.55.535](https://doi.org/10.1253/jcj.55.535)
 - Guyton AC, Lindsey AW, Kaufmann BN. Effect of mean circulatory filling pressure and other peripheral circulatory factors on cardiac output. *Am J Physiol* 1955;180:463–8. [doi:10.1152/ajplegacy.1955.180.3.463](https://doi.org/10.1152/ajplegacy.1955.180.3.463)
 - Guyton AC, Lindsey AW, Abernathy B, Richardson T. Venous return at various right atrial pressures and the normal venous return curve. *Am J Physiol* 1957;189:609–15. [doi:10.1152/ajplegacy.1957.189.3.609](https://doi.org/10.1152/ajplegacy.1957.189.3.609)
 - Magder S. Volume and its relationship to cardiac output and venous return. *Crit Care* 2016;20:271. [doi:10.1186/s13054-016-1438-7](https://doi.org/10.1186/s13054-016-1438-7)

@@ -652,7 +652,8 @@ export class Simulator {
       rvLvRatio: c.lvEdv > 0 ? c.rvEdv / c.lvEdv : 1,
       pmsf: ema.pmsf, pCrit: ema.pCrit, pPeri: ema.peri,
       operatingPoint, respiratoryOperatingPoint,
-      // Same collapse law as the integrator, same averaging window as its terms.
+      // Forward analytic gradient from matched mean determinants; nonlinear
+      // collapse and signed caval backflow prevent equating it to net flow × R.
       gradientVr: ema.pmsf - venousReturnBackPressure(cvp, ema.pCrit),
       respiratoryGradientVr: respiratoryOperatingPoint.pmsf
         - venousReturnBackPressure(respiratoryOperatingPoint.pra,

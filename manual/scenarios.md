@@ -69,8 +69,8 @@ R/I is one constraint, not the validator of the whole preset. The current openin
 | state | EELV (L) | end-expiratory Ppl / PL (cmH₂O) | plateau (cmH₂O) | achieved R/I | open lung | derived PVR (WU) | RV/LV | CO (L/min) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
 | recruitable baseline | 0.94 | -1.4 / 13.4 | 19.6 | 0.70 | 59% | 5.3 | 1.72 | 4.00 |
-| recruitable, high PEEP | 1.30 | 0.4 / 19.6 | 41.0 | 0.70 | 74% | 5.8 | 1.77 | 3.79 |
-| non-recruitable, high PEEP | 1.03 | -0.9 / 20.9 | 46.6 | 0.00 | 58% | 7.2 | 1.97 | 3.53 |
+| recruitable, high PEEP | 1.30 | 0.4 / 19.6 | 41.0 | 0.70 | 74% | 5.8 | 1.77 | 3.78 |
+| non-recruitable, high PEEP | 1.03 | -0.9 / 20.9 | 46.6 | 0.00 | 58% | 7.2 | 1.97 | 3.50 |
 <!-- END GENERATED: ards-scenario -->
 
 ### Acute pulmonary embolism

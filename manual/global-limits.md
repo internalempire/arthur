@@ -1,6 +1,6 @@
 # Global limits
 
-The [independent audit](validation.md#independent-audit-and-unresolved-findings) separates unresolved findings from passing contracts. Cardiac output uses integrated valve flow; incompatible ventricular pressure envelopes or filling/ejection throughflow suspend clinical interpretation. The LV-failure preset demonstrates pressure unloading with a modest fall in forward output. Four separate findings remain open: finite-volume R/I agreement, narrow-threshold hysteresis convergence, preservation of intrinsic recruitability during a chest-wall intervention, and reverse flow through an open caval segment.
+The [independent audit](validation.md#independent-audit-and-unresolved-findings) separates unresolved findings from passing contracts. Cardiac output uses integrated valve flow; incompatible ventricular pressure envelopes or filling/ejection throughflow suspend clinical interpretation. The LV-failure preset demonstrates pressure unloading with a modest fall in forward output. Open-caval reversal is represented and checked. Three audit findings remain open: finite-volume R/I agreement, narrow-threshold hysteresis convergence, and preservation of intrinsic recruitability during a chest-wall intervention.
 
 > The model is a compact mechanical argument about heart–lung interaction; it is not a complete cardiopulmonary patient, and every scenario inherits the omissions below.
 
@@ -47,6 +47,7 @@ The pulmonary-embolism scenario therefore raises one aggregate vascular load. It
 - Ventricles are lumped elastance chambers, not spatial myocardium; the RV:LV ratio is a model-volume ratio rather than an imaging ratio.
 - Pericardial capacity supports a directional tamponade phenotype, but there is no fluid compartment, accumulation rate, loculation, echocardiographic chamber collapse or clinically calibrated pressure–volume relation.
 - One systemic arterial and one venous reservoir replace organ beds, regional autoregulation, capillary exchange and microcirculation.
+- The caval segment allows brief backflow, but retains one abdominal closing pressure and a mathematical zero-flow interval near equilibrium. No separate superior caval route or vessel-wall dynamics is present; the upstream reservoir-to-IVC segment and pulmonary arterial inflow remain forward-only. The analytic Guyton curve is a forward-return approximation and need not pass through measured net mean inflow.
 - No renal fluid balance, hormonal control, vascular stress relaxation or long-term remodelling.
 
 ## Autonomic and therapeutic limits

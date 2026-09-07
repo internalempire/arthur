@@ -2,6 +2,63 @@
 
 Updated: 2026-09-07
 
+## Conservative caval backflow adopted — September 7
+
+The clinician explicitly authorized adoption and documentation after the
+private comparison below. This section supersedes that comparison's pending
+adoption status. The starting checkout was `f56c6cf` on `main`.
+
+`cavalFlow` in `src/model/circulation.js` preserves the existing forward branch
+and mirrors its endpoints for reverse IVC–RA flow. Its output remains signed
+mL/s; the existing donor limiter and volume balances transfer backward blood
+from the atrium to the cava. No new state, coefficient, timestep, preset or UI
+behavior is introduced. Upstream systemic-to-IVC flow, pulmonary arterial
+inflow and the single abdominal closing pressure retain their prior laws.
+
+Manual pages now distinguish signed net inflow from the forward analytic
+Guyton curve, document the retained near-equilibrium zero-flow interval, and
+qualify the scope of human Doppler support. Related stale respiratory-only
+descriptions of the default Live curve were corrected: Live uses heartbeat
+determinants, Mean uses breath determinants, the measured marker retains its
+respiratory clock, and only Mean shows the predicted crossing. The curve at
+measured RAP and the predicted crossing are different comparisons; neither
+marker is moved to manufacture agreement.
+
+The `venous-reversal` audit entry is promoted to resolved, with permanent
+direction, no-flow, forward-branch, pressure-reference, donor and volume-balance
+regression checks. The four cardiac entries remain resolved and the three
+respiratory entries remain open. This is not an assertion that all
+cardiorespiratory physiology has been externally validated.
+
+Official snapshot/example generators reproduce the reviewed private-copy diff:
+three snapshot rows, the embolism pulmonary-volume example (548 to 546 mL),
+and two ARDS high-PEEP outputs (3.79 to 3.78 and 3.53 to 3.50 L/min). No
+tolerance was widened. All 19 figures were regenerated and have no diff.
+Snapshot and example protocols retain their own windows; these values must
+not be substituted for the earlier trial's directly integrated 60 s means.
+
+The 14 targeted caval checks, 44 UI smoke contracts, 10 verification-harness
+checks and syntax checks of 56 modules pass. The independent audit exits 0
+with five PASS and three KNOWN_FAILURE entries. Manual build/lint passes:
+53 pages, 18 generated blocks, 57 files, 145 bibliography entries, no errors
+or warnings. One intermediate lint run caught a stale search index after
+a final prose edit; rebuilding the index and rerunning lint resolved it.
+Chromium checks cover healthy passive and embolism Live/Mean rendering,
+Deep opt-in/cancellation, and four manual pages including mathematical
+rendering, with no page errors or failed HTTP requests. The browser check
+does not claim completion of the deep loading experiment. Browser tooling
+and extracted libraries are temporary and add no project dependencies.
+The complete adopted-source `npm test` run passes: 390 checks, zero failures,
+including the refreshed snapshot and documentation contracts. This is a full
+suite run, superseding the private trial's 373-pass/three-reference-mismatch
+result. `git diff --check` passes. The exact source is committed and pushed
+after these checks; the final local/remote SHA is recorded in the private report.
+
+The private adoption record is
+`codex-notes/Arthur-adozione-reflusso-cavale-2026-09-07.md`; numerical
+artifacts and logs use `outputs/Arthur-caval-adoption-*`. Neither directory is
+committed. The Windows copy has not been verified.
+
 ## Test caval backflow alternatives without adopting them — September 7
 
 The clinician authorized comparing the computational and teaching consequences

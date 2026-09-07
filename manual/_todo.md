@@ -14,4 +14,4 @@ The isolated LV probe demonstrates greater forward ejection at fixed starting vo
 
 The superior vena cava is surrounded by pleural pressure and the inferior by abdominal pressure, and the model uses one closing pressure derived from the abdomen alone. The consequences, and why this survived while the analogous pulmonary simplification did not, are set out under [vascular waterfalls](vascular-waterfalls.md).
 
-- Resolve the separately tracked finite-volume R/I, hysteresis convergence, chest-wall intervention and open-caval reversal findings. See the audit registry and handover.
+- Resolve the separately tracked finite-volume R/I, hysteresis convergence and chest-wall intervention findings. See the audit registry and handover.

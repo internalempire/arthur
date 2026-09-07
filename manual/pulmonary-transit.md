@@ -66,7 +66,7 @@ With passive ventilation, HR 75/min, RR 18/min, VT 450 mL and PEEP 5 cmH2O held 
 | phenotype | pulmonary blood volume (mL) | estimated PA-to-LA transit (s) | staged buffer (s) |
 |---|---:|---:|---:|
 | reference circulation | 404 | 4.5 | 2.0 |
-| pulmonary embolism | 548 | 8.3 | 3.6 |
+| pulmonary embolism | 546 | 8.3 | 3.6 |
 | congested low-output LV failure | 765 | 15.2 | 6.0 |
 <!-- END GENERATED: pulmonary-transit -->
 

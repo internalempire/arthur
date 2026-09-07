@@ -37,17 +37,17 @@ The two are the same physics in different vessels, which is why they are one pag
 
 ### On the venous side
 
-The closing pressure is abdominal pressure less the compression the cava tolerates before it shuts. The waterfall now lives on the downstream segment only — the [inferior vena cava](inferior-vena-cava.md) is a separate compliant compartment, and it is this conduit, not the splanchnic reservoir, that collapses as its pressure approaches the closing pressure:
+The aggregate closing pressure is abdominal pressure less a selected compression allowance. The waterfall lives on the downstream segment only — the [inferior vena cava](inferior-vena-cava.md) is a separate compliant compartment. This represents flow limitation in the conduit; it does not calculate vessel-wall collapse and reopening:
 
 $$
 P_{crit} = P_{ab,\mathrm{mmHg}} - \left(0.7356\ \frac{\mathrm{mmHg}}{\mathrm{cmH_2O}}\right)\left(5\ \mathrm{cmH_2O}\right)
 $$
 
-- $P_{crit}$ — right atrial pressure below which the great veins collapse, mmHg
+- $P_{crit}$ — aggregate critical closing pressure, mmHg relative to atmosphere
 - $P_{ab,\mathrm{mmHg}}$ — [abdominal pressure](abdominal-pressure.md) after conversion to mmHg
-- the 5 cmH₂O is the transmural compression the vena cava tolerates before shutting
+- the 5 cmH₂O is a model compression allowance, not a measured threshold for an individual cava
 
-Collapse is progressive rather than a hard knee. As right atrial pressure approaches the closing pressure the vessel flutters, so sensitivity fades over about a millimetre of mercury instead of vanishing at a point:
+The forward-return relation smooths the transition between atrial and closing pressure over about a millimetre of mercury:
 
 $$
 P_{\text{back}} = P_{crit} + k \ln\!\left(1 + e^{(P_{ra} - P_{crit})/k}\right), \qquad k = 1.1\ \text{mmHg}
@@ -58,13 +58,27 @@ $$
 $$
 
 - $P_{\text{back}}$ — the effective back-pressure venous return sees, mmHg
-- $P_{ra}$ — right atrial pressure, mmHg
+- $P_{ra}$ — right atrial pressure, mmHg relative to atmosphere
 - $k$ — width of the collapse knee, 1.1 mmHg
 - $P_{msf}$ — mean systemic filling pressure, mmHg
-- $R_{vr}$ — resistance to venous return
+- $R_{vr}$ — resistance to venous return, mmHg·s/mL in this equation
 - $\dot{Q}_{vr}$ — venous return, mL/s
 
-This softplus approaches $P_{ra}$ well above the closing pressure and $P_{crit}$ well below it. The smoothing is not cosmetic: a hard `max()` puts a corner in the derivative, and a forward-Euler integrator crossing that corner at the respiratory rate produces a kink that looks like physiology.
+This softplus approaches $P_{ra}$ well above the closing pressure and $P_{crit}$ well below it. The equation above is the **forward analytic Guyton relation** for the combined pathway. Its determinants follow the selected Live/Mean clock described in the [panel manual](panel-guyton.md).
+
+The integrated **IVC–right-atrial segment** instead uses instantaneous pressures at its own ends and only its downstream resistance. Define $B(b)=P_{crit}+k\ln(1+e^{(b-P_{crit})/k})$ and $F(a,b,R)=\max(0,(a-B(b))/R)$. Its signed flow is:
+
+$$
+Q_{cav} =
+\begin{cases}
+F(P_{IVC},P_{ra},R_{down}) & P_{IVC}\geq P_{ra} \\
+-F(P_{ra},P_{IVC},R_{down}) & P_{IVC}<P_{ra}
+\end{cases}
+$$
+
+All endpoint pressures and $P_{crit}$ are in mmHg relative to atmosphere; $R_{down}$ is in mmHg·s/mL. Positive $Q_{cav}$ (mL/s) enters the right atrium; negative flow returns blood to the cava. The original forward branch is preserved exactly and the reverse branch exchanges the two ends. At equal pressures flow is zero. The same volume transfer is subtracted from one compartment and added to the other, including during reversal.
+
+The pressure smoothing does not make the entire flow law smooth: the non-negative clamp retains a small zero-flow interval near pressure equality, especially near the closing pressure. This is a mathematical limitation, not a simulated valve or a measured reopening threshold. Net inflow averages subtract backward volume. The forward Guyton curve uses mean determinants, so it need not reproduce that net average in a pulsatile circulation.
 
 ### On the pulmonary side
 
@@ -102,7 +116,7 @@ On the pulmonary side, the zone III index falls from 0.53 at PEEP 5 to 0.00 at P
 
 ## Why this and not something else
 
-**The smooth collapse law.** A hard `max()` is the textbook form and is what most lumped models use. It was replaced because the model is integrated explicitly at a fixed time step and the discontinuity in the derivative was visible in the output as a beat-frequency artefact near the plateau. The softplus reproduces the same two asymptotes with a knee about a millimetre wide, which is also closer to what a fluttering vessel does than an instantaneous switch.
+**The smoothed closing-pressure transition.** The softplus connects the open-vessel and flow-limited asymptotes without a sharp corner in effective back-pressure. Its width is a numerical and didactic choice. It does not calculate wall motion or flutter. Mirroring the existing branch allows backward flow while preserving the established forward-collapse behavior, at the cost of retaining the near-equilibrium zero-flow interval.
 
 **A fraction rather than a switch on the pulmonary side.** A whole-lung switch is an all-or-none behaviour standing in for a regional one. The model has no regional geography, so a fractional exposure is a transparent way to express that only part of the aggregate bed is affected. The value 0.45 is a didactic coefficient informed by published vascular partitions; it is not a measured fraction of the whole human bed that enters a waterfall simultaneously.
 
@@ -128,6 +142,7 @@ That is a statement about what the tests happen to constrain, not about which si
 - **The 5 cmH₂O of tolerated transmural compression is a single coefficient**, not a measured caval property, and does not vary with vessel filling or tone.
 - **No West zone map.** There is no gravitational gradient and no vertical distribution of blood flow, so zones are a fraction and an index rather than regions. The model cannot show zone I at all.
 - **The knee width is a numerical choice** as much as a physiological one.
+- **Some unvalved connections remain forward-only.** The reservoir-to-IVC segment and pulmonary arterial inflow still exclude reversal. The symmetric caval extension is not a fitted human pressure-flow relation and adds no vessel-wall dynamics.
 - The zone III index qualifies a readout; it does not change the perfusion distribution, because there is no distribution to change.
 
 ### Of clinical application

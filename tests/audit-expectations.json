@@ -6,5 +6,5 @@
   "ri-protocol": "open",
   "hysteresis-convergence": "open",
   "patient-wall-intervention": "open",
-  "venous-reversal": "open"
+  "venous-reversal": "resolved"
 }

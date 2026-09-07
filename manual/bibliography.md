@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 144 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 145 unique entries.
 
 ---
 
@@ -97,6 +97,7 @@ A citation documents the physiological or methodological claim made on its sourc
 
 - Maas JJ, Geerts BF, van den Berg PCM, Pinsky MR, Jansen JRC. Assessment of venous return curve and mean systemic filling pressure in postoperative cardiac surgery patients. *Crit Care Med*. 2009;37:912–918. [doi:10.1097/CCM.0b013e3181961481](https://doi.org/10.1097/CCM.0b013e3181961481)
 - MacIntyre NR, Cheng KC, McConnell R. Applied PEEP during pressure support reduces the inspiratory threshold load of intrinsic PEEP. *Chest*. 1997;111:188–193. [doi:10.1378/chest.111.1.188](https://doi.org/10.1378/chest.111.1.188)
+- Maeda T, Matsuzaki M, Shiomi K, et al. Characteristics of blood flow velocity patterns of central systemic veins in healthy adults assessed by Doppler echocardiography. *Jpn Circ J*. 1991;55:535–542. [doi:10.1253/jcj.55.535](https://doi.org/10.1253/jcj.55.535)
 - Magder S. Bench-to-bedside review: an approach to hemodynamic monitoring—Guyton at the bedside. *Crit Care*. 2012;16:236. [doi:10.1186/cc11395](https://doi.org/10.1186/cc11395)
 - Magder S. Central venous pressure: a useful but not so simple measurement. *Crit Care Med* 2006;34:2224–7. [doi:10.1097/01.CCM.0000227646.98423.98](https://doi.org/10.1097/01.CCM.0000227646.98423.98)
 - Magder S. Heart–lung interaction in spontaneous breathing subjects: the basics. *Ann Transl Med*. 2018;6:348. [doi:10.21037/atm.2018.06.19](https://doi.org/10.21037/atm.2018.06.19)

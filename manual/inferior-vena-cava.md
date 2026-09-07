@@ -56,7 +56,9 @@ The resistance to venous return (`rvr`) is divided into two series segments:
 
 The same softplus collapse law described under [vascular waterfalls](vascular-waterfalls.md) applies only to the downstream segment. The upstream segment carries no collapse: the splanchnic bed is a capacious reservoir whose pressure is set by stressed volume and venous compliance, not by a surrounding pressure that can compress it shut.
 
-In steady state, total flow is the same as before because `rvr_up + rvr_down = rvr_total`. The IVC adds an RC time constant of about 0.6 s (filling: $C_{IVC} \times rvr_{up}$), which buffers the respiratory oscillations in venous return.
+The downstream segment permits brief reversal when atrial pressure exceeds IVC pressure: blood then leaves the atrium and returns to the IVC. Its forward branch is preserved and its reverse branch uses the same closing-pressure law with the ends exchanged. The upstream segment remains forward-only. The volume balance uses signed downstream flow, so reversal fills the cava rather than creating blood.
+
+For steady forward flow the two resistances add. In a pulsatile circulation, a curve evaluated at mean pressures need not equal the mean signed flow through the two segments. The IVC adds an RC time constant of about 0.6 s (filling: $C_{IVC} \times rvr_{up}$), which buffers the respiratory oscillations in venous return; allowing reversal adds no new compartment or time constant.
 
 ### What the thorax panel shows
 

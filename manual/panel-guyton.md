@@ -18,7 +18,7 @@ Reduced venous inflow can relieve excessive distension. That may be useful even 
 
 - **RV function** is the rapidly updated ascending relation. Its highlighted steep segment corresponds to the local RV preload-reserve construction.
 - **Venous return** is the descending relation determined by systemic filling pressure, caval closing pressure and resistance to return.
-- **mean venous inflow**, the dark marker, uses IVC-to-right-atrial venous inflow on the same respiratory clock. It is not RV output, LV output or cardiac output.
+- **mean venous inflow**, the dark marker, uses net IVC-to-right-atrial venous inflow over a complete breath: forward volume minus backward volume, divided by elapsed time. It is not RV output, LV output or cardiac output.
 - **predicted equilibrium**, the hollow marker shown in Mean, is the crossing of the local RV and venous-return relations on the same respiratory-mean clock.
 - **inflow path**, the faint trail, retains one-heartbeat means of venous inflow and right atrial pressure. It displays temporary storage and respiratory timing.
 
@@ -29,6 +29,8 @@ The RV construction uses right atrial pressure, RV end-diastolic/end-systolic vo
 The mean venous-inflow marker retains its respiratory clock in both views; the faint trail retains the within-breath inflow path. Live withholds the predicted-equilibrium marker: even curves on the same heartbeat clock do not establish instantaneous whole-circuit equilibrium while blood is being stored or released between compartments.
 
 At steady state mean venous inflow and the predicted crossing should be close. During redistribution, venous return and LV output can differ because blood is being stored or released between them. In pulmonary embolism or severe RV pressure loading, the trail can be broad while the respiratory-mean points remain close once the whole circulation settles. Drawing a trail from successive predicted crossings would hide that dynamic information.
+
+The descending curve retains the forward-return formula, whereas measured inflow includes brief caval reversal. Nonlinear collapse also means that flow calculated from mean pressures need not equal the mean of instantaneous flows. Consequently, even in a settled pulsatile circulation, the curve at measured mean RAP need not pass through the dark marker. This gap is distinct from the distance between the dark marker and the hollow crossing. Neither marker is moved to force agreement. See [venous return](venous-return.md) for the flow definition and [vascular waterfalls](vascular-waterfalls.md) for the conservative reverse-flow law and its limits.
 
 No deep-response worker, loading simulation or background precomputation starts in this default view. The ventricular pressure-volume panels continue their ordinary live display.
 

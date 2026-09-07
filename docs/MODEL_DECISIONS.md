@@ -1,5 +1,30 @@
 # Model decisions
 
+## 2026-09-07 — Allow conservative caval backflow
+
+After comparison in isolated source copies, the clinician authorized adopting
+the mirrored IVC-to-RA law. Forward flow retains the existing softplus/clamp
+branch exactly. For a reversed endpoint pressure gradient the same branch is
+evaluated with the ends exchanged and the result counted as negative. The
+signed donor limiter and compartment balances already support this transfer.
+No coefficient, state, numerical timestep, preset or UI control is added.
+
+Simply removing the zero clamp was rejected because it permits flow at equal
+pressures. The smoother two-pressure alternative was not adopted because it
+also changes the established forward-collapse relation. The chosen extension
+retains the small zero-flow interval near pressure equality. It is an aggregate
+teaching law, not a measured human caval pressure-flow relation; human Doppler
+observations support the possibility of reversal, not this model's amplitudes.
+See [venous return](../manual/venous-return.md) for the clinical source.
+
+The systemic-reservoir-to-IVC segment and pulmonary arterial inflow remain
+forward-only, and the single abdominal critical closing pressure is retained.
+The analytic Guyton curve keeps its forward formula; measured inflow is a
+signed net average and must not be repositioned to force agreement with that
+curve. No quantitative human validation is inferred from resolving the audit's
+open-caval reverse-gradient criterion. That criterion is now a regression
+requirement; the three respiratory audit findings remain open.
+
 ## 2026-09-06 — Show respiratory movement of both fast Guyton curves
 
 Live is the default and uses one-heartbeat averages for both RV and VR determinants, including the RV chamber-volume anchor. Mean uses full-breath summaries for both. This restores respiratory teaching movement without changing the patient equations or using a deep loading experiment. Only the mean view presents an equilibrium marker; storage during a breath prevents the live crossing from being treated as measured instantaneous output. Deep CO remains opt-in with its own reference clock. The healthy PEEP 5-to-15 probe changes only PEEP and reports pressure references, reservoir pressure components and integrated flows separately.

@@ -195,6 +195,10 @@ wedge surrogate about 3 mmHg, an internal $(mPAP-P_{LA})/CO$ estimate about
 7.6 WU, atmospheric CVP about 3 mmHg, higher transmural right-atrial pressure
 and RV/LV ratio about 1.9. The aggregate zone-3 index cautions both the wedge
 surrogate and derived-PVR interpretation.
+Brief caval backflow is now included in net venous inflow. The descending
+Guyton curve retains its forward analytic formula, so its value at mean RAP
+need not equal measured net mean inflow in this pulsatile state. This gap must
+not be mistaken for volume loss or removed by moving the measured marker.
 Changing to passive volume control and raising PEEP from 0 to 10 cmH2O lowers
 output by roughly 10% and further raises right-sided pressure and RV/LV ratio.
 
