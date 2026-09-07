@@ -2,6 +2,62 @@
 
 Updated: 2026-09-07
 
+## Cardiorespiratory review before respiratory revision — September 7
+
+The clinician authorized reviewing pulmonary transit, pulmonary vascular load
+and venous return, while requiring explicit discussion and confirmation before
+substantive physiology or UI changes. This review changes neither production
+code nor coefficients, presets, numerical acceptance or display behavior.
+It examines model revision `0c7f6fd`; the report and reproducible probes remain
+private in `codex-notes/Arthur-audit-cardiorespiratorio-2026-09-07.md` and
+`outputs/Arthur-cardiorespiratory-review-2026-09-07-*`.
+
+All 12 presets plus healthy passive PEEP 15 were sampled after 135 s preparation
+in two 60 s windows, using actual transferred flows and retaining preset reflex
+settings. Blood is conserved and cardiac domain/volume-limit flags remain clear.
+The septic preset retains a small autonomic drift rather than exact settlement.
+An independent passive tracer, including signed PV–LA exchange, confirms
+pulmonary mean residence against pulmonary blood volume/mean flow in three
+isolated, nonventilating states at dt 0.00025 and 0.000125 s. Paired RV-elastance
+steps preserve the delayed LV response. These are internal checks, not external
+validation of contrast timing or every respiratory phase delay. An initial
+first-arrival tracer discarded LA-to-PV returns and measured a different
+quantity; its shorter times are not evidence of a transport defect. The final
+interpretation uses the complete tracer and explicitly defined boundaries.
+
+A frozen-lung, zone-3 pressure-flow bench confirms that the resistive coefficient
+does not respond to intravascular distension, an already documented omission.
+PA/PV reservoir compliance exists and must not be confused with distensibility
+of the resistive bed or a catheter-derived compliance index. Clinical PVR
+comparisons require matched pressure references, territory and measurement
+windows. This review verified the Cappio Borlino 2024 primary abstract, not its
+complete measurement protocol; it does not promote coefficient calibration
+outside zone 3 to independent catheter-PVR validation.
+
+The known caval reverse-flow clamp acts in ordinary ARDS/RV, embolism and
+tamponade presets even when RAP exceeds caval pressure and both are above the
+model closing threshold. A further structural question is the unidirectional
+PA-to-transport flow: LV failure and the large-swing preset have intervals with
+PA below PV while both exceed alveolar pressure, yet this pathway permits no
+reverse flow. These observations persist at half the timestep. Time fractions
+of blocked flow are not estimates of CO error; no alternative circulation was
+implemented to establish effect size. The pressureless transport stages make
+a pulmonary bidirectional formulation a separate design question, not a blind
+removal of a numerical maximum. Keep these proposals distinct from accepted
+roadmap work. The current review does not justify replacing the transit model
+or retuning PVR to force an LV-output benefit.
+
+Verification: `npm test` reports 376 passed, 0 failed, exit 0. The separate
+`npm run test:audit` exits 0 with four cardiac PASS criteria and the same four
+KNOWN_FAILURE criteria (R/I protocol, hysteresis convergence, chest-wall
+intervention and caval reversal). Known failures remain physiological failures.
+All private survey, bench, transit, tracer and timestep-refinement probes
+complete with exit 0. No UI/browser rerun is claimed for unchanged behavior.
+`npm run manual:build` writes/indexes 53 pages without generated-file changes;
+`npm run manual:lint` confirms 18 generated blocks and checks 57 files with
+zero errors or warnings. `git diff --check` passes. The Windows checkout has
+not been verified from this session.
+
 ## Align the physiological summary with the current Guyton display — September 7
 
 The clinician authorized correcting section 7 of `docs/PHYSIOLOGY.md`, which
