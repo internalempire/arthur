@@ -2,6 +2,38 @@
 
 Updated: 2026-09-07
 
+## Distensibility and ventricular loading assessed together — September 7
+
+After requesting a clearer clinical explanation, the clinician emphasized
+that intravascular distension and increased ventricular loading can coexist.
+They authorized three bounded comparisons in private copies: imposed flow
+through a frozen vascular bed, higher downstream pressure, and higher
+reference pulmonary resistance. The full-circuit downstream experiment raises
+LV diastolic stiffness and lets LA pressure emerge; it does not overwrite
+atrial pressure or claim to isolate all consequences of that intervention.
+
+Actual forward flow, RV ejection pressure relative to pleural plus pericardial
+pressure, stroke volume and net pressure-volume work are measured together.
+The distensible variant can exhibit lower pathway resistance with higher RV
+ejection pressure and lower output after downstream congestion. Lower work per
+beat can accompany lower ejected volume and must not alone be called reduced
+afterload. Higher reference resistance raises RV pressure/work and lowers
+output in all versions; distensibility attenuates rather than reverses these
+changes. The production model already retains pressure opposing RV ejection.
+
+Targeted conservation, domain, settlement and timestep-refinement checks pass.
+The laws are those already timed; neither another Deep run nor a duplicate
+performance benchmark was needed. These are internally checked mechanistic
+comparisons, not a fit to matched human data or validation of pulsatile
+impedance and pressure-dependent arterial compliance, which remain omitted.
+The recommendation is to retain the current production law for now; no
+substantive adoption or new research sequence is automatically authorized.
+The clinician-facing report is private at
+`codex-notes/Arthur-distensibilita-postcarico-2026-09-07.md`; runners, copies,
+numerical results and logs use `outputs/Arthur-distensibility-coupling-*`.
+Model, scenario, current manual and UI behavior are unchanged. Windows has
+not been verified.
+
 ## Pulmonary distensibility experiments remain private — September 7
 
 The clinician authorized an isolated comparison, then assessment of how
