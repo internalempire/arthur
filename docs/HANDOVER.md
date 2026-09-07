@@ -1,6 +1,26 @@
 # Project handover
 
-Updated: 2026-09-06
+Updated: 2026-09-07
+
+## Align the physiological summary with the current Guyton display — September 7
+
+The clinician authorized correcting section 7 of `docs/PHYSIOLOGY.md`, which
+still described the RV curve only on a respiratory-mean window. It now explains
+the default heartbeat-averaged Live curves, the full-breath Mean construction,
+the distinct inflow marker and trail, and the Mean-only equilibrium marker.
+The optional Deep CO experiment is summarized with its reference conditions,
+validity boundary and cancellation behavior, linking to the existing panel
+manual for details. This is a documentation correction; model equations,
+coefficients, presets and UI behavior are unchanged. Further model revision
+awaits the clinician's next instruction.
+
+Verification on VPS: `npm run manual:build` completes with 53 written/indexed
+pages and no generated-file changes; `npm run manual:lint` confirms all 18
+generated numerical blocks and checks 57 files with zero errors or warnings.
+`git diff --check` passes. Model/UI suites were not rerun for this prose-only
+change. Logs are in `outputs/Arthur-physiology-doc-2026-09-07-*.log`; the private
+continuity note is in `codex-notes/Arthur-PHYSIOLOGY-Guyton-2026-09-07.md`.
+The Windows checkout has not been verified from this session.
 
 ## Restore respiratory RV excursion and inspect healthy PEEP 5 to 15 — September 6
 

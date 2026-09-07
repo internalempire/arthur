@@ -251,25 +251,43 @@ patient's Pmsf.
 
 ---
 
-## 7. The Guyton panel uses two time scales
+## 7. The Guyton panel separates Live, Mean and optional Deep CO
 
-The explicit IVC is a compliant compartment, so venous inflow into the right
-atrium can briefly differ from RV output even during passive ventilation. A
-one-heartbeat mean removes atrial pulsation but does not remove that respiratory
-storage. It is therefore retained as the moving trail, not used as the settled
-operating point.
+The default **Live** view shows respiratory movement of both the local
+RV-function curve and the venous-return curve. Both use determinants averaged
+over one heartbeat, attenuating cardiac pulsation while preserving respiratory
+variation. **Mean** constructs both curves from determinants averaged over a
+complete breath; it does not average the drawn lines point by point. The
+horizontal axis is right atrial pressure relative to atmosphere, in mmHg, and
+the vertical axis is flow in L/min.
 
-The filled simulated-mean point averages right atrial pressure and IVC inflow
-over one complete breath. In a settled periodic circulation, every compartment
-returns to its starting volume over that interval, so mean venous return, RV
-output and LV output must agree. The hollow crossing is evaluated from curves
-using the same respiratory mean.
+The local RV-function curve is anchored to RV end-diastolic and end-systolic
+volumes on the selected heartbeat or respiratory window, together with matching
+right atrial pressure, heart rate and RV contractility. This avoids assuming
+that mean right atrial pressure equals RV end-diastolic transmural pressure.
+It remains a local analytic approximation, not an independently measured LV
+response or an instantaneous cardiac-output measurement.
 
-The local RV-function curve is anchored to respiratory-mean RV end-diastolic
-and end-systolic volumes. This avoids assuming that mean right atrial pressure
-is the same as RV end-diastolic transmural pressure. The resulting overlap is an
-internal conservation and curve-consistency check; it is not an independent
-validation against human cardiac-function data.
+The dark marker averages right atrial pressure and IVC-to-right-atrial inflow
+over a complete breath in both views. The faint trail retains one-heartbeat
+means. The compliant IVC and other compartments can temporarily store or release
+blood, so venous inflow, RV output and LV output can differ within a breath.
+Only Mean shows the hollow predicted-equilibrium marker at the crossing of the
+two respiratory-mean curves. Once storage has settled, mean flows should agree
+and the measured inflow marker should be close to that local crossing. Their
+agreement is an internal consistency check, not independent clinical validation.
+
+**Deep CO** is an optional loading experiment in separate copies containing both
+ventricles and the pulmonary circulation. It imposes eight levels of right
+atrial inflow and plots the resulting mean atmospheric right atrial pressure
+against independently integrated aortic output. Only settled, domain-valid
+points are drawn. The reference fixes autonomic drive and shares respiratory
+and systemic source-pressure trajectories across the copies; arterial pressure
+can still respond to their flow. This reference-conditioned analysis is
+available only by explicit selection. Leaving Deep CO,
+changing a parameter or scenario, or resetting cancels it and requires a fresh
+opt-in. See the [Guyton panel manual](../manual/panel-guyton.md) for its separate
+VR mean/live selector, measurement windows and acceptance limits.
 
 ## 8. Limitations
 
