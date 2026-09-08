@@ -61,7 +61,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. The preset leaves maximum lung capacity at the 6 L default: collapse makes the accessible baby lung smaller, while reduced `clung` independently makes its aerated tissue less compliant. A separate supine thoracic load shifts resting pleural pressure without changing chest-wall compliance. Follow end-expiratory Ppl and PL, plateau pressure, achieved R/I, derived PVR, its wedge-dependent quality badge, RV/LV ratio, septal interaction and output together. Extreme PEEP can still generate plateau pressures outside a useful quantitative range and can invalidate the catheter interpretation of the wedge surrogate; prone response is directional rather than patient-specific. See [recruitment and R/I](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md), [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) and [ventricular interdependence](ventricular-interdependence.md).
 
-R/I is one constraint, not the validator of the whole preset. The current opening-range centre is 15.5 cmH₂O and the requested R/I remains 0.70, but the scenario tests also constrain end-expiratory Ppl and PL, EELV, plateau pressure, measured respiratory-system compliance, filling pressures and the RV phenotype. If those absolute mechanics drift, preserving R/I alone is no longer sufficient for the scenario to pass.
+R/I is one constraint, not the validator of the whole preset. The current opening-range centre is 15.5 cmH₂O and the requested R/I remains 0.70, but the scenario tests also constrain end-expiratory Ppl and PL, EELV, plateau pressure, measured respiratory-system compliance, filling pressures and the RV phenotype. If those absolute mechanics drift, preserving R/I alone is insufficient for the scenario to pass.
 
 <!-- BEGIN GENERATED: ards-scenario -->
 *Executable preset outputs after 45 s of settling. End-expiratory Ppl is read from the selected chest-wall relation at measured EELV; PL is total PEEP minus that pressure.*
@@ -119,7 +119,7 @@ In the intact circulation, distinguish the first response from the settled respo
 
 **Try.** Slow respiratory rate, shorten inspiratory time, and compare external PEEP below and above the expiratory choke.
 
-**Read.** Slower expiration reduces trapped gas, intrinsic PEEP and circulatory loading. High `clung` raises the relaxation volume through loss of recoil but no longer enlarges maximum capacity, which remains at the 6 L default. Below the choke, external PEEP mainly substitutes for intrinsic pressure; above it, total PEEP and lung volume rise and output falls. This is a qualitative waterfall demonstration, not a universal fraction-of-auto-PEEP titration rule. See [expiratory flow limitation](expiratory-flow-limitation.md) and [vascular waterfalls](vascular-waterfalls.md).
+**Read.** Slower expiration reduces trapped gas, intrinsic PEEP and circulatory loading. High `clung` raises the relaxation volume through loss of recoil while maximum capacity is independently set at the 6 L default. Below the choke, external PEEP mainly substitutes for intrinsic pressure; above it, total PEEP and lung volume rise and output falls. This is a qualitative waterfall demonstration, not a universal fraction-of-auto-PEEP titration rule. See [expiratory flow limitation](expiratory-flow-limitation.md) and [vascular waterfalls](vascular-waterfalls.md).
 
 ### Intra-abdominal hypertension
 
@@ -285,7 +285,7 @@ These tables describe how each starting phenotype is assembled, not what every c
 
 The LV-failure intervention requires valid cardiac phases, elevated filling pressure, reduced EF, lower transmural ejection pressure and lower filling with PEEP; its modest fall in integrated forward output is part of that explicit contract. In cardiac tamponade, restoring pericardial capacity must lower pericardial pressure and CVP, increase pressure and output, and restore proportionally more RV than LV end-diastolic volume.
 
-The former weaning preset was removed. A matched experiment did not reproduce the expected rise in filling pressure or fall in output, and the model lacks work of breathing, myocardial oxygen demand, sympathetic activation, ischaemia, dynamic mitral regurgitation, fluid redistribution and time-dependent pulmonary oedema. The physiology of weaning-induced pulmonary oedema is real; a preset that merely carries its name without generating enough of its mechanism is not useful teaching.
+Weaning-induced pulmonary oedema is outside the available scenario set. The model omits work of breathing, myocardial oxygen demand, sympathetic activation, ischaemia, dynamic mitral regurgitation, fluid redistribution and time-dependent pulmonary oedema. Its mechanical response to removing positive pressure cannot represent the complete syndrome.
 
 ## Why presets and not scripted cases
 

@@ -36,7 +36,7 @@ This is the equilibrium relation used when hysteresis is off. With [recruitment 
 - $P_{open}$ — the `pOpen` control, cmH₂O
 - 1.3 and <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY --> — the widths of the two distributions
 
-The 0.75 cmH₂O width of the diseased distribution is a **didactic shape coefficient**, not an anatomical estimate of alveolar opening-pressure variance. It was narrowed first from 7 to make clinically observed R/I attainable, then from 2 because one shared cohort phenotype could not otherwise keep recruited volume and low/high-PEEP lung compliance inside the published low- and high-recruiter IQRs. The [R/I page](recruitment-and-ri.md#cohort-constraint-on-the-latent-mapping) shows that executable comparison and its limits.
+The 0.75 cmH₂O width of the diseased distribution is a **didactic shape coefficient**, not an anatomical estimate of alveolar opening-pressure variance. One shared cohort phenotype constrains recruited volume and low/high-PEEP lung compliance jointly against the published low- and high-recruiter IQRs. The [R/I page](recruitment-and-ri.md#cohort-constraint-on-the-latent-mapping) shows that executable comparison and its limits.
 
 ### The sponge idealisation
 
@@ -65,9 +65,9 @@ The `collapsed` control is a fraction of a **normal** lung, not of the patient's
 
 ## Why this and not something else
 
-**Two populations, not two compartments.** A two-compartment lung — two volumes, two compliances, two resistances, gas moving between them — would give pendelluft and regional time constants. It would also need two vascular beds to be worth having in a heart–lung model, and would double the state to be conserved. Two *populations of units sharing one volume* costs one extra state variable and delivers the thing that was actually missing: recruitability.
+**Two populations, not two compartments.** A two-compartment lung — two volumes, two compliances, two resistances, gas moving between them — would give pendelluft and regional time constants. It would also need two vascular beds to be worth having in a heart–lung model, and would double the state to be conserved. Two *populations of units sharing one volume* represent selective recruitability without regional gas exchange or separate regional blood volumes.
 
-**Why the split was needed at all.** An earlier claim in this project was that a one-compartment lung could not express recruitability. That was wrong in an instructive way: recruitability had no representation not because one compartment forbade it, but because resting volume was a *control* (`frc`) and recruitment was therefore something that could only be recorded, never produced. Removing `frc` and making resting volume an outcome is what made recruitment mechanical. The population split is what made it *selective*.
+**Selective recruitment.** Resting volume is an outcome of lung and chest-wall mechanics. Opening additional units therefore changes the volume that the lung holds at a given pressure. The population split confines recruitability to the diseased fraction while preserving the separate mechanics of already-aerated tissue.
 
 **The openable share is not a control.** It would be easy to expose "what fraction of the collapsed lung can open" as a slider. It is hidden because it is an internal coefficient, and the quantity a clinician measures is R/I. Presenting a latent fraction and a bedside index as interchangeable patient inputs would be exactly the category error the model's [interpretability](interpretability.md) rules exist to prevent.
 

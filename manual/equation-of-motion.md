@@ -61,7 +61,7 @@ $$
 P_l(V_{EE})+P_{cw}(V_{EE})=PEEP
 $$
 
-This is the key structural change. A collapsed, stiff lung now meets the unchanged wall at a lower volume and a higher transpulmonary recoil. A lung with lost recoil meets the same wall at a higher volume. Changing the lung no longer silently moves the chest-wall reference.
+A collapsed, stiff lung meets the independent chest-wall relation at a lower volume and a higher transpulmonary recoil. A lung with lost recoil meets the same wall at a higher volume. Lung properties and the chest-wall reference are controlled independently.
 
 ### Dynamic breaths
 
@@ -83,7 +83,7 @@ The simulator stores respiratory volume as displacement from the current passive
 
 **A sigmoid is used as a physiological shape, not a patient fit.** Human relaxation curves are near-linear in their middle range and stiffen toward the volume extremes. The model calibrates the normal operating point and local compliance, but it does not claim that the curve's remote asymptotes are measured RV or TLC.
 
-**Airway-pressure curvature is no longer exclusively pulmonary.** In the ordinary tidal range, chest-wall curvature is small and the [stress index](stress-index.md) remains mainly a readout of changing lung compliance. At extreme volume or wall mechanics, however, the wall can contribute to the airway-pressure shape. This is physiologically more honest than forcing the wall to remain linear merely to make the index easier to interpret.
+**Both lung and wall can contribute to airway-pressure curvature.** In the ordinary tidal range, chest-wall curvature is small and the [stress index](stress-index.md) remains mainly a readout of changing lung compliance. At extreme volume or wall mechanics, however, the wall can contribute to the airway-pressure shape. The stress index therefore needs to be interpreted in the context of both lung and wall mechanics.
 
 ---
 

@@ -40,7 +40,7 @@ PPV remains a descriptive number, accompanied by [interpretability](interpretabi
 
 The model has no arrhythmia, so regular rhythm is always present and cannot be checked. Low respiratory-system compliance is not by itself a badge rule, although the simulator exposes the within-breath PVR swing and RV dilatation that can reveal the mechanism.
 
-An earlier version used a 13% threshold and was tuned against the Michard 2000 cohort. That was retired: the study's ventilation and population do not justify transporting one regression into every scenario. The tidal-volume challenge was also removed because applying it to an incompletely calibrated PPV amplitude could create a convincing but model-specific false result.
+There is no diagnostic PPV threshold or tidal-volume challenge. The ventilation and population of a published cohort do not justify transporting a single regression into every scenario. PPV amplitude is not quantitatively calibrated across the control space, so a model-specific change during a tidal-volume manoeuvre cannot establish clinical fluid responsiveness.
 
 The model's PPV is non-monotonic at **both** ends of the filling range.
 

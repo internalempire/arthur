@@ -26,7 +26,7 @@ The panel can also display **Derived PVR: use with caution**. This warning is pr
 
 ## In the model
 
-The two reference limbs are calculated with the open fraction fixed at one. Their sum is exactly the open vascular pathway used by the flow equations. The patient point is calculated separately from the parallel open and closed beds. This prevents the earlier visual error in which recruitment and HPV distorted the named alveolar and extra-alveolar curves.
+The two reference limbs are calculated with the open fraction fixed at one. Their sum is exactly the open vascular pathway used by the flow equations. The patient point is calculated separately from the parallel open and closed beds. Recruitment and HPV therefore affect the patient point through the population mixture, while the named reference limbs describe the fully open pathway.
 
 Model RV is the completely open lung volume at zero transpulmonary pressure; model TLC is the selected `lungCapacity`. These are graphical model landmarks, not spirometric measurements in the current patient.
 

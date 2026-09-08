@@ -37,7 +37,7 @@ There is no alveolar or arterial oxygen tension in the model. The control theref
 
 A global multiplier on PVR would show the RV cost of vasoconstriction but not its local purpose—redistributing flow. Two parallel pathways preserve that distinction with one control and without adding gas exchange or dozens of lung regions.
 
-A mechanistic oxygen-sensing model was not added because it would require regional ventilation, perfusion, shunt, oxygen content, mixed venous oxygen, acid–base state and vascular response kinetics. Those variables would turn the application toward gas-exchange physiology while its central subject is heart–lung interaction.
+There is no mechanistic oxygen-sensing response. Regional ventilation, perfusion, shunt, oxygen content, mixed venous oxygen, acid–base state and vascular response kinetics are outside the model. HPV is an aggregate gain on the closed pathway, so its setting does not predict a response to a measured oxygen tension.
 
 ## Limits
 

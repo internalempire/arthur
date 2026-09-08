@@ -30,7 +30,7 @@ The model treats the lung as two contributions:
 1. The already-aerated fraction follows the current transpulmonary pressure. It does not remember a recruitment manoeuvre.
 2. The collapsed but recruitable fraction can retain its previous state between the opening and closing ranges.
 
-This distinction is important. In an earlier implementation, recruitment memory was applied to the whole lung. That made the already-aerated fraction behave as if it had the same opening and closing pressures as injured lung. The current implementation confines memory to the compartment for which `pOpen` and `pClose` are defined.
+Recruitment memory is confined to the diseased, recruitable compartment for which `pOpen` and `pClose` are defined. The already-aerated fraction follows its own opening relation without retaining that memory.
 
 The calculation can be summarised as:
 
@@ -45,7 +45,7 @@ $$
 
 At each simulation step, $r$ is compared with the amount that the present pressure can open and the amount it can keep open. It rises when pressure enters the opening range, falls when pressure enters the closing range, and otherwise remains unchanged. This bounded memory rule is rate-independent: pressure history matters, but the time spent at a pressure does not.
 
-The resulting total open fraction is used by lung mechanics, strain and [pulmonary vascular resistance](pulmonary-vascular-resistance.md). A lung with no collapsed compartment now behaves identically with hysteresis on or off.
+The resulting total open fraction is used by lung mechanics, strain and [pulmonary vascular resistance](pulmonary-vascular-resistance.md). A lung with no collapsed compartment behaves identically with hysteresis on or off.
 
 ### A reproducible experiment
 

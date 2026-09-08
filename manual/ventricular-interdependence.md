@@ -79,9 +79,9 @@ The reflex point still matters. When the [baroreflex](baroreflex.md) is active, 
 
 ## Why this and not something else
 
-**Volume thresholds rather than geometry.** A geometric septum — curvature computed from the two cavity pressures, with the septal position solved each step — is the faithful approach and would produce the D-shape directly. It was not done: it requires a shape model for both ventricles, adds a nested solve to every time step, and the teaching content is the *direction and asymmetry* of the coupling, which two gains and two thresholds carry.
+**Volume thresholds represent septal interaction.** Two gains and two thresholds express the direction and asymmetry of ventricular coupling. There is no calculation of septal curvature or chamber shape, so the model cannot produce or quantify a septal D-shape. The volume-based coupling is a teaching approximation, not a geometric measurement.
 
-**Separating systolic assistance from the septal control** is the more consequential decision, and it came from a test that failed. With both effects on one switch, disabling septal coupling to measure diastolic interdependence also removed the systolic contribution, and the measured effect was the sum of two mechanisms attributed to one.
+**Systolic assistance is separate from the septal control.** Disabling diastolic septal coupling leaves the represented systolic contribution of LV contraction to RV pressure generation active. The two mechanisms can therefore be distinguished when interpreting an intervention.
 
 **One pericardial pressure for four chambers** rather than per-chamber contact pressures. This is what makes the pericardium behave as a shared constraint rather than as four independent stiffenings, which is the physiologically important property.
 

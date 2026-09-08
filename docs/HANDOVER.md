@@ -1,6 +1,44 @@
 # Project handover
 
-Updated: 2026-09-07
+Updated: 2026-09-08
+
+## Current pulmonary law retained; manual describes current behavior — September 8
+
+The clinician explicitly chose to retain the production pulmonary resistance
+law after the private distensibility and ventricular-loading experiments.
+Pressure-dependent vascular distensibility has not been adopted. This is a
+documentation-only revision: physiological equations, coefficients, scenarios,
+numerical timestep and application behavior remain unchanged.
+
+The explanatory manual describes implemented mechanisms in the present tense,
+without comparing them with previous implementations. This is a standing rule
+for every future documentation update, recorded in `AGENTS.md` and
+`manual/_schema.md`. The schema's contrary instruction to narrate reversals was
+replaced. Correction history belongs in this handover and `manual/_log.md`;
+physiological before/after manoeuvres remain appropriate in the manual.
+
+Current explanations cover conservative bidirectional caval transfer, actual
+forward stroke-volume/output measurement, pulmonary transit, independent lung
+and chest-wall mechanics, recruitment and reflex behavior. The Guyton manual
+already documents the current Live/Mean clocks and optional Deep protocol.
+Pulmonary pages distinguish the strain/open-fraction/HPV resistance law from
+compliant blood storage and pressure gradients: PA pressure opposes RV ejection,
+and resistance, vascular pressures, filling and output evolve together.
+Lower resistance is not a promise of lower RV ejection pressure or higher CO.
+The volume-versus-pressure and FRC-nadir pages explain current assumptions and
+measurement boundaries; they do not claim volume is the sole vascular cause.
+
+Private experiments remain under `codex-notes/` and `outputs/`. The open
+respiratory audit findings are unchanged; no further substantive model or UI
+revision is automatically authorized. Numerical examples and physiological
+figures are not hand-edited. Windows synchronization has not been verified.
+
+The review also found `undefined–undefined` in the generated R/I cohort table:
+the renderer indexed calculated compliance numbers as though they were the
+source IQR arrays. It now reads the observed ranges from the cohort definitions
+and the calculated values from the evaluation, and labels compliance units.
+The correction belongs to the documentation generator; model results and
+cohort acceptance criteria are unchanged. Regenerate with `manual:examples`.
 
 ## Distensibility and ventricular loading assessed together — September 7
 

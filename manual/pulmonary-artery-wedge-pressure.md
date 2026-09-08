@@ -62,7 +62,7 @@ $$
 PVR = \frac{mPAP - PAWP}{CO}
 $$
 
-An invalid PAWP makes the calculation numerically possible but physiologically uncertain. This is why the model now propagates wedge caution to the derived-PVR tile.
+An invalid PAWP makes the calculation numerically possible but physiologically uncertain. This is why the model propagates wedge caution to the derived-PVR tile.
 
 **Pulmonary hypertension phenotype.** PAWP helps separate pre-capillary from post-capillary haemodynamics. Current ESC/ERS definitions use PAWP at or below 15 mmHg together with PVR above 2 WU for pre-capillary pulmonary hypertension, and PAWP above 15 mmHg for post-capillary disease. These thresholds classify a valid invasive haemodynamic measurement in clinical context; they do not validate the model's surrogate.
 
@@ -113,9 +113,9 @@ $$
 I_{Z3} = \operatorname{clamp}\!\left(\frac{P_{pv,raw}-P_{alv}}{4\ \mathrm{mmHg}},\ 0,\ 1\right)
 $$
 
-The wedge surrogate is unqualified only when $I_{Z3}\ge0.95$; otherwise it remains visible with a caution. The 4 mmHg scale and 0.95 threshold are conservative model heuristics. The index is **not the percentage of the human lung in zone 3**, which is why the interface no longer calls it a “zone 3 fraction”.
+The wedge surrogate is unqualified only when $I_{Z3}\ge0.95$; otherwise it remains visible with a caution. The 4 mmHg scale and 0.95 threshold are conservative model heuristics. The index is **not the percentage of the human lung in zone 3**.
 
-Derived PVR now inherits this caution. If cardiac output is too close to zero for division, derived PVR is unavailable instead. The internal pulmonary resistance coefficient remains separate because it does not use the wedge surrogate.
+Derived PVR inherits this caution. If cardiac output is too close to zero for division, derived PVR is unavailable instead. The internal pulmonary resistance coefficient remains separate because it does not use the wedge surrogate.
 
 ### Reading a PEEP change in the model
 
@@ -126,7 +126,7 @@ When PEEP rises, follow four quantities rather than the wedge tile alone:
 3. **Left atrial and ventricular volume or LV pressure–volume loop** — did chamber filling actually increase or decrease?
 4. **Zone 3 index and derived-PVR badge** — is the downstream surrogate still defensible for a catheter-like calculation?
 
-The new transmural tile makes the second and third questions easier to separate. Its lack of a zone 3 caution does not validate the wedge: the model knows its own atrial wall pressure exactly even when a real occluded pulmonary arterial branch would no longer transmit left atrial pressure reliably.
+The transmural tile makes the second and third questions easier to separate. Its lack of a zone 3 caution does not validate the wedge: the model knows its own atrial wall pressure exactly even when a real occluded pulmonary arterial branch would no longer transmit left atrial pressure reliably.
 
 ### Worked examples
 

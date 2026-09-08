@@ -121,7 +121,7 @@ $$
 PVR_{derived}=\frac{mPAP-P_{w,surr}}{CO}
 $$
 
-Because cardiac output is in the denominator, derived PVR can rise when flow falls even if the internal resistance coefficient barely changes. It is unavailable near zero forward flow and now inherits any zone-3 caution from the wedge surrogate.
+Because cardiac output is in the denominator, derived PVR can rise when flow falls even if the internal resistance coefficient barely changes. It is unavailable near zero forward flow and inherits any zone-3 caution from the wedge surrogate.
 
 Related pages: [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Vascular waterfalls](vascular-waterfalls.md)
 

@@ -57,13 +57,13 @@ The internal openable fraction is not observed in the Cappio Borlino cohort. It 
 <!-- BEGIN GENERATED: ri-cohort-mapping -->
 *Executable shared phenotype: collapsed compartment 30%, aerated-lung compliance 55 mL/cmH₂O, maximum capacity 6.0 L, chest-wall compliance 200 mL/cmH₂O, no external wall load and diseased opening midpoint 17 cmH₂O. Only the cohort median R/I changes between rows.*
 
-| cohort group | requested / achieved R/I | latent openable share of diseased compartment | latent openable share of whole lung | recruited volume, model / observed IQR (mL) | low-PEEP C<sub>L</sub>, model / observed IQR | high-PEEP C<sub>L</sub>, model / observed IQR |
+| cohort group | requested / achieved R/I | latent openable share of diseased compartment | latent openable share of whole lung | recruited volume, model / observed IQR (mL) | low-PEEP C<sub>L</sub>, model / observed IQR (mL/cmH₂O) | high-PEEP C<sub>L</sub>, model / observed IQR (mL/cmH₂O) |
 |---|---:|---:|---:|---:|---:|---:|
-| low recruiters | 0.35 / 0.35 | 24% | 7% | 118 / 90–202 | 41 / undefined–undefined | 41 / undefined–undefined |
-| high recruiters | 0.72 / 0.72 | 53% | 16% | 263 / 181–421 | 45 / undefined–undefined | 49 / undefined–undefined |
+| low recruiters | 0.35 / 0.35 | 24% | 7% | 118 / 90–202 | 41 / 38–85 | 41 / 23–51 |
+| high recruiters | 0.72 / 0.72 | 53% | 16% | 263 / 181–421 | 45 / 42–78 | 49 / 30–66 |
 <!-- END GENERATED: ri-cohort-mapping -->
 
-The higher median R/I therefore maps to a larger latent recruitable share without using a different lung phenotype to obtain the answer. The diseased opening transition has a <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY --> width because the previous 2 cmH₂O transition could not keep recruited volume and both compliance measurements inside the reported group ranges simultaneously. This is an aggregate cohort constraint on the translation, not direct anatomical validation of the latent percentages: the study did not measure those percentages, and its IQRs do not preserve patient-level covariance.
+The higher median R/I therefore maps to a larger latent recruitable share without using a different lung phenotype to obtain the answer. The diseased opening transition has a <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY --> width to constrain recruited volume and both compliance measurements jointly against the reported group ranges. This is an aggregate cohort constraint on the translation, not direct anatomical validation of the latent percentages: the study did not measure those percentages, and its IQRs do not preserve patient-level covariance.
 
 ### What recruitment then does
 
@@ -80,9 +80,9 @@ That last coupling is why a PEEP step in a poorly recruitable lung raises derive
 
 ## Why this and not something else
 
-**Replacing the fraction with the measured index.** The control used to be "what fraction of the collapsed compartment can ever open". That is a useful internal state and not a measurable quantity, and renaming it R/I would have been false. Chen's definition was implemented instead, and the internal fraction is solved to match it.
+**The measured index and the latent fraction are different quantities.** The R/I control specifies an index defined by a pressure-step protocol. The model solves for the fraction of diseased lung that can open so that its static mechanics match that requested index when attainable. That internal recruitable fraction is not itself the measured R/I.
 
-The difference was not cosmetic. With the earlier opening distribution, the reference phenotype produced R/I below 0.15 even when every collapsed unit was allowed to open — a number that could not occur in the cohorts the control is named for. Making the control honest exposed that the distribution was wrong, which a rename would have hidden.
+The translation depends on the opening-pressure distribution and the reference manoeuvre. Matching a requested R/I is a constraint on this translation, not independent validation of all tidal mechanics or of a finite-duration bedside manoeuvre.
 
 **Solving numerically rather than inverting analytically.** The relation between openable fraction and R/I passes through two static pressure–volume solves and a tangent compliance, and has no closed form. Twelve samples plus a bisection is cheap and, because it is the *same* code path the assessment uses, cannot disagree with it.
 

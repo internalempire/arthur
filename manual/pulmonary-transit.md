@@ -36,7 +36,7 @@ The represented pulmonary blood volume is the blood physically contained in thre
 
 Eight well-mixed stages sit between pulmonary arterial inflow and pulmonary venous delivery. They distribute the delayed response in time; one reservoir would attenuate respiratory variation too strongly, while a pure time shift would return an unrealistically rigid copy of the right-sided waveform.
 
-The stages do not use the whole PA-to-LA time because pulmonary artery and pulmonary vein already store blood as pressure-bearing compliant compartments. They use the fraction corresponding to the pathway's original 160 mL allocation within the initial 375 mL pulmonary circuit:
+The stages do not use the whole PA-to-LA time because pulmonary artery and pulmonary vein already store blood as pressure-bearing compliant compartments. They use the fraction corresponding to the pathway's initial 160 mL allocation within the initial 375 mL pulmonary circuit:
 
 $$
 T_{stage,target} = T_{pul} \times \frac{160}{375}
@@ -78,11 +78,11 @@ Pressure is not delayed with blood. Pulmonary venous pressure still enters the p
 
 ## Why this and not something else
 
-Keeping a fixed 2-second delay preserved one useful reference sequence but made every circulation transport blood at the same speed. Deriving time from volume and flow adds the clinically important dependence without adding a regional lung network or another user control.
+Deriving transit time from pulmonary blood volume and RV output makes delivery depend on both storage and flow. The estimate uses the aggregate circulation; it does not require a regional lung network or another user control.
 
-Using only the current volume inside the pressureless pathway was rejected during implementation. That volume can drain while the pressure-bearing pulmonary artery fills, so the calculation could shorten transit in pulmonary embolism despite an enlarged total pulmonary reservoir. Summing PA, pathway and PV prevents that reversal.
+Pulmonary blood volume is the sum of blood in the pulmonary artery, pressureless pathway and pulmonary vein. The pathway can drain while the artery fills; summing all three compartments prevents loss of volume from one compartment alone from being interpreted as a shorter whole-circuit transit time.
 
-A detailed contrast-kinetic model was also rejected. It would require injection and sampling landmarks, recirculation, regional path lengths and a definition of what imaging sequence is being reproduced. Those additions would explain an imaging biomarker more precisely but would add little to the central heart–lung teaching question: when does a right-sided flow change reach left ventricular preload?
+The transport pathway is not a contrast-kinetic model. It has no injection or sampling protocol, tracer recirculation or regional path-length distribution. Its teaching question is when a right-sided flow change reaches left ventricular preload, rather than how to interpret a particular imaging biomarker.
 
 ---
 

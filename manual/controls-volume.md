@@ -23,7 +23,7 @@ At the same stressed volume, lower compliance generates higher elastic filling p
 
 ### Resistance to venous return
 
-This control changes how much flow a given Pmsf–right-atrial-pressure gradient can sustain. It aggregates venous, hepatic and caval resistance, now split between the splanchnic reservoir and the [inferior vena cava](inferior-vena-cava.md) conduit (33% upstream, 67% downstream); abdominal pressure can add a dynamic contribution and create a waterfall plateau on the downstream segment.
+This control changes how much flow a given Pmsf–right-atrial-pressure gradient can sustain. It aggregates venous, hepatic and caval resistance, split between the splanchnic reservoir and the [inferior vena cava](inferior-vena-cava.md) conduit (33% upstream, 67% downstream); abdominal pressure can add a dynamic contribution and create a waterfall plateau on the downstream segment.
 
 ### Systemic vascular resistance
 

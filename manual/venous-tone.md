@@ -40,7 +40,7 @@ In the shipped septic phenotype, enabling the aggregate baroreflex raises output
 
 Changing venous compliance to represent tone would make constriction both shift and steepen the pressure-volume relation. That can occur in real vascular beds, but it would erase the didactically important difference between capacitance and compliance and would make a pressure rise impossible to attribute.
 
-The model therefore uses the smallest mechanism that expresses the central principle: change the zero-pressure volume while leaving slope and total volume alone. A regional pharmacological model was rejected because different veins, organs and vasoactive drugs would require separate dose-response curves and redistribution time constants.
+The model therefore uses the smallest mechanism that expresses the central principle: change the zero-pressure volume while leaving slope and total volume alone. Regional venous responses, drug-specific dose-response curves and redistribution time constants are outside this representation.
 
 ---
 

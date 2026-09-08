@@ -28,7 +28,7 @@ A page never restates a source at length. It explains, then links. Files under `
 
 ## Physiology            always — brief where the concept is ordinary, developed where it is not
 ## In the model          only where the implementation is itself content
-## Why this and not something else    the alternative that was rejected, and on what grounds
+## Why this and not something else    the rationale and boundaries of the current construction
 ## Limits                of construction and of clinical application — always
 ## Validation            the executable rows that constrain this page, where any exist
 ## References            design sources plus a literature search
@@ -61,7 +61,7 @@ A page never restates a source at length. It explains, then links. Files under `
 
 **A coefficient chosen to express an unquantified principle carries no citation.** Where a constant was picked to make a well-established but never-measured relationship visible, the page calls it a **didactic shape coefficient** and names no paper. Attaching a citation to a chosen number misrepresents both. Where a constant *is* anchored, the page says to what, and under which measurement conditions.
 
-**State reversals.** Where the model once did something else, say so and say why it changed. Several of this model's most defensible positions are reversals, and a reader who only sees the conclusion cannot judge it.
+**Describe the current implementation.** On every documentation update, explanatory manual pages describe only what is implemented and how it works. Explain current assumptions, rationale and limits without narrating previous versions, removed implementations or development comparisons. Record changes and corrected conclusions in `docs/HANDOVER.md` and `manual/_log.md`. Comparisons between physiological states or manoeuvres remain appropriate. Experimental variants are not current behavior unless their adoption has been explicitly authorized and implemented.
 
 **Link liberally, including to pages that do not exist.** A link to an unwritten page renders as a placeholder that names the gap. That is the point: it marks work to do rather than hiding it.
 

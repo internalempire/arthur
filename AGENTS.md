@@ -39,6 +39,13 @@ documentation choice was made.
 ## Documentation
 
 - Write the manual for clinicians first, then explain implementation details.
+- On every documentation update, describe only the implemented, current
+  behavior in the explanatory manual pages. Do not narrate previous versions,
+  removed implementations, or before/after development comparisons there.
+  Keep correction history in `docs/HANDOVER.md` and `manual/_log.md`.
+  Comparisons between physiological states or manoeuvres remain appropriate.
+- Describe experimental variants as current behavior only after their adoption
+  has been explicitly authorized and implemented.
 - Keep symbols, units, pressure references, averaging windows, and respiratory
   phase explicit.
 - Do not hand-edit generated numerical examples or figures. Use the generators

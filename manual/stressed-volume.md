@@ -55,7 +55,7 @@ $$
 
 ## Why this and not something else
 
-An earlier model could have represented a fluid bolus by changing venous compliance or by raising venous pressure directly. Either choice would conceal the central distinction: fluid changes volume, tone changes capacity, and compliance changes the slope relating them. Keeping the three controls independent makes the effect of each intervention traceable.
+Fluid changes blood volume, tone changes unstressed capacity, and compliance changes the slope of the pressure-volume relation. The three controls are independent so that the effect of each intervention remains traceable; venous pressure follows from the resulting state.
 
 The control is instantaneous because the intended lesson is the new haemodynamic equilibrium. Modelling infusion rate, distribution between vascular beds, transcapillary escape and renal handling would add respiratory and renal physiology without clarifying the immediate heart–lung interaction.
 

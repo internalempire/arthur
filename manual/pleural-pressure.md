@@ -85,9 +85,9 @@ The net sign depends on resting chest-wall load, PEEP, delivered volume and effo
 
 The timing follows the same balance. Ppl falls when muscle pressure is increasing faster than chest-wall recoil pressure. After the patient generates the pneumatic trigger, ventilator inflation can transiently flatten or partly reverse that fall by expanding the wall. If the ventilator cycles before neural inspiration ends, Ppl can continue to fall after Paw has returned to PEEP. That pattern is early cycling, not post-inspiratory braking; braking begins only after neural switch-off while effective muscle pressure decays.
 
-### The passive reference now emerges
+### The passive reference emerges
 
-The model no longer assigns −5 cmH₂O pleural pressure to whichever volume the selected lung reaches at 5 cmH₂O transpulmonary pressure. Instead, it solves the intersection of independent lung and wall recoil:
+The passive reference is the intersection of independent lung and chest-wall recoil relations:
 
 $$
 P_l(V_{relax})+P_{cw}(V_{relax})=0
@@ -105,11 +105,11 @@ The obesity and intra-abdominal-hypertension scenarios also use a positive wall 
 
 ## Why this implementation
 
-An independent wall curve fixes a structural problem that a linear wall could not fix by retuning. Previously, lung disease moved the wall's reference relation along with the lung, so the model could not express the higher transpulmonary pressure expected when a stiff, low-volume lung is held open by an otherwise unchanged thorax.
+The chest-wall relation is independent of lung disease. A stiff, low-volume lung can therefore require a higher transpulmonary pressure while the properties of the thorax remain fixed. Changing lung compliance does not change chest-wall compliance or its relaxation volume.
 
 The model still uses one aggregate wall. Dividing it into rib cage, diaphragm and abdominal wall would allow more accurate posture and obesity mechanics, but would introduce several poorly constrained compartments outside the app's main purpose: mechanical interaction between ventilation and circulation.
 
-A fixed airway-to-pleural transmission fraction was rejected. Pressure transmission is an outcome of lung recoil, wall recoil, volume and load. It should change when those properties change.
+Pressure transmission is an outcome of lung recoil, wall recoil, volume and load. It changes with those properties; there is no fixed airway-to-pleural transmission fraction.
 
 ---
 

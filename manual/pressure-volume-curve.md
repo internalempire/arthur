@@ -46,9 +46,9 @@ The formula is easier to interpret than it may appear. Far from the ceiling, an 
 
 The smooth transition is a numerical and didactic choice, not a fitted human tissue constant. A hard cap would create a sudden discontinuity in compliance and would make the [stress index](stress-index.md) unstable precisely where it should demonstrate progressive overdistension.
 
-### What `clung` means now
+### What `clung` means
 
-`clung` is the local compliance assigned to **aerated tissue while it is not close to its volume ceiling**. It is used continuously in the pressure–volume relation; it no longer determines maximum lung size.
+`clung` is the local compliance assigned to **aerated tissue while it is not close to its volume ceiling**. It is used continuously in the pressure–volume relation; maximum lung size is set independently by `lungCapacity`.
 
 The live compliance displayed by the model is not required to equal this setting. It also contains:
 
@@ -71,7 +71,7 @@ $$
 
 where $\varphi$ is the [open fraction](two-population-lung.md). If only 60% of the lung is open, the instantaneous accessible ceiling is approximately 60% of `lungCapacity`. Recruitment raises that accessible share; permanently non-openable tissue does not.
 
-This is how the model now separates three lesions:
+This is how the model separates three lesions:
 
 | control | primary meaning | does not automatically mean |
 |---|---|---|
@@ -138,15 +138,15 @@ End-expiratory volume is therefore an outcome of lung recoil, capacity, open fra
 
 ## Why this implementation
 
-**Separate controls prevent double-counting.** Previously, reducing `clung` reduced both the slope and the expandable volume of the tissue curve. Increasing `collapsed` then removed lung again. An ARDS preset using both controls could therefore make the baby lung small twice without saying so.
+**Separate controls describe separate properties.** `clung` sets aerated-tissue compliance, `lungCapacity` sets the whole-lung volume ceiling, and `collapsed` sets how much lung belongs to the diseased population. Recruitability determines how much of that population can open. A small aerated lung and stiff aerated tissue can coexist, but neither control implicitly substitutes for the other.
 
 **The lower and upper limbs remain separate mechanisms.** Unit opening produces the lower-limb sigmoid through $\varphi(P_l)$. The soft capacity ceiling produces upper-limb flattening. Adding another full logistic tissue curve would duplicate recruitment at low pressure.
 
 **A smooth ceiling is preferable to a hard stop.** Progressive curvature preserves a continuous derivative for pressure inversion and for stress-index fitting. The 18% transition width is a transparent model coefficient selected for a visible but gradual upper limb; it is not presented as a measured universal human value.
 
-**Capacity is entered in litres for now.** Predicted TLC would require anthropometric inputs and reference equations that add little to the present focus on heart–lung interaction. Direct litre scaling is sufficient for teaching, provided it is not interpreted as spirometric prediction.
+**Capacity is entered in litres.** Predicted TLC would require anthropometric inputs and reference equations that add little to the present focus on heart–lung interaction. Direct litre scaling is sufficient for teaching, provided it is not interpreted as spirometric prediction.
 
-**The wall is solved, not recentered.** Preserving −5 cmH₂O pleural pressure at every phenotype's lung-derived reference made the two elastic elements mathematically inseparable. Solving their intersection allows lung disease, wall stiffness and external thoracic load to have different causal meanings.
+**Independent lung and wall relations.** Solving their intersection allows lung disease, wall stiffness and external thoracic load to have different causal meanings. Passive pleural pressure follows that equilibrium and is not fixed at −5 cmH₂O for every phenotype.
 
 ---
 

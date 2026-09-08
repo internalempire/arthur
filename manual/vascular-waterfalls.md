@@ -76,7 +76,7 @@ F(P_{IVC},P_{ra},R_{down}) & P_{IVC}\geq P_{ra} \\
 \end{cases}
 $$
 
-All endpoint pressures and $P_{crit}$ are in mmHg relative to atmosphere; $R_{down}$ is in mmHg·s/mL. Positive $Q_{cav}$ (mL/s) enters the right atrium; negative flow returns blood to the cava. The original forward branch is preserved exactly and the reverse branch exchanges the two ends. At equal pressures flow is zero. The same volume transfer is subtracted from one compartment and added to the other, including during reversal.
+All endpoint pressures and $P_{crit}$ are in mmHg relative to atmosphere; $R_{down}$ is in mmHg·s/mL. Positive $Q_{cav}$ (mL/s) enters the right atrium; negative flow returns blood to the cava. The same closing-pressure law applies in both directions, with source and receiving ends exchanged. At equal pressures flow is zero. The same volume transfer is subtracted from one compartment and added to the other, including during reversal.
 
 The pressure smoothing does not make the entire flow law smooth: the non-negative clamp retains a small zero-flow interval near pressure equality, especially near the closing pressure. This is a mathematical limitation, not a simulated valve or a measured reopening threshold. Net inflow averages subtract backward volume. The forward Guyton curve uses mean determinants, so it need not reproduce that net average in a pulsatile circulation.
 
@@ -93,7 +93,7 @@ $$
 - $P_{alv}$ — alveolar pressure, mmHg
 - $w$ — share of the pulmonary bed exposed to alveolar pressure
 
-An earlier version put the *entire* pulmonary resistance behind `max(Ppv, Palv)`. A small crossing of those two mean pressures then switched the whole lung from zone III to zone II at once and added several Wood units at high PEEP. Real lungs contain alveolar and extra-alveolar segments in series and regions in different zones simultaneously; the fractional treatment is a deliberately transparent aggregate. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
+The weighted relation applies alveolar compression to a fixed share of the aggregate bed. It represents coexistence of vascular segments with different surrounding pressures, without resolving regional zones. Crossing the alveolar-pressure threshold therefore affects that share rather than switching the whole lung between two states. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 
 The model also tracks a **zone III index** — how far pulmonary venous pressure sits above alveolar pressure — and uses it to qualify the displayed [wedge surrogate](pulmonary-artery-wedge-pressure.md) rather than to switch the vascular behaviour. It is a normalised pressure margin, not the anatomical fraction of lung in zone III.
 
@@ -116,21 +116,19 @@ On the pulmonary side, the zone III index falls from 0.53 at PEEP 5 to 0.00 at P
 
 ## Why this and not something else
 
-**The smoothed closing-pressure transition.** The softplus connects the open-vessel and flow-limited asymptotes without a sharp corner in effective back-pressure. Its width is a numerical and didactic choice. It does not calculate wall motion or flutter. Mirroring the existing branch allows backward flow while preserving the established forward-collapse behavior, at the cost of retaining the near-equilibrium zero-flow interval.
+**The smoothed closing-pressure transition.** The softplus connects the open-vessel and flow-limited asymptotes without a sharp corner in effective back-pressure. Its width is a numerical and didactic choice. It does not calculate wall motion or flutter. Exchanging the source and receiving ends applies the same collapse relation to backward flow. The near-equilibrium zero-flow interval remains a limitation of the law.
 
 **A fraction rather than a switch on the pulmonary side.** A whole-lung switch is an all-or-none behaviour standing in for a regional one. The model has no regional geography, so a fractional exposure is a transparent way to express that only part of the aggregate bed is affected. The value 0.45 is a didactic coefficient informed by published vascular partitions; it is not a measured fraction of the whole human bed that enters a waterfall simultaneously.
 
 **Why the venous side is not treated the same way, and what that costs.**
 
-The two waterfalls are handled with different degrees of care, and the reason is not principled.
+Pulmonary and systemic venous flow use different aggregate representations. The pulmonary bed has a fractional exposure to alveolar pressure; systemic venous return uses a single caval closing pressure.
 
 On the pulmonary side the bed is split: 45% of it sits behind the alveolar waterfall, the rest does not. On the venous side there is a single closing pressure for all venous return. The venous anatomy presents an analogous regional problem: the superior vena cava is surrounded predominantly by **pleural** pressure, while the inferior route is strongly influenced by **abdominal** pressure. Those pressures can diverge — for example with high PEEP and a soft abdomen, or intra-abdominal hypertension at modest PEEP — so the two routes need not approach collapse at the same pressure or time in the breath.
 
 The model collapses both at one pressure, derived from the abdomen alone. Two things follow that a clinician should know before teaching from the plateau. Raising PEEP in this model does not selectively truncate superior caval return, and raising abdominal pressure does not selectively truncate the inferior route: both act through one closing pressure, so the model shows a single blended plateau instead of two limbs reaching their own. And because the closing pressure is built from abdominal pressure alone, ventilation reaches it only indirectly.
 
-The asymmetry survives for a reason worth stating plainly. The pulmonary simplification had a **quantitative consequence that a test caught**: with the whole bed behind `max(Ppv, Palv)`, derived pulmonary vascular resistance in ARDS reached 10–16 Wood units against human cohort ranges of about 1.5–4.75, and the executable rows in [validation](validation.md) failed. The venous simplification produces no comparable violation — no published row it is checked against distinguishes one closing pressure from two — so nothing forced it to be fixed.
-
-That is a statement about what the tests happen to constrain, not about which simplification is more defensible. It is recorded here rather than in a commit message because it is exactly the kind of thing a reader is entitled to know is unfinished.
+The executable checks do not compare separate superior and inferior caval closing conditions. A passing suite therefore does not validate this regional simplification. The model can illustrate an aggregate flow-limited plateau, but cannot predict how flow divides between the two caval routes.
 
 ---
 
@@ -148,7 +146,7 @@ That is a statement about what the tests happen to constrain, not about which si
 ### Of clinical application
 
 - The model can show *why* a left-atrial-pressure surrogate becomes unreliable when alveolar pressure governs part of the downstream bed. It cannot determine whether a particular patient's measured wedge is valid, and the zone III index must not be read as a measurement.
-- The arithmetic $(\overline{P}_{pa}-P_{la})/\dot Q$ remains computable when the wedge surrogate is flagged, but the derived-PVR tile now inherits the same caution and must be read as an internal hydraulic gradient rather than a catheter-derived PVR.
+- The arithmetic $(\overline{P}_{pa}-P_{la})/\dot Q$ remains computable when the wedge surrogate is flagged, but the derived-PVR tile inherits the same caution and must be read as an internal hydraulic gradient rather than a catheter-derived PVR.
 - The closing pressure is not a bedside quantity. Nothing here supports estimating a patient's critical closing pressure from an abdominal pressure measurement.
 - The plateau of the venous return curve in a patient is reached through mechanisms the model does not have, including vessel tone and reflex responses that alter caval collapsibility.
 

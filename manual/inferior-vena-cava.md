@@ -28,7 +28,7 @@ The IVC therefore sits at the junction of three teaching concepts: stressed volu
 
 ### A separate compliant compartment
 
-The IVC is now a distinct compliant compartment between the splanchnic reservoir and the right atrium. Its volume changes with the balance of inflow and outflow, and its pressure is determined by its own compliance:
+The IVC is a distinct compliant compartment between the splanchnic reservoir and the right atrium. Its volume changes with the balance of inflow and outflow, and its pressure is determined by its own compliance:
 
 $$
 P_{IVC,tm} = \frac{V_{IVC} - V_{u,IVC}}{C_{IVC}}
@@ -39,11 +39,11 @@ P_{IVC,atm} = P_{IVC,tm} + P_{ab}
 $$
 
 - $V_{IVC}$ — blood volume held in the IVC, mL
-- $V_{u,IVC} = 50$ mL — unstressed IVC volume, reallocated from the splanchnic reservoir
+- $V_{u,IVC} = 50$ mL — unstressed volume assigned to the IVC
 - $C_{IVC} = 20$ mL/mmHg — IVC compliance, within the published range of 15–40 mL/mmHg
 - $P_{ab}$ — abdominal pressure, mmHg; the IVC is intra-abdominal
 
-Total systemic venous unstressed volume is unchanged (2,800 mL before, now 2,750 mL splanchnic + 50 mL IVC). The `stressedVolume` control continues to add blood to the splanchnic reservoir; the IVC is a downstream conduit whose volume is a consequence of the dynamics, not a second user input.
+Total systemic venous unstressed volume is 2,800 mL: 2,750 mL in the splanchnic reservoir and 50 mL in the IVC. The `stressedVolume` control adds blood to the splanchnic reservoir; IVC volume follows the balance of inflow and outflow and is not a second user input.
 
 ### Split resistance to venous return
 
@@ -56,9 +56,9 @@ The resistance to venous return (`rvr`) is divided into two series segments:
 
 The same softplus collapse law described under [vascular waterfalls](vascular-waterfalls.md) applies only to the downstream segment. The upstream segment carries no collapse: the splanchnic bed is a capacious reservoir whose pressure is set by stressed volume and venous compliance, not by a surrounding pressure that can compress it shut.
 
-The downstream segment permits brief reversal when atrial pressure exceeds IVC pressure: blood then leaves the atrium and returns to the IVC. Its forward branch is preserved and its reverse branch uses the same closing-pressure law with the ends exchanged. The upstream segment remains forward-only. The volume balance uses signed downstream flow, so reversal fills the cava rather than creating blood.
+The downstream segment permits brief reversal when atrial pressure exceeds IVC pressure: blood then leaves the atrium and returns to the IVC. Both directions use the same closing-pressure law, with upstream and downstream ends exchanged for reversal. The upstream segment remains forward-only. The volume balance uses signed downstream flow, so reversal fills the cava rather than creating blood.
 
-For steady forward flow the two resistances add. In a pulsatile circulation, a curve evaluated at mean pressures need not equal the mean signed flow through the two segments. The IVC adds an RC time constant of about 0.6 s (filling: $C_{IVC} \times rvr_{up}$), which buffers the respiratory oscillations in venous return; allowing reversal adds no new compartment or time constant.
+For steady forward flow the two resistances add. In a pulsatile circulation, a curve evaluated at mean pressures need not equal the mean signed flow through the two segments. The IVC adds an RC time constant of about 0.6 s (filling: $C_{IVC} \times rvr_{up}$), which buffers the respiratory oscillations in venous return. Signed flow in either direction uses these same compartment balances.
 
 ### What the thorax panel shows
 
@@ -87,7 +87,7 @@ This is not an echocardiographic diameter equation. It is a visually compressed 
 | same tamponade state, capacity restored | 107 | 14.0 | 11.3 |
 <!-- END GENERATED: ivc-respiratory-calibre -->
 
-The respiratory volume swing is not the same as ultrasound collapsibility. The displayed-calibre column reports only how much the schematic width changes after the square-root transformation. In the tamponade preset, the underlying IVC volume continues to vary through the breath; the drawing now shows that small excursion rather than clipping every value above 150 mL to the same width.
+The respiratory volume swing is not the same as ultrasound collapsibility. The displayed-calibre column reports only how much the schematic width changes after the square-root transformation. In the tamponade preset, the underlying IVC volume varies through the breath and the drawing displays that small excursion. A distended cava can therefore remain visibly distended while still changing calibre.
 
 The magnitude is deliberately not calibrated to an ultrasound cutoff. In Himelman and colleagues' cohort, IVC plethora was defined as less than 50% reduction with deep inspiration, and the plethora group showed a mean reduction of 18%. The model uses ordinary regular breaths, has no ultrasound plane or longitudinal vessel deformation, and should therefore reproduce only the direction: **dilated and less collapsible**, not a particular diagnostic percentage.
 
@@ -97,9 +97,9 @@ The magnitude is deliberately not calibrated to an ultrasound cutoff. In Himelma
 
 **Why a separate compartment rather than a pressure-driven schematic.** Drawing the IVC from instantaneous right-atrial pressure reproduces the correct *direction* of respiratory variation in many states, but can make the vessel oscillate strongly even when it should be plethoric. In tamponade the impaired right heart cannot readily accept the returning blood, so the IVC remains dilated while its respiratory excursion is blunted. The compartment makes that distension a volume state rather than an instantaneous pressure proxy.
 
-**Why a square-root display rather than a hard ceiling.** A linear fullness scale previously reached its maximum at 150 mL. The tamponade preset varied from roughly 160 to 180 mL by respiratory phase, so genuine model variation was hidden and the vessel looked completely immobile. Relating diameter to the square root of distending volume is a simple geometric approximation that retains this change while compressing high volumes. It improves visual honesty without changing venous return or any physiological equation.
+**Displayed calibre follows distending volume.** Relating diameter to the square root of distending volume is a geometric approximation that preserves small excursions while compressing the display of high volumes. The 150 mL reference is a display reference, not an upper limit on IVC volume. The width calculation does not enter the physiological flow equations.
 
-**Why the Starling resistor sits on the downstream segment only.** The splanchnic reservoir is a capacious bed whose surrounding pressure (abdominal) actually helps squeeze blood forward when the abdomen is distended (zone III). It does not flutter shut the way the IVC does at the thoracic inlet — the collapse is a property of the conduit, not of the reservoir. Moving the resistor downstream preserves the abdominal zone conditions described under [abdominal pressure](abdominal-pressure.md) without changing the behaviour the diagram was built to teach.
+**Why the Starling resistor sits on the downstream segment only.** The splanchnic reservoir is a capacious bed whose surrounding pressure (abdominal) actually helps squeeze blood forward when the abdomen is distended (zone III). It does not flutter shut the way the IVC does at the thoracic inlet — the collapse is a property of the conduit, not of the reservoir. The downstream resistor expresses the conduit closing condition described under [abdominal pressure](abdominal-pressure.md); reservoir compression separately contributes to the upstream pressure head.
 
 **Why 20 mL/mmHg for the IVC.** The published range of human caval distensibility spans 15–40 mL/mmHg. A middle value was chosen — large enough to produce a visible buffering effect, small enough that the IVC does not become a dominant capacitance. The value is a didactic choice and must not be read as a measured patient parameter.
 

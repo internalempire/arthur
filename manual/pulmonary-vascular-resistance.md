@@ -45,11 +45,11 @@ Three further mechanisms load the low-volume limb in a real patient, and the J-c
 
 - **Hypoxic vasoconstriction.** Collapsed units are hypoxic, and their vessels constrict. See [hypoxic vasoconstriction](hypoxic-vasoconstriction.md).
 - **The alveolar waterfall.** Where alveolar pressure exceeds pulmonary venous pressure, the alveolar segment behaves as a Starling resistor: the effective downstream pressure becomes alveolar rather than venous, and lowering venous pressure further cannot increase flow. This is West zone 2, and it is the same physics as caval collapse on the venous side — see [vascular waterfalls](vascular-waterfalls.md).
-- **Derecruitment itself** removes vascular pathway, so the remaining open lung carries the whole cardiac output.
+- **Derecruitment itself** reduces the conductance of the affected vascular pathways and redistributes perfusion toward the remaining open lung. Closed units can remain perfused.
 
 ### Why this matters at the bedside
 
-The right ventricle is a thin-walled pump that tolerates volume far better than pressure — see [the right ventricle](the-right-ventricle.md). Its afterload is minimised near FRC, and *both* directions away from FRC raise it. This is the mechanical basis of the observation that ventilating an injured lung can cause acute cor pulmonale, and of the practice of limiting plateau and driving pressure for reasons that have nothing to do with alveolar rupture.
+The right ventricle is sensitive to the pressure against which it ejects — see [the right ventricle](the-right-ventricle.md). The mechanical resistance curve has a minimum near FRC in this teaching construction. Total ventricular load also depends on vascular pressures, flow and arterial compliance; the minimum of a resistance curve alone does not determine the lowest RV ejection pressure or the highest cardiac output. This distinction matters when interpreting either derecruitment or overdistension.
 
 It also explains a clinical trap: raising PEEP in a poorly recruitable lung moves the aerated units up the *right* limb without opening anything, so resistance rises. In a recruitable lung the same PEEP moves collapsed units onto the curve at all, and resistance can fall or stay flat. The PEEP response of pulmonary resistance therefore **interacts with recruitability**; it is not a specific test of recruitability by itself. See [recruitment and R/I](recruitment-and-ri.md) and [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure).
 
@@ -57,7 +57,9 @@ It also explains a clinical trap: raising PEEP in a poorly recruitable lung move
 
 ## In the model
 
-The scale of the whole bed is set by one control, `pvrBase` — see [pulmonary circulation controls](controls-pulmonary.md). Everything below shapes that scale as a function of lung volume; nothing below introduces a second adjustable magnitude.
+The scale of the whole bed is set by `pvrBase` — see [pulmonary circulation controls](controls-pulmonary.md). The resistance coefficient depends on strain in aerated units, the shares of open and closed lung, and hypoxic vasoconstriction in the closed pathway. These determine how easily blood can pass through the aggregate bed.
+
+Intravascular pressure does not directly enlarge the vessels or recruit additional vascular pathways in this resistance law. Pulmonary arterial and venous compartments do have fixed compliances: they store blood, and their pressure changes with stored volume and surrounding pressure. That storage function is distinct from a pressure-dependent change in the resistance coefficient.
 
 ### Strain, not absolute volume
 
@@ -129,6 +131,23 @@ $$
 - $P_{alv}$ — alveolar pressure, mmHg
 - $w$ — share of the bed exposed to alveolar pressure
 
+### Pressure, ventricular load and flow are coupled
+
+The pressure gradient determines inflow from the pulmonary artery into the transport pathway:
+
+$$
+Q_{pul} = \max\left(0,\frac{P_{pa}-P_{down}}{R_{total}}\right)
+$$
+
+- $Q_{pul}$ — requested forward pulmonary inflow, mL/s; actual transfer is also limited by available donor volume
+- $P_{pa}$ — pulmonary arterial pressure relative to atmosphere, mmHg
+- $P_{down}$ — effective downstream pressure defined above, relative to atmosphere, mmHg
+- $R_{total}$ — internal pulmonary resistance coefficient, mmHg·s/mL in the flow equations
+
+Higher pulmonary arterial pressure can increase this driving gradient, but it also opposes RV ejection through the pulmonary valve. Higher pulmonary venous pressure can raise the downstream pressure and reduce the gradient. The resulting flows change vascular and chamber volumes, which change pressures and subsequent filling and ejection. These quantities evolve together in the closed circulation.
+
+A fall in the resistance coefficient therefore does not guarantee lower RV ejection pressure or greater cardiac output. Read the coefficient alongside pulmonary arterial and left atrial pressure, RV filling, and measured forward output. A pressure that helps explain flow through a vascular segment can simultaneously represent a load on the ventricle supplying it.
+
 ### What the fully open normal lung does
 
 | | RV (1.31 L) | FRC (2.20 L) | TLC (6.00 L) |
@@ -146,7 +165,7 @@ The point labelled “RV” is the model's low-volume reference at zero transpul
 The model reports pulmonary resistance twice, and they are different kinds of quantity. This distinction is the subject of [interpretability](interpretability.md).
 
 - **Pulmonary resistance coefficient** — the model's own internal $R$, the thing the equations divide by. Not measurable in a patient, and not a Poiseuille resistance.
-- **PVR, derived** — $(\overline{P}_{pa} - P_{la})/\dot{Q}$, computed from mean pulmonary arterial pressure, model left atrial pressure and cardiac output. It has the form of catheter PVR only while left atrial pressure is a defensible [wedge surrogate](pulmonary-artery-wedge-pressure.md), and now inherits that tile's caution automatically.
+- **PVR, derived** — $(\overline{P}_{pa} - P_{la})/\dot{Q}$, computed from mean pulmonary arterial pressure, model left atrial pressure and cardiac output. It has the form of catheter PVR only while left atrial pressure is a defensible [wedge surrogate](pulmonary-artery-wedge-pressure.md), and inherits that tile's caution automatically.
 
 They can move in opposite directions, because the derived value carries cardiac output in its denominator. In the calibration phenotype, PEEP 4 → 14:
 
@@ -155,7 +174,7 @@ They can move in opposite directions, because the derived value carries cardiac 
 | R/I 0.05 (poorly recruitable) | 2.38 → 2.36 WU (−1%) | 2.64 → **3.16 WU (+20%)** | 58 → 59% |
 | R/I 0.50 (recruitable) | 2.38 → 2.22 WU (−7%) | 2.54 → 2.64 WU (+4%) | 58 → 64% |
 
-Reading the coefficient as though it were the pressure–flow estimate would report the opposite direction. However, at PEEP 14 these model runs fall outside the zone III assumption and the wedge surrogate is flagged. The table therefore demonstrates an internal pressure–flow response and its dependence on recruitability; it does not independently reproduce a valid catheter measurement at both PEEP levels. The earlier coefficient/derived-value confusion is written up in [the postmortem](../docs/POSTMORTEM-2026-08-09.md).
+Reading the coefficient as though it were the pressure–flow estimate would report the opposite direction. However, at PEEP 14 these model runs fall outside the zone III assumption and the wedge surrogate is flagged. The table therefore demonstrates an internal pressure–flow response and its dependence on recruitability; it does not independently reproduce a valid catheter measurement at both PEEP levels.
 
 ---
 
@@ -163,18 +182,9 @@ Reading the coefficient as though it were the pressure–flow estimate would rep
 
 ### The minimum is placed at FRC, and this is a genuine choice
 
-Earlier versions put the minimum at 2.87 L — 48% of maximal volume — following primary measurements in excised and isolated animal lungs, which locate it at roughly half of maximal volume, above FRC. Common clinical schematics draw it *at* or near FRC.
+The fully open mechanical minimum is constructed at zero strain, near the tissue's resting volume. This follows the clinical teaching geometry of a minimum near FRC. Primary measurements in isolated animal lungs support opposing mechanical effects but can place the minimum nearer half maximal volume; that location is not treated as a measured human target.
 
-The model now follows the clinical schematic because the former ARDS phenotype produced roughly 10–16 WU, far outside the approximately 1.5–4.75 WU span of the relevant human cohort measurements. That excess did **not** have one cause:
-
-| earlier construction | consequence | current construction |
-|---|---|---|
-| resistance divided by open fraction | closed units were effectively removed rather than poorly perfused | open and closed conductances remain in parallel |
-| HPV multiplied the whole pulmonary bed | hypoxic tone amplified even the aerated pathway | HPV acts only on the derecruited pathway |
-| one pressure crossing activated a whole-bed waterfall | a regional phenomenon became an all-or-none jump | only a fixed alveolar share sees the waterfall |
-| nadir fixed at 2.87 L | the low-volume ARDS lung sat far down the steep animal left limb | zero strain places the open-lung minimum near its resting volume |
-
-All four changes were made in the same revision, so the fall from 10–16 WU cannot be attributed retrospectively to the nadir alone. The evidence hierarchy is therefore explicit:
+Four features determine the aggregate response: open and closed conductances in parallel, HPV confined to the closed pathway, a fractional alveolar waterfall, and the strain-dependent open pathway. The evidence hierarchy is explicit:
 
 1. **Human in-vivo catheter measurements** constrain the approximate magnitude and recruitability-dependent PEEP response.
 2. **The contemporary clinical synthesis** supplies the human teaching topology: a minimum near FRC with resistance rising toward both lower and higher volume.
@@ -184,11 +194,11 @@ The nadir is consequently at FRC *by construction*—$K$ is solved to put it the
 
 ### Both limbs follow volume, not transpulmonary pressure
 
-The experimental argument is described [above](#why-the-mechanical-curve-uses-volume). It supports volume as the better organising variable for the model's **mechanical curve**, not a pressure-free pulmonary circulation. Driving the extra-alveolar limb directly with transpulmonary pressure once caused one pressure signal to carry parenchymal geometry, vessel transmural pressure and waterfall behaviour simultaneously. Using strain for the curve and keeping the waterfall separate preserves those distinctions. Hakim's and Peták's inflation-mode results are the reason this qualification matters: pressure-related effects remain real even when volume better organises the underlying mechanical relation.
+The experimental argument is described [above](#why-the-mechanical-curve-uses-volume). It supports volume as an organising variable for the model's **mechanical curve**, not a pressure-free pulmonary circulation. Strain describes inflation of aerated units; the separate waterfall describes the effect of alveolar pressure on the downstream pressure for flow. Hakim's and Peták's inflation-mode results show why this distinction matters: pressure-related effects remain real even when volume better organises the mechanical relation in a particular preparation.
 
 ### Conductances in parallel, not a divided single path
 
-Representing the two populations as parallel conductances is what allows a derecruited unit to be *poorly* perfused rather than absent, and keeps HPV acting where hypoxia is. It also removes the discontinuity that made whole-lung resistance jump when a mean pressure crossed a threshold.
+The two populations contribute parallel conductances. A derecruited unit remains poorly perfused, and HPV acts on that pathway. The mixture varies continuously with open fraction; alveolar pressure contributes separately through the fractional waterfall.
 
 ### Coefficients that are declared rather than cited
 
@@ -212,9 +222,9 @@ The closed-path factor and phenotype were constrained jointly against the numeri
 ### Of the construction
 
 - One aggregate bed. There is no regional zonal network, no gravitational gradient, no distribution of transit paths through parallel regions. West zones appear as a fractional share, not as a map.
-- No pressure- or flow-dependent vascular recruitment and distension. Real PVR falls as pulmonary arterial pressure or flow rises; here it depends on lung volume and open fraction only.
+- No pressure- or flow-dependent vascular recruitment and distension in the resistance law. Its determinants are lung strain, open fraction, HPV and the reference resistance scale. Compliant vascular storage is present, but it does not change resistance through pressure-induced vessel widening. A pressure–flow response outside these mechanisms cannot be inferred from this model.
 - No blood rheology. Viscosity and haematocrit do not exist, although the partition they most affect is one of the model's chosen constants.
-- No vascular remodelling, characteristic impedance or wave reflection. The pulmonary circuit is resistive and compliant, not pulsatile in the vascular sense. Pressure propagation is instantaneous; only volume delivery is delayed, by [pulmonary transit](pulmonary-transit.md).
+- No vascular remodelling, characteristic impedance or wave reflection. Pulmonary pressures and flows vary during each beat in a resistive and compliant circuit, but there is no distributed pressure-wave propagation. Volume delivery is delayed by [pulmonary transit](pulmonary-transit.md).
 - HPV is a gain applied to the derecruited pathway, not a response to a measured oxygen tension. There is no gas exchange, no V/Q, no CO₂.
 - The secondary high-volume rise found outside the alveolar segment in isolated lobes is not represented; the clinical two-limb decomposition is followed instead.
 - The minimum is at FRC by construction. See the caveat above.

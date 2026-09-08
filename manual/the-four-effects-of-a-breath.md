@@ -44,7 +44,7 @@ The piston is on its own control (`piston`) and is gated by the zone III index, 
 
 After an isolated sustained fall in RV contractility, the first affected RV beat has not yet changed LV stroke volume. The left-sided response becomes detectable over the following two to three beats. Total blood volume remains conserved while the staged pulmonary compartment supplies that interval.
 
-The delay is now state-dependent rather than one fixed constant. In matched passive experiments, pulmonary embolism lengthens the PA-to-LA estimate relative to the reference circulation, and congested low-output LV failure lengthens it further. The [pulmonary transit](pulmonary-transit.md) page gives the experiment, the three separate readouts and their limits.
+The delay depends on pulmonary blood volume and RV output. In matched passive experiments, pulmonary embolism lengthens the PA-to-LA estimate relative to the reference circulation, and congested low-output LV failure lengthens it further. The [pulmonary transit](pulmonary-transit.md) page gives the experiment, the three separate readouts and their limits.
 
 This timing result does not validate PPV or SVV amplitude. The compliant pulmonary circuit filters the RV variation, while the piston, septum, pericardium and LV afterload act through separate immediate routes. Their superposition determines the final arterial waveform.
 
@@ -52,11 +52,11 @@ This timing result does not validate PPV or SVV amplitude. The compliant pulmona
 
 ## Why this and not something else
 
-The four effects could have been added directly to the output as four independent corrections. Instead, the model computes them through shared compartment pressures and flows, allowing the represented effects to reinforce or offset one another. This improves internal consistency, but it does not remove the assumptions embedded in each relation.
+The model computes the four effects through shared compartment pressures and flows, allowing them to reinforce or offset one another. This coupling provides internal consistency, but each relation still carries its own physiological assumptions.
 
 Here they arise from a shared set of pressure, volume and flow relations rather than four waveform-level effects. The model can therefore be run to ask whether its piston or afterload term dominates in a given simulated phenotype, whether raising PEEP helps or harms that phenotype, and whether variation is driven mainly by preload or afterload. Those answers describe the model and require external validation before they are transferred to a patient.
 
-The delay is the one place where a mechanism was added specifically to get the *timing* right rather than the magnitude. Its justification, and the alternatives that were tried and rejected, are on the [pulmonary transit](pulmonary-transit.md) page.
+[Pulmonary transit](pulmonary-transit.md) represents the timing and dispersion of blood delivery from the right to the left heart. Its mean depends on represented pulmonary blood volume and RV output; it is distinct from pressure-wave propagation.
 
 ---
 
@@ -65,7 +65,7 @@ The delay is the one place where a mechanism was added specifically to get the *
 ### Of the construction
 
 - **The four effects are the four this model has.** Bronchial circulation, direct compression of the heart by inflated lung, and the mechanical effect of lung volume on cardiac fossa geometry are absent.
-- **Transit remains aggregate.** Its mean now changes with represented pulmonary blood volume and RV output, but one staged path cannot reproduce regional capillary transit, shunt or contrast kinetics. The staged portion is bounded to 0.8–6 s for numerical stability.
+- **Transit remains aggregate.** Its mean changes with represented pulmonary blood volume and RV output, but one staged path cannot reproduce regional capillary transit, shunt or contrast kinetics. The staged portion is bounded to 0.8–6 s for numerical stability.
 - **One pleural pressure**, so no regional differences in how the breath reaches different parts of the heart.
 - The piston is a single coefficient acting on pulmonary venous unstressed volume. It is a stand-in for a distributed squeezing of a compliant bed, not a representation of it.
 - Spontaneous effort is one aggregate activation with one amplitude control and a regular post-inspiratory decay. There is no inspiratory threshold load, separately recruited expiratory-muscle pressure or complete dyssynchrony model.

@@ -49,7 +49,7 @@ The integrated circulation and the analytic curve describe the same pathway at d
 
 The integrator separates the systemic venous reservoir, a compliant IVC and the right atrium. The selected resistance to venous return is divided into an upstream segment and a collapsible downstream segment. This allows the IVC to store a small amount of blood and delay transmission during a breath.
 
-The caval segment permits flow in either direction. Forward flow retains the original collapse law; when right atrial pressure exceeds IVC pressure, the same law is applied with the ends exchanged and the resulting flow counted as negative. The upstream reservoir-to-IVC segment remains forward-only. The [waterfall page](vascular-waterfalls.md) gives the equations and the retained zero-flow region near pressure equality.
+The caval segment permits flow in either direction. The closing-pressure law limits forward flow from the IVC into the atrium. When right atrial pressure exceeds IVC pressure, the law uses the atrium as the source and the cava as the receiver, and counts the resulting flow as negative. The upstream reservoir-to-IVC segment is forward-only. The [waterfall page](vascular-waterfalls.md) gives the equations and the zero-flow region near pressure equality.
 
 The analytic venous-return curve reduces the two resistances to their sum and uses the shared forward closing-pressure law. It is a forward-return approximation constructed from mean determinants. In a pulsatile circulation, applying a nonlinear law to mean pressures need not reproduce the mean of actual signed flow, even after net storage has settled. The curve therefore need not pass through the measured mean inflow marker. This distinction is particularly visible with pulmonary embolism and brief caval backflow.
 
@@ -105,7 +105,7 @@ The default RV curve is a local analytic relation anchored to RV volumes on the 
 
 Venous return uses a soft collapse law rather than a hard `max()`, for reasons given under [vascular waterfalls](vascular-waterfalls.md).
 
-The resistance to venous return is a single control. Splitting it into the several parallel beds that a real circulation drains through — with their own compliances and time constants — would be more faithful and would make the reservoir's response to a fluid bolus time-dependent. It was not done: one reservoir keeps volume conservation checkable and keeps the diagram legible, which is what the construction is for.
+The resistance to venous return is a single control. One systemic reservoir keeps volume conservation explicit and the diagram legible. Separate regional beds with different compliances, emptying times and fluid-distribution kinetics are outside this representation.
 
 ---
 
@@ -118,7 +118,7 @@ The resistance to venous return is a single control. Splitting it into the sever
 - **The resistance to venous return is constant in a normally filled circulation.** An additional abdominal contribution is confined to the upstream segment when both the systemic reservoir and IVC are poorly distended. It does not otherwise vary with flow, tone or vessel calibre.
 - **The Guyton curves are local approximations placed under a dynamic trail.** Live uses heartbeat determinants and Mean uses respiratory determinants. The measured respiratory-mean inflow and the Mean-only predicted crossing have different definitions and need not coincide.
 - **The ascending analytic curve represents a local RV relation, not an independent biventricular or LV function curve.** Its RV-volume anchor follows the selected clock and does not reproduce a new closed-loop beat at every pressure on the curve.
-- **Caval reversal is an aggregate pressure-driven extension.** It adds no vessel-wall dynamics or separate superior caval route. The remaining zero-flow region is a mathematical limitation, not a measured physiological threshold.
+- **Caval reversal is an aggregate pressure-driven flow.** Vessel-wall dynamics and a separate superior caval route are absent. The zero-flow region is a mathematical limitation, not a measured physiological threshold.
 - **The filled point is venous inflow, not cardiac output.** Its height must not be read as simultaneous RV or LV forward flow.
 - Mean systemic filling pressure here is computed from the model's own state. It is an internal quantity, not the thing an occlusion manoeuvre measures — see [Pmsf and occlusions](pmsf-and-occlusions.md).
 

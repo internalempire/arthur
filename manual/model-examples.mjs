@@ -13,7 +13,7 @@ import {
 } from '../src/model/lung.js';
 import { ivcDisplayWidth } from '../src/ui/panels/thorax.js';
 import {
-  evaluateRecruitmentCohort, RECRUITMENT_COHORT_PHENOTYPE,
+  evaluateRecruitmentCohort, RECRUITMENT_COHORT_PHENOTYPE, RECRUITMENT_COHORT_GROUPS,
 } from '../tests/support/recruitment-cohort.mjs';
 
 const SETTLING_SECONDS = 45;
@@ -593,9 +593,12 @@ function recruitmentCohortBlock() {
   return [
     `*Executable shared phenotype: collapsed compartment ${Math.round(phenotype.collapsed * 100)}%, aerated-lung compliance ${phenotype.clung} mL/cmH\u2082O, maximum capacity ${fixed(phenotype.lungCapacity, 1)} L, chest-wall compliance ${phenotype.ccw} mL/cmH\u2082O, no external wall load and diseased opening midpoint ${phenotype.pOpen} cmH\u2082O. Only the cohort median R/I changes between rows.*`,
     '',
-    '| cohort group | requested / achieved R/I | latent openable share of diseased compartment | latent openable share of whole lung | recruited volume, model / observed IQR (mL) | low-PEEP C<sub>L</sub>, model / observed IQR | high-PEEP C<sub>L</sub>, model / observed IQR |',
+    '| cohort group | requested / achieved R/I | latent openable share of diseased compartment | latent openable share of whole lung | recruited volume, model / observed IQR (mL) | low-PEEP C<sub>L</sub>, model / observed IQR (mL/cmH₂O) | high-PEEP C<sub>L</sub>, model / observed IQR (mL/cmH₂O) |',
     '|---|---:|---:|---:|---:|---:|---:|',
-    ...groups.map((group) => `| ${group.label} | ${fixed(group.riRatio, 2)} / ${fixed(group.calibration.achieved, 2)} | ${Math.round(group.calibration.openableFraction * 100)}% | ${Math.round(group.wholeLungOpenableFraction * 100)}% | ${Math.round(group.calibration.assessment.recruitedVolume)} / ${group.recruitedVolume[0]}\u2013${group.recruitedVolume[1]} | ${Math.round(group.lowPeepLungCompliance)} / ${group.lowPeepLungCompliance[0]}\u2013${group.lowPeepLungCompliance[1]} | ${Math.round(group.highPeepLungCompliance)} / ${group.highPeepLungCompliance[0]}\u2013${group.highPeepLungCompliance[1]} |`),
+    ...groups.map((group) => {
+      const observed = RECRUITMENT_COHORT_GROUPS.find(({ id }) => id === group.id);
+      return `| ${group.label} | ${fixed(group.riRatio, 2)} / ${fixed(group.calibration.achieved, 2)} | ${Math.round(group.calibration.openableFraction * 100)}% | ${Math.round(group.wholeLungOpenableFraction * 100)}% | ${Math.round(group.calibration.assessment.recruitedVolume)} / ${group.recruitedVolume[0]}\u2013${group.recruitedVolume[1]} | ${Math.round(group.lowPeepLungCompliance)} / ${observed.lowPeepLungCompliance[0]}\u2013${observed.lowPeepLungCompliance[1]} | ${Math.round(group.highPeepLungCompliance)} / ${observed.highPeepLungCompliance[0]}\u2013${observed.highPeepLungCompliance[1]} |`;
+    }),
   ].join('\n');
 }
 

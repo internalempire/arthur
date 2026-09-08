@@ -69,7 +69,7 @@ Time still works. At the shipped PEEP, slowing the rate from 26 to 12 breaths pe
 
 ## Why this and not something else
 
-**One aggregate choke rather than fast and slow lung units.** A richer regional model could produce a maximal-flow envelope together with heterogeneous time constants, pendelluft and regional trapping. It was not added here: the heart–lung lesson is the *existence* of a choke and its consequence for mean intrathoracic pressure, and a second lung compartment would need its own vascular bed to be worth the state it adds. See [the equation of motion](equation-of-motion.md) for the same argument in general form.
+**One aggregate choke.** The model represents flow limitation and its consequence for trapped volume and mean intrathoracic pressure. It has no separate fast and slow lung units, regional maximal-flow envelope, pendelluft or regional gas trapping. See [the equation of motion](equation-of-motion.md) for the aggregate mechanics.
 
 **A flow envelope rather than a variable resistance.** Raising resistance as volume falls would slow expiration but would preserve the property that matters most — that mouth pressure still controls flow. The whole point of a choke is that it does not.
 

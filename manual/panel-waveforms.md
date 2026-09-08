@@ -65,7 +65,7 @@ Each trace contains the most recent 12 seconds sampled at 250 Hz. Palv and $P_L$
 
 The synchronised cursor uses a separate 20 Hz presentation history containing pressures, volumes, summary measurements and the state needed by the analytical panels. It is read-only and does not enter any physiological equation.
 
-The panel shows no airflow trace. Expiratory flow limitation must be inferred from volume not returning, auto-PEEP and the EFL readout; the manifest previously described this panel as containing flow and has been corrected.
+The panel shows no airflow trace. Expiratory flow limitation must be inferred from volume not returning, auto-PEEP and the EFL readout.
 
 ## Limits
 

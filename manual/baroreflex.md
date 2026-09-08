@@ -62,7 +62,7 @@ With no compensation, every respiratory intervention is applied to an idealised 
 
 One bounded state was chosen because the relevant teaching question is narrower: how much of an immediate mechanical disturbance remains visible after a plausible aggregate pressure defence? A shared state also keeps it clear that the readout is compensation, not a diagnosis of autonomic activity.
 
-An additive heart-rate reserve is used instead of multiplying the selected baseline rate. A proportional response previously counted pre-existing tachycardia twice and could drive an already tachycardic phenotype above 350/min.
+The reflex adds a bounded heart-rate reserve to the selected baseline rate. Pre-existing tachycardia is therefore part of the baseline, and the reflex contribution remains a separate quantity rather than scaling that baseline.
 
 ---
 

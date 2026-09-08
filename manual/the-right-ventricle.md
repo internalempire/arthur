@@ -29,6 +29,10 @@ When the RV dilates, septal displacement and pericardial constraint can reduce L
 
 The RV uses time-varying elastance with a lower default end-systolic elastance than the LV. Its pressure is calculated relative to pleural and pericardial pressure. A one-way pulmonic valve connects it to the pulmonary artery.
 
+Pulmonary arterial pressure directly opposes RV ejection: forward flow requires RV pressure to exceed it. Ejected blood changes pulmonary arterial volume and pressure, while pulmonary outflow depends on the downstream pressure and the resistance of the vascular pathway. The resulting flow through the lungs fills the left heart. Pressure, resistance, ventricular filling and output are therefore determined together in the closed circulation; lowering one resistance does not prescribe a higher cardiac output.
+
+Forward RV stroke volume is the blood actually transferred through the pulmonic valve during a completed beat. RV output uses that volume and the measured duration of the same beat. EDV and ESV describe chamber geometry and are used for ejection fraction and the pressure-volume loop. These quantities have distinct definitions; the [PV-loop page](panel-pv-loops.md) explains their interpretation and the domain checks for inadmissible filling/ejection overlap or pressure relations.
+
 Pulmonary load includes the volume-dependent [PVR J-curve](pulmonary-vascular-resistance.md), parallel open and derecruited vascular pathways, aggregate zone-2 waterfall behaviour and downstream pulmonary venous pressure. The circulation is resistive and compliant; characteristic impedance and reflected waves are absent.
 
 RV dilatation affects the LV through two explicit routes. Diastolic septal coupling raises the LV filling penalty as the RV becomes larger, and pericardial pressure rises when total cardiac volume exceeds the selected capacity. The same shared pressure can also restrict the RV preferentially because its normal filling pressure is lower. A separate systolic term permits LV contraction to assist RV pressure generation. These coefficients are teaching representations, not echocardiographic measurements. The [cardiac tamponade](cardiac-tamponade.md) page isolates the pericardial route.
@@ -39,7 +43,7 @@ Changing RV output reaches LV preload after [pulmonary transit](pulmonary-transi
 
 A single PVR multiplier would be cheaper, but it would hide the principal pulmonary teaching point: recruitment, absolute lung volume and alveolar pressure can change RV load by different routes. The chosen model retains those routes while avoiding a regional pulmonary network.
 
-Pulsatile pulmonary impedance, wave reflection, RV wall stress, coronary perfusion and oxygen consumption were not added. They matter clinically, particularly in advanced RV failure, but would add states and parameters whose behaviour is less visible than the core sequence from lung pressure to vascular load, RV dilatation and LV underfilling.
+The represented sequence runs from lung pressure and vascular load to RV dilatation and LV underfilling. Pulsatile pulmonary impedance, wave reflection, RV wall stress, coronary perfusion and oxygen consumption are outside this model. Its pressure, volume and flow outputs do not independently measure those mechanisms.
 
 ## Limits
 

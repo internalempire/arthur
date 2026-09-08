@@ -111,9 +111,9 @@ In this filled model run, a modest rise in abdominal pressure initially mobilise
 
 The simplest alternative is to make abdominal pressure add to mean systemic filling pressure with a fixed coefficient. That represents compression of a distended reservoir but omits the simultaneous increase in closing pressure and, in severe depletion, upstream resistance.
 
-Another compact alternative is to multiply the entire resistance to venous return whenever abdominal pressure rises. That was rejected because it makes quiet inspiration look obstructive in a normally filled subject and duplicates part of the downstream caval cost already represented by the waterfall.
+The additional upstream resistance is conditional on poor filling of the reservoir and IVC. Abdominal pressure does not multiply the entire resistance to venous return indiscriminately: upstream narrowing and the downstream caval waterfall are separate contributions.
 
-Splitting the effect uses states the model already has rather than new controls: the elastic pressure of the venous reservoir indicates whether there is blood available to mobilise, and IVC transmural pressure indicates whether the conduit is poorly distended. The alternative, giving the abdomen its own compliant venous compartment with its own volume, would represent the zone behaviour more completely. It was not done because it adds another reservoir and additional constants for a distinction these two existing states can make visible.
+Two existing states determine the response: the elastic pressure of the venous reservoir indicates whether blood is available to mobilise, and IVC transmural pressure indicates how well the conduit is distended. There is no additional regional abdominal venous compartment; the aggregate response cannot resolve regional abdominal blood redistribution.
 
 The `0.6` splanchnic fraction, the transition window and the resistance coefficient are **didactic shape coefficients**. They set where the balance tips, and no measurement fixes them for an aggregate model with one venous reservoir.
 

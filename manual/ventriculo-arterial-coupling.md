@@ -120,7 +120,7 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 
 ### Of clinical application
 
-- The normal reference now produces an ejection fraction in the expected resting range because the activation waveform reaches the selected elastance. Individual values remain properties of the model's elastances and loading; they are not calibrated against echocardiographic measurement and should not be compared directly with a patient's number.
+- The normal reference produces an ejection fraction in the expected resting range because the activation waveform reaches the selected elastance. Individual values remain properties of the model's elastances and loading; they are not calibrated against echocardiographic measurement and should not be compared directly with a patient's number.
 - The ratios in the table use $MAP/SV$, not effective arterial elastance. They show a direction — vasodilatation raising stroke volume in a failing ventricle — and must not be quoted as coupling measurements.
 - Nothing here supports a decision about inotropes versus vasodilators in a particular patient. The model has no myocardial oxygen balance, which is the constraint that decision usually turns on.
 
