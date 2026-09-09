@@ -45,6 +45,10 @@ $$
 
 At each simulation step, $r$ is compared with the amount that the present pressure can open and the amount it can keep open. It rises when pressure enters the opening range, falls when pressure enters the closing range, and otherwise remains unchanged. This bounded memory rule is rate-independent: pressure history matters, but the time spent at a pressure does not.
 
+**Pressure and recruitment are calculated together.** At a given gas volume, the amount of open lung determines the pressure needed to contain that gas; that pressure also determines which units can open or remain open. The model finds a pressure and an open fraction that satisfy both conditions, using the recruitment retained from the preceding step. At fixed gas volume, a passive occlusion therefore maintains a stable lung recoil and recruitment state. During an assisted occlusion, airway pressure can still change as muscle pressure relaxes; that change comes from the chest wall and effort, not from repeated recruitment calculations.
+
+The numerical solver starts from the preceding pressure and uses a bounded search when needed. Its volume tolerance is 0.001 mL. Preliminary flow calculations and the final-volume calculation share the same preceding recruitment memory; only the final state is retained. Plateau pressure uses that same lung state with muscle pressure removed. This calculation is part of the ordinary simulation and does not require a Deep CO experiment.
+
 The resulting total open fraction is used by lung mechanics, strain and [pulmonary vascular resistance](pulmonary-vascular-resistance.md). A lung with no collapsed compartment behaves identically with hysteresis on or off.
 
 ### A reproducible experiment
@@ -110,7 +114,7 @@ Three examples are useful at the bedside:
 - **No time dependence.** Holding the same pressure for one second or one minute produces no additional recruitment or derecruitment.
 - **Shared opening and closing distributions.** All recruitable units belong to two smooth pressure ranges with fixed widths; there is no patient-specific distribution of regional thresholds.
 - **One global recruitment state.** Dependent and non-dependent regions cannot open or close differently.
-- **Numerical instability can occur with hysteresis enabled.** In some stiff, highly collapsed states with nearby opening and closing ranges, the sequential pressure and recruitment update can oscillate even at fixed gas volume. It can corrupt the inspiratory-volume count and alter pulmonary pressure and cardiac output. The general validity badge does not reliably detect this failure. A smaller numerical timestep can avoid its onset in a particular run without eliminating the underlying inconsistency; quantitative interpretation requires a dedicated convergence check in affected states. The independent audit keeps this finding open.
+- **Numerical verification has a defined scope.** Fixed-volume consistency, gas conservation and timestep refinement are checked in demanding recruitable-lung states. These checks establish internal consistency in the tested conditions; they do not validate every control combination or the numerical values against patients.
 - `pOpen` and `pClose` are model inputs. The model does not estimate them from a bedside manoeuvre.
 
 ### Of clinical application
@@ -132,6 +136,8 @@ Executable tests require the following properties:
 - returning below the closing range removes the gain;
 - a lung with no collapsed compartment has no recruitment hysteresis and gives bit-identical mechanics with the feature on or off;
 - setting `pClose` equal to `pOpen` is equivalent to switching hysteresis off.
+
+Additional regression checks require stable pressure at fixed gas volume from the same severe collapsed-lung state at three timesteps, agreement with an independent pressure solution, and compatible pressure, volume and recruitment during volume control, pressure control, pressure support and spontaneous breathing. The independent audit also requires delivered VT and occlusion stability in the severe fixture.
 
 ---
 

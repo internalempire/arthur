@@ -42,7 +42,7 @@
 <text class="tick" x="486.8" y="396" text-anchor="middle">35</text>
 <line class="axis" x1="66" y1="26" x2="66" y2="378"/>
 <line class="axis" x1="66" y1="378.0" x2="560" y2="378.0"/>
-<path class="total" style="stroke-dasharray:none" d="M132.8 336.7 L155.6 293.3 L177.3 246.5 L199.2 202.7 L223.6 172.5 L282.5 161.0 L343.9 160.8 L405.5 160.8 L467.1 160.8 L528.7 160.8"/>
+<path class="total" style="stroke-dasharray:none" d="M132.8 336.7 L155.6 293.5 L177.3 246.7 L199.2 202.7 L223.6 172.5 L282.5 161.0 L343.9 160.8 L405.5 160.8 L467.1 160.8 L528.7 160.8"/>
 <path class="alv" style="stroke-dasharray:none" d="M528.7 160.8 L467.1 160.8 L405.5 160.8 L343.9 160.8 L282.5 160.8 L221.1 160.8 L190.4 160.8 L159.8 160.8 L129.1 160.8 L98.5 160.8"/>
 <text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Lung open (%)</text>
 <text class="label" x="313" y="424" text-anchor="middle">End-expiratory transpulmonary pressure (cmH₂O)</text>

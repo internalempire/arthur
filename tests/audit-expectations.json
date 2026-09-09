@@ -4,7 +4,7 @@
   "ventricular-pressure-domain": "resolved",
   "activation-continuity": "resolved",
   "ri-protocol": "open",
-  "hysteresis-convergence": "open",
+  "hysteresis-convergence": "resolved",
   "patient-wall-intervention": "open",
   "venous-reversal": "resolved"
 }

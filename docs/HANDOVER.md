@@ -2,6 +2,73 @@
 
 Updated: 2026-09-09
 
+## Coupled pressure/recruitment calculation adopted — September 9
+
+The clinician explicitly authorized the numerical correction after the fixed-
+volume instability and its proposed solution were explained. This adoption
+supersedes the pending status of the assessment below. Physiological laws,
+coefficients, presets, timestep and UI controls remain unchanged; pulmonary
+vascular distensibility is not added.
+
+`transpulmonaryWithRecruitment` solves gas volume with the prior diseased
+recruitment projected onto the trial pressure's opening/closing band. It shares
+the existing bounded inverse algorithm with the fixed-memory static helper:
+previous-pressure start, up to four Newton iterations, 0.001 mL volume tolerance,
+and a 34-iteration bisection fallback over -25 to 80 cmH2O. Each respiratory step
+keeps one prior accepted memory for its preliminary flow and final-volume
+calculations, then commits the final compatible state. Plateau bookkeeping
+reuses that recoil with muscle pressure removed and does not run another solve.
+No biological rate constant, extra state, dependency or Deep calculation is
+introduced. The existing validity UI is not expanded.
+
+Permanent numerical tests cover independent bracketed pressure solutions,
+identical fixed-volume initial states at three timesteps, per-step gas balance
+and pressure/memory agreement in all four ventilation modes, plateau consistency
+and exact zero-gap/off equivalence. The severe fixture's audit criterion is
+promoted to a regression requirement. Finite-volume R/I and chest-wall
+intervention remain the two open audit findings; adoption does not resolve them
+or establish patient-level validation.
+
+Private adoption record: `codex-notes/Arthur-isteresi-adozione-2026-09-09.md`.
+Baseline source copy, numerical results, benchmark and verification logs:
+`outputs/Arthur-hysteresis-adoption-2026-09-09/`. These remain unversioned.
+Nine adopted-source runs (120 s preparation plus two independent 60 s windows)
+agree exactly with the private reference in final mean CO, PA pressure, internal
+PVR, lung volume and open fraction. Blood and gas balances remain conserved,
+all sampled volumes are positive, and no domain/capacity/limiter flags occur.
+The severe fixture gives about 5.22 L/min and 25.1 mmHg; its delivered VT stays
+near 150 mL at three timesteps and occlusion pressure swing is zero.
+
+Sequential VPS timing, with the full suite temporarily stopped and then resumed,
+measures about 0.60 to 0.82 ms per 10 ms simulated in ARDS-on (+37%), essentially
+unchanged timing in the manual example, and lower cost in the formerly unstable
+fixture. It includes core and metrics, not browser rendering, fast curves or
+Deep. The small absolute cost does not mean zero overhead or establish latency
+on other devices.
+
+Snapshot regeneration leaves all twelve rows unchanged. All eighteen generated
+manual blocks retain their rounded values. Of nineteen regenerated figures,
+only two vertical coordinates in the hysteresis incremental branch change by
+0.2 px; the decremental branch is unchanged. No tolerance is widened.
+The final detached `npm test` run passes: 408 checks, zero failures. The
+first attached run was terminated with exit 143 before its summary, after
+288 passing assertions; it is preserved as incomplete, not counted as a pass.
+No assertion failure preceded that interruption, whose cause was not established.
+The full suite was rerun without changing model source or acceptance criteria.
+
+The independent audit exits 0 with six PASS and two KNOWN_FAILURE findings;
+44 UI smoke contracts, ten verification-harness checks and syntax checks of
+57 modules pass. Manual build/lint passes with eighteen current generated blocks,
+53 pages, zero errors and zero warnings. Chromium verifies healthy/severe states,
+loaded controls, VT/plateau, Live/Mean, fixed-volume stability and the current
+manual without JavaScript or HTTP errors; Deep remains off. Its first runner
+incorrectly expected a DOM option value of `on` instead of the control's index
+`1`; correcting that test assumption, including a check of the real model
+parameter, required no product change. `git diff --check` passes. Runtime hashes
+match the adopted source used by the completed tests. The final VPS/GitHub SHA
+is recorded in the private report after commit and push.
+Windows has not been verified.
+
 ## Hysteresis stability assessed; no numerical correction adopted — September 9
 
 The clinician authorized roadmap point 1: identify the hysteresis instability,

@@ -218,6 +218,16 @@ lacks a separate airway-opening-pressure measurement, so it cannot apply that
 bedside correction. Finally, R/I does not establish that high PEEP avoids
 overdistension, and the simulator does not present it as an optimal-PEEP rule.
 
+Optional recruitment hysteresis retains only the recruitable diseased fraction;
+already-aerated lung follows current transpulmonary pressure. Each respiratory
+step solves the gas-volume relation and the opening/closing memory constraint
+together, using the same previously accepted recruitment for preliminary flow
+and final-volume evaluations. The final pressure and recruitment therefore
+describe the same lung. Plateau bookkeeping reuses that state with muscle
+pressure removed. This is a rate-independent memory law: it has no biological
+opening or closing time constant. See [Recruitment hysteresis](../manual/hysteresis.md)
+for the current calculation, numerical checks and physiological limits.
+
 ---
 
 ## 6. What the occlusion manoeuvres show

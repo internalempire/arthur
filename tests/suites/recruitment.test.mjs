@@ -174,7 +174,7 @@ section('Recruitment hysteresis');
 
   // And the condition under which it does not, which is the clinical point.
   const lost = manoeuvre({ pClose: 14, peep: 10 });
-  check('a manoeuvre buys nothing if the PEEP after it is below the closing pressure',
+  check('a manoeuvre loses its gain when transpulmonary pressure reaches the closing range',
     Math.abs(lost.after.open - lost.before.open) < 0.005,
     `end-expiratory transpulmonary pressure ${lost.before.pl.toFixed(1)} against a closing pressure of 14; `
     + `${(lost.before.open * 100).toFixed(1)}% -> ${(lost.after.open * 100).toFixed(1)}%`);

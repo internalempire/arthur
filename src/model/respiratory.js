@@ -22,7 +22,7 @@
 
 import { clamp } from './units.js';
 import {
-  transpulmonaryAt, transpulmonaryAtRecruitmentState, relaxationVolume, lungComplianceAt,
+  transpulmonaryAt, transpulmonaryWithRecruitment, relaxationVolume, lungComplianceAt,
   stepRecruitedFraction, recruitmentBand, openFractionFromRecruitmentState,
   hysteresisGap, staticEndExpiratoryVolume, staticEndExpiratoryVolumeAtRecruitmentState,
   chestWallPressure, chestWallComplianceAt, CHEST_WALL_REFERENCE_PRESSURE,
@@ -280,18 +280,22 @@ export function stepRespiratory(p, r, dt) {
   // chest-wall and lung recoil evaluated at the same absolute volume. One
   // function is used for flow and reported pressure so they cannot drift apart.
   //
-  // With hysteresis only the recruitable diseased share is frozen for the step.
-  // Normal lung still follows present pressure, so both branches require a
-  // warm-started inverse solve. Freezing the total open fraction here was the
-  // structural error that gave normal lung an ARDS-like memory.
+  // Keep the previous accepted recruitment as the memory input throughout this
+  // step. Solve pressure and its compatible recruitment together, including the
+  // preliminary flow evaluation; accept only the final-volume pair. Normal
+  // lung follows present pressure and carries no recruitment memory.
+  const previousRecruitment = r.recruitedFraction;
+  let consistentRecruitment = previousRecruitment;
   const alveolar = (v, pmus) => {
     const absoluteVolume = vRelax + v;
-    r.plSolved = hysteretic
-      ? transpulmonaryAtRecruitmentState(p, absoluteVolume, r.recruitedFraction, r.plSolved)
-      : transpulmonaryAt(p, absoluteVolume, r.plSolved);
-    r.openFraction = hysteretic
-      ? openFractionFromRecruitmentState(p, r.plSolved, r.recruitedFraction)
-      : null;
+    if (hysteretic) {
+      r.plSolved = transpulmonaryWithRecruitment(p, absoluteVolume, previousRecruitment, r.plSolved);
+      consistentRecruitment = stepRecruitedFraction(p, previousRecruitment, r.plSolved);
+      r.openFraction = openFractionFromRecruitmentState(p, r.plSolved, consistentRecruitment);
+    } else {
+      r.plSolved = transpulmonaryAt(p, absoluteVolume, r.plSolved);
+      r.openFraction = null;
+    }
     return chestWallPressure(p, absoluteVolume) - pmus + r.plSolved;
   };
 
@@ -312,7 +316,7 @@ export function stepRespiratory(p, r, dt) {
     r.relaxVolume = vRelax;
     r.pab = p.pab0 + p.abdCoupling * r.v;
     if (hysteretic) {
-      r.recruitedFraction = stepRecruitedFraction(p, r.recruitedFraction, r.pl);
+      r.recruitedFraction = consistentRecruitment;
       r.openFraction = openFractionFromRecruitmentState(p, r.pl, r.recruitedFraction);
     }
     r.prevPhase = r.phase;
@@ -507,11 +511,9 @@ export function stepRespiratory(p, r, dt) {
   // miss it entirely and report a fabricated pressure as a result.
   if (r.plSolved >= 79.5) r.hitCapacity = true;
   r.pab = p.pab0 + p.abdCoupling * r.v;
-  // The state the next step will read. Updated after the pressures rather than
-  // before them, so what is reported and what the flow was computed from are the
-  // same lung.
+  // Commit the recruitment belonging to the final-volume pressure solve.
   if (hysteretic) {
-    r.recruitedFraction = stepRecruitedFraction(p, r.recruitedFraction, r.pl);
+    r.recruitedFraction = consistentRecruitment;
     r.openFraction = openFractionFromRecruitmentState(p, r.pl, r.recruitedFraction);
   }
 
@@ -523,7 +525,11 @@ export function stepRespiratory(p, r, dt) {
   // would show after an inspiratory hold. Read from the same relation as
   // everything else rather than from a compliance that no longer exists as a
   // single number.
-  if (r.phase === 'insp') r.pplatCandidate = alveolar(r.v, 0);
+  // Removing muscle pressure at unchanged volume does not change lung recoil
+  // or recruitment. Reuse the accepted solve without advancing its memory.
+  if (r.phase === 'insp') {
+    r.pplatCandidate = chestWallPressure(p, r.lungVolume) + r.plSolved;
+  }
 
   // Everything reported per breath is latched exactly once, at the moment
   // inspiration ends — not on a time window that can fire twice.

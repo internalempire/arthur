@@ -404,8 +404,29 @@ export function transpulmonaryAt(p, lungVolume, hint = null) {
  * entire open fraction and is retained for static analytic uses.
  */
 export function transpulmonaryAtRecruitmentState(p, lungVolume, recruitedFraction, hint = null) {
+  return invertRecruitmentVolume(
+    (pl) => lungVolumeAtRecruitmentState(p, pl, recruitedFraction), lungVolume, hint,
+  );
+}
+
+/**
+ * Solve pressure and recruitment together at the requested gas volume.
+ *
+ * The previously accepted diseased fraction is the memory input. At each trial
+ * pressure it is projected onto that pressure's opening/closing band, then the
+ * resulting open lung must hold the requested volume. Both factors increase
+ * monotonically with pressure, allowing a bounded inverse without a new rate
+ * constant. Callers must retain the same previous memory throughout one step.
+ */
+export function transpulmonaryWithRecruitment(p, lungVolume, previous, hint = null) {
+  return invertRecruitmentVolume(
+    (pl) => lungVolumeAtRecruitmentState(p, pl, stepRecruitedFraction(p, previous, pl)),
+    lungVolume, hint,
+  );
+}
+
+function invertRecruitmentVolume(volumeAt, lungVolume, hint) {
   const TOL = 1e-6; // L
-  const volumeAt = (pl) => lungVolumeAtRecruitmentState(p, pl, recruitedFraction);
 
   if (hint !== null && Number.isFinite(hint)) {
     let pl = hint;

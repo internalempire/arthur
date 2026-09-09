@@ -99,7 +99,7 @@ The translation depends on the opening-pressure distribution and the reference m
 - **The solve is static.** It uses equilibrium volumes, not a single-breath manoeuvre with its flow and timing.
 - **The calibration ignores hysteretic history.** The internal mapping from requested R/I to openable fraction does not include `pClose` or the path by which the lung reached either pressure. When hysteresis is enabled, the actual decremental response can therefore differ from the static reference mapping.
 - The maximum achievable ratio depends on `collapsed` and `pOpen`, so the control's usable range moves with the rest of the phenotype.
-- Recruitment here is instantaneous with pressure except where [hysteresis](hysteresis.md) is enabled. There is no time-dependent recruitment, no slow opening over minutes.
+- Recruitment responds instantaneously to pressure. With [hysteresis](hysteresis.md) enabled, the recruitable compartment also retains its opening and closing history. Neither setting includes time-dependent recruitment or slow opening over minutes.
 
 ### Of clinical application
 
