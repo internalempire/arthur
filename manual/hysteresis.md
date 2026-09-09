@@ -82,7 +82,7 @@ The vertical axis is open fraction, not lung volume. The figure is therefore **n
 
 Three examples are useful at the bedside:
 
-**Pressure afterwards is too low.** If pressure falls through the closing range, recently opened units close again. In the example above, raising `pClose` to 14 cmH₂O leaves essentially no persistent gain after return to PEEP 10.
+**Pressure afterwards is too low.** If transpulmonary pressure falls through the closing range, recently opened units close again. Raising `pClose` only removes the retained gain if the subsequent pressure trajectory reaches enough of that range. Follow transpulmonary pressure and open fraction together: comparing closing pressure with the numerical PEEP setting alone does not establish whether units will close.
 
 **Ordinary breaths may already reach the opening range.** The generated comparison above shows how increasing tidal volume reduces the additional gain left for the manoeuvre.
 
@@ -110,6 +110,7 @@ Three examples are useful at the bedside:
 - **No time dependence.** Holding the same pressure for one second or one minute produces no additional recruitment or derecruitment.
 - **Shared opening and closing distributions.** All recruitable units belong to two smooth pressure ranges with fixed widths; there is no patient-specific distribution of regional thresholds.
 - **One global recruitment state.** Dependent and non-dependent regions cannot open or close differently.
+- **Numerical instability can occur with hysteresis enabled.** In some stiff, highly collapsed states with nearby opening and closing ranges, the sequential pressure and recruitment update can oscillate even at fixed gas volume. It can corrupt the inspiratory-volume count and alter pulmonary pressure and cardiac output. The general validity badge does not reliably detect this failure. A smaller numerical timestep can avoid its onset in a particular run without eliminating the underlying inconsistency; quantitative interpretation requires a dedicated convergence check in affected states. The independent audit keeps this finding open.
 - `pOpen` and `pClose` are model inputs. The model does not estimate them from a bedside manoeuvre.
 
 ### Of clinical application

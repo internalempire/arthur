@@ -1,6 +1,55 @@
 # Project handover
 
-Updated: 2026-09-08
+Updated: 2026-09-09
+
+## Hysteresis stability assessed; no numerical correction adopted — September 9
+
+The clinician authorized roadmap point 1: identify the hysteresis instability,
+its operating conditions, its circulatory effect and the cost of a possible
+solution. Production source remains the source of `5acc140`; pulmonary
+resistance, other physiology, coefficients, presets, timestep and UI behavior
+are unchanged. The hysteresis audit entry remains open.
+
+The registered severe collapsed/stiff-lung fixture reproduces an alternating
+pressure/recruitment cycle. Identical frozen gas volume and prior recruitment
+produce the same pressure alternation at all tested timesteps: refinement can
+avoid entering the unstable state but does not remove its fixed-volume map.
+Pressure is calculated with prior recruitment and recruitment is then projected
+onto the pressure-dependent band; the resulting pair can violate the volume
+law. Spurious inward flow during expiration also accumulates in reported VT;
+this is not a literal enormous lung-volume excursion. Circulatory means change
+despite conserved blood volume and a clear general validity badge.
+
+A private diagnostic reference solves the existing pressure-volume relation
+and recruitment-memory projection together, retaining the previous accepted
+memory throughout each step. No recruitment time constant or physiological
+coefficient is introduced. Independent bracketed solutions agree; fixed-volume
+oscillations disappear, refinement agrees, and retained recruitment survives
+the usual manoeuvre. Differences in the sampled ordinary examples are small;
+the severe fixture has a material pulmonary-pressure and output error in
+production. These are numerical comparisons, not human physiological
+validation or a complete control-space guarantee.
+
+Sequential timing includes the numerical core and metrics, excluding browser
+rendering and Deep. Cost is state-dependent: the diagnostic solver has a
+measurable overhead in the ARDS-on example, a small overhead in the manual
+example, and avoids costly unstable iterations in the severe fixture. Do not
+promise zero overhead or infer browser latency from this benchmark. Adoption,
+optimization, permanent regression checks and any invalid-state guard still
+require the clinician's confirmation. R/I and wall-intervention work remain
+separate and unresolved.
+
+The manual now states the current numerical limitation and corrects an
+unsupported closing-pressure example: retained recruitment depends on the
+actual transpulmonary trajectory reaching the closing range, not on comparing
+the closing setting with PEEP. An initial additional probe failed that prose
+claim; the stored comparison preserves the finding rather than loosening a
+production acceptance criterion.
+
+Private report: `codex-notes/Arthur-isteresi-verifica-2026-09-09.md`.
+Runners, source copy/diff, source hashes, numerical results and logs:
+`outputs/Arthur-hysteresis-review-2026-09-09/`. These are not committed.
+Windows has not been verified.
 
 ## Current pulmonary law retained; manual describes current behavior — September 8
 
