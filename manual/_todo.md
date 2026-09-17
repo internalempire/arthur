@@ -16,4 +16,4 @@ The superior vena cava is surrounded by pleural pressure and the inferior by abd
 
 ### Validate opening profiles as coupled respiratory–circulatory phenotypes
 
-Assess pressure, volume, compliance and circulatory response jointly under specified PEEP and pressure-history protocols, without treating model percentages as anatomy. Preserve the current constitutive laws unless a clinically explained, materially useful correction is authorized.
+Constrain the magnitude of within-breath opening and its plateau/compliance consequences against measurements obtained under a matched pressure-history protocol. Extend joint checks beyond the passive ARDS/RV phenotype to other mechanics and ventilatory modes. Define which vascular comparisons are defensible when the aggregate zone-3 condition fails; do not treat internal fractions as anatomy or an atrial-pressure ratio as a validated catheter measurement. Preserve the current constitutive laws unless a clinically explained, materially useful correction is authorized.

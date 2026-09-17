@@ -2,6 +2,41 @@
 
 Updated: 2026-09-17
 
+## Joint pulmonary mechanics and circulation review — September 17
+
+After R/I retirement checks passed, the clinician authorized the joint review.
+The current model at `d7ca34fae6405dc45352a46b751db7a7ca7a2c2b` was exercised
+without changing physiology, presets, coefficients, timestep defaults or UI.
+The passive ARDS/RV phenotype was compared across all three opening profiles
+through PEEP 5→10→15→10→5, with fixed VCV volume and respiratory/cardiac rates,
+at the ordinary and halved integration steps. Consecutive settled windows,
+direct valve-flow integrals, gas/blood conservation, pressure–volume consistency
+and numerical-domain checks passed. A separate paired PEEP 10→15 experiment
+used identical initial states and exactly matched clocks within each pair.
+Its initial effect sizes are more phase-sensitive than the settled means;
+they do not validate a clinical transit time.
+
+Opening, distension, external pressure, filling and ejection load must be read
+together. More opening and a lower internal vascular coefficient did not always
+give greater output. Lower plateau without memory could reflect substantial
+within-breath opening; compliance inferred from the breath is not simply
+aerated-tissue compliance. Returning to the lower PEEP recovered the same
+periodic state in this protocol, including the memory profile. The aggregate
+zone-3 condition was not sustained, limiting catheter-style PVR comparisons.
+The severe phenotype and unmatched clinical protocols permit qualitative
+external comparison only, not patient-level quantitative validation.
+
+No result justified another model change. Remaining work is narrowed in
+`manual/_todo.md` to quantitative cyclic-opening evidence, other phenotypes/
+modes and defensible vascular comparisons outside the zone-3 condition.
+The private report is
+`codex-notes/Arthur-verifica-congiunta-polmone-circolo-2026-09-17.md`; reproducible
+scripts, numerical results and logs are in
+`outputs/Arthur-coupled-opening-review-2026-09-17/`. These remain unversioned.
+Product verification is the completed retirement suite recorded below; only
+documentation changed afterward. Manual build/lint passed with eighteen
+unchanged generated blocks and zero errors/warnings. Windows is not verified.
+
 ## R/I retired and isolated — September 17
 
 The clinician explicitly chose to abandon R/I. The active lung has no static
