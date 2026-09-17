@@ -51,4 +51,4 @@ Model RV is the completely open lung volume at zero transpulmonary pressure; mod
 
 ## See also
 
-[Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Hypoxic vasoconstriction](hypoxic-vasoconstriction.md) · [Recruitment and R/I](recruitment-and-ri.md) · [The right ventricle](the-right-ventricle.md) · [Pulmonary controls](controls-pulmonary.md)
+[Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Hypoxic vasoconstriction](hypoxic-vasoconstriction.md) · [Lung opening profiles](recruitment-and-ri.md) · [The right ventricle](the-right-ventricle.md) · [Pulmonary controls](controls-pulmonary.md)

@@ -6,8 +6,6 @@
 // assert an outcome, the model applies the three mechanical changes and lets
 // the outcome fall out of them, so the balance can be inspected.
 
-import { normalizeRecruitmentParameters } from './recruitment.js';
-
 export const PRONE = {
   // The anterior chest wall now rests against the bed and cannot expand, so the
   // chest wall stiffens. Reported reductions in compliance cluster around a
@@ -30,11 +28,7 @@ export const PRONE = {
 };
 
 /** Position changes pressures and mechanics, preserving the lung's potential. */
-export function resolveParams(parameters) {
-  // Compatibility for isolated analyses with an old prescription. Simulator
-  // normalizes at reset, so live integration never enters this branch.
-  const p = Object.hasOwn(parameters, 'riRatio')
-    ? normalizeRecruitmentParameters(parameters) : parameters;
+export function resolveParams(p) {
   const supine = { ...p, openableDiseasedFraction: p.reopenable ?? 0 };
   if (p.position !== 'prone') return supine;
   return {

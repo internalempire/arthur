@@ -1,5 +1,6 @@
 // Explicit phenotype prescriptions. These select the existing opening law;
 // they are teaching examples, not anatomical measurements or PEEP targets.
+import { calibrateRecruitmentToInflation } from './lung.js';
 
 export const ARDS_REOPENABLE = 0.3892077555259069;
 export const RECRUITMENT_PROFILES = Object.freeze({
@@ -18,11 +19,16 @@ export function recruitmentProfileOf(p) {
   return 'custom';
 }
 
-/** Validate the explicit prescription and order its pressure midpoints. */
+/** One-time conversion at a prescription boundary, never during integration. */
 export function normalizeRecruitmentParameters(parameters) {
   const p = { ...parameters };
   if (Object.hasOwn(p, 'riRatio')) {
-    throw new Error('R/I prescriptions are not supported. Use explicit opening settings; convert version-1 files separately.');
+    if (!Number.isFinite(p.riRatio) || p.riRatio < 0 || p.riRatio > 2) {
+      throw new Error('Legacy R/I must be a finite value from 0 to 2.');
+    }
+    p.reopenable = calibrateRecruitmentToInflation(p).openableFraction;
+    delete p.riRatio;
+    p.recruitmentProfile = recruitmentProfileOf(p);
   }
   // A historical closing midpoint above opening already meant zero memory.
   // Equality preserves that effective law while enforcing an explicit range.

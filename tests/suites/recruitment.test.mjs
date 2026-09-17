@@ -9,8 +9,8 @@ import {
 section('Recruitment changes the mechanics');
 {
   const p = defaultParams();
-  const recruitable = { ...p, collapsed: 0.42, clung: 40, riRatio: 0.7, pOpen: 18.5 };
-  const consolidated = { ...recruitable, riRatio: 0 };
+  const recruitable = { ...p, collapsed: 0.42, clung: 40, reopenable: 0.2750646074612935, pOpen: 18.5 };
+  const consolidated = { ...recruitable, reopenable: 0 };
 
   // The pressure–volume curve has to be a curve, and the signature is a slope
   // that *recovers*: stiffest where the baby lung is being stretched alone, less
@@ -88,7 +88,7 @@ section('Recruitment changes the mechanics');
 
   // Resting volume is an outcome now, so the whole model has to agree on it.
   {
-    const s = settled({ collapsed: 0.42, clung: 40, riRatio: 0.7, pOpen: 18.5, peep: 0, mode: 'vcv', vt: 300 }, 40);
+    const s = settled({ collapsed: 0.42, clung: 40, reopenable: 0.2750646074612935, pOpen: 18.5, peep: 0, mode: 'vcv', vt: 300 }, 40);
     check('the integrator settles at the resting volume the curve predicts',
       near(s.resp.relaxVolume, relaxationVolume(s.params), 1e-9),
       `${s.resp.relaxVolume.toFixed(4)} vs ${relaxationVolume(s.params).toFixed(4)} L`);
@@ -102,8 +102,8 @@ section('Recruitment changes the mechanics');
     for (let i = 0; i < (60 / sim.params.rr) / 0.01; i++) { sim.advance(0.01, true); lo = Math.min(lo, sim.resp.lungVolume); }
     return lo;
   };
-  const rGain = eelv({ riRatio: 0.7, pOpen: 18.5, peep: 16 }) - eelv({ riRatio: 0.7, pOpen: 18.5, peep: 4 });
-  const cGain = eelv({ riRatio: 0, peep: 16 }) - eelv({ riRatio: 0, peep: 4 });
+  const rGain = eelv({ reopenable: 0.2750646074612935, pOpen: 18.5, peep: 16 }) - eelv({ reopenable: 0.2750646074612935, pOpen: 18.5, peep: 4 });
+  const cGain = eelv({ reopenable: 0, peep: 16 }) - eelv({ reopenable: 0, peep: 4 });
   check('PEEP 4 to 16 gains a recruitable lung more volume than a consolidated one',
     rGain > cGain * 1.25,
     `${(rGain * 1000).toFixed(0)} mL vs ${(cGain * 1000).toFixed(0)} mL`);
@@ -119,8 +119,8 @@ section('Recruitment hysteresis');
   const ARDS = {
     ...SCENARIOS.find((x) => x.id === 'ards-rv').params,
     // This higher-opening fixture deliberately exercises the full hysteresis
-    // band; its requested R/I is capacity-limited and is not a cohort fit.
-    hysteresis: 'on', pOpen: 18.5, riRatio: 0.7, vt: 250,
+    // band with the whole compromised component reopenable; it is not a cohort fit.
+    hysteresis: 'on', pOpen: 18.5, reopenable: 1, vt: 250,
   };
   // Settle, then a recruitment manoeuvre, then back to where it started.
   const manoeuvre = (over) => {
@@ -251,13 +251,13 @@ section('The stress index');
     si({ vt: 1400, peep: 10 }) > si({ vt: 450, peep: 10 }) + 0.03,
     `${si({ vt: 450, peep: 10 }).toFixed(2)} at 450 mL -> ${si({ vt: 1400, peep: 10 }).toFixed(2)} at 1400`);
   check('a small stiff collapsed lung at a large tidal volume shows overdistension',
-    si({ lungCapacity: 4, clung: 45, collapsed: 0.4, riRatio: 0, vt: 900, peep: 15 }) > 1.1,
-    `${si({ lungCapacity: 4, clung: 45, collapsed: 0.4, riRatio: 0, vt: 900, peep: 15 }).toFixed(2)}`);
+    si({ lungCapacity: 4, clung: 45, collapsed: 0.4, reopenable: 0, vt: 900, peep: 15 }) > 1.1,
+    `${si({ lungCapacity: 4, clung: 45, collapsed: 0.4, reopenable: 0, vt: 900, peep: 15 }).toFixed(2)}`);
 
   // The other direction, and the pair that makes it a teaching point: the same
   // lung reads below 1 when PEEP is too low to hold it open and above 1 once it
   // is not.
-  const openable = { clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 17.6, vt: 600 };
+  const openable = { clung: 40, collapsed: 0.42, reopenable: 0.9765564948320389, pOpen: 17.6, vt: 600 };
   check('too little PEEP shows tidal recruitment instead',
     si({ ...openable, peep: 2 }) < 0.95, `${si({ ...openable, peep: 2 }).toFixed(2)} at PEEP 2`);
   check('and enough of it turns the same lung the other way',
@@ -341,8 +341,8 @@ section('Body position');
     Math.abs(normalProne.metrics.openFraction - normalSupine.metrics.openFraction) < 0.01,
     `open ${normalSupine.metrics.openFraction.toFixed(3)} -> ${normalProne.metrics.openFraction.toFixed(3)}`);
 
-  const consolidated = settled({ ...ARDS, riRatio: 0 });
-  const consolidatedProne = settled({ ...ARDS, riRatio: 0, position: 'prone' });
+  const consolidated = settled({ ...ARDS, reopenable: 0 });
+  const consolidatedProne = settled({ ...ARDS, reopenable: 0, position: 'prone' });
   check('and proning a consolidated lung recruits nothing either — it is shut, not closed',
     Math.abs(consolidatedProne.metrics.openFraction - consolidated.metrics.openFraction) < 0.01,
     `open ${consolidated.metrics.openFraction.toFixed(3)} -> ${consolidatedProne.metrics.openFraction.toFixed(3)}`);

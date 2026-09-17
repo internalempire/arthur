@@ -11,7 +11,7 @@ import {
 
 const severe = {
   collapsed: 0.8, clung: 20, pOpen: 20.5, pClose: 20, cwLoad: 10,
-  riRatio: 1.5, hysteresis: 'on', vt: 150, ti: 0.4, rr: 20, peep: 10,
+  reopenable: 0.2730275491873423, hysteresis: 'on', vt: 150, ti: 0.4, rr: 20, peep: 10,
 };
 function parameters(overrides) {
   const p = resolveParams({ ...defaultParams(), ...overrides });
@@ -36,7 +36,7 @@ section('Coupled pressure and recruitment');
 {
   let worstPressure = 0, worstVolume = 0;
   for (const collapsed of [0.3, 0.5, 0.8]) for (const gap of [0.5, 3, 12]) {
-    const p = parameters({ ...severe, collapsed, pClose: 20.5 - gap });
+    const p = parameters({ ...severe, collapsed, reopenable: collapsed === 0.8 ? severe.reopenable : 0, pClose: 20.5 - gap });
     for (const share of [0, 0.25, 0.75, 1]) for (const pl of [5, 10, 15, 20, 25, 35]) {
       const previous = collapsed * p.openableDiseasedFraction * share;
       const volume = lungVolumeAtPl(p, pl);

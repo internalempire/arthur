@@ -3,33 +3,22 @@ import { section, check, defaultParams, Simulator, SCENARIOS, totalVolume } from
 import { parsePatientState, createPatientState } from '../../src/model/patient-state.js';
 import { resolveParams } from '../../src/model/position.js';
 import { ARDS_REOPENABLE, normalizeRecruitmentParameters } from '../../src/model/recruitment.js';
-import { lungVolumeAtPl, lungRegions, calibrateRecruitmentToInflation } from '../../src/model/lung.js';
+import { lungRegions } from '../../src/model/lung.js';
 
 section('Explicit opening profiles and saved prescriptions');
-const old = { ...defaultParams(), ...SCENARIOS.find(x=>x.id==='ards-rv').params, riRatio: .7 };
-delete old.reopenable; delete old.recruitmentProfile;
-const parsed = parsePatientState({ format:'arthur-patient-state', version:1, parameters:old });
-check('version 1 converts the full supine phenotype once and preserves its exact share',
-  parsed.migrated && parsed.params.reopenable === ARDS_REOPENABLE && !Object.hasOwn(parsed.params,'riRatio'));
-const legacyCustom={...old,position:'prone',hysteresis:'on',pOpen:18.5,pClose:4};
-const convertedCustom=parsePatientState({format:'arthur-patient-state',version:1,parameters:legacyCustom});
-check('a legacy custom prone prescription preserves its own pressure settings and supine potential',
- convertedCustom.params.recruitmentProfile==='custom' && convertedCustom.params.pClose===4
- && convertedCustom.params.pOpen===18.5 && convertedCustom.params.position==='prone'
- && convertedCustom.params.reopenable===calibrateRecruitmentToInflation(legacyCustom).openableFraction);
-const legacyResolved = { ...old, openableDiseasedFraction:calibrateRecruitmentToInflation(old).openableFraction };
-check('converted gas-volume and opening curves equal the legacy prescription',
-  Array.from({length:211},(_,i)=>-25+i*.5).every(pl=>lungVolumeAtPl(legacyResolved,pl)===lungVolumeAtPl(resolveParams(parsed.params),pl)));
+const params = { ...defaultParams(), ...SCENARIOS.find(x=>x.id==='ards-rv').params };
+const parsed = parsePatientState(createPatientState(params));
+check('version 2 preserves the preset explicit share', parsed.params.reopenable === ARDS_REOPENABLE);
 const custom={...parsed.params,reopenable:.314159265358,pOpen:22,pClose:7,hysteresis:'on',recruitmentProfile:'custom',position:'prone'};
 const roundtrip=parsePatientState(createPatientState(custom));
 check('version 2 preserves exact custom values and typed settings',JSON.stringify(roundtrip.params)===JSON.stringify(custom));
 let rejected=0;
 for(const candidate of [
- {format:'arthur-patient-state',version:1,parameters:{...old,riRatio:NaN}},
+ {format:'arthur-patient-state',version:1,parameters:{...params,riRatio:.7}},
  createPatientState({...custom,reopenable:1.1}),
  createPatientState({...custom,pOpen:10,pClose:12}),
 ])try{parsePatientState(candidate);}catch{rejected++;}
-check('invalid legacy ratios, fractions and closing ranges are rejected',rejected===3);
+check('version 1, invalid fractions and closing ranges are rejected',rejected===3);
 const wall=[{ccw:100},{cwLoad:15},{clung:40},{collapsed:.6},{position:'prone'}];
 check('wall, tissue, extent and position never recalibrate reopenable potential',wall.every(change=>resolveParams({...custom,...change}).openableDiseasedFraction===custom.reopenable));
 const zero=normalizeRecruitmentParameters({...defaultParams(),collapsed:0});

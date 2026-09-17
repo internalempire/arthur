@@ -228,7 +228,7 @@ export const PARAMETERS = [
   {
     id: 'pOpen', group: 'mechanics', advanced: 'recruitment', label: 'Opening midpoint (transpulmonary)', unit: 'cmH₂O',
     min: 5, max: 40, step: 0.5, default: 20,
-    help: 'Recruitment occurs over a range, not at one pressure. This is the centre of that opening range for the collapsed but recruitable part of the lung: below it fewer than half of those units are open, above it more than half are. It is an alveolar-minus-pleural pressure, not an airway-pressure threshold or a PEEP setting.',
+    help: 'Recruitment occurs over a range, not at one pressure. This is the centre of that opening range for the collapsed but recruitable part of the lung: below it fewer than half of those units are open, above it more than half are. It is a transpulmonary pressure, not the airway-opening pressure used to correct a bedside R/I manoeuvre.',
   },
   {
     id: 'hysteresis', group: 'mechanics', advanced: 'recruitment', label: 'Opening memory',

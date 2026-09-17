@@ -6,7 +6,7 @@ const ACRONYMS = new Map([
   ['ards', 'ARDS'], ['co', 'CO'], ['copd', 'COPD'], ['efl', 'EFL'],
   ['frc', 'FRC'], ['hpv', 'HPV'], ['ivc', 'IVC'], ['lv', 'LV'],
   ['pap', 'PAP'], ['pawp', 'PAWP'], ['peep', 'PEEP'], ['pmsf', 'Pmsf'],
-  ['ppv', 'PPV'], ['pvr', 'PVR'], ['ri', 'R/I'], ['rv', 'RV'],
+  ['ppv', 'PPV'], ['pvr', 'PVR'], ['rv', 'RV'],
 ]);
 
 const decode = (value) => {
@@ -31,6 +31,7 @@ export function manualHash(slug, anchor = '') {
 
 /** Used only when a written page title is unavailable (for example offline). */
 export function fallbackTitle(slug) {
+  if (slug === 'recruitment-and-ri') return 'Lung opening profiles';
   return String(slug).split('-').map((word, index) => {
     const known = ACRONYMS.get(word.toLowerCase());
     if (known) return known;

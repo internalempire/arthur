@@ -34,7 +34,7 @@ Do not expect one universal direction for cardiac output. The point of the exper
 3. Raise PEEP gradually.
 4. Return to the preset, select the Non-reopenable opening profile, and repeat the same PEEP change.
 
-With recruitable lung, some added pressure opens units and distributes inflation across a larger aerated volume. Without recruitment, more of the pressure distends the already open lung. The comparison is qualitative: it demonstrates why equal PEEP is not equal lung stress or equal RV load. See [recruitment and R/I](recruitment-and-ri.md) and [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
+With recruitable lung, some added pressure opens units and distributes inflation across a larger aerated volume. Without recruitment, more of the pressure distends the already open lung. The comparison is qualitative: it demonstrates why equal PEEP is not equal lung stress or equal RV load. See [lung opening profiles](recruitment-and-ri.md) and [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 
 ## Minute 8–10: inspect a ventricular response
 
@@ -62,9 +62,15 @@ Use **Save patient** after creating a useful phenotype. The application download
 
 **Load patient** validates that file, labels the result *Custom*, starts a fresh simulation and allows it to settle. The same parameter set is therefore reproduced without carrying across the arbitrary cardiac phase, respiratory phase, pressures or compartment volumes present when Save was clicked. This distinction is intentional: the feature reproduces a patient definition and experiment, not one frozen animation frame.
 
-Version 2 files retain the exact reopenable share and custom opening settings, including precision not shown in percentage labels. Version 1 files with an R/I prescription are accepted: the loader converts that prescription once into explicit potential using the saved lung and chest-wall settings before applying position. Subsequent chest-wall changes preserve that potential. The conversion reproduces the saved model phenotype, not a clinical R/I measurement.
+Version 2 files retain the exact reopenable share and custom opening settings, including precision not shown in percentage labels. The loader accepts version 2 only. A version-1 file requires separate conversion before loading; rejection leaves the current patient unchanged. The offline recovery tool uses a self-contained archived implementation and writes a new version-2 file without overwriting the original:
 
-Unknown settings from an older file are reported and ignored. A known setting outside its available range is rejected rather than silently clipped, because clipping would make a debugging case appear reproduced when it was not.
+```bash
+node tools/archive/ri/convert-patient.mjs input-v1.json output-v2.json
+```
+
+Load the resulting version-2 file normally. The converter requires Node.js and a local project checkout; it does not run in the browser. See the [recovery tool instructions](../tools/archive/ri/README.md).
+
+Unknown settings in a version-2 file are reported and ignored; an R/I field is rejected to avoid silently changing the prescribed phenotype. A known setting outside its available range is rejected rather than silently clipped, because clipping would make a debugging case appear reproduced when it was not.
 
 ## Limits
 

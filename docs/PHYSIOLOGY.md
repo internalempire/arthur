@@ -213,13 +213,12 @@ reset and occlusions invalidate both until a complete breath at the new settings
 is available. They are internal state measurements, not recruited volume or
 injury indices, and require no additional deep calculation.
 
-R/I remains a clinical concept distinct from these controls. Research helpers
-retain a static 5-to-15 cmH₂O tangent-compliance analogue and a version-1 file
-conversion. Their agreement with a finite-volume ventilator manoeuvre is an
-unresolved validation criterion; cohort IQR agreement does not validate that
-manoeuvre or identify anatomical percentages. Version-1 conversion runs once
-against the saved supine prescription, before posture is applied. Version-2
-files store the explicit share, profile and pressure settings.
+The active model neither calculates nor accepts R/I. Opening potential is an
+explicit coefficient; external validation must assess pressure, volume,
+compliance and circulatory response jointly. Version-2 patient files store the
+explicit share, profile and pressure settings. Version-1 files require the
+isolated offline recovery tool before loading; the application does not import
+that archived calculation.
 
 Optional recruitment hysteresis retains only the recruitable diseased fraction;
 already-aerated lung follows current transpulmonary pressure. Each respiratory

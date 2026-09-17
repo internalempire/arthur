@@ -17,7 +17,7 @@ import { render } from '../render.mjs';
 import { buildSearchIndex } from './search-index.mjs';
 import { consistencyErrors } from './consistency.mjs';
 import {
-  DISEASED_RECRUITMENT_WIDTH, RI_HIGH_PEEP, RI_LOW_PEEP,
+  DISEASED_RECRUITMENT_WIDTH,
 } from '../../src/model/lung.js';
 import { REFERENCE_WEIGHT_KG, defaultParams } from '../../src/model/parameters.js';
 import { TRACE_SAMPLE_HZ, TRACE_SECONDS } from '../../src/model/simulator.js';
@@ -118,7 +118,6 @@ const consistencyAnchors = {
   'diseased-recruitment-width': `${DISEASED_RECRUITMENT_WIDTH} cmH₂O`,
   'pericardial-capacity-default': `${defaults.pericardialCapacity} mL`,
   'reference-weight': `${REFERENCE_WEIGHT_KG} kg`,
-  'ri-reference-step': `${RI_LOW_PEEP} → ${RI_HIGH_PEEP}`,
   'trace-sample-rate': `${TRACE_SAMPLE_HZ} Hz`,
   'trace-window-seconds': String(TRACE_SECONDS),
 };

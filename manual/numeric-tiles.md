@@ -228,7 +228,7 @@ The main value is the closed fraction of the whole model lung immediately before
 
 Both are withheld until a complete breath has occurred under the current settings. Parameter changes, reset and occlusions invalidate the pair. The normal population can contribute a small pressure-dependent excursion even with no reopenable compromised units. Neither readout requires Deep CO.
 
-Related page: [Recruitment and R/I](recruitment-and-ri.md)
+Related page: [Lung opening profiles](recruitment-and-ri.md)
 
 ### Stress index
 

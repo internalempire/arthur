@@ -1,5 +1,22 @@
 # Model decisions
 
+## 2026-09-17 — Retire R/I and isolate its recovery code
+
+The clinician explicitly chose to abandon R/I. The active lung has no static
+R/I assessment, calibration or reference protocol. Opening mechanics use only
+explicit potential. Active fixtures retain the same potential values at full
+precision; pulmonary resistance, opening width, presets and tolerances are
+unchanged. The finite-volume R/I criterion is retired, not resolved or marked
+PASS. The static cohort-mapping row is also outside active acceptance.
+
+Recovery code and its frozen dependencies are self-contained in
+`tools/archive/ri/`. No runtime, active test or manual generator imports it,
+and it imports no active model. It can be moved out of the checkout as a unit.
+Version-1 patient files require explicit offline conversion to version 2;
+automatic conversion would retain an application dependency on the abandoned
+calculation. Unsupported files are rejected before changing the current
+patient. Version-2 precision and current opening controls are preserved.
+
 ## 2026-09-17 — Specify opening potential directly
 
 After private R/I and intratidal-opening experiments, the clinician authorized

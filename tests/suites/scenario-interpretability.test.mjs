@@ -186,16 +186,15 @@ section('Scenario teaching mechanisms');
 {
   const baselineSimulator = scenarioSimulator('ards-rv');
   const baseline = baselineSimulator.metrics;
-  // R/I is not allowed to validate this preset by itself. The reference state
-  // must also occupy a defensible absolute pressure and mechanics range; this
-  // catches the former failure in which R/I 0.7 was obtained only because the
-  // PEEP manoeuvre crossed an excessively high transpulmonary-pressure window.
+  // Opening potential alone cannot validate this preset. The reference state
+  // must also occupy a defensible absolute pressure and mechanics range; the
+  // PEEP manoeuvre must not require excessive transpulmonary pressures.
   const endExpiratoryPpl = chestWallPressure(
     baselineSimulator.params, baseline.endExpiratoryVolume,
   );
   const endExpiratoryPl = baseline.totalPeep - endExpiratoryPpl;
   const recruiter = scenarioMetrics('ards-rv', { peep: 20 });
-  const nonRecruiter = scenarioMetrics('ards-rv', { peep: 20, riRatio: 0 });
+  const nonRecruiter = scenarioMetrics('ards-rv', { peep: 20, reopenable: 0 });
   demonstrates['ards-rv'] = baseline.papMean > 20
     && baseline.pvrDerivedWood > 4
     && baseline.rvLvRatio > 1.5
@@ -212,7 +211,7 @@ section('Scenario teaching mechanisms');
     demonstrates['ards-rv'],
     `baseline Ppl/PL ${endExpiratoryPpl.toFixed(1)}/${endExpiratoryPl.toFixed(1)} cmH2O, `
       + `plateau ${baseline.pplat.toFixed(1)}, reopenable ${(baseline.reopenableShare * 100).toFixed(1)}%; `
-      + `PVR at PEEP 20: R/I on ${recruiter.pvrDerivedWood.toFixed(1)}, `
+      + `PVR at PEEP 20: reopenable ${recruiter.pvrDerivedWood.toFixed(1)}, `
       + `off ${nonRecruiter.pvrDerivedWood.toFixed(1)} WU`);
 }
 

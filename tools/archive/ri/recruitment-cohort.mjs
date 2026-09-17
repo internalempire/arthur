@@ -1,6 +1,6 @@
 import {
   calibrateRecruitmentToInflation, lungComplianceAt,
-} from '../../src/model/lung.js';
+} from './lung.js';
 
 // One shared mechanical phenotype for both Cappio Borlino groups. Only the
 // static R/I target changes. This checks the historical mapping against group

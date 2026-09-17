@@ -177,4 +177,4 @@ End-expiratory volume is therefore an outcome of lung recoil, capacity, open fra
 
 ## See also
 
-[Equation of motion](equation-of-motion.md) · [The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Stress index](stress-index.md) · [Hysteresis](hysteresis.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Controls: mechanics](controls-mechanics.md)
+[Equation of motion](equation-of-motion.md) · [The two-population lung](two-population-lung.md) · [Lung opening profiles](recruitment-and-ri.md) · [Stress index](stress-index.md) · [Hysteresis](hysteresis.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Controls: mechanics](controls-mechanics.md)

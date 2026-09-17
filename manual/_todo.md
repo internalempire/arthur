@@ -14,4 +14,6 @@ The isolated LV probe demonstrates greater forward ejection at fixed starting vo
 
 The superior vena cava is surrounded by pleural pressure and the inferior by abdominal pressure, and the model uses one closing pressure derived from the abdomen alone. The consequences, and why this survived while the analogous pulmonary simplification did not, are set out under [vascular waterfalls](vascular-waterfalls.md).
 
-- Resolve or explicitly retire the finite-volume R/I research-analogue criterion using an externally defensible measurement protocol; removing the clinical tile does not validate the analogue. Validate opening profiles jointly against pressure, volume, compliance and circulatory response, without treating their percentages as anatomy.
+### Validate opening profiles as coupled respiratory–circulatory phenotypes
+
+Assess pressure, volume, compliance and circulatory response jointly under specified PEEP and pressure-history protocols, without treating model percentages as anatomy. Preserve the current constitutive laws unless a clinically explained, materially useful correction is authorized.

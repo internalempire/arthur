@@ -53,4 +53,4 @@ The `pvr-human-frc-nadir` and `pvr-human-j-direction` rows check the constructed
 
 ## See also
 
-[Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Why the mechanical PVR curve uses volume](pvr-volume-vs-pressure.md) · [The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md)
+[Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Why the mechanical PVR curve uses volume](pvr-volume-vs-pressure.md) · [The two-population lung](two-population-lung.md) · [Lung opening profiles](recruitment-and-ri.md)

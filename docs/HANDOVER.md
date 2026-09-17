@@ -2,6 +2,37 @@
 
 Updated: 2026-09-17
 
+## R/I retired and isolated — September 17
+
+The clinician explicitly chose to abandon R/I. The active lung has no static
+R/I assessment, calibration or reference protocol. Opening mechanics use only
+explicit potential. Active fixtures retain the same potential values at full
+precision; pulmonary resistance, opening width, presets and tolerances are
+unchanged. The finite-volume R/I criterion is retired, not resolved or marked
+PASS. The static cohort-mapping row is also outside active acceptance.
+
+Recovery code and its frozen dependencies are self-contained in
+`tools/archive/ri/`. No runtime, active test or manual generator imports it,
+and it imports no active model. It can be moved out of the checkout as a unit.
+Version-1 patient files require explicit offline conversion to version 2;
+automatic conversion would retain an application dependency on the abandoned
+calculation. Unsupported files are rejected before changing the current
+patient. Version-2 precision and current opening controls are preserved.
+
+Completed verification: `npm test` — 431 passed, zero failed, including
+all twelve unchanged scenario snapshots and five retirement-boundary checks;
+`npm run test:audit:strict` — seven PASS; `npm run test:ui` — 44 passed;
+Chromium — legacy-file rejection without patient mutation, exact converted-v2
+load/save, opening controls, manual and no archive requests. Manual build/lint
+passed with eighteen unchanged generated blocks and zero errors/warnings;
+80 modules passed syntax checks and ten verification-harness checks passed.
+A comparison against the frozen baseline found 624 identical runtime readings
+across twelve presets plus one custom case, and 2,954 identical mechanical
+curve points across fourteen test prescriptions. The relocated offline converter
+reproduced three historical prescriptions exactly and rejected overwrites.
+No physiological bound was relaxed. Private reports remain in `codex-notes/`
+and artifacts in `outputs/Arthur-ri-retirement-2026-09-17/`. Windows is not verified.
+
 ## Disabled opening controls explained — September 17
 
 Following the clinician's report about Custom, opening controls now state why

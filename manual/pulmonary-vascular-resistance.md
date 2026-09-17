@@ -51,7 +51,7 @@ Three further mechanisms load the low-volume limb in a real patient, and the J-c
 
 The right ventricle is sensitive to the pressure against which it ejects — see [the right ventricle](the-right-ventricle.md). The mechanical resistance curve has a minimum near FRC in this teaching construction. Total ventricular load also depends on vascular pressures, flow and arterial compliance; the minimum of a resistance curve alone does not determine the lowest RV ejection pressure or the highest cardiac output. This distinction matters when interpreting either derecruitment or overdistension.
 
-It also explains a clinical trap: raising PEEP in a poorly recruitable lung moves the aerated units up the *right* limb without opening anything, so resistance rises. In a recruitable lung the same PEEP moves collapsed units onto the curve at all, and resistance can fall or stay flat. The PEEP response of pulmonary resistance therefore **interacts with recruitability**; it is not a specific test of recruitability by itself. See [recruitment and R/I](recruitment-and-ri.md) and [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure).
+It also explains a clinical trap: raising PEEP in a poorly recruitable lung moves the aerated units up the *right* limb without opening anything, so resistance rises. In a recruitable lung the same PEEP moves collapsed units onto the curve at all, and resistance can fall or stay flat. The PEEP response of pulmonary resistance therefore **interacts with recruitability**; it is not a specific test of recruitability by itself. See [lung opening profiles](recruitment-and-ri.md) and [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure).
 
 ---
 
@@ -167,12 +167,12 @@ The model reports pulmonary resistance twice, and they are different kinds of qu
 - **Pulmonary resistance coefficient** — the model's own internal $R$, the thing the equations divide by. Not measurable in a patient, and not a Poiseuille resistance.
 - **PVR, derived** — $(\overline{P}_{pa} - P_{la})/\dot{Q}$, computed from mean pulmonary arterial pressure, model left atrial pressure and cardiac output. It has the form of catheter PVR only while left atrial pressure is a defensible [wedge surrogate](pulmonary-artery-wedge-pressure.md), and inherits that tile's caution automatically.
 
-They can move in opposite directions, because the derived value carries cardiac output in its denominator. In the research calibration phenotype, PEEP 4 → 14 (the row labels identify static R/I analogues used to construct the fixtures, not measured R/I or current controls):
+They can move in opposite directions, because the derived value carries cardiac output in its denominator. In the research calibration phenotype, PEEP 4 → 14 with fixed low and high reopenable shares of the same compromised component:
 
 | | coefficient | derived | open fraction |
 |---|---|---|---|
-| static analogue 0.05 (poorly recruitable) | 2.38 → 2.36 WU (−1%) | 2.64 → **3.16 WU (+20%)** | 58 → 59% |
-| static analogue 0.50 (recruitable) | 2.38 → 2.22 WU (−7%) | 2.54 → 2.64 WU (+4%) | 58 → 64% |
+| low reopenable share | 2.38 → 2.36 WU (−1%) | 2.64 → **3.16 WU (+20%)** | 58 → 59% |
+| high reopenable share | 2.38 → 2.22 WU (−7%) | 2.54 → 2.64 WU (+4%) | 58 → 64% |
 
 Reading the coefficient as though it were the pressure–flow estimate would report the opposite direction. However, at PEEP 14 these model runs fall outside the zone III assumption and the wedge surrogate is flagged. The table therefore demonstrates an internal pressure–flow response and its dependence on recruitability; it does not independently reproduce a valid catheter measurement at both PEEP levels.
 
@@ -233,7 +233,7 @@ The closed-path factor and phenotype were constrained jointly against the numeri
 
 - **Do not read the coefficient as a patient's PVR.** It is an internal quantity. The value labelled *derived* is comparable in form to catheter PVR only when the left-atrial-pressure wedge surrogate is valid.
 - **The absolute pressure–flow values are calibrated in one phenotype**, at PEEP 4–14, against one human ARDS cohort. The high-PEEP rows are outside the model's zone III assumption, so this should not be described as catheter-level validation. Elsewhere in the control space the model is directionally interpretable and quantitatively unvalidated.
-- **This is not a PEEP titration tool.** R/I is not a prescription, a high R/I does not establish that high PEEP is safe, and the model deliberately does not turn the PEEP response of resistance into a recommendation.
+- **This is not a PEEP titration tool.** A large reopenable share does not establish that high PEEP is safe, and the model does not turn the PEEP response of resistance into a recommendation.
 - **In the pulmonary embolism preset**, a raised `pvrBase` is an *effective aggregate load*. It reproduces the pressure, flow and right-ventricular consequences of obstruction without representing clot burden, embolic distribution or a right-shifted pressure–flow relation as separate quantities. See [acute pulmonary embolism](scenarios.md#acute-pulmonary-embolism).
 - Nothing here defends right ventricular **coronary** perfusion, which is absent from the model and is a real part of the clinical spiral.
 
@@ -249,7 +249,7 @@ Five rows in [`LITERATURE_RANGES.md`](../docs/LITERATURE_RANGES.md) are executed
 | `pvr-human-j-direction` | higher at RV and TLC than at FRC; extra-alveolar predominates at RV, alveolar at TLC |
 | `pvr-recruitability-low` | model pressure–flow estimate inside the low-recruiter IQRs, rising with PEEP |
 | `pvr-recruitability-high` | model pressure–flow estimate inside the high-recruiter IQRs, near-flat with PEEP |
-| `pvr-recruitability-dissociation` | across fixtures defined by static R/I analogues 0 → 0.8, the PEEP-related rise is progressively attenuated |
+| `pvr-recruitability-dissociation` | across explicit reopenable-share fixtures from 0 to 100%, the PEEP-related rise is progressively attenuated |
 
 The first two are topological: they test the shape, not a fitted number, because the shape is what this page teaches and the schematic it follows has no quantitative y-axis. The cohort-range tests are regression constraints on the chosen phenotype, not proof that the downstream pressure is measurable as a wedge under every tested condition.
 
@@ -294,4 +294,4 @@ The first two are topological: they test the shape, not a fitted number, because
 
 ## See also
 
-[The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Hypoxic vasoconstriction](hypoxic-vasoconstriction.md) · [The right ventricle](the-right-ventricle.md) · [Transmural pressure](transmural-pressure.md) · [Interpretability](interpretability.md) · [The PVR curve panel](panel-pvr-curve.md) · [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure)
+[The two-population lung](two-population-lung.md) · [Lung opening profiles](recruitment-and-ri.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Hypoxic vasoconstriction](hypoxic-vasoconstriction.md) · [The right ventricle](the-right-ventricle.md) · [Transmural pressure](transmural-pressure.md) · [Interpretability](interpretability.md) · [The PVR curve panel](panel-pvr-curve.md) · [ARDS with right ventricular failure](scenarios.md#ards-with-right-ventricular-failure)

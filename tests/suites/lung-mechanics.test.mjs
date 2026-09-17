@@ -1,9 +1,8 @@
-// Static lung mechanics, baby-lung strain, legacy static R/I conversion and the PVR operating point.
+// Static lung mechanics, baby-lung strain and the PVR operating point.
 import {
   Simulator, SCENARIOS, defaultParams,
   lungRegions, pvrComponents, transpulmonaryAt, relaxationVolume, openFractionAt,
   chestWallPressure, chestWallComplianceAt, chestWallNeutralVolume,
-  calibrateRecruitmentToInflation, recruitmentToInflation,
   section, check, near, settled,
 } from '../support/model.mjs';
 
@@ -35,7 +34,7 @@ section('The independent chest wall');
   // This is the structural regression test. Lung disease may move the volume
   // at which the two elements meet, but it cannot move the wall relation itself.
   const diseasedLungs = [
-    { ...normal, collapsed: 0.42, clung: 40, riRatio: 0, pOpen: 21 },
+    { ...normal, collapsed: 0.42, clung: 40, reopenable: 0, pOpen: 21 },
     { ...normal, clung: 300 },
     { ...normal, lungCapacity: 4 },
   ];
@@ -125,8 +124,8 @@ section('The two-compartment lung');
   // volume *adds*, not the level it reaches: the two lungs start from different
   // resting strains, because stiff tissue holds less gas at the same pressure,
   // and comparing the levels measures that instead.
-  const ards = { ...p, collapsed: 0.42, clung: 40, riRatio: 0 };
-  const collapseOnly = { ...p, collapsed: 0.42, riRatio: 0 };
+  const ards = { ...p, collapsed: 0.42, clung: 40, reopenable: 0 };
+  const collapseOnly = { ...p, collapsed: 0.42, reopenable: 0 };
   const gained = (q) => {
     const rest = relaxationVolume(q);
     return lungRegions(q, rest + 0.4).strain - lungRegions(q, rest).strain;
@@ -144,7 +143,7 @@ section('The two-compartment lung');
     + `${(openFractionAt(p, 5) / openFractionAt(collapseOnly, 5)).toFixed(2)} at the resting point`);
 
   // The mechanism the single-compartment model could not express.
-  const closed = lungRegions({ ...ards, riRatio: 0 }, 1.8);
+  const closed = lungRegions({ ...ards, reopenable: 0 }, 1.8);
   const opens = lungRegions({
     ...ards, openableDiseasedFraction: 1, pOpen: 12,
   }, 1.8);
@@ -154,30 +153,8 @@ section('The two-compartment lung');
     + `strain ${closed.strain.toFixed(2)} -> ${opens.strain.toFixed(2)}`);
 
   check('recruitability does nothing to a lung that is not collapsed',
-    lungRegions({ ...p, riRatio: 0 }, 2.2).openFraction
-      === lungRegions({ ...p, riRatio: 1 }, 2.2).openFraction);
-
-  // This tests the historical static analogue used for v1 conversion, not a
-  // finite-volume bedside measurement. It reproduces attainable targets; the finite
-  // collapsed compartment makes a larger request impossible.
-  {
-    const phenotype = { ...p, collapsed: 0.42, clung: 40, ccw: 200, pOpen: 20, riRatio: 0.6 };
-    const calibration = calibrateRecruitmentToInflation(phenotype);
-    const measured = recruitmentToInflation({
-      ...phenotype,
-      openableDiseasedFraction: calibration.openableFraction,
-    });
-    check('legacy static R/I conversion reproduces an attainable analogue',
-      near(measured.ratio, 0.6, 0.01) && !calibration.limited,
-      `target 0.60, achieved ${measured.ratio.toFixed(3)}, openable fraction ${calibration.openableFraction.toFixed(3)}`);
-
-    const impossible = calibrateRecruitmentToInflation({
-      ...p, collapsed: 0.1, clung: 40, pOpen: 30, riRatio: 2,
-    });
-    check('legacy static R/I conversion never invents lung beyond the compromised compartment',
-      impossible.limited && impossible.openableFraction <= 1,
-      `target 2.00, maximum ${impossible.maximum.toFixed(3)}, fraction ${impossible.openableFraction.toFixed(3)}`);
-  }
+    lungRegions({ ...p, reopenable: 0 }, 2.2).openFraction
+      === lungRegions({ ...p, reopenable: 1 }, 2.2).openFraction);
 
   // Transpulmonary pressure has to be the same number the mechanics produce,
   // otherwise the curve is drawn from one model and the patient lives in another.
@@ -247,7 +224,7 @@ section('The two-compartment lung');
     // lung is reopening its *normal* units — those close at very low volume and
     // need almost no pressure back. That gives it a shallow optimum of its own
     // around PEEP 8, which is real and worth not asserting away.
-    const consLow = at(4, { riRatio: 0 }), consHigh = at(20, { riRatio: 0 });
+    const consLow = at(4, { reopenable: 0 }), consHigh = at(20, { reopenable: 0 });
     const recrLow = at(4, {}), recrHigh = at(20, {});
     // On the derived value, because that is what a catheter reads and what the
     // trial these claims come from measured. The model's own coefficient falls
@@ -269,7 +246,7 @@ section('The two-compartment lung');
     // No optimum at all in the consolidated lung: every increment of PEEP costs
     // it. That is what the corrected curve says, and it is the sharper teaching
     // point — there is nothing to recruit, so there is nothing to trade against.
-    const sweep = [0, 4, 8, 12, 16, 20].map((peep) => at(peep, { riRatio: 0 }).pvrDerivedWood);
+    const sweep = [0, 4, 8, 12, 16, 20].map((peep) => at(peep, { reopenable: 0 }).pvrDerivedWood);
     check('and in a consolidated lung there is no best PEEP — every increment costs it',
       sweep.every((v, i) => i === 0 || v > sweep[i - 1]),
       sweep.map((v, i) => `${[0, 4, 8, 12, 16, 20][i]}:${v.toFixed(1)}`).join('  '));

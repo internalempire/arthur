@@ -17,7 +17,7 @@ section('Manual navigation and clinical titles');
     manualHash(route.slug, route.anchor) === '#/pulmonary-vascular-resistance#what-the-model-shows');
   check('fallback titles preserve familiar clinical notation',
     fallbackTitle('pvr-nadir-at-frc') === 'PVR nadir at FRC'
-      && fallbackTitle('recruitment-and-ri') === 'Recruitment and R/I');
+      && fallbackTitle('recruitment-and-ri') === 'Lung opening profiles');
 
   const status = JSON.parse(readFileSync(new URL('../../manual/status.json', import.meta.url), 'utf8'));
   check('the sidebar title source is generated from authored page headings',

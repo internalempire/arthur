@@ -153,4 +153,4 @@ Additional regression checks require stable pressure at fixed gas volume from th
 
 ## See also
 
-[The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Stress index](stress-index.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [The Campbell panel](panel-campbell.md) · [Controls: mechanics](controls-mechanics.md)
+[The two-population lung](two-population-lung.md) · [Lung opening profiles](recruitment-and-ri.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Stress index](stress-index.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [The Campbell panel](panel-campbell.md) · [Controls: mechanics](controls-mechanics.md)

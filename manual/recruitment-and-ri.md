@@ -1,4 +1,4 @@
-# Recruitment and R/I
+# Lung opening profiles
 
 > Specify how much lung belongs to the compromised component and how that component can open. Read the resulting closed fraction at end expiration and the opening excursion during the breath. These are internal teaching quantities, not CT measurements or a bedside R/I.
 
@@ -57,11 +57,9 @@ The lung contains a normal population and a compromised population sharing one g
 
 Opening changes accessible volume and the effective pressure–volume relation. It also changes gas volume per open unit and the parallel vascular pathways represented in the pulmonary resistance law. With memory enabled, pressure and recruitment state are solved together at each respiratory step. There is no biological opening time constant or slow recruitment over minutes.
 
-## Why this is not R/I
+## Scope of the quantities
 
-Clinical R/I is a manoeuvre-derived estimate: the change in end-expiratory volume is compared with the inflation predicted from low-PEEP respiratory-system compliance. It depends on the pressure step, the compliance measurement and any airway-opening-pressure correction. It is neither a percentage of collapsed lung nor the fraction of that lung that could ever reopen.
-
-Arthur's profiles and advanced shares specify an internal phenotype directly. No R/I is presented as a measured result. Research helpers retain a static tangent-compliance analogue at PEEP <!-- CONSISTENCY: ri-reference-step -->5 → 15<!-- /CONSISTENCY --> cmH₂O, but it can disagree with a finite-volume ventilator manoeuvre. That discrepancy remains an explicit validation limit. Matching cohort ranges with the static construction does not establish validity of the corresponding clinical measurement or of the anatomical percentages.
+Arthur specifies opening potential directly and measures the resulting model state. It does not calculate or accept a recruitment-to-inflation ratio (R/I), nor use one to calibrate opening or assess model validity. The compromised fraction, reopenable share and actual closed fraction describe different parts of the model; none is a measured anatomical percentage.
 
 ## Limits
 

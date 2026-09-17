@@ -69,4 +69,4 @@ Executable checks require stronger HPV to reduce relative flow through the derec
 
 ## See also
 
-[Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [The two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [The right ventricle](the-right-ventricle.md) · [Global limits](global-limits.md)
+[Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [The two-population lung](two-population-lung.md) · [Lung opening profiles](recruitment-and-ri.md) · [The right ventricle](the-right-ventricle.md) · [Global limits](global-limits.md)

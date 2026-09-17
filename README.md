@@ -89,7 +89,7 @@ The lung model includes:
 - chest-wall and abdominal pressure transmission;
 - a deliberately coarse prone-position transformation.
 
-Detailed pages: **[Equation of motion](manual/equation-of-motion.md)**, **[Pressure–volume curve](manual/pressure-volume-curve.md)**, **[Two-population lung](manual/two-population-lung.md)**, **[Recruitment and R/I](manual/recruitment-and-ri.md)**, **[Hysteresis](manual/hysteresis.md)** and **[Expiratory flow limitation](manual/expiratory-flow-limitation.md)**.
+Detailed pages: **[Equation of motion](manual/equation-of-motion.md)**, **[Pressure–volume curve](manual/pressure-volume-curve.md)**, **[Two-population lung](manual/two-population-lung.md)**, **[Lung opening profiles](manual/recruitment-and-ri.md)**, **[Hysteresis](manual/hysteresis.md)** and **[Expiratory flow limitation](manual/expiratory-flow-limitation.md)**.
 
 ### Closed-loop circulation
 
@@ -167,7 +167,7 @@ Six linked visual panels show the same simulation:
 | Guyton diagram | dynamic venous return, RV function and operating point; optional deep LV-output analysis | [Guyton diagram](manual/panel-guyton.md) |
 | PVR–volume curve | alveolar, extra-alveolar and total pulmonary vascular load | [PVR curve](manual/panel-pvr-curve.md) |
 
-The application supports light, dark and automatic themes, keyboard-safe controls, text alternatives for canvas panels and colour-independent status labelling. A custom patient can be downloaded as a versioned JSON parameter file and loaded again locally, allowing a teaching experiment or debugging case to be reproduced without serialising transient cardiovascular state.
+The application supports light, dark and automatic themes, keyboard-safe controls, text alternatives for canvas panels and colour-independent status labelling. A custom patient can be downloaded as a versioned JSON parameter file and loaded again locally, allowing a teaching experiment or debugging case to be reproduced without serialising transient cardiovascular state. The loader accepts version-2 files with explicit opening settings; version-1 recovery uses the separate offline converter described in the [manual](manual/quick-start.md#save-and-reload-a-custom-patient).
 
 ---
 

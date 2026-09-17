@@ -88,4 +88,4 @@ Prone position is deliberately coarse. It combines directional changes intended 
 
 ## See also
 
-[Pressure–volume curve](pressure-volume-curve.md) · [Two-population lung](two-population-lung.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Hysteresis](hysteresis.md) · [Abdominal pressure](abdominal-pressure.md) · [Expiratory flow limitation](expiratory-flow-limitation.md)
+[Pressure–volume curve](pressure-volume-curve.md) · [Two-population lung](two-population-lung.md) · [Lung opening profiles](recruitment-and-ri.md) · [Hysteresis](hysteresis.md) · [Abdominal pressure](abdominal-pressure.md) · [Expiratory flow limitation](expiratory-flow-limitation.md)

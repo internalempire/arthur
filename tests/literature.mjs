@@ -10,7 +10,6 @@ import { defaultParams, REFERENCE_WEIGHT_KG } from '../src/model/parameters.js';
 import { pvrComponents, NORMAL_FRC } from '../src/model/lung.js';
 import { systemicVenousVolumeState, venousReturnFlow } from '../src/model/circulation.js';
 import { applyBaroreflex } from '../src/model/baroreflex.js';
-import { evaluateRecruitmentCohort } from './support/recruitment-cohort.mjs';
 
 function settle(overrides, seconds = 30) {
   const s = new Simulator();
@@ -22,8 +21,8 @@ function settle(overrides, seconds = 30) {
 
 const change = (before, after) => (after / before - 1) * 100;
 
-// The two phenotypes are the *same collapsed lung*. They differ in a static R/I analogue,
-// which the model translates into how much of that compartment can reopen.
+// The two phenotypes are the *same collapsed lung*. They differ only in the
+// explicit share of that compartment that can reopen.
 // Holding collapse and tissue compliance equal is the point: it makes the
 // comparison about recruitment relative to inflation rather than lung size.
 // This is a calibration phenotype for the Cappio Borlino cohort, not the app's
@@ -36,7 +35,7 @@ const HUMAN_ARDS = {
   clung: 40, vt: 350, rr: 24, pvrBase: 0.09, hpv: 1.6,
   // The narrower cohort-constrained recruitment distribution moves the same
   // mechanical transition over a shorter pressure interval. Keeping the old
-  // midpoint at 21 cmH2O would put both R/I groups on the inflation side of the
+  // midpoint at 21 cmH2O would put both opening phenotypes on the inflation side of the
   // PVR curve. A midpoint of 17.5 preserves the independently observed PVR
   // separation without changing the shipped ARDS/RV-failure preset.
   collapsed: 0.42, pOpen: 17.5,
@@ -112,8 +111,8 @@ export const LITERATURE = {
   // remains deliberately broader than a ratio of cohort medians, which is not
   // the median within-patient response.
   'pvr-recruitability-low': () => {
-    const a = settle({ ...HUMAN_ARDS, riRatio: 0.05, peep: 4 }, 45);
-    const b = settle({ ...HUMAN_ARDS, riRatio: 0.05, peep: 14 }, 45);
+    const a = settle({ ...HUMAN_ARDS, reopenable: 0.06188009182612101, peep: 4 }, 45);
+    const b = settle({ ...HUMAN_ARDS, reopenable: 0.06188009182612101, peep: 14 }, 45);
     const d = change(a.pvrDerivedWood, b.pvrDerivedWood);
     const absolute = a.pvrDerivedWood >= 1.50 && a.pvrDerivedWood <= 3.71
       && b.pvrDerivedWood >= 2.08 && b.pvrDerivedWood <= 4.75;
@@ -128,8 +127,8 @@ export const LITERATURE = {
   },
 
   'pvr-recruitability-high': () => {
-    const a = settle({ ...HUMAN_ARDS, riRatio: 0.5, peep: 4 }, 45);
-    const b = settle({ ...HUMAN_ARDS, riRatio: 0.5, peep: 14 }, 45);
+    const a = settle({ ...HUMAN_ARDS, reopenable: 0.7497452596823374, peep: 4 }, 45);
+    const b = settle({ ...HUMAN_ARDS, reopenable: 0.7497452596823374, peep: 14 }, 45);
     const d = change(a.pvrDerivedWood, b.pvrDerivedWood);
     const absolute = a.pvrDerivedWood >= 2.31 && a.pvrDerivedWood <= 3.61
       && b.pvrDerivedWood >= 2.10 && b.pvrDerivedWood <= 3.75;
@@ -141,36 +140,21 @@ export const LITERATURE = {
   },
 
   // The row above needs a phenotype chosen for it, so on its own it could be
-  // satisfied by picking one. Across the static R/I fixture targets, increasing recruitment
+  // satisfied by picking one. Across the explicit-share fixtures, increasing recruitment
   // relative to inflation must progressively attenuate the PEEP-related rise.
   // The human study does not require a sign change: the high-recruiter cohort
   // median still rose by 5%.
   'pvr-recruitability-dissociation': () => {
-    const at = (riRatio) => {
-      const a = settle({ ...HUMAN_ARDS, riRatio, peep: 4 }, 45);
-      const b = settle({ ...HUMAN_ARDS, riRatio, peep: 14 }, 45);
+    const at = (reopenable) => {
+      const a = settle({ ...HUMAN_ARDS, reopenable, peep: 4 }, 45);
+      const b = settle({ ...HUMAN_ARDS, reopenable, peep: 14 }, 45);
       return change(a.pvrDerivedWood, b.pvrDerivedWood);
     };
-    const steps = [0, 0.2, 0.4, 0.6, 0.8].map(at);
+    const steps = [0, 0.26362718641757965, 0.5760336369276047, 0.9422854383786519, 1].map(at);
     const monotone = steps.every((d, i) => i === 0 || d < steps[i - 1]);
     return {
       pass: monotone && steps[0] - steps[steps.length - 1] >= 15,
-      detail: `ΔPVR ${steps.map((d) => d.toFixed(0) + '%').join(' → ')} across static R/I analogues 0 → 0.8`,
-    };
-  },
-
-  'ri-cohort-latent-mapping': () => {
-    const groups = evaluateRecruitmentCohort();
-    const [low, high] = groups;
-    const separation = high.wholeLungOpenableFraction
-      > low.wholeLungOpenableFraction * 1.8;
-    return {
-      pass: groups.every((group) => group.pass) && separation,
-      detail: groups.map((group) => `${group.label}: static R/I analogue ${group.calibration.achieved.toFixed(2)}, `
-        + `openable whole lung ${(group.wholeLungOpenableFraction * 100).toFixed(0)}%, `
-        + `recruited ${group.calibration.assessment.recruitedVolume.toFixed(0)} mL, `
-        + `CL ${group.lowPeepLungCompliance.toFixed(0)} → ${group.highPeepLungCompliance.toFixed(0)} mL/cmH2O`).join('; ')
-        + ' (all observed comparisons use the published group IQRs)',
+      detail: `ΔPVR ${steps.map((d) => d.toFixed(0) + '%').join(' → ')} across explicit reopenable shares 0 → 100%`,
     };
   },
 
@@ -242,8 +226,8 @@ export const LITERATURE = {
     // verify arithmetic, not the clinical classification it claims to encode.
     const pre = settle({
       // Classification does not require an injured lung. Keeping this fixture
-      // fully aerated isolates high pre-capillary load and prevents an R/I
-      // calibration change from deciding whether the wedge is admissible.
+      // fully aerated isolates high pre-capillary load from opening mechanics
+      // when checking whether the wedge surrogate is admissible.
       peep: 0, vt: 250, stressedVolume: 1100, pvrBase: 0.44, eesRv: 0.32,
     }, 45);
     return {

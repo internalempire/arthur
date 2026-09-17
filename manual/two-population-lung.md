@@ -105,4 +105,4 @@ The `collapsed` control is a fraction of a **normal** lung, not of the patient's
 
 ## See also
 
-[Pressure–volume curve](pressure-volume-curve.md) · [Recruitment and R/I](recruitment-and-ri.md) · [Hysteresis](hysteresis.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Stress index](stress-index.md) · [Interpretability](interpretability.md) · [Controls: mechanics](controls-mechanics.md)
+[Pressure–volume curve](pressure-volume-curve.md) · [Lung opening profiles](recruitment-and-ri.md) · [Hysteresis](hysteresis.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Stress index](stress-index.md) · [Interpretability](interpretability.md) · [Controls: mechanics](controls-mechanics.md)

@@ -3,7 +3,6 @@
   "diastolic-throughflow": "resolved",
   "ventricular-pressure-domain": "resolved",
   "activation-continuity": "resolved",
-  "ri-protocol": "open",
   "hysteresis-convergence": "resolved",
   "patient-wall-intervention": "resolved",
   "venous-reversal": "resolved"

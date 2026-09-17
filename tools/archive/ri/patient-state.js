@@ -62,10 +62,7 @@ export function parsePatientState(candidate) {
   if (candidate.format !== PATIENT_STATE_FORMAT) {
     throw new Error('This is not an arthur patient-state file.');
   }
-  if (candidate.version === 1) {
-    throw new Error('Version-1 patient files require separate conversion to version 2. See Quick start in the manual: Save and reload a custom patient.');
-  }
-  if (candidate.version !== PATIENT_STATE_VERSION) {
+  if (![1, PATIENT_STATE_VERSION].includes(candidate.version)) {
     throw new Error(`Patient-state version ${candidate.version ?? 'missing'} is not supported.`);
   }
   if (!isRecord(candidate.parameters)) {
@@ -75,8 +72,12 @@ export function parsePatientState(candidate) {
   const parameterValues = {};
   const ignored = [];
   for (const [id, value] of Object.entries(candidate.parameters)) {
-    if (id === 'riRatio') {
-      throw new Error('R/I is not a version-2 parameter. Use an explicitly converted patient file.');
+    if (candidate.version === 1 && id === 'riRatio') {
+      if (!Number.isFinite(value) || value < 0 || value > 2) {
+        throw new Error('The saved R/I must be a finite value from 0 to 2.');
+      }
+      parameterValues.riRatio = value;
+      continue;
     }
     const spec = PARAM_BY_ID.get(id);
     if (!spec) {
@@ -89,8 +90,11 @@ export function parsePatientState(candidate) {
     parameterValues[id] = value;
   }
 
-  const merged = { ...defaultParams(), ...parameterValues };
-  if (merged.pClose > merged.pOpen) {
+  // Version 1 used R/I 0.5 when that optional field was absent. Convert against
+  // the full supine prescription, before applying any positional transform.
+  const legacy = candidate.version === 1 ? { riRatio: 0.5 } : {};
+  const merged = { ...defaultParams(), ...legacy, ...parameterValues };
+  if (candidate.version === 2 && merged.pClose > merged.pOpen) {
     throw new Error('Closing midpoint must not exceed opening midpoint.');
   }
   const params = normalizeRecruitmentParameters(merged);
@@ -99,5 +103,6 @@ export function parsePatientState(candidate) {
     params,
     overrides: patientParameterOverrides(params),
     ignored,
+    migrated: candidate.version === 1,
   };
 }

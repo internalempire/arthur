@@ -24,10 +24,9 @@ work, not excuses.
 | `copd-flow-limited-peep` | In the flow-limited COPD phenotype, raising external PEEP from 0 to 5 cmH₂O leaves total PEEP and end-expiratory lung volume nearly unchanged; raising it beyond the choke increases lung volume and lowers cardiac output. This is a directional waterfall constraint, not a portable 85%-of-PEEPi titration rule. | agrees | Ranieri et al., *Am Rev Respir Dis* 1993;147:5–13; van den Berg et al., *Eur Respir J* 1991;4:561–7 |
 | `peep-euvolaemic-pig` | Experimental anchor, not a human clinical range: in nine anaesthetised pigs at 7.7 mL/kg, PEEP 5 → 10 raised balloon-occlusion MSFP 12.9 → 14.0 mmHg (+1.1) and changed pulmonary arterial flow 2.75 → 2.56 L/min (−6.9%, `p=0.094`). At the equivalent reference-weight tidal volume, the model allows ΔPmsf +0.5 to +1.8 mmHg and ΔCO −15% to +5%; these are model tolerances around the reported means, not study confidence intervals. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–H806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on central filling: raising PEEP from 5 to 15 reduces output more in the underfilled model than in the euvolaemic model. This is a directional teaching constraint. Fougères et al. measured a 13±9% cardiac-index fall with higher PEEP and a 14±10% restoration with passive leg raising at high PEEP; they did **not** report the former model target of a ≥1.5× between-state ratio. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
-| `pvr-recruitability-low` | At R/I 0.05 in the human ARDS calibration phenotype, PEEP 4 → 14 keeps derived PVR inside the low-recruiter trial IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | At R/I 0.50, the same manoeuvre stays inside the high-recruiter IQRs (2.31–3.61 → 2.10–3.75 WU) and changes PVR by −10% to +20%; the current model gives +6%, while the ratio of cohort medians is +5% (P = 0.55). This is broad compatibility with reported dispersion, not a patient-level fit. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-dissociation` | Sweeping R/I from 0 to 0.8 progressively attenuates the PEEP-related PVR rise by at least 15 percentage points. No sign change is required: the measured high-recruiter median was still +5%. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `ri-cohort-latent-mapping` | In one shared mechanical phenotype, Table 2 group-median R/I values 0.35 [0.29–0.42] and 0.72 [0.68–0.77] map to progressively larger latent openable fractions while model recruited volume remains inside the reported group IQRs (90–202 and 181–421 mL) and model lung compliance at low/high PEEP remains inside the paired group IQRs (38–85/23–51 and 42–78/30–66 mL/cmH₂O). Only median R/I changes between model rows. This constrains an aggregate translation; it does not validate the unmeasured latent fraction anatomically or patient by patient. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7), Table 2 |
+| `pvr-recruitability-low` | At an explicit reopenable share of 0.06188009182612101 in the human ARDS calibration phenotype, PEEP 4 → 14 keeps derived PVR inside the low-recruiter trial IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | At an explicit reopenable share of 0.7497452596823374, the same manoeuvre stays inside the high-recruiter IQRs (2.31–3.61 → 2.10–3.75 WU) and changes PVR by −10% to +20%; the current model gives +6%, while the ratio of cohort medians is +5% (P = 0.55). This is broad compatibility with reported dispersion, not a patient-level fit. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-dissociation` | Sweeping fixed explicit shares [0, 0.26362718641757965, 0.5760336369276047, 0.9422854383786519, 1] progressively attenuates the PEEP-related PVR rise by at least 15 percentage points. No sign change is required: the measured high-recruiter median was still +5%. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `pvr-human-frc-nadir` | The fully open mechanical J-curve has its minimum within 0.15 L of the model's 2.2 L human FRC. | agrees | Cecconi, Collino & Pinsky, *Intensive Care Med* 2026, Fig. 1C (clinical synthesis: minimum near FRC) |
@@ -91,31 +90,24 @@ raising absolute EELV or total PEEP; above the choke, further PEEP adds volume
 and haemodynamic cost. The row checks this direction but deliberately does not
 fit Ranieri's 85% cohort threshold or expose it as a treatment rule.
 
-## R/I research analogue and current opening controls
+## Explicit opening controls and validation scope
 
-The clinical R/I and the model's explicit reopenable share are different
-quantities. Current controls specify the compromised population and its potential
-opening directly; the numeric tile reports actual closure and opening excursion
-on a completed breath. Neither is an anatomical measurement.
+Current controls specify the compromised population and its potential opening
+directly; the numeric tile reports actual closure and opening excursion on a
+completed breath. Neither is an anatomical measurement. The PVR comparisons
+above prescribe exact explicit shares, keep their previous mechanical states
+and retain all pressure-flow acceptance bounds. The shares are internal fixture
+coefficients, not measured cohort percentages or R/I values.
 
-Research fixtures and version-1 patient conversion retain the static PEEP
-5 → 15 cmH₂O construction: equilibrium EELV change minus the inflation predicted
-from low-PEEP tangent compliance, normalised by pressure step and compliance.
-The mapping is bounded by the available compartment. It is a static analogue,
-not a measured finite-breath R/I. The independent finite-volume audit remains
-open. No airway-opening-pressure correction is represented, and the diseased
-transpulmonary opening midpoint must not substitute for that airway measurement.
-The clinical 0.5 cohort split is not a treatment threshold.
-
-The diseased opening transition is 0.75 cmH₂O wide. This didactic coefficient
-was selected by a cohort-level constraint: with collapse, tissue compliance,
-capacity, chest wall and opening midpoint held fixed, the low- and high-recruiter
-median R/I values yield 118 and 263 mL recruited volume and low/high-PEEP lung
-compliances of 41/41 and 45/49 mL/cmH₂O. Each lies inside its Table 2 group IQR.
-The corresponding model openable shares are about 7% and 16% of the whole lung,
-but those percentages were not measured in the study. Group summaries also do
-not retain within-patient covariance, so this is an aggregate constraint rather
-than parameter identification or external patient validation.
+R/I is outside the active model and validation scope. On 2026-09-17 the clinician
+retired the finite-volume agreement criterion and the `ri-cohort-latent-mapping`
+row. The former was a known disagreement, not a passed measurement; the latter
+only tested the static construction. Both are superseded, not evidence for
+clinical R/I or anatomical validity. The self-contained implementation and
+historical cohort mapping are in `tools/archive/ri/`, with no imports to or from
+active model, tests or manual generators. Earlier decisions and source history
+preserve the reason the fixed 0.75 cmH₂O opening width was chosen; that width is
+retained without asserting fresh external validation.
 
 ## Current phase-3 volume semantics
 
@@ -568,9 +560,7 @@ as uncalibrated.
 
 Historically, the `pvr-recruitability-high` row passed on a phenotype this file
 chose — 55% of the collapsed lung openable at an opening pressure of 20 cmH₂O —
-rather than on the R/I ratio the trial measured. Phase 5 retires that mismatch:
-the active row uses R/I 0.50 and the dissociation row sweeps the same measured
-control. This paragraph is retained to record why a sign-only row was not enough.
+rather than on the R/I ratio the trial measured. The subsequent static R/I mapping was itself retired on 2026-09-17. The active rows now retain explicit fixture shares and the PVR bounds; they make no R/I measurement claim.
 
 ## What this file is not
 

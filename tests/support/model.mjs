@@ -22,8 +22,7 @@ import {
   normalOpenFractionAt, recruitmentBand, stepRecruitedFraction,
   openFractionFromRecruitmentState,
   chestWallPressure, chestWallComplianceAt, chestWallNeutralVolume,
-  staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
-  recruitmentToInflation,
+  staticEndExpiratoryVolume,
 } from '../../src/model/lung.js';
 import { PRESSURE_SUPPORT } from '../../src/model/respiratory.js';
 import { SNAPSHOTS } from '../snapshots.js';
@@ -42,8 +41,8 @@ export {
   normalOpenFractionAt, recruitmentBand, stepRecruitedFraction,
   openFractionFromRecruitmentState,
   chestWallPressure, chestWallComplianceAt, chestWallNeutralVolume,
-  staticEndExpiratoryVolume, calibrateRecruitmentToInflation,
-  recruitmentToInflation, PRESSURE_SUPPORT,
+  staticEndExpiratoryVolume,
+  PRESSURE_SUPPORT,
   readFileSync, readdirSync, SNAPSHOTS, LITERATURE,
 };
 
