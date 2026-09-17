@@ -17,9 +17,9 @@
 // normal units, which close on deflation and reopen at low pressure, and
 // diseased units, which are shut at rest and reopen only if they are
 // recruitable at all. Consolidated lung is collapsed and stays collapsed however
-// hard it is pushed. The user describes recruitability with the bedside R/I
-// ratio; the fraction of diseased units that can open is an internal consequence
-// of that measurement, not a second user-facing definition of the same concept.
+// hard it is pushed. The reopenable share is an explicit phenotype property.
+// Opening/closing pressures determine how much of that potential is realised;
+// the chest wall never recalibrates the share to preserve a requested index.
 //
 // Units are treated as either open at full size or shut — the sponge
 // idealisation. It is why the arithmetic below works, and it is also the reason
@@ -85,15 +85,18 @@ const logistic = (x) => 1 / (1 + Math.exp(-x));
  *
  * Resolved simulator parameters carry this value explicitly. Direct callers of
  * the lung helpers (tests, diagrams and small analyses) may pass only `riRatio`;
- * in that case the same calibration is performed lazily. Keeping this internal
- * avoids presenting a fraction of units and a bedside R/I as interchangeable
- * patient inputs — they are not.
+ * in that case the historical static conversion is performed lazily. Current
+ * prescriptions use the explicit `reopenable` share, a teaching coefficient
+ * distinct from a manoeuvre-derived R/I.
  */
 function openableDiseasedFraction(p) {
   if (Number.isFinite(p.openableDiseasedFraction)) {
     return clamp(p.openableDiseasedFraction, 0, 1);
   }
-  return calibrateRecruitmentToInflation(p).openableFraction;
+  // Isolated legacy analyses may still request the historical static mapping.
+  // Live prescriptions contain an explicit share and no riRatio.
+  if (Object.hasOwn(p, 'riRatio')) return calibrateRecruitmentToInflation(p).openableFraction;
+  return clamp(p.reopenable ?? 0, 0, 1);
 }
 
 // Transpulmonary pressure at the relaxation volume: the recoil that holds the
@@ -536,8 +539,8 @@ function assessRecruitmentToInflation(p) {
     recruitedCompliance: recruitedVolume / pressureStep,
     // A negative value means the average compliance over the step was lower
     // than its low-PEEP tangent (pure inflation/overdistension), not "negative
-    // recruitment". Bedside R/I is reported from zero upward, so the clinical
-    // readout is floored while the raw value remains available for tests.
+    // recruitment". Retain the historical non-negative analogue for conversion;
+    // the raw value remains available for research comparisons.
     rawRatio,
     ratio: Math.max(0, rawRatio),
   };
@@ -569,10 +572,9 @@ export function recruitmentToInflation(p) {
 }
 
 /**
- * Translate a requested bedside R/I into the latent fraction of diseased units
- * that may reopen. R/I and "fraction recruitable" are not synonyms, so this is
- * a numerical calibration against the same static PEEP manoeuvre used to label
- * the control.
+ * Historical static mapping used for version-1 prescription conversion and
+ * research fixtures. This is not a finite-volume ventilator measurement and
+ * is not used to recalibrate an active explicit-share prescription.
  *
  * The collapsed compartment is a hard physical ceiling. If the requested R/I
  * would require more than all of it, the closest attainable phenotype is

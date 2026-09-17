@@ -109,9 +109,26 @@ export const PARAMETERS = [
     help: 'A collapsible-airway choke during expiration: below its critical downstream pressure, a larger pressure gradient cannot increase expiratory flow. This distinguishes flow limitation from high linear resistance without adding regional lung compartments.',
   },
   {
-    id: 'collapsed', group: 'mechanics', label: 'Collapsed lung', unit: 'fraction',
+    id: 'collapsed', group: 'mechanics', label: 'Compromised lung', unit: '%', displayScale: 100,
     min: 0, max: 0.8, step: 0.05, default: 0,
-    help: 'How much of the lung is shut at rest. Resting volume is no longer something you set — it follows from how much lung is open and how compliant it is, which is what lets recruitment raise it. A lung that has lost its recoil rests high; a collapsed one rests low.',
+    help: 'Share assigned to the diseased population. Some of it may already be open: this is not the current closed fraction or a CT measurement. Tissue compliance and maximum capacity remain separate.',
+  },
+  {
+    id: 'recruitmentProfile', group: 'mechanics', label: 'Opening profile', type: 'choice',
+    options: [
+      { value: 'closed', label: 'Non-reopenable' },
+      { value: 'equilibrium', label: 'Reopenable, no memory' },
+      { value: 'memory', label: 'Reopenable, with memory' },
+      { value: 'custom', label: 'Custom' },
+    ],
+    default: 'closed',
+    help: 'Profiles specify the reopenable share and transpulmonary opening/closing ranges. They do not guarantee tidal recruitment: the pressures reached determine actual opening. With no compromised component the profile has no effect.',
+  },
+  {
+    id: 'reopenable', group: 'mechanics', advanced: 'recruitment',
+    label: 'Reopenable share of compromised lung', unit: '%', displayScale: 100,
+    min: 0, max: 1, step: 0.01, default: 0,
+    help: 'Potentially reopenable share of the compromised component, not of the whole lung. For example, 40% compromised with 50% reopenable permits up to 20% of the whole lung to reopen. This potential stays fixed when chest-wall mechanics change.',
   },
   {
     id: 'pab0', group: 'mechanics', label: 'Baseline abdominal pressure', unit: 'cmH₂O',
@@ -209,27 +226,22 @@ export const PARAMETERS = [
     help: 'The resistance coefficient of a fully open lung at its resting volume. Collapse and hypoxic vasoconstriction then redistribute flow between open and derecruited vascular pathways.',
   },
   {
-    id: 'riRatio', group: 'mechanics', label: 'Recruitment-to-inflation ratio', unit: 'R/I',
-    min: 0, max: 2, step: 0.05, default: 0.5,
-    help: 'Supine bedside R/I for a passive PEEP 5 to 15 cmH₂O manoeuvre: compliance of recruited volume divided by respiratory-system compliance at low PEEP. Values below 0.5 describe lower recruitment relative to inflation; 0.5 is a cohort-derived teaching threshold, not an outcome-proven treatment cutoff. Collapse remains a separate input: if too little lung is closed to realise the requested R/I, the model stops at the available lung and flags the shortfall. Proning may change the achieved readout by shifting opening pressures.',
-  },
-  {
-    id: 'pOpen', group: 'mechanics', label: 'Opening pressure', unit: 'cmH₂O',
+    id: 'pOpen', group: 'mechanics', advanced: 'recruitment', label: 'Opening midpoint (transpulmonary)', unit: 'cmH₂O',
     min: 5, max: 40, step: 0.5, default: 20,
     help: 'Recruitment occurs over a range, not at one pressure. This is the centre of that opening range for the collapsed but recruitable part of the lung: below it fewer than half of those units are open, above it more than half are. It is a transpulmonary pressure, not the airway-opening pressure used to correct a bedside R/I manoeuvre.',
   },
   {
-    id: 'hysteresis', group: 'mechanics', label: 'Recruitment hysteresis',
+    id: 'hysteresis', group: 'mechanics', advanced: 'recruitment', label: 'Opening memory',
     type: 'choice',
     options: [
       { value: 'off', label: 'Off' },
       { value: 'on', label: 'On' },
     ],
     default: 'off',
-    help: 'Off, units open and close at the same pressure, so how much lung is open follows the pressure of the moment and nothing you do to it lasts. On, they close at a lower pressure than they opened at, so how much is open becomes a state with a history — which is what makes a recruitment manoeuvre buy anything, and what makes a decremental PEEP trial land somewhere different from an incremental one.',
+    help: 'Off, the reopenable component follows the current transpulmonary pressure. On, previously opened units can remain open at a lower pressure, so inflation history can change the result of a decremental PEEP trial. Retention depends on the closing range and the pressures already reached.',
   },
   {
-    id: 'pClose', group: 'mechanics', label: 'Closing pressure', unit: 'cmH₂O',
+    id: 'pClose', group: 'mechanics', advanced: 'recruitment', label: 'Closing midpoint (transpulmonary)', unit: 'cmH₂O',
     min: 2, max: 40, step: 1, default: 12,
     requires: { id: 'hysteresis', value: 'on' },
     help: 'Derecruitment also occurs over a range. This is the centre of the closing range for previously recruited diseased units: half remain open here during falling pressure. Already-aerated lung does not acquire this memory. It only has an effect with hysteresis on and below the opening pressure; setting the two pressures equal switches the memory off.',

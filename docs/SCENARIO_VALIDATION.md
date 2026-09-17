@@ -158,21 +158,23 @@ arterial waveform measurement error.
 **Teaching question.** How does recruitability alter the balance between
 recruitment benefit and inflation-related RV load?
 
-**What the model produces.** At PEEP 12 cmH2O the preset has end-expiratory Ppl
-about −1 cmH2O and PL about 13 cmH2O, plateau pressure about 22 cmH2O, measured
-respiratory-system compliance about 35 mL/cmH2O and achieved R/I 0.70. The
-circulation has mPAP about 26 mmHg, derived PVR about 5.0 WU, CVP and wedge
-surrogates around 5 mmHg, and an RV/LV end-diastolic volume ratio about 1.7. The
-wedge and derived-PVR tiles remain subject to the aggregate zone-3 rule. At PEEP
-20, removing recruitment raises derived PVR from about 5.6 to 7.2 WU, raises
-RV/LV from about 1.7 to 2.0 and lowers output. Prone positioning opens more lung
-and modestly lowers PVR, while its immediate chest-wall transformation still
-raises plateau pressure.
+**What the model produces.** The preset combines a small accessible lung,
+pressure-dependent opening without memory, explicit thoracic load and RV
+impairment. At its starting PEEP, end-expiratory pleural pressure remains
+modestly negative while transpulmonary pressure is positive; the RV is dilated
+and derived PVR is elevated. The exact settled values, including end-expiratory
+closure, are generated from the executable prescription in the
+[scenario manual](../manual/scenarios.md#ards-with-right-ventricular-failure).
+The wedge and derived-PVR tiles remain subject to the aggregate zone-3 rule.
+At higher PEEP, making the compromised component non-reopenable increases
+pulmonary vascular and RV load and lowers output compared with its reopenable
+counterpart. Prone positioning opens more lung and modestly lowers PVR, while
+its immediate chest-wall transformation still raises plateau pressure.
 
 **Assessment — qualified.** The central interaction between recruitability,
 inflation and pulmonary vascular load is supported by human in-vivo data, and
-the RV phenotype is qualitatively coherent. R/I is no longer allowed to validate
-the preset on its own: executable tests also constrain absolute Ppl and PL,
+the RV phenotype is qualitatively coherent. Opening coefficients alone do not
+validate the preset: executable tests also constrain absolute Ppl and PL,
 EELV, plateau pressure, respiratory-system compliance, filling pressure and RV
 load. The preset is deliberately more severe than the cohort used for the
 PVR/recruitability comparison. PEEP 20 can produce plateau pressures above the

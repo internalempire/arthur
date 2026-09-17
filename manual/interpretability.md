@@ -38,7 +38,7 @@ The full reason remains on the numerical tile. Panels whose central reading depe
 | stress index | not passive volume control, or no complete breath | — |
 | preload reserve | the Guyton curves have no finite crossing | — |
 | PPV | spontaneous effort | VT below 8 mL/kg for an assumed <!-- CONSISTENCY: reference-weight -->70 kg<!-- /CONSISTENCY --> reference, fewer than 3.6 beats/breath, RV/LV EDV ratio above 1.2, or abdominal pressure above 12 cmH₂O |
-| R/I | no collapsed compartment | the requested ratio exceeds what the selected lung can recruit |
+| closed at end expiration / opening excursion | no complete breath under the current settings, including after an occlusion | internal model quantities; no anatomical or bedside index interpretation |
 | plateau pressure | spontaneous effort | — |
 | wedge surrogate | — | the zone 3 pressure-margin index is below 0.95 |
 | derived PVR | no meaningful forward flow | the wedge surrogate is cautioned |
@@ -83,7 +83,7 @@ The rules are mechanism-specific rather than scenario-specific. A spontaneous pa
 
 ## Validation
 
-Contract tests require spontaneous breathing to withhold PPV and stress index where appropriate, low tidal volume and RV dilatation to qualify PPV, R/I to be unavailable without collapsed lung, and every scenario audit statement to agree with the active badges. Separate safety tests detect non-finite or out-of-domain global states.
+Contract tests require spontaneous breathing to withhold PPV and stress index where appropriate, low tidal volume and RV dilatation to qualify PPV, opening readouts to exclude incomplete or interrupted breaths, and every scenario audit statement to agree with the active badges. Separate safety tests detect non-finite or out-of-domain global states.
 
 ---
 

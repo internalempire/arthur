@@ -30,9 +30,9 @@ Do not expect one universal direction for cardiac output. The point of the exper
 ## Minute 6–8: compare recruitment with distension
 
 1. Select *ARDS with right ventricular failure*.
-2. Note collapsed fraction, R/I, open fraction, plateau pressure, derived PVR and RV:LV volume ratio.
+2. Note compromised fraction, opening profile, closed fraction at end expiration, opening excursion, plateau pressure, derived PVR and RV:LV volume ratio.
 3. Raise PEEP gradually.
-4. Return to the preset, set R/I to zero, and repeat the same PEEP change.
+4. Return to the preset, select the Non-reopenable opening profile, and repeat the same PEEP change.
 
 With recruitable lung, some added pressure opens units and distributes inflation across a larger aerated volume. Without recruitment, more of the pressure distends the already open lung. The comparison is qualitative: it demonstrates why equal PEEP is not equal lung stress or equal RV load. See [recruitment and R/I](recruitment-and-ri.md) and [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 
@@ -61,6 +61,8 @@ This preset combines high aggregate pulmonary vascular load with a vulnerable ri
 Use **Save patient** after creating a useful phenotype. The application downloads a small, readable JSON file containing the complete set of current controls and a list of those that differ from the defaults. The file remains on the local device and can be renamed, archived with a bug report or shared with another reviewer.
 
 **Load patient** validates that file, labels the result *Custom*, starts a fresh simulation and allows it to settle. The same parameter set is therefore reproduced without carrying across the arbitrary cardiac phase, respiratory phase, pressures or compartment volumes present when Save was clicked. This distinction is intentional: the feature reproduces a patient definition and experiment, not one frozen animation frame.
+
+Version 2 files retain the exact reopenable share and custom opening settings, including precision not shown in percentage labels. Version 1 files with an R/I prescription are accepted: the loader converts that prescription once into explicit potential using the saved lung and chest-wall settings before applying position. Subsequent chest-wall changes preserve that potential. The conversion reproduces the saved model phenotype, not a clinical R/I measurement.
 
 Unknown settings from an older file are reported and ignored. A known setting outside its available range is rejected rather than silently clipped, because clipping would make a debugging case appear reproduced when it was not.
 

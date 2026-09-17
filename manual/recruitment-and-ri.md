@@ -1,112 +1,74 @@
 # Recruitment and R/I
 
-> Recruitability is a control in this model, and it is expressed as the ratio a clinician measures — recruitment-to-inflation — rather than as an internal fraction of units. The model solves for the internal fraction that reproduces the requested ratio under the reference manoeuvre.
+> Specify how much lung belongs to the compromised component and how that component can open. Read the resulting closed fraction at end expiration and the opening excursion during the breath. These are internal teaching quantities, not CT measurements or a bedside R/I.
 
 ---
 
-## Physiology
+## The clinical question
 
-Applying PEEP to an injured lung does two things at once. It inflates the lung that is already open, and it may open lung that was shut. The first is unavoidable and carries a risk of overdistension; the second is the reason for doing it. Nothing measurable at the bedside separates them directly — end-expiratory lung volume rises either way.
+Raising PEEP can distend already open lung and, if sufficient transpulmonary pressure is reached, open part of the compromised component. Opening may distribute gas over more lung and change pulmonary vascular load; higher pressures also affect venous return and ventricular loading. The net effect on cardiac output must emerge from the coupled simulation.
 
-The **recruitment-to-inflation ratio** separates them by subtraction. Step PEEP down from a high to a low value and measure the volume released. Some of it is the passive deflation predicted by the compliance at the low PEEP; the rest, by difference, must have come from lung that closed.
+A recruitment manoeuvre and maintenance PEEP have different pressure histories. With opening memory enabled, a high pressure can open units that remain open at a lower pressure. This does not imply that PEEP cannot recruit, or that a manoeuvre necessarily provides additional persistent opening: both depend on which pressures have already been reached and on subsequent closing pressure.
 
-$$
-R/I = \frac{C_{rec}}{C_{low}}, \qquad C_{rec} = \frac{\Delta V_{EELV} - C_{low}\,\Delta P}{\Delta P}
-$$
+## What to set
 
-- $R/I$ — recruitment-to-inflation ratio, dimensionless
-- $C_{low}$ — respiratory system compliance at the low PEEP, mL/cmH₂O
-- $C_{rec}$ — "recruited compliance": the extra volume per unit pressure attributable to opening, mL/cmH₂O
-- $\Delta V_{EELV}$ — measured change in end-expiratory lung volume, mL
-- $\Delta P$ — the PEEP step, cmH₂O
+**Compromised lung** is the percentage assigned to the diseased population. It includes both potentially reopenable and permanently closed units. It is a patient characteristic in the model, not the percentage currently closed. The internal parameter name is `collapsed`.
 
-A value near zero means the PEEP step only inflated. A high value means much of the volume came from lung that opened. A conventional split at 0.5 is used to separate higher from lower recruiters in the published cohorts.
+**Opening profile** specifies the behaviour of that component. The non-reopenable profile leaves it closed; pressure-dependent opening follows current transpulmonary pressure; opening with memory also depends on the preceding inflation and deflation. These are illustrative prescriptions, not patient classifications or recommended ventilator settings.
 
-The index is **protocol-dependent**: it is defined by a particular PEEP step, and a different step gives a different number for the same patient. That is a property of the measurement, not a defect of it, and it is why the pressures belong in the definition.
+<!-- BEGIN GENERATED: opening-profiles -->
+*Generated from the profile prescriptions. Fractions refer to the compromised component; pressures are transpulmonary midpoints, in cmH₂O.*
 
----
+| profile | potentially reopenable share | opening midpoint | closing midpoint | memory |
+|---|---:|---:|---:|---|
+| Non-reopenable | 0.0% | inactive | same as opening | off |
+| Pressure-dependent opening | 38.9% | 15.5 | same as opening | off |
+| Opening with memory | 38.9% | 15.5 | 6 | on |
+<!-- END GENERATED: opening-profiles -->
 
-## In the model
+Selecting a profile leaves ventilation, aerated-tissue compliance, maximum capacity and cardiovascular settings unchanged. The gas already present is preserved. While memory remains enabled, the retained diseased opening is kept but cannot exceed the newly specified potential. Switching memory off clears that retained state; enabling it starts from the opening branch rather than preloading the entire reopenable compartment as open. With no compromised component, the profile has no effect. Adding a compromised component to the default healthy prescription gives non-reopenable lung until another profile or an advanced share is selected.
 
-The user sets `riRatio`. The model does **not** use it directly. It solves for the internal openable fraction that would produce that ratio under the reference manoeuvre.
+### Advanced opening settings
 
-**The reference manoeuvre** is PEEP <!-- CONSISTENCY: ri-reference-step -->5 → 15<!-- /CONSISTENCY --> cmH₂O, held as constants in the lung module rather than hidden in a test fixture, because the number means nothing without them.
+- **Reopenable share of compromised lung:** 0–100%. This is the maximum share of the compromised component that can participate in opening. Multiply it by the compromised fraction to obtain the corresponding share of the whole model lung. It is not the amount already open or the amount that will open during a particular PEEP step.
+- **Opening midpoint:** 5–40 cmH₂O transpulmonary pressure. It locates the centre of the opening distribution, not an airway-pressure threshold or a prescribed PEEP.
+- **Opening memory:** off/on. Off, opening and closing follow the same pressure relation. On, previously opened diseased units can remain open at lower pressure.
+- **Closing midpoint:** 2 cmH₂O up to the selected opening midpoint. It is relevant only with memory on. Equality removes the pressure gap and therefore the memory effect. Reducing the opening midpoint below the selected closing value also lowers the closing value to preserve this ordering.
 
-**The solve.** For a candidate openable fraction, the model computes the static end-expiratory volume at both PEEP levels, takes the tangent respiratory system compliance at the low one, and applies the R/I formula. It samples twelve candidates, finds the maximum achievable ratio for this phenotype, then bisects to the requested value. This is a static analogue of the bedside method, not a simulation of its single-breath measurement protocol.
+Editing one of these details selects **Custom**. Their numerical values are saved without rounding to the displayed percentage. Changing a preset selects its specified values again. Distribution width and solver settings are not exposed as advanced controls.
 
-**The result is capped by the lung.** The collapsed compartment is finite and the opening pressure is a separate control, so a patient may not be able to reach the requested ratio. The model then reports the achieved value and raises a caution rather than silently pretending.
+### Why the chest wall matters
 
-**Matching R/I does not validate the whole pressure–volume state.** The same ratio can be produced by different combinations of pleural pressure, transpulmonary pressure, opening range, tissue compliance and collapsed volume. Scenario validation must therefore check the absolute pressure window, EELV, plateau pressure and measured compliance as well as the achieved ratio. The ARDS preset is tested this way; moving `pOpen` merely to preserve R/I while those other quantities drift is explicitly rejected.
+The potential reopenable share is fixed when chest-wall compliance or load changes. The actual fraction open may change because transpulmonary pressure is alveolar minus pleural pressure. A chest-wall intervention can therefore change the pressure available to open the lung without changing which units are capable of opening. Prone position retains the same potential share while applying its documented coarse changes to chest wall, abdominal pressure and opening midpoint.
 
-| requested R/I | achieved | maximum for this patient | recruited volume | end-expiratory volume |
-|---|---|---|---|---|
-| 0 | 0.00 | — | −20 mL | 1.06 L |
-| 0.2 | 0.20 | 1.07 | 36 | 1.09 |
-| 0.5 | 0.50 | 1.07 | 93 | 1.12 |
-| 0.8 | 0.80 | 1.07 | 158 | 1.16 |
-| 1.2 | **1.07** | 1.07 | 228 | 1.21 |
+## What to read
 
-The last row is the interesting one: the request is refused and the readout says so.
+**Closed at end expiration** is 100 × (1 − open fraction), sampled immediately before the next inspiration. Its subtitle gives the maximum minus minimum open fraction during that same completed breath, in **percentage points**. This excursion describes within-breath variation; it is not cumulative opening traffic, recruited millilitres or a measure of injury.
 
-The negative recruited volume at R/I 0 is not a bug. It means the average compliance over the step was *lower* than its low-PEEP tangent — pure inflation with a touch of overdistension. Bedside R/I is reported from zero upward, so the clinical readout is floored while the raw value stays available to the tests.
+Both values describe the whole model lung, including its normal pressure-dependent population. A small excursion is therefore possible even when the compromised component is non-reopenable. Results require one complete breath under the current settings. Parameter changes, reset and an occlusion clear them; an incomplete breath after the change is excluded. They do not require Deep CO or an additional settling calculation.
 
-### Cohort constraint on the latent mapping
+The instantaneous open fraction remains available beside respiratory compliance. Compare pressures, volume, derived PVR, RV/LV volumes and output together; a higher open fraction does not guarantee a haemodynamic benefit.
 
-The internal openable fraction is not observed in the Cappio Borlino cohort. It can nevertheless be constrained indirectly: one shared mechanical phenotype is evaluated at the published median R/I of the low- and high-recruiter groups, then its recruited volume and lung compliance at low and high PEEP are required to remain inside the corresponding Table 2 interquartile ranges. Collapse, tissue compliance, maximum capacity, chest wall and opening midpoint do not change between the rows.
+## How the model represents opening
 
-<!-- BEGIN GENERATED: ri-cohort-mapping -->
-*Executable shared phenotype: collapsed compartment 30%, aerated-lung compliance 55 mL/cmH₂O, maximum capacity 6.0 L, chest-wall compliance 200 mL/cmH₂O, no external wall load and diseased opening midpoint 17 cmH₂O. Only the cohort median R/I changes between rows.*
+The lung contains a normal population and a compromised population sharing one gas volume. Only the specified reopenable share of the latter follows its diseased opening distribution. The distribution width is <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY -->, an internal shape coefficient rather than a measured anatomical variance. [The two-population lung](two-population-lung.md) gives the equation.
 
-| cohort group | requested / achieved R/I | latent openable share of diseased compartment | latent openable share of whole lung | recruited volume, model / observed IQR (mL) | low-PEEP C<sub>L</sub>, model / observed IQR (mL/cmH₂O) | high-PEEP C<sub>L</sub>, model / observed IQR (mL/cmH₂O) |
-|---|---:|---:|---:|---:|---:|---:|
-| low recruiters | 0.35 / 0.35 | 24% | 7% | 118 / 90–202 | 41 / 38–85 | 41 / 23–51 |
-| high recruiters | 0.72 / 0.72 | 53% | 16% | 263 / 181–421 | 45 / 42–78 | 49 / 30–66 |
-<!-- END GENERATED: ri-cohort-mapping -->
+Opening changes accessible volume and the effective pressure–volume relation. It also changes gas volume per open unit and the parallel vascular pathways represented in the pulmonary resistance law. With memory enabled, pressure and recruitment state are solved together at each respiratory step. There is no biological opening time constant or slow recruitment over minutes.
 
-The higher median R/I therefore maps to a larger latent recruitable share without using a different lung phenotype to obtain the answer. The diseased opening transition has a <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY --> width to constrain recruited volume and both compliance measurements jointly against the reported group ranges. This is an aggregate cohort constraint on the translation, not direct anatomical validation of the latent percentages: the study did not measure those percentages, and its IQRs do not preserve patient-level covariance.
+## Why this is not R/I
 
-### What recruitment then does
+Clinical R/I is a manoeuvre-derived estimate: the change in end-expiratory volume is compared with the inflation predicted from low-PEEP respiratory-system compliance. It depends on the pressure step, the compliance measurement and any airway-opening-pressure correction. It is neither a percentage of collapsed lung nor the fraction of that lung that could ever reopen.
 
-Because the open fraction feeds the [pressure–volume curve](pressure-volume-curve.md) and the [strain](two-population-lung.md) term, opening lung changes the mechanics rather than being recorded alongside them:
-
-- respiratory system compliance rises, because there is more lung to inflate;
-- resting volume rises, because a more open lung comes to rest higher;
-- strain falls at constant tidal volume, because the same volume is shared among more units;
-- [pulmonary vascular resistance](pulmonary-vascular-resistance.md) changes in two ways at once — more vascular pathway in parallel, and a different position on the J-curve.
-
-That last coupling is why a PEEP step in a poorly recruitable lung raises derived PVR by 20% while in a recruitable one it changes it by 4%.
-
----
-
-## Why this and not something else
-
-**The measured index and the latent fraction are different quantities.** The R/I control specifies an index defined by a pressure-step protocol. The model solves for the fraction of diseased lung that can open so that its static mechanics match that requested index when attainable. That internal recruitable fraction is not itself the measured R/I.
-
-The translation depends on the opening-pressure distribution and the reference manoeuvre. Matching a requested R/I is a constraint on this translation, not independent validation of all tidal mechanics or of a finite-duration bedside manoeuvre.
-
-**Solving numerically rather than inverting analytically.** The relation between openable fraction and R/I passes through two static pressure–volume solves and a tangent compliance, and has no closed form. Twelve samples plus a bisection is cheap and, because it is the *same* code path the assessment uses, cannot disagree with it.
-
-**Reporting the achieved value and a caution.** The alternative is to clamp silently. A control that accepts a number while delivering another would be misleading in a teaching model.
-
----
+Arthur's profiles and advanced shares specify an internal phenotype directly. No R/I is presented as a measured result. Research helpers retain a static tangent-compliance analogue at PEEP <!-- CONSISTENCY: ri-reference-step -->5 → 15<!-- /CONSISTENCY --> cmH₂O, but it can disagree with a finite-volume ventilator manoeuvre. That discrepancy remains an explicit validation limit. Matching cohort ranges with the static construction does not establish validity of the corresponding clinical measurement or of the anatomical percentages.
 
 ## Limits
 
-### Of the construction
-
-- **R/I is protocol-dependent and the model fixes one protocol.** Its <!-- CONSISTENCY: ri-reference-step -->5 → 15<!-- /CONSISTENCY --> step is the reference; a patient's measured value from a different step is not the same quantity.
-- **No airway opening pressure.** Chen's method corrects for the case where airway opening pressure exceeds the low PEEP; the model has no such measurement, so its 10 cmH₂O effective step cannot reproduce that correction.
-- **The solve is static.** It uses equilibrium volumes, not a single-breath manoeuvre with its flow and timing.
-- **The calibration ignores hysteretic history.** The internal mapping from requested R/I to openable fraction does not include `pClose` or the path by which the lung reached either pressure. When hysteresis is enabled, the actual decremental response can therefore differ from the static reference mapping.
-- The maximum achievable ratio depends on `collapsed` and `pOpen`, so the control's usable range moves with the rest of the phenotype.
-- Recruitment responds instantaneously to pressure. With [hysteresis](hysteresis.md) enabled, the recruitable compartment also retains its opening and closing history. Neither setting includes time-dependent recruitment or slow opening over minutes.
-
-### Of clinical application
-
-- **A high R/I does not mean high PEEP is safe or beneficial.** The model deliberately does not turn its PEEP response into a recommendation, and there is no outcome in it to optimise.
-- **The 0.5 split is a teaching convention** taken from the published cohorts, not a validated decision threshold.
-- The model has no oxygenation, no dead space and no CO₂, so it can show only the mechanical and haemodynamic half of a PEEP trial. Three of the four readings a bedside PEEP step is judged on are unavailable here.
-- Recruited volume in millilitres is a model quantity computed from its own equilibrium volumes, not a measurement.
+- Compromised, reopenable and actually closed fractions are different model quantities. None is calibrated as a CT tissue fraction.
+- Opening has one aggregate pressure distribution; regional pressures, airway closure, pendelluft and separate regional time constants are absent.
+- The 5% numerical floor on total open fraction limits interpretation at extreme closure.
+- Opening excursion is descriptive. It has no validated injury threshold and is not a recruitment-volume measurement.
+- There is no gas exchange or oxygenation benefit to balance against circulatory effects. The model cannot select optimal PEEP or recommend a recruitment manoeuvre.
+- External validation still requires joint assessment of pressures, volumes, compliance and circulatory response under a specified protocol; a plausible fraction alone is insufficient.
 
 ---
 

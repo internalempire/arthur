@@ -22,7 +22,7 @@ function settle(overrides, seconds = 30) {
 
 const change = (before, after) => (after / before - 1) * 100;
 
-// The two phenotypes are the *same collapsed lung*. They differ in measured R/I,
+// The two phenotypes are the *same collapsed lung*. They differ in a static R/I analogue,
 // which the model translates into how much of that compartment can reopen.
 // Holding collapse and tissue compliance equal is the point: it makes the
 // comparison about recruitment relative to inflation rather than lung size.
@@ -141,7 +141,7 @@ export const LITERATURE = {
   },
 
   // The row above needs a phenotype chosen for it, so on its own it could be
-  // satisfied by picking one. Across the R/I control, increasing recruitment
+  // satisfied by picking one. Across the static R/I fixture targets, increasing recruitment
   // relative to inflation must progressively attenuate the PEEP-related rise.
   // The human study does not require a sign change: the high-recruiter cohort
   // median still rose by 5%.
@@ -155,7 +155,7 @@ export const LITERATURE = {
     const monotone = steps.every((d, i) => i === 0 || d < steps[i - 1]);
     return {
       pass: monotone && steps[0] - steps[steps.length - 1] >= 15,
-      detail: `ΔPVR ${steps.map((d) => d.toFixed(0) + '%').join(' → ')} across R/I 0 → 0.8`,
+      detail: `ΔPVR ${steps.map((d) => d.toFixed(0) + '%').join(' → ')} across static R/I analogues 0 → 0.8`,
     };
   },
 
@@ -166,7 +166,7 @@ export const LITERATURE = {
       > low.wholeLungOpenableFraction * 1.8;
     return {
       pass: groups.every((group) => group.pass) && separation,
-      detail: groups.map((group) => `${group.label}: R/I ${group.calibration.achieved.toFixed(2)}, `
+      detail: groups.map((group) => `${group.label}: static R/I analogue ${group.calibration.achieved.toFixed(2)}, `
         + `openable whole lung ${(group.wholeLungOpenableFraction * 100).toFixed(0)}%, `
         + `recruited ${group.calibration.assessment.recruitedVolume.toFixed(0)} mL, `
         + `CL ${group.lowPeepLungCompliance.toFixed(0)} → ${group.highPeepLungCompliance.toFixed(0)} mL/cmH2O`).join('; ')

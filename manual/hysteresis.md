@@ -18,12 +18,12 @@ A classical respiratory pressure–volume loop contains more than recruitment an
 
 ## In the model
 
-Hysteresis is off by default. When it is enabled, two controls describe the recruitable part of the collapsed lung:
+Memory is off in the default prescription. The Opening with memory profile enables it; Advanced opening settings also permit custom values. The reopenable share specifies how much of the compromised component can participate, while two transpulmonary midpoints locate its pressure ranges:
 
 - `pOpen` locates the **opening range**. Opening is gradual: at this transpulmonary pressure half of the units that can be recruited have opened during rising pressure.
 - `pClose` locates the lower **closing range**. During falling pressure, half of those recruitable units remain open at this pressure.
 
-Both are transpulmonary pressures. They are not airway pressures, PEEP values or sharply defined thresholds at which every unit changes state.
+The closing midpoint cannot exceed the opening midpoint; equality removes the memory gap. Both are transpulmonary pressures. They are not airway pressures, PEEP values or sharply defined thresholds at which every unit changes state.
 
 The model treats the lung as two contributions:
 
@@ -56,7 +56,7 @@ The resulting total open fraction is used by lung mechanics, strain and [pulmona
 The executable example below uses one recruitable ARDS phenotype for both the manoeuvre and the incremental/decremental paths.
 
 <!-- BEGIN GENERATED: hysteresis-example -->
-*Executable setup: volume control, VT 250 mL, 20/min, aerated-lung compliance 45 mL/cmH₂O, 45% collapsed, achieved R/I 0.60, opening midpoint 25 cmH₂O and closing midpoint 6 cmH₂O. After settling at PEEP 10, PEEP is raised to 35 for 30 s and returned to 10.*
+*Executable setup: volume control, VT 250 mL, 20/min, aerated-lung compliance 45 mL/cmH₂O, 45% compromised with 72.8% of that component reopenable, opening midpoint 25 cmH₂O and closing midpoint 6 cmH₂O (both transpulmonary). After settling at PEEP 10, PEEP is raised to 35 for 30 s and returned to 10.*
 
 | | before | after |
 |---|---:|---:|

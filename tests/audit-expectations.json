@@ -5,6 +5,6 @@
   "activation-continuity": "resolved",
   "ri-protocol": "open",
   "hysteresis-convergence": "resolved",
-  "patient-wall-intervention": "open",
+  "patient-wall-intervention": "resolved",
   "venous-reversal": "resolved"
 }

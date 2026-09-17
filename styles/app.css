@@ -589,6 +589,19 @@ select { min-width: 150px; }
 
 .ctrl-group { margin-top: 14px; }
 
+.opening-profile-summary {
+  margin: 4px 0 12px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+}
+.recruitment-advanced {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+.recruitment-advanced > summary { cursor: pointer; font-size: 12px; margin-bottom: 10px; }
+
 .control-change-summary {
   position: sticky;
   top: 0;

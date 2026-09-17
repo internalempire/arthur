@@ -35,7 +35,7 @@ A page never restates a source at length. It explains, then links. Files under `
 ## See also              three to six lateral links
 ```
 
-`In the model` is not a code tour. Compliance does not need explaining; the recruitment-to-inflation solver and the pulmonary transit stages do. The test is whether a reader could be misled about what the number means without it.
+`In the model` is not a code tour. Compliance does not need explaining; the distinction between potential and actual opening and the pulmonary transit stages do. The test is whether a reader could be misled about what the number means without it.
 
 `Limits` is the section that must never be thin. Both halves are required: what the construction cannot represent, and what a clinician must not conclude from it.
 

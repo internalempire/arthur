@@ -1,9 +1,10 @@
 import { defaultParams, REFERENCE_WEIGHT_KG } from './parameters.js';
+import { normalizeRecruitmentParameters, RECRUITMENT_PROFILES } from './recruitment.js';
 import { resolveParams } from './position.js';
 import { createBaroreflexState, stepBaroreflex, applyBaroreflex } from './baroreflex.js';
 import {
   createRespiratoryState, stepRespiratory, respiratorySystemCompliance,
-  EXPIRATORY_FLOW_LIMIT,
+  EXPIRATORY_FLOW_LIMIT, invalidateRecruitmentCycle,
 } from './respiratory.js';
 import { pvrComponents, lungRegions, relaxationVolume, openBand } from './lung.js';
 import {
@@ -98,6 +99,7 @@ export class Simulator {
   }
 
   reset() {
+    this.params = normalizeRecruitmentParameters(this.params);
     this.resp = createRespiratoryState();
     this.baro = createBaroreflexState();
     this.effective = resolveParams(this.params);
@@ -162,12 +164,34 @@ export class Simulator {
     // passive equilibrium. `resp.v` is a display-friendly offset from that
     // equilibrium, not the stored absolute thoracic volume.
     const mechanicsChanged = id === 'collapsed' || id === 'clung' || id === 'lungCapacity'
-      || id === 'riRatio' || id === 'pOpen' || id === 'ccw' || id === 'cwLoad'
+      || id === 'reopenable' || id === 'recruitmentProfile' || id === 'hysteresis' || id === 'pClose' || id === 'pOpen' || id === 'ccw' || id === 'cwLoad'
       || id === 'position';
     const absoluteVolume = mechanicsChanged
       ? (this.resp.relaxVolume || relaxationVolume(resolveParams(this.params))) + this.resp.v
       : null;
+    if (id === 'riRatio') throw new Error('Use an explicit opening profile or reopenable share.');
     this.params[id] = value;
+    if (id === 'recruitmentProfile' && RECRUITMENT_PROFILES[value]) {
+      Object.assign(this.params, RECRUITMENT_PROFILES[value]);
+    } else if (['reopenable', 'pOpen', 'pClose', 'hysteresis'].includes(id)) {
+      this.params.recruitmentProfile = 'custom';
+    }
+    this.params.pClose = Math.min(this.params.pClose, this.params.pOpen);
+    if (['collapsed', 'reopenable', 'recruitmentProfile', 'hysteresis'].includes(id)) {
+      const limit = this.params.collapsed * this.params.reopenable;
+      if (this.params.hysteresis !== 'on') this.resp.recruitedFraction = null;
+      else if (this.resp.recruitedFraction !== null) {
+        this.resp.recruitedFraction = Math.min(this.resp.recruitedFraction, limit);
+      }
+    }
+    invalidateRecruitmentCycle(this.resp);
+    if (this.metrics) {
+      this.metrics.closedEndExpiratoryFraction = null;
+      this.metrics.tidalOpenExcursion = null;
+      this.metrics.interpretability.lungOpening = {
+        level: 'unavailable', reasons: ['waiting for a complete uninterrupted breath'],
+      };
+    }
     // Volume and pressure control are entered as genuinely passive modes.
     // Scenarios with spontaneous effort must not carry that muscle pressure
     // invisibly across the mode transition. This is a transition default, not
@@ -196,6 +220,8 @@ export class Simulator {
     if (mechanicsChanged) {
       const after = relaxationVolume(resolveParams(this.params));
       this.resp.v = Math.max(-after * 0.9, absoluteVolume - after);
+      this.resp.relaxVolume = after;
+      this.resp.lungVolume = after + this.resp.v;
       this.resp.plSolved = null;
     }
   }
@@ -567,21 +593,6 @@ export class Simulator {
     if (p.pab0 > 12) ppvReasons.push('raised intra-abdominal pressure');
     const ppvLevel = spontaneousEffort ? 'unavailable' : ppvReasons.length ? 'caution' : 'ok';
 
-    // R/I is a property of a specified PEEP manoeuvre, not of a lung with no
-    // closed compartment. A requested value can also exceed what the selected
-    // collapse and opening pressure can physically supply; in that case report
-    // the achieved model manoeuvre and retain the target only as context.
-    const riReasons = [];
-    let riLevel = 'ok';
-    if ((p.collapsed ?? 0) < 0.005) {
-      riLevel = 'unavailable';
-      riReasons.push('no collapsed compartment is available to recruit');
-    } else if (p.riLimited) {
-      riLevel = 'caution';
-      riReasons.push(`target ${Number(p.riTarget).toFixed(2)} exceeds the model maximum `
-        + `${Number(p.riMaximum).toFixed(2)} for this collapsed compartment and opening pressure`);
-    }
-
     const plateauLevel = spontaneousEffort ? 'unavailable' : 'ok';
     const wedgeLevel = c.p.zone3 >= 0.95 ? 'ok' : 'caution';
     // Derived PVR depends on the wedge surrogate as well as forward flow. Its
@@ -615,7 +626,10 @@ export class Simulator {
         reasons: preloadReasons,
       },
       ppv: { level: ppvLevel, reasons: ppvReasons },
-      ri: { level: riLevel, reasons: riReasons },
+      lungOpening: {
+        level: r.lastClosedEndExpiratory === null ? 'unavailable' : 'ok',
+        reasons: r.lastClosedEndExpiratory === null ? ['waiting for a complete uninterrupted breath'] : [],
+      },
       plateau: { level: plateauLevel, reasons: plateauLevel === 'unavailable' ? ['no passive plateau during spontaneous effort'] : [] },
       wedge: {
         level: wedgeLevel,
@@ -668,16 +682,10 @@ export class Simulator {
       } : null,
       lungVolume: r.lungVolume, pab: r.pab,
       openFraction: regions.openFraction,
-      // Result of the same static 5 -> 15 cmH2O calculation used to translate
-      // the user-entered R/I into the model's latent openable compartment.
-      // Keeping target and achieved separate prevents a physical saturation
-      // from masquerading as a successful calibration.
-      riRatio: p.riAchieved,
-      riTarget: p.riTarget,
-      riMaximum: p.riMaximum,
-      riLimited: p.riLimited,
-      riRecruitedVolume: p.riAssessment?.recruitedVolume ?? null,
-      riLowCompliance: p.riAssessment?.lowCompliance ?? null,
+      closedEndExpiratoryFraction: r.lastClosedEndExpiratory,
+      tidalOpenExcursion: r.lastOpenExcursion,
+      reopenableShare: p.reopenable,
+      recruitmentProfile: p.recruitmentProfile,
       // With hysteresis on, how much is open is a state rather than a reading of
       // the present pressure, so the tile has to say which and by how much they
       // differ — the gap is what the lung remembers.

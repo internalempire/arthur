@@ -167,12 +167,12 @@ The model reports pulmonary resistance twice, and they are different kinds of qu
 - **Pulmonary resistance coefficient** — the model's own internal $R$, the thing the equations divide by. Not measurable in a patient, and not a Poiseuille resistance.
 - **PVR, derived** — $(\overline{P}_{pa} - P_{la})/\dot{Q}$, computed from mean pulmonary arterial pressure, model left atrial pressure and cardiac output. It has the form of catheter PVR only while left atrial pressure is a defensible [wedge surrogate](pulmonary-artery-wedge-pressure.md), and inherits that tile's caution automatically.
 
-They can move in opposite directions, because the derived value carries cardiac output in its denominator. In the calibration phenotype, PEEP 4 → 14:
+They can move in opposite directions, because the derived value carries cardiac output in its denominator. In the research calibration phenotype, PEEP 4 → 14 (the row labels identify static R/I analogues used to construct the fixtures, not measured R/I or current controls):
 
 | | coefficient | derived | open fraction |
 |---|---|---|---|
-| R/I 0.05 (poorly recruitable) | 2.38 → 2.36 WU (−1%) | 2.64 → **3.16 WU (+20%)** | 58 → 59% |
-| R/I 0.50 (recruitable) | 2.38 → 2.22 WU (−7%) | 2.54 → 2.64 WU (+4%) | 58 → 64% |
+| static analogue 0.05 (poorly recruitable) | 2.38 → 2.36 WU (−1%) | 2.64 → **3.16 WU (+20%)** | 58 → 59% |
+| static analogue 0.50 (recruitable) | 2.38 → 2.22 WU (−7%) | 2.54 → 2.64 WU (+4%) | 58 → 64% |
 
 Reading the coefficient as though it were the pressure–flow estimate would report the opposite direction. However, at PEEP 14 these model runs fall outside the zone III assumption and the wedge surrogate is flagged. The table therefore demonstrates an internal pressure–flow response and its dependence on recruitability; it does not independently reproduce a valid catheter measurement at both PEEP levels.
 
@@ -249,7 +249,7 @@ Five rows in [`LITERATURE_RANGES.md`](../docs/LITERATURE_RANGES.md) are executed
 | `pvr-human-j-direction` | higher at RV and TLC than at FRC; extra-alveolar predominates at RV, alveolar at TLC |
 | `pvr-recruitability-low` | model pressure–flow estimate inside the low-recruiter IQRs, rising with PEEP |
 | `pvr-recruitability-high` | model pressure–flow estimate inside the high-recruiter IQRs, near-flat with PEEP |
-| `pvr-recruitability-dissociation` | across R/I 0 → 0.8, the PEEP-related rise is progressively attenuated |
+| `pvr-recruitability-dissociation` | across fixtures defined by static R/I analogues 0 → 0.8, the PEEP-related rise is progressively attenuated |
 
 The first two are topological: they test the shape, not a fitted number, because the shape is what this page teaches and the schematic it follows has no quantitative y-axis. The cohort-range tests are regression constraints on the chosen phenotype, not proof that the downstream pressure is measurable as a wedge under every tested condition.
 

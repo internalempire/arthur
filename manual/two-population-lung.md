@@ -20,7 +20,7 @@ One volume, two populations of units sharing it.
 
 **Normal units** — a fraction $1 - d$ of the lung — open along a narrow logistic centred near zero transpulmonary pressure. They are shut only at frankly negative distending pressure and reopen almost as soon as there is any.
 
-**Diseased units** — a fraction $d$, the `collapsed` control — are split again. Only a fraction of them is *openable*; the rest never opens at any pressure and stands for consolidation. The openable ones follow a logistic centred on the `pOpen` control.
+**Diseased units** — a fraction $d$, the Compromised lung control (`collapsed`) — are split again. Only a fraction of them is *openable*; the rest never opens at any pressure and stands for consolidation. The openable ones follow a logistic centred on the `pOpen` control.
 
 $$
 \varphi(P_l) = (1-d)\,\sigma\!\left(\frac{P_l - 0}{1.3}\right) + d\,\omega\,\sigma\!\left(\frac{P_l - P_{open}}{0.75}\right)
@@ -31,12 +31,12 @@ This is the equilibrium relation used when hysteresis is off. With [recruitment 
 - $\varphi$ — open fraction of the lung, clamped to the range 0.05 to 1
 - $\sigma(x) = 1/(1+e^{-x})$ — the logistic
 - $d$ — the `collapsed` control, the diseased fraction
-- $\omega$ — the openable share of the diseased compartment, **not** a user control; it is solved from the requested [R/I ratio](recruitment-and-ri.md)
+- $\omega$ — the openable share of the diseased compartment, selected through an [opening profile or advanced setting](recruitment-and-ri.md); it stays fixed during chest-wall interventions
 - $P_l$ — transpulmonary pressure, cmH₂O
 - $P_{open}$ — the `pOpen` control, cmH₂O
 - 1.3 and <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY --> — the widths of the two distributions
 
-The 0.75 cmH₂O width of the diseased distribution is a **didactic shape coefficient**, not an anatomical estimate of alveolar opening-pressure variance. One shared cohort phenotype constrains recruited volume and low/high-PEEP lung compliance jointly against the published low- and high-recruiter IQRs. The [R/I page](recruitment-and-ri.md#cohort-constraint-on-the-latent-mapping) shows that executable comparison and its limits.
+The 0.75 cmH₂O width of the diseased distribution is a **didactic shape coefficient**, not an anatomical estimate of alveolar opening-pressure variance. Grouped cohort ranges provide only an indirect constraint on its scale. They do not validate the anatomical percentages or the finite-breath recruitment response; see [opening profiles and R/I](recruitment-and-ri.md#why-this-is-not-ri).
 
 ### The sponge idealisation
 
@@ -69,7 +69,7 @@ The `collapsed` control is a fraction of a **normal** lung, not of the patient's
 
 **Selective recruitment.** Resting volume is an outcome of lung and chest-wall mechanics. Opening additional units therefore changes the volume that the lung holds at a given pressure. The population split confines recruitability to the diseased fraction while preserving the separate mechanics of already-aerated tissue.
 
-**The openable share is not a control.** It would be easy to expose "what fraction of the collapsed lung can open" as a slider. It is hidden because it is an internal coefficient, and the quantity a clinician measures is R/I. Presenting a latent fraction and a bedside index as interchangeable patient inputs would be exactly the category error the model's [interpretability](interpretability.md) rules exist to prevent.
+**The openable share is an explicit internal coefficient.** A profile selects it, and the advanced settings permit a custom value. It is identified as model potential, distinct from a bedside R/I, from imaging and from the actual closed fraction at a given pressure.
 
 ---
 
@@ -83,7 +83,7 @@ The `collapsed` control is a fraction of a **normal** lung, not of the patient's
 - **The open fraction is floored at 0.05**, a numerical guard rather than a physiological statement.
 - Consolidation is represented only as tissue that never opens. It has no separate compliance, weight or perfusion.
 - The two distribution widths are chosen, not measured.
-- **Aerated compliance, maximum capacity and collapse are independent controls.** `clung` changes the local tissue slope, `lungCapacity` changes the completely open ceiling, and `collapsed` changes the share currently available. They can coexist in a phenotype, but none silently substitutes for another.
+- **Aerated compliance, maximum capacity and collapse are independent controls.** `clung` changes the local tissue slope, `lungCapacity` changes the completely open ceiling, and `collapsed` changes the size of the compromised component. They can coexist in a phenotype, but none silently substitutes for another.
 
 ### Of clinical application
 

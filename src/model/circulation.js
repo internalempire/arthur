@@ -279,7 +279,12 @@ const COLLAPSE_KNEE = 1.1; // mmHg
  * direction. A curve evaluated at mean pressures need not equal mean flow.
  */
 export function venousReturnBackPressure(pra, pCrit) {
-  return pCrit + COLLAPSE_KNEE * Math.log1p(Math.exp((pra - pCrit) / COLLAPSE_KNEE));
+  const x = (pra - pCrit) / COLLAPSE_KNEE;
+  // log(1 + exp(x)) = x + log(1 + exp(-x)). Preserve ordinary
+  // arithmetic exactly; avoid exponential overflow in out-of-domain stress
+  // cases without changing the pressure law or hiding their validity flags.
+  if (x > 700) return pra + COLLAPSE_KNEE * Math.log1p(Math.exp(-x));
+  return pCrit + COLLAPSE_KNEE * Math.log1p(Math.exp(x));
 }
 
 export function venousReturnFlow(pmsf, pra, pCrit, rvr) {

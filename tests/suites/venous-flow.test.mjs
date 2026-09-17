@@ -1,8 +1,16 @@
 import { section, check, settled, SCENARIOS, COMPARTMENTS, totalVolume } from '../support/model.mjs';
-import { cavalFlow, venousReturnFlow, stepCirculation } from '../../src/model/circulation.js';
+import { cavalFlow, venousReturnFlow, venousReturnBackPressure, stepCirculation } from '../../src/model/circulation.js';
 import { stepRespiratory } from '../../src/model/respiratory.js';
 
 section('Signed caval flow and conservation');
+
+check('extreme finite venous pressures retain the softplus high-pressure limit without overflow',
+  venousReturnBackPressure(1000, 0) === 1000
+  && venousReturnBackPressure(2000, 1000) === 2000
+  && venousReturnBackPressure(0, -1000) === 0);
+check('overflow-safe continuation does not change finite ordinary-pressure arithmetic',
+  [-100, -10, 0, 10, 100, 750].every(pra => venousReturnBackPressure(pra, 3)
+    === 3 + 1.1 * Math.log1p(Math.exp((pra - 3) / 1.1))));
 
 const pressures = [-10, -3, 0, 3, 10, 25];
 let rest = true, direction = true, symmetric = true, forward = true, reference = true;

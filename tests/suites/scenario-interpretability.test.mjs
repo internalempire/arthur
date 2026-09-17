@@ -199,7 +199,7 @@ section('Scenario teaching mechanisms');
   demonstrates['ards-rv'] = baseline.papMean > 20
     && baseline.pvrDerivedWood > 4
     && baseline.rvLvRatio > 1.5
-    && baseline.riRatio >= 0.65 && !baseline.riLimited
+    && Math.abs(baseline.reopenableShare - 0.3892077555259069) < 1e-12
     && endExpiratoryPpl >= -3 && endExpiratoryPpl <= 5
     && endExpiratoryPl >= 8 && endExpiratoryPl <= 15
     && baseline.pplat >= 18 && baseline.pplat <= 30
@@ -211,7 +211,7 @@ section('Scenario teaching mechanisms');
   check('ARDS preset couples RV failure to a recruitability-dependent PEEP response',
     demonstrates['ards-rv'],
     `baseline Ppl/PL ${endExpiratoryPpl.toFixed(1)}/${endExpiratoryPl.toFixed(1)} cmH2O, `
-      + `plateau ${baseline.pplat.toFixed(1)}, R/I ${baseline.riRatio.toFixed(2)}; `
+      + `plateau ${baseline.pplat.toFixed(1)}, reopenable ${(baseline.reopenableShare * 100).toFixed(1)}%; `
       + `PVR at PEEP 20: R/I on ${recruiter.pvrDerivedWood.toFixed(1)}, `
       + `off ${nonRecruiter.pvrDerivedWood.toFixed(1)} WU`);
 }

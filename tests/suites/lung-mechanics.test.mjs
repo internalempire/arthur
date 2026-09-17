@@ -1,4 +1,4 @@
-// Static lung mechanics, baby-lung strain, R/I calibration and the PVR operating point.
+// Static lung mechanics, baby-lung strain, legacy static R/I conversion and the PVR operating point.
 import {
   Simulator, SCENARIOS, defaultParams,
   lungRegions, pvrComponents, transpulmonaryAt, relaxationVolume, openFractionAt,
@@ -157,8 +157,8 @@ section('The two-compartment lung');
     lungRegions({ ...p, riRatio: 0 }, 2.2).openFraction
       === lungRegions({ ...p, riRatio: 1 }, 2.2).openFraction);
 
-  // R/I is now a measured manoeuvre rather than a renamed unit fraction. The
-  // calibration must reproduce attainable targets and disclose when the finite
+  // This tests the historical static analogue used for v1 conversion, not a
+  // finite-volume bedside measurement. It reproduces attainable targets; the finite
   // collapsed compartment makes a larger request impossible.
   {
     const phenotype = { ...p, collapsed: 0.42, clung: 40, ccw: 200, pOpen: 20, riRatio: 0.6 };
@@ -167,14 +167,14 @@ section('The two-compartment lung');
       ...phenotype,
       openableDiseasedFraction: calibration.openableFraction,
     });
-    check('R/I calibration reproduces an attainable bedside phenotype',
+    check('legacy static R/I conversion reproduces an attainable analogue',
       near(measured.ratio, 0.6, 0.01) && !calibration.limited,
       `target 0.60, achieved ${measured.ratio.toFixed(3)}, openable fraction ${calibration.openableFraction.toFixed(3)}`);
 
     const impossible = calibrateRecruitmentToInflation({
       ...p, collapsed: 0.1, clung: 40, pOpen: 30, riRatio: 2,
     });
-    check('R/I calibration never invents lung beyond the collapsed compartment',
+    check('legacy static R/I conversion never invents lung beyond the compromised compartment',
       impossible.limited && impossible.openableFraction <= 1,
       `target 2.00, maximum ${impossible.maximum.toFixed(3)}, fraction ${impossible.openableFraction.toFixed(3)}`);
   }

@@ -55,7 +55,7 @@ A breath begins with the [equation of motion](equation-of-motion.md), which dete
 
 The two ventricles share a septum and a constrained space, described under [ventricular interdependence](ventricular-interdependence.md). [Cardiac tamponade](cardiac-tamponade.md) shows what happens when the available pericardial space becomes the dominant limit to filling. Ventricular output also depends on filling, contractility and arterial load; [ventriculo-arterial coupling](ventriculo-arterial-coupling.md) provides the conceptual framework. [The four effects of a breath](the-four-effects-of-a-breath.md) puts these pathways in temporal order.
 
-Respiratory pathology is represented selectively. A [two-population lung](two-population-lung.md) separates already aerated from recruitable units. [R/I](recruitment-and-ri.md) sets how much of the latter can be gained over a standard PEEP step; [hysteresis](hysteresis.md) gives recruited diseased units memory; [expiratory flow limitation](expiratory-flow-limitation.md) creates dynamic trapping without turning the simulator into a regional COPD model.
+Respiratory pathology is represented selectively. A [two-population lung](two-population-lung.md) separates already aerated from recruitable units. [Opening profiles](recruitment-and-ri.md) specify the potentially reopenable share and its pressure dependence; [hysteresis](hysteresis.md) gives recruited diseased units memory; [expiratory flow limitation](expiratory-flow-limitation.md) creates dynamic trapping without turning the simulator into a regional COPD model.
 
 ## How to use it responsibly
 

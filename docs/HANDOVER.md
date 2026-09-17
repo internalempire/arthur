@@ -1,6 +1,81 @@
 # Project handover
 
-Updated: 2026-09-09
+Updated: 2026-09-17
+
+## Explicit opening profiles adopted — September 17
+
+The clinician authorized adoption after the private September 13–17 R/I,
+intratidal-opening and parametrization discussions. Main controls now specify
+**Compromised lung** and an opening profile. Advanced settings expose the
+reopenable share of that component, transpulmonary opening midpoint, memory
+switch and closing midpoint. Editing them selects Custom; closing is bounded
+by opening. Fractions remain model coefficients, not CT measurements or R/I.
+
+The equilibrium and memory profiles use reopenable share
+0.3892077555259069 and opening midpoint 15.5 cmH₂O; memory uses closing midpoint
+6 cmH₂O. Non-reopenable sets share zero and memory off. A newly added compromised
+component in the healthy default is non-reopenable. ARDS retains its exact
+established potential and mechanics; all 12 scenario snapshots are unchanged.
+No opening width, constitutive law, PVR law, physiological time constant or
+timestep was changed. Pulmonary distensibility is still not added.
+
+Potential is now fixed during chest-wall and tissue interventions rather than
+recalibrated to preserve a static R/I target. Actual opening responds to the
+transpulmonary trajectory; position also retains its explicit midpoint shift.
+This resolves the wall-intervention audit criterion, which is now enforced.
+The finite-volume R/I criterion remains open: the retained static research
+analogue is not a finite-breath measurement. Existing research fixtures are
+labelled accordingly; their bounds have not been relaxed.
+
+The R/I tile is replaced by closed fraction at end expiration plus maximum-minus-
+minimum open fraction over the same completed breath, in percentage points.
+Changes, reset and occlusions invalidate incomplete cycles. Sampling runs in
+ordinary integration, with no new deep experiment. Visible saved R/I tiles
+migrate in place; hidden tiles stay hidden. Live/Mean and opt-in Deep CO retain
+their behaviour.
+
+Duplicated ARDS prose values in the scenario validation document are replaced
+by a reference to its executable manual table, avoiding stale numerical copies.
+
+Version-1 patient files convert once from the saved supine prescription before
+position is applied. Version-2 files store explicit values at full precision.
+The manual describes current operation and these compatibility rules; history
+belongs here and in `manual/_log.md`. Sequential paused mechanics edits also
+update the absolute-volume reference immediately, preventing silent gas changes.
+
+A private comparison against baseline `52ff9f3` sampled eleven respiratory and
+haemodynamic metrics across all twelve presets and two saved legacy cases,
+including prone memory and a severe narrow-gap phenotype. Every sampled value
+was identical. Alternated CPU-time samples gave roughly 3% median overhead,
+with individual case ratios about 0.97–1.09; this small local benchmark is not a
+browser-frame or patient-level validation. Results and scripts are private in
+`outputs/Arthur-recruitment-adoption-2026-09-17/`.
+
+The first full suite exposed three non-finite venous-gradient readouts in two
+extreme random configurations, already invalid for lung capacity and depleted
+compartments. The added controls changed the deterministic sweep's sampled
+combinations and exposed exponential overflow in the existing venous softplus.
+For arguments above 700 the implementation uses the algebraically identical
+`x + log1p(exp(-x))` form; ordinary arithmetic remains bit-identical. This is a
+numerical overflow correction, not a new venous law or a relaxation of domain
+checks. Targeted replay retains explicit invalidity and finite readouts; two
+permanent tests protect the limiting form and ordinary-pressure equivalence.
+The initial failed suite and the subsequent full rerun are both retained in
+private output logs.
+
+Completed verification: `npm test` — 431 passed, zero failed, including the
+21 opening/migration regressions and two overflow checks; 44 UI smoke
+contracts; Chromium control/readout/layout/file/manual checks without console or
+network errors; 7 audit passes and the explicitly known R/I failure; syntax and
+10 verification-runner failure-path checks; manual examples/build/lint (18
+blocks, 53 pages, zero lint errors/warnings). Snapshot and figure regeneration
+produced no numerical differences. The final full run exited zero after about
+18 minutes; the initial 428-pass/1-fail run is retained as diagnostic history.
+The tested source hashes and synchronization record are stored privately with
+the adoption results. No physiological acceptance bound was relaxed.
+Windows is not accessible and must not be declared updated. The private
+proposal and adoption reports stay in `codex-notes/`; numerical results stay
+in `outputs/`, with neither committed to GitHub.
 
 ## Coupled pressure/recruitment calculation adopted — September 9
 

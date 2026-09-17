@@ -66,6 +66,12 @@
 
 ## R–Z
 
+**Compromised lung.** The model population assigned to diseased units, including a specified potentially reopenable share and a permanently closed remainder. It is distinct from the closed fraction actually reached at end expiration and is not a CT tissue measurement.
+
+**Reopenable share.** The specified fraction of the compromised population capable of opening. Its value is fixed during chest-wall interventions; actual opening depends on transpulmonary pressure and, if enabled, memory.
+
+**Opening excursion.** Maximum minus minimum open fraction over one complete breath, expressed in percentage points of the whole model lung.
+
 **Recruitment-to-inflation ratio (R/I).** Compliance of recruited volume divided by respiratory-system compliance at low PEEP for a specified PEEP step. It compares recruitment with inflation of already open lung. See [recruitment and R/I](recruitment-and-ri.md).
 
 **Resistance to venous return.** The denominator relating the pressure available for venous return to flow, in mmHg·s/mL. In the model it is split between the splanchnic reservoir and the [inferior vena cava](inferior-vena-cava.md) conduit (33% upstream, 67% downstream), with the downstream segment carrying the caval waterfall.

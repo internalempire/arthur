@@ -222,9 +222,11 @@ Related pages: [Pleural pressure](pleural-pressure.md) · [The Campbell diagram]
 
 ## Recruitment and dynamic indices
 
-### Recruitment-to-inflation
+### Closed at end expiration
 
-The tile reports the R/I achieved by the model during a standard static PEEP 5→15 cmH₂O assessment, alongside the requested target and recruited volume. It is unavailable without a collapsed compartment and cautioned when the requested target exceeds what the selected collapsed and recruitable lung can provide.
+The main value is the closed fraction of the whole model lung immediately before the next inspiration. The subtitle reports maximum minus minimum open fraction over that same completed breath, in percentage points. This is a model state and a within-breath excursion, not a CT measurement, R/I or a measured recruited volume.
+
+Both are withheld until a complete breath has occurred under the current settings. Parameter changes, reset and occlusions invalidate the pair. The normal population can contribute a small pressure-dependent excursion even with no reopenable compromised units. Neither readout requires Deep CO.
 
 Related page: [Recruitment and R/I](recruitment-and-ri.md)
 

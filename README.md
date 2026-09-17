@@ -82,7 +82,7 @@ The lung model includes:
 
 - a pressure–volume relation with independent **aerated-lung compliance** and **maximum lung capacity**;
 - already aerated, collapsed, recruitable and non-recruitable tissue;
-- a bedside-inspired recruitment-to-inflation ratio;
+- explicit compromised-lung and opening-profile controls, with advanced reopenable share and transpulmonary midpoints;
 - optional recruitment hysteresis with separate opening and closing ranges;
 - expiratory flow limitation and dynamic hyperinflation;
 - an independent nonlinear chest-wall relaxation curve, with stiffness separated from external loading;
@@ -136,7 +136,7 @@ These include:
 - effective systemic resistance coefficient, mPAP, wedge surrogate, pulmonary resistance coefficient and derived PVR;
 - stress index, pulse pressure variation and stroke volume variation;
 - mean systemic filling pressure and model preload reserve;
-- open fraction, R/I and pulmonary transit estimates.
+- instantaneous open fraction, closed fraction at end expiration, within-breath opening excursion and pulmonary transit estimates.
 
 Values can be marked *caution* or withheld as *unavailable* when their assumptions are absent. See **[Numerical tiles](manual/numeric-tiles.md)** and **[Interpretability](manual/interpretability.md)**.
 

@@ -91,27 +91,21 @@ raising absolute EELV or total PEEP; above the choke, further PEEP adds volume
 and haemodynamic cost. The row checks this direction but deliberately does not
 fit Ranieri's 85% cohort threshold or expose it as a treatment rule.
 
-## Current R/I semantics
+## R/I research analogue and current opening controls
 
-`riRatio` is the model result of a defined passive PEEP 5 → 15 cmH₂O manoeuvre,
-not a renamed fraction of units. Following Chen et al., the model subtracts the
-volume predicted by low-PEEP respiratory-system compliance from the EELV change,
-divides that recruited volume by the pressure step, and normalises the resulting
-compliance to low-PEEP compliance. It numerically maps that target to an internal
-openable fraction while keeping `collapsed`, `clung`, `lungCapacity` and `pOpen`
-independent.
+The clinical R/I and the model's explicit reopenable share are different
+quantities. Current controls specify the compromised population and its potential
+opening directly; the numeric tile reports actual closure and opening excursion
+on a completed breath. Neither is an anatomical measurement.
 
-The mapping is bounded by available lung. If all of the collapsed compartment
-is already openable and the requested R/I is still not reached, the model reports
-the attained ratio and marks it with a caution. It does not increase collapse or
-permit an openable fraction above one. R/I 0.5 is the cohort split used in the
-source studies, not a validated treatment threshold.
-
-The simulator cannot apply the airway-opening-pressure correction because it has
-no separate airway-opening measurement; `pOpen` is a transpulmonary alveolar
-opening pressure and must not be substituted for it. Thus the executable R/I is
-an internally consistent teaching analogue of the standard manoeuvre, not a
-claim that every bedside technical condition is represented.
+Research fixtures and version-1 patient conversion retain the static PEEP
+5 → 15 cmH₂O construction: equilibrium EELV change minus the inflation predicted
+from low-PEEP tangent compliance, normalised by pressure step and compliance.
+The mapping is bounded by the available compartment. It is a static analogue,
+not a measured finite-breath R/I. The independent finite-volume audit remains
+open. No airway-opening-pressure correction is represented, and the diseased
+transpulmonary opening midpoint must not substitute for that airway measurement.
+The clinical 0.5 cohort split is not a treatment threshold.
 
 The diseased opening transition is 0.75 cmH₂O wide. This didactic coefficient
 was selected by a cohort-level constraint: with collapse, tissue compliance,

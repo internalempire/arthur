@@ -152,14 +152,11 @@ const TILES = [
         : ` · resting volume ${m.relaxVolume.toFixed(2)} L`),
   },
   {
-    id: 'ri', label: 'Recruitment-to-inflation', unit: 'R/I', kind: 'derived',
-    get: (m) => Number(m.riRatio).toFixed(2),
-    sub: (m) => `PEEP 5→15 · target ${Number(m.riTarget).toFixed(2)}`
-      + (m.riRecruitedVolume === null ? '' : ` · recruited ${Math.max(0, m.riRecruitedVolume).toFixed(0)} mL`),
-    quality: (m) => m.interpretability.ri,
-    // No diagnostic colour threshold: 0.5 split the original cohort at its
-    // median. It is useful for phenotype comparison, not a validated command
-    // to raise PEEP in an individual patient.
+    id: 'lungOpening', label: 'Closed lung at end-expiration', unit: '%', kind: 'measured',
+    get: (m) => m.closedEndExpiratoryFraction === null ? '—' : (m.closedEndExpiratoryFraction * 100).toFixed(1),
+    sub: (m) => m.tidalOpenExcursion === null ? 'waiting for a complete breath'
+      : `last complete breath · open-fraction excursion ${(m.tidalOpenExcursion * 100).toFixed(1)} percentage points`,
+    quality: (m) => m.interpretability.lungOpening,
   },
   {
     id: 'stressIndex', label: 'Stress index', unit: '', kind: 'derived',
@@ -255,6 +252,13 @@ function loadLayout() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (Array.isArray(saved) && saved.length > 0) {
       let changed = false;
+      // Replace a visible retired R/I tile in place. A deliberately hidden
+      // tile stays hidden; the new state readout remains available in Add.
+      const oldOpeningIndex = saved.indexOf('ri');
+      if (oldOpeningIndex >= 0) {
+        saved.splice(oldOpeningIndex, 1, ...(saved.includes('lungOpening') ? [] : ['lungOpening']));
+        changed = true;
+      }
       if (localStorage.getItem(READOUT_MIGRATION_KEY) !== 'done') {
         // These readouts did not exist when older layouts were saved. Add them
         // once beside the quantities they explain, then respect any later hide

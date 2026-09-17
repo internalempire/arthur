@@ -69,7 +69,7 @@ The panels are scaled independently because their pressure excursions differ. A 
 | normal aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 500 mL; PEEP 8 | 1.01 | 13.2 | 5.2 | 96 |
 | maximum lung capacity 4.0 L, aerated-lung compliance 200 mL/cmH₂O, no collapse; VT 900 mL; PEEP 8 | 1.25 | 19.8 | 11.8 | 76 |
 | the same 4.0 L maximum-capacity lung; VT 350 mL; PEEP 8 | 1.05 | 12.0 | 4.0 | 87 |
-| aerated-lung compliance 40 mL/cmH₂O, 42% collapsed, achieved R/I 0.70, transpulmonary opening midpoint 17.6 cmH₂O; VT 600 mL; PEEP 2 | 0.58 | 10.1 | 8.1 | 74 |
+| aerated-lung compliance 40 mL/cmH₂O, 42% compromised with 97.7% of that component reopenable, transpulmonary opening midpoint 17.6 cmH₂O; VT 600 mL; PEEP 2 | 0.58 | 10.1 | 8.1 | 74 |
 | the same recruitable lung; VT 600 mL; PEEP 14 | 1.03 | 31.8 | 17.8 | 34 |
 <!-- END GENERATED: stress-index -->
 

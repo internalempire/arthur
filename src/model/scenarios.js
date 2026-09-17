@@ -1,3 +1,4 @@
+import { ARDS_REOPENABLE } from './recruitment.js';
 // Presets. Each one is a partial override of the defaults plus the question it
 // is meant to make answerable — the note is the reason the preset exists.
 
@@ -58,18 +59,17 @@ export const SCENARIOS = [
   {
     id: 'ards-rv',
     name: 'ARDS with right ventricular failure',
-    note: 'A collapsed, stiff lung and a failing right ventricle, with a high-recruiter R/I phenotype. The RV dilates, the septum bows left and the left ventricle cannot fill. At the starting PEEP, end-expiratory transpulmonary pressure is about 13 cmH₂O rather than being forced upward merely to preserve R/I. Compare PEEP levels, then set R/I to zero while leaving collapse, tissue stiffness and the thoracic load unchanged: the consolidated phenotype carries the greater pulmonary vascular and RV cost.',
+    note: 'A collapsed, stiff lung and a failing right ventricle, with a reopenable diseased component. The RV dilates, the septum bows left and the left ventricle cannot fill. At the starting PEEP, end-expiratory transpulmonary pressure is about 13 cmH₂O. Compare PEEP levels, then select the non-reopenable profile while leaving collapse, tissue stiffness and the thoracic load unchanged: the consolidated phenotype carries the greater pulmonary vascular and RV cost.',
     params: {
       mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
       collapsed: 0.42, clung: 25,
       // A supine thoracic load is explicit rather than hidden in the lung. It
       // shifts resting pleural pressure without changing chest-wall compliance.
       cwLoad: 10,
-      // R/I remains an independently measured 5 -> 15 cmH2O phenotype. With
-      // the cohort-constrained narrower opening transition, 15.5 cmH2O keeps
-      // the absolute mechanics in range while retaining a visible recruited
-      // versus consolidated response at high PEEP.
-      riRatio: 0.7, pOpen: 15.5,
+      // Explicit potential and opening midpoint preserve the calibrated
+      // pressure-volume phenotype and its recruited versus consolidated
+      // response at high PEEP. The share is not an anatomical measurement.
+      reopenable: ARDS_REOPENABLE, recruitmentProfile: 'equilibrium', pOpen: 15.5,
       // Filling and RV/pulmonary load are co-tuned so correcting the respiratory
       // pressures does not erase the scenario's right-heart teaching lesion.
       stressedVolume: 900, eesRv: 0.26, pvrBase: 0.19, hpv: 1.6,

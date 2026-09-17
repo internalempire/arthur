@@ -7,14 +7,12 @@
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams, GROUPS, PARAMETERS } from '../src/model/parameters.js';
 import { SCENARIOS } from '../src/model/scenarios.js';
+import { RECRUITMENT_PROFILES } from '../src/model/recruitment.js';
 import {
   lungVolumeAtPl, staticEndExpiratoryVolume, relaxationVolume,
   chestWallPressure, transpulmonaryAt,
 } from '../src/model/lung.js';
 import { ivcDisplayWidth } from '../src/ui/panels/thorax.js';
-import {
-  evaluateRecruitmentCohort, RECRUITMENT_COHORT_PHENOTYPE, RECRUITMENT_COHORT_GROUPS,
-} from '../tests/support/recruitment-cohort.mjs';
 
 const SETTLING_SECONDS = 45;
 
@@ -48,7 +46,7 @@ export const STRESS_INDEX_BASE = {
 export const HYSTERESIS_EXAMPLE = Object.freeze({
   parameters: Object.freeze({
     mode: 'vcv', pmus: 0, vt: 250, rr: 20,
-    clung: 45, collapsed: 0.45, riRatio: 0.6,
+    clung: 45, collapsed: 0.45, reopenable: 0.728227565685908, recruitmentProfile: 'custom',
     hysteresis: 'on', pOpen: 25, pClose: 6,
   }),
   baselinePeep: 10,
@@ -81,9 +79,9 @@ export const STRESS_INDEX_CASES = [
   {
     id: 'recruiting-low',
     title: 'Tidal recruitment',
-    label: 'aerated-lung compliance 40 mL/cmH₂O, 42% collapsed, achieved R/I 0.70, transpulmonary opening midpoint 17.6 cmH₂O; VT 600 mL; PEEP 2',
+    label: 'aerated-lung compliance 40 mL/cmH₂O, 42% compromised with 97.7% of that component reopenable, transpulmonary opening midpoint 17.6 cmH₂O; VT 600 mL; PEEP 2',
     overrides: {
-      clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 17.6, hysteresis: 'off',
+      clung: 40, collapsed: 0.42, reopenable: 0.9765564948320389, recruitmentProfile: 'custom', pOpen: 17.6, hysteresis: 'off',
       vt: 600, peep: 2,
     },
   },
@@ -92,7 +90,7 @@ export const STRESS_INDEX_CASES = [
     title: 'The same lung, held open',
     label: 'the same recruitable lung; VT 600 mL; PEEP 14',
     overrides: {
-      clung: 40, collapsed: 0.42, riRatio: 0.7, pOpen: 17.6, hysteresis: 'off',
+      clung: 40, collapsed: 0.42, reopenable: 0.9765564948320389, recruitmentProfile: 'custom', pOpen: 17.6, hysteresis: 'off',
       vt: 600, peep: 14,
     },
   },
@@ -111,7 +109,7 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/pulmonary-artery-wedge-pressure.md', ids: ['wedge-peep-examples'] },
   { file: 'manual/scenarios.md', ids: ['swing-scenario', 'ards-scenario', 'scenario-overrides'] },
   { file: 'manual/baroreflex.md', ids: ['baroreflex-septic'] },
-  { file: 'manual/recruitment-and-ri.md', ids: ['ri-cohort-mapping'] },
+  { file: 'manual/recruitment-and-ri.md', ids: ['opening-profiles'] },
   { file: 'manual/hysteresis.md', ids: ['hysteresis-example'] },
 ];
 
@@ -309,7 +307,7 @@ function lungWallEquilibriumBlock() {
   const cases = [
     ['normal reference', {}],
     ['collapsed, stiff and non-recruitable lung', {
-      collapsed: 0.42, clung: 40, riRatio: 0, pOpen: 21,
+      collapsed: 0.42, clung: 40, reopenable: 0, pOpen: 21,
     }],
     ['lost lung recoil', { clung: 300 }],
     ['normal lung with a 6 cmH₂O external wall load', { cwLoad: 6 }],
@@ -482,6 +480,7 @@ function scenarioValue(spec, value) {
     return spec.options.find((option) => option.value === value)?.label ?? String(value);
   }
   if (spec.type === 'checkbox') return value ? 'On' : 'Off';
+  if (spec.displayScale === 100) return `${fixed(value * 100, 1)}%`;
   if (spec.unit === 'fraction') return `${Math.round(value * 100)}%`;
 
   const stepText = String(spec.step ?? 1);
@@ -557,14 +556,14 @@ function ardsScenarioBlock() {
   const states = [
     ['recruitable baseline', { peep: 12 }],
     ['recruitable, high PEEP', { peep: 20 }],
-    ['non-recruitable, high PEEP', { peep: 20, riRatio: 0 }],
+    ['non-reopenable, high PEEP', { peep: 20, reopenable: 0, recruitmentProfile: 'closed' }],
   ].map(([label, overrides]) => ({ label, ...ardsScenarioState(overrides) }));
   return [
     '*Executable preset outputs after 45 s of settling. End-expiratory Ppl is read from the selected chest-wall relation at measured EELV; PL is total PEEP minus that pressure.*',
     '',
-    '| state | EELV (L) | end-expiratory Ppl / PL (cmH₂O) | plateau (cmH₂O) | achieved R/I | open lung | derived PVR (WU) | RV/LV | CO (L/min) |',
+    '| state | EELV (L) | end-expiratory Ppl / PL (cmH₂O) | plateau (cmH₂O) | closed at end expiration | open lung (instantaneous) | derived PVR (WU) | RV/LV | CO (L/min) |',
     '|---|---:|---:|---:|---:|---:|---:|---:|---:|',
-    ...states.map(({ label, metrics, endExpiratoryPpl, endExpiratoryPl }) => `| ${label} | ${fixed(metrics.endExpiratoryVolume, 2)} | ${fixed(endExpiratoryPpl, 1)} / ${fixed(endExpiratoryPl, 1)} | ${fixed(metrics.pplat, 1)} | ${fixed(metrics.riRatio, 2)} | ${Math.round(metrics.openFraction * 100)}% | ${fixed(metrics.pvrDerivedWood, 1)} | ${fixed(metrics.rvLvRatio, 2)} | ${fixed(metrics.co, 2)} |`),
+    ...states.map(({ label, metrics, endExpiratoryPpl, endExpiratoryPl }) => `| ${label} | ${fixed(metrics.endExpiratoryVolume, 2)} | ${fixed(endExpiratoryPpl, 1)} / ${fixed(endExpiratoryPl, 1)} | ${fixed(metrics.pplat, 1)} | ${fixed(metrics.closedEndExpiratoryFraction * 100, 1)}% | ${Math.round(metrics.openFraction * 100)}% | ${fixed(metrics.pvrDerivedWood, 1)} | ${fixed(metrics.rvLvRatio, 2)} | ${fixed(metrics.co, 2)} |`),
   ].join('\n');
 }
 
@@ -588,17 +587,13 @@ function baroreflexSepticBlock() {
 }
 
 function recruitmentCohortBlock() {
-  const groups = evaluateRecruitmentCohort();
-  const phenotype = RECRUITMENT_COHORT_PHENOTYPE;
+  const labels = { closed: 'Non-reopenable', equilibrium: 'Pressure-dependent opening', memory: 'Opening with memory' };
   return [
-    `*Executable shared phenotype: collapsed compartment ${Math.round(phenotype.collapsed * 100)}%, aerated-lung compliance ${phenotype.clung} mL/cmH\u2082O, maximum capacity ${fixed(phenotype.lungCapacity, 1)} L, chest-wall compliance ${phenotype.ccw} mL/cmH\u2082O, no external wall load and diseased opening midpoint ${phenotype.pOpen} cmH\u2082O. Only the cohort median R/I changes between rows.*`,
+    '*Generated from the profile prescriptions. Fractions refer to the compromised component; pressures are transpulmonary midpoints, in cmH₂O.*',
     '',
-    '| cohort group | requested / achieved R/I | latent openable share of diseased compartment | latent openable share of whole lung | recruited volume, model / observed IQR (mL) | low-PEEP C<sub>L</sub>, model / observed IQR (mL/cmH₂O) | high-PEEP C<sub>L</sub>, model / observed IQR (mL/cmH₂O) |',
-    '|---|---:|---:|---:|---:|---:|---:|',
-    ...groups.map((group) => {
-      const observed = RECRUITMENT_COHORT_GROUPS.find(({ id }) => id === group.id);
-      return `| ${group.label} | ${fixed(group.riRatio, 2)} / ${fixed(group.calibration.achieved, 2)} | ${Math.round(group.calibration.openableFraction * 100)}% | ${Math.round(group.wholeLungOpenableFraction * 100)}% | ${Math.round(group.calibration.assessment.recruitedVolume)} / ${group.recruitedVolume[0]}\u2013${group.recruitedVolume[1]} | ${Math.round(group.lowPeepLungCompliance)} / ${observed.lowPeepLungCompliance[0]}\u2013${observed.lowPeepLungCompliance[1]} | ${Math.round(group.highPeepLungCompliance)} / ${observed.highPeepLungCompliance[0]}\u2013${observed.highPeepLungCompliance[1]} |`;
-    }),
+    '| profile | potentially reopenable share | opening midpoint | closing midpoint | memory |',
+    '|---|---:|---:|---:|---|',
+    ...Object.entries(RECRUITMENT_PROFILES).map(([id, p]) => `| ${labels[id]} | ${fixed(p.reopenable * 100, 1)}% | ${p.pOpen ?? 'inactive'} | ${p.hysteresis === 'on' ? p.pClose : 'same as opening'} | ${p.hysteresis} |`),
   ].join('\n');
 }
 
@@ -655,7 +650,7 @@ function hysteresisExampleBlock() {
   const gain = (result.held.after.open - result.held.before.open) * 100;
   const largerGain = (result.largerBreath.after.open - result.largerBreath.before.open) * 100;
   return [
-    `*Executable setup: volume control, VT 250 mL, 20/min, aerated-lung compliance 45 mL/cmH₂O, 45% collapsed, achieved R/I 0.60, opening midpoint ${HYSTERESIS_EXAMPLE.parameters.pOpen} cmH₂O and closing midpoint ${HYSTERESIS_EXAMPLE.parameters.pClose} cmH₂O. After settling at PEEP ${HYSTERESIS_EXAMPLE.baselinePeep}, PEEP is raised to ${HYSTERESIS_EXAMPLE.manoeuvrePeep} for 30 s and returned to ${HYSTERESIS_EXAMPLE.baselinePeep}.*`,
+    `*Executable setup: volume control, VT 250 mL, 20/min, aerated-lung compliance 45 mL/cmH₂O, 45% compromised with ${fixed(HYSTERESIS_EXAMPLE.parameters.reopenable * 100, 1)}% of that component reopenable, opening midpoint ${HYSTERESIS_EXAMPLE.parameters.pOpen} cmH₂O and closing midpoint ${HYSTERESIS_EXAMPLE.parameters.pClose} cmH₂O (both transpulmonary). After settling at PEEP ${HYSTERESIS_EXAMPLE.baselinePeep}, PEEP is raised to ${HYSTERESIS_EXAMPLE.manoeuvrePeep} for 30 s and returned to ${HYSTERESIS_EXAMPLE.baselinePeep}.*`,
     '',
     '| | before | after |',
     '|---|---:|---:|',
@@ -697,7 +692,7 @@ export function renderDocumentedExampleBlocks() {
     ['swing-scenario', swingScenarioBlock()],
     ['ards-scenario', ardsScenarioBlock()],
     ['baroreflex-septic', baroreflexSepticBlock()],
-    ['ri-cohort-mapping', recruitmentCohortBlock()],
+    ['opening-profiles', recruitmentCohortBlock()],
     ['hysteresis-example', hysteresisExampleBlock()],
     ['scenario-overrides', scenarioOverridesBlock()],
   ]);

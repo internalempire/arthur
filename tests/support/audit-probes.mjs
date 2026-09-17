@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { Simulator } from '../../src/model/simulator.js';
 import { SCENARIO_BY_ID } from '../../src/model/scenarios.js';
 import { defaultParams } from '../../src/model/parameters.js';
+import { recruitmentToInflation } from '../../src/model/lung.js';
 import { resolveParams } from '../../src/model/position.js';
 import { stepRespiratory } from '../../src/model/respiratory.js';
 import { stepCirculation, ventricularActivation } from '../../src/model/circulation.js';
@@ -100,7 +101,7 @@ export function respiratoryAudit() {
   const rows = [5, 15].map(peep => {
     const s = settle({ ...ards, rr: 10, ti: 1, peep });
     return { peep, eelv: s.metrics.endExpiratoryVolume, compliance: s.metrics.crsMeasured,
-      ratio: s.metrics.riRatio };
+      staticAnalogue: recruitmentToInflation(s.effective).ratio };
   });
   const finiteRI = (rows[1].eelv - rows[0].eelv) * 1000 / (rows[0].compliance * 10) - 1;
   const hysteresis = [0.00025, 0.000125, 0.0000625].map(dt => {
@@ -119,7 +120,7 @@ export function respiratoryAudit() {
     return { cwLoad, openable: p.openableDiseasedFraction };
   });
   return [
-    { id: 'ri-protocol', satisfied: Math.abs(rows[0].ratio - Math.max(0, finiteRI)) < 0.05,
+    { id: 'ri-protocol', satisfied: Math.abs(rows[0].staticAnalogue - Math.max(0, finiteRI)) < 0.05,
       measurements: { rows, finiteRI } },
     { id: 'hysteresis-convergence', satisfied: hysteresis.every(r => Math.abs(r.vt - 150) < 1
       && r.occlusionSwing < 0.01), measurements: hysteresis },

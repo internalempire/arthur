@@ -1,5 +1,32 @@
 # Model decisions
 
+## 2026-09-17 — Specify opening potential directly
+
+After private R/I and intratidal-opening experiments, the clinician authorized
+replacing the ordinary R/I input with compromised-lung extent and an opening
+profile. The advanced section exposes reopenable share, transpulmonary opening
+and closing midpoints, and memory. The existing opening distribution, coupled
+solver, hysteresis and pulmonary resistance law are retained. A profile is an
+internal teaching prescription, not an anatomical measurement or PEEP target.
+
+Potential stays fixed during changes in chest-wall compliance/load, tissue
+compliance, compromised extent and position; actual opening responds to the
+pressure history. The two concepts must not be silently recalibrated together.
+The ARDS preset stores its full-precision potential explicitly to preserve its
+established phenotype. A compromised component added to a healthy default is
+non-reopenable unless the clinician selects otherwise.
+
+The displayed state is closure at end expiration plus maximum-minus-minimum
+open fraction over the same complete breath. Changes and occlusions invalidate
+incomplete cycles. The sample bookkeeping runs during ordinary integration;
+no additional settling job or Deep CO is introduced.
+
+Version-1 files convert once using their original supine prescription; version-2
+files store explicit values at full precision. Static R/I helpers remain for
+conversion and research regression. Their finite-volume disagreement remains
+open, independently of removing the R/I tile. Resolving the chest-wall
+invariance criterion does not establish patient-level external validation.
+
 ## 2026-09-07 — Allow conservative caval backflow
 
 After comparison in isolated source copies, the clinician authorized adopting

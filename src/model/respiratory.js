@@ -23,7 +23,7 @@
 import { clamp } from './units.js';
 import {
   transpulmonaryAt, transpulmonaryWithRecruitment, relaxationVolume, lungComplianceAt,
-  stepRecruitedFraction, recruitmentBand, openFractionFromRecruitmentState,
+  stepRecruitedFraction, recruitmentBand, openFractionFromRecruitmentState, openFractionAt,
   hysteresisGap, staticEndExpiratoryVolume, staticEndExpiratoryVolumeAtRecruitmentState,
   chestWallPressure, chestWallComplianceAt, CHEST_WALL_REFERENCE_PRESSURE,
 } from './lung.js';
@@ -126,12 +126,28 @@ export function createRespiratoryState() {
     // diseased units; already-aerated lung continues to follow present pressure.
     openFraction: null,
     recruitedFraction: null,
+    openingCycleActive: false,
+    openingCycleMin: Infinity,
+    openingCycleMax: -Infinity,
+    lastOpenSample: null,
+    lastClosedEndExpiratory: null,
+    lastOpenExcursion: null,
     pplatCandidate: 0,
     pplMin: Infinity,
     pplMax: -Infinity,
     vtAccum: 0,
     ppeakAccum: -Infinity,
   };
+}
+
+/** A readout requires one whole, uninterrupted breath under this prescription. */
+export function invalidateRecruitmentCycle(r) {
+  r.openingCycleActive = false;
+  r.openingCycleMin = Infinity;
+  r.openingCycleMax = -Infinity;
+  r.lastClosedEndExpiratory = null;
+  r.lastOpenExcursion = null;
+  r.lastOpenSample = null;
 }
 
 /**
@@ -305,6 +321,7 @@ export function stepRespiratory(p, r, dt) {
   // toward the passive elastic pressure. That sequence is the physiology
   // behind the pressure-muscle-index manoeuvre, without calculating an index.
   const stepOcclusion = () => {
+    invalidateRecruitmentCycle(r);
     r.flow = 0;
     r.holdElapsed += dt;
     const palvHeld = alveolar(r.v, r.pmus);
@@ -435,6 +452,13 @@ export function stepRespiratory(p, r, dt) {
   // PEEP keeps loss-of-recoil hyperinflation separate from dynamically trapped
   // volume. With hysteresis on, use the branch the lung is actually occupying.
   if (r.prevPhase === 'exp' && r.phase === 'insp') {
+    if (r.openingCycleActive && r.lastOpenSample !== null) {
+      r.lastClosedEndExpiratory = 1 - r.lastOpenSample;
+      r.lastOpenExcursion = r.openingCycleMax - r.openingCycleMin;
+    }
+    r.openingCycleActive = true;
+    r.openingCycleMin = r.lastOpenSample ?? Infinity;
+    r.openingCycleMax = r.lastOpenSample ?? -Infinity;
     r.lastEndExpiratoryVolume = vRelax + r.v;
     const staticEelv = hysteretic
       ? staticEndExpiratoryVolumeAtRecruitmentState(p, p.peep, r.recruitedFraction)
@@ -515,6 +539,13 @@ export function stepRespiratory(p, r, dt) {
   if (hysteretic) {
     r.recruitedFraction = consistentRecruitment;
     r.openFraction = openFractionFromRecruitmentState(p, r.pl, r.recruitedFraction);
+  }
+
+  const openNow = r.openFraction ?? openFractionAt(p, r.plSolved);
+  r.lastOpenSample = openNow;
+  if (r.openingCycleActive) {
+    r.openingCycleMin = Math.min(r.openingCycleMin, openNow);
+    r.openingCycleMax = Math.max(r.openingCycleMax, openNow);
   }
 
   // --- per-breath bookkeeping ----------------------------------------------

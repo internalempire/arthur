@@ -32,13 +32,14 @@ Airway resistance remains linear; EFL adds a separate expiratory choke. This dis
 
 | control | range | model meaning |
 |---|---:|---|
-| collapsed lung | 0–0.80 | fraction unavailable at low pressure before recruitment |
-| R/I ratio | 0–2.0 | target recruitment relative to inflation for model PEEP <!-- CONSISTENCY: ri-reference-step -->5 → 15<!-- /CONSISTENCY --> |
-| opening pressure | 5–40 cmH₂O | centre of the opening range of recruitable diseased units |
-| recruitment hysteresis | off/on | permits recruited diseased units to remain open on falling pressure |
-| closing pressure | 2–40 cmH₂O | centre of the closing range; active only with hysteresis on |
+| compromised lung | 0–80% | diseased component, including reopenable and permanently closed units; not the fraction currently closed |
+| opening profile | non-reopenable / pressure-dependent / memory / custom | selects a prescribed potential share and opening behaviour |
+| advanced: reopenable share | 0–100% of compromised lung | maximum share capable of opening; independent of the chest wall |
+| advanced: opening midpoint | 5–40 cmH₂O transpulmonary | centre of the opening distribution |
+| advanced: opening memory | off/on | retains previously opened diseased units on falling pressure |
+| advanced: closing midpoint | 2 cmH₂O to opening midpoint | centre of the closing distribution; active with memory on |
 
-Collapse answers “how much lung is initially unavailable”; R/I answers “how much of it opens over the reference pressure step”; opening pressure answers “where along transpulmonary pressure the opening occurs”. These are separate questions and the controls should not be used as interchangeable severity sliders.
+The compromised fraction specifies the size of the diseased component; its reopenable share specifies potential, and the pressure history determines actual opening. These are separate questions. Advanced edits select Custom; selecting a profile restores its prescribed values. See [opening profiles](recruitment-and-ri.md) for the exact prescriptions and the complete-breath readouts.
 
 Opening and closing pressures are the centres of broad recruitment ranges, not single thresholds at which the entire lung flips state. Hysteresis applies only to the recruitable diseased population; already aerated lung follows the ordinary pressure–volume relation without recruitment memory.
 
@@ -61,7 +62,7 @@ Prone position is deliberately coarse. It combines directional changes intended 
 - Maximum capacity is entered directly in litres; height-, sex- and age-based prediction is not implemented.
 - The chest wall has one aggregate sigmoid curve; rib cage, diaphragm and abdominal wall are not separate compartments.
 - Chest-wall load is selected directly rather than predicted from anthropometry, posture or abdominal pressure.
-- R/I is mapped to a standard model manoeuvre and is not recalculated from an actual bedside pressure–volume acquisition.
+- The reopenable share is an internal teaching coefficient, not a measured R/I or an anatomical percentage.
 - Recruitment has one diseased population; opening pressures are distributed but not spatially assigned.
 - EFL has one choke and no small-airway heterogeneity, airway closure or gas compression.
 - Prone effects are directional and not patient-specific.

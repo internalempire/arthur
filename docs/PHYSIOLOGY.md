@@ -61,7 +61,7 @@ numbers. The following all reproduce:
   underfilled starting point than from the plateau of the model RV-function curve.
   PPV is displayed descriptively but is not used as the validation target.
 - ARDS with right ventricular failure is checked as a multi-observable
-  phenotype rather than accepted because its R/I ratio alone is plausible. At
+  phenotype rather than accepted because one opening coefficient is plausible. At
   the shipped PEEP, end-expiratory pleural and transpulmonary pressure, plateau
   pressure, measured respiratory compliance, filling pressures, pulmonary
   vascular load and RV:LV size must all occupy the declared teaching range.
@@ -186,37 +186,40 @@ remain absent.
 
 ---
 
-## 5. R/I is a manoeuvre-defined phenotype
+## 5. Explicit opening potential and breathwise state
 
-The user-facing recruitability control is the recruitment-to-inflation ratio
-measured over a passive PEEP 5 → 15 cmH₂O reference manoeuvre. The model computes
-the change in end-expiratory lung volume, subtracts the volume predicted from
-low-PEEP respiratory-system compliance, and divides the resulting recruited
-compliance by that low-PEEP compliance. It then solves for the smallest internal
-fraction of diseased units that reproduces the requested R/I.
+The main controls specify a compromised fraction (`collapsed`) and an opening
+profile. The compromised component includes permanently closed units and a
+potentially reopenable share (`reopenable`). Their product is the maximum
+reopenable fraction of the whole model lung. Neither is the fraction currently
+closed, a CT fraction or a manoeuvre-derived R/I. Aerated-tissue compliance
+(`clung`) and completely open capacity (`lungCapacity`) remain independent.
 
-This prevents four concepts from collapsing into one slider: `collapsed` is how
-much lung is closed, `clung` is the local compliance of aerated tissue,
-`lungCapacity` is the completely open volume ceiling, and R/I is how much
-recruitment the specified pressure step produces relative to inflation of the
-baby lung. The internal openable fraction is capped at one. If
-the requested R/I would require more lung than is collapsed, or the selected
-opening pressure lies outside the manoeuvre, the achieved value is shown with a
-caution instead of silently changing collapse.
+The profiles select non-reopenable, pressure-dependent or memory-dependent
+opening. Advanced controls expose the reopenable share, transpulmonary opening
+midpoint, memory switch and closing midpoint. Closing cannot exceed opening;
+equality removes the memory gap. Custom values retain full precision in saved
+patient prescriptions. See the generated profile table in the
+[manual](../manual/recruitment-and-ri.md) for their exact prescriptions.
 
-The latent translation is constrained against the Cappio Borlino cohort with
-one shared mechanical phenotype. At group-median R/I 0.35 and 0.72, model
-recruited volume and lung compliance at low and high PEEP must remain inside the
-corresponding Table 2 IQRs. The resulting openable shares increase from about 7%
-to 16% of the whole lung. Those shares are model inferences, not measurements:
-the paper reports grouped respiratory mechanics and does not identify an
-anatomical recruitable fraction or patient-level parameter combination.
+Chest-wall compliance, wall load and position do not recalibrate potential.
+They can change actual opening by changing the transpulmonary pressure reached;
+prone position also applies its explicit opening-midpoint transformation.
+Pressure, recruitment and circulatory response remain jointly determined.
 
-The 0.5 split is retained only as the cohort median used by Chen et al. and by
-Cappio Borlino et al.; it is not a validated treatment threshold. The model also
-lacks a separate airway-opening-pressure measurement, so it cannot apply that
-bedside correction. Finally, R/I does not establish that high PEEP avoids
-overdistension, and the simulator does not present it as an optimal-PEEP rule.
+The numeric tile reports closed fraction at end expiration and the maximum
+minus minimum open fraction over the same completed breath. Parameter changes,
+reset and occlusions invalidate both until a complete breath at the new settings
+is available. They are internal state measurements, not recruited volume or
+injury indices, and require no additional deep calculation.
+
+R/I remains a clinical concept distinct from these controls. Research helpers
+retain a static 5-to-15 cmH₂O tangent-compliance analogue and a version-1 file
+conversion. Their agreement with a finite-volume ventilator manoeuvre is an
+unresolved validation criterion; cohort IQR agreement does not validate that
+manoeuvre or identify anatomical percentages. Version-1 conversion runs once
+against the saved supine prescription, before posture is applied. Version-2
+files store the explicit share, profile and pressure settings.
 
 Optional recruitment hysteresis retains only the recruitable diseased fraction;
 already-aerated lung follows current transpulmonary pressure. Each respiratory

@@ -3,7 +3,9 @@ import {
 } from '../../src/model/lung.js';
 
 // One shared mechanical phenotype for both Cappio Borlino groups. Only the
-// measured R/I changes. The selected compliance and opening midpoint are close
+// static R/I target changes. This checks the historical mapping against group
+// ranges, not the finite-volume manoeuvre or anatomical fractions. The selected
+// compliance and opening midpoint are close
 // to the cohort's low-PEEP lung-compliance and inspiratory-transpulmonary-
 // pressure ranges; they are not fitted separately for each group.
 export const RECRUITMENT_COHORT_PHENOTYPE = Object.freeze({

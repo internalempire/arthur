@@ -129,9 +129,8 @@ const PANELS = [
         ['Aerated-lung compliance setting', `${p.clung} mL/cmH₂O`],
         ['Maximum lung capacity', `${n(p.lungCapacity, 1)} L`],
         ['Live respiratory-system compliance (not a Campbell curve)', `${n(m.crs, 0)} mL/cmH₂O`],
-        ['Recruitment-to-inflation ratio', m.interpretability.ri.level === 'unavailable'
-          ? 'not applicable without collapsed lung'
-          : `${n(m.riRatio, 2)} over PEEP 5 to 15 cmH₂O (target ${n(m.riTarget, 2)})`],
+        ['Closed lung at end-expiration', m.closedEndExpiratoryFraction === null
+          ? 'waiting for a complete breath' : `${n(m.closedEndExpiratoryFraction * 100, 1)}%`],
         ['Expiratory time constant', `${n(m.expTimeConstant, 2)} s`],
         ['Plateau pressure', `${n(m.pplat)} cmH₂O`],
         [endExpiratory.label, `${n(m.totalPeep)} cmH₂O; ${endExpiratory.detail}`],
@@ -195,9 +194,9 @@ const PANELS = [
         ['Open fraction', `${n(m.openFraction * 100, 0)}%`],
         ['Strain per open unit', `${n(m.lungStrain * 100, 0)}%`],
         ['Reopened by pressure', `${n(m.recruitedFraction * 100, 0)}% of the lung`],
-        ['R/I reference manoeuvre', m.interpretability.ri.level === 'unavailable'
-          ? 'not applicable without collapsed lung'
-          : `${n(m.riRatio, 2)}; ${n(Math.max(0, m.riRecruitedVolume), 0)} mL recruited`],
+        ['Reopenable share of compromised lung', `${n(m.reopenableShare * 100, 1)}%`],
+        ['Open-fraction excursion, last complete breath', m.tidalOpenExcursion === null
+          ? 'waiting for a complete breath' : `${n(m.tidalOpenExcursion * 100, 1)} percentage points`],
         ['Open-unit vascular bed', `${n(comp.openBed * RESISTANCE_TO_WOOD, 2)} Wood units`],
         // A logistic opening curve never reaches exactly 100%, so an otherwise
         // normal lung can retain a mathematically tiny closed branch with a

@@ -1,6 +1,6 @@
 # Global limits
 
-The [independent audit](validation.md#independent-audit-and-unresolved-findings) separates unresolved findings from passing contracts. Cardiac output uses integrated valve flow; incompatible ventricular pressure envelopes or filling/ejection throughflow suspend clinical interpretation. The LV-failure preset demonstrates pressure unloading with a modest fall in forward output. Open-caval reversal is represented and checked. Three audit findings remain open: finite-volume R/I agreement, narrow-threshold hysteresis convergence, and preservation of intrinsic recruitability during a chest-wall intervention.
+The [independent audit](validation.md#independent-audit-and-unresolved-findings) separates unresolved findings from passing contracts. Cardiac output uses integrated valve flow; incompatible ventricular pressure envelopes or filling/ejection throughflow suspend clinical interpretation. The LV-failure preset demonstrates pressure unloading with a modest fall in forward output. Open-caval reversal is represented and checked. Hysteresis convergence and preservation of the potential reopenable share during chest-wall interventions are enforced regression checks. One audit finding remains open: agreement of the static R/I research analogue with a finite-volume ventilator manoeuvre.
 
 > The model is a compact mechanical argument about heart–lung interaction; it is not a complete cardiopulmonary patient, and every scenario inherits the omissions below.
 
@@ -69,7 +69,7 @@ Controls do not represent drug dose. Fluid is placed instantaneously in the veno
 
 ## Limits of indices and scenarios
 
-PPV and SVV are descriptive and deliberately not tied to a diagnostic fluid-responsiveness threshold. There is no tidal-volume challenge because the model is not quantitatively calibrated to its proposed PPV increment. R/I is a teaching analogue of a fixed PEEP manoeuvre and can be bounded by available collapsed lung. Preload reserve is the slope of an analytic model curve, not a validated bedside index.
+PPV and SVV are descriptive and deliberately not tied to a diagnostic fluid-responsiveness threshold. There is no tidal-volume challenge because the model is not quantitatively calibrated to its proposed PPV increment. The specified reopenable share and the reported closed fraction/opening excursion are internal model quantities, not anatomical measurements. The static R/I research analogue is not validated as a finite-breath measurement and is not a clinical readout. Preload reserve is the slope of an analytic model curve, not a validated bedside index.
 
 Every scenario is a phenotype designed around one question. None contains the full disease named in its title. ARDS lacks gas exchange, inflammatory and thrombotic biology; COPD lacks regional obstruction; sepsis lacks endothelial and organ physiology; LV failure does not generate hydrostatic pulmonary oedema from filling pressure and lacks fluid kinetics and mitral regurgitation; pulmonary embolism lacks explicit clot; tamponade lacks pericardial fluid dynamics and diagnostic imaging. Prone position is a coarse immediate transformation. There is no weaning scenario: the model does not represent enough of the syndrome’s causal physiology.
 

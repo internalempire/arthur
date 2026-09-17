@@ -1,11 +1,12 @@
 import { PARAMETERS, PARAM_BY_ID, defaultParams } from './parameters.js';
+import { normalizeRecruitmentParameters } from './recruitment.js';
 
 // A patient-state file is deliberately a parameter prescription, not a memory
 // dump of the integrator. Replaying pressures, chamber volumes or respiratory
 // phase would preserve a transient numerical accident rather than recreate the
 // same physiological experiment from a settled starting point.
 export const PATIENT_STATE_FORMAT = 'arthur-patient-state';
-export const PATIENT_STATE_VERSION = 1;
+export const PATIENT_STATE_VERSION = 2;
 
 const isRecord = (value) => value !== null
   && typeof value === 'object'
@@ -61,7 +62,7 @@ export function parsePatientState(candidate) {
   if (candidate.format !== PATIENT_STATE_FORMAT) {
     throw new Error('This is not an arthur patient-state file.');
   }
-  if (candidate.version !== PATIENT_STATE_VERSION) {
+  if (![1, PATIENT_STATE_VERSION].includes(candidate.version)) {
     throw new Error(`Patient-state version ${candidate.version ?? 'missing'} is not supported.`);
   }
   if (!isRecord(candidate.parameters)) {
@@ -71,6 +72,13 @@ export function parsePatientState(candidate) {
   const parameterValues = {};
   const ignored = [];
   for (const [id, value] of Object.entries(candidate.parameters)) {
+    if (candidate.version === 1 && id === 'riRatio') {
+      if (!Number.isFinite(value) || value < 0 || value > 2) {
+        throw new Error('The saved R/I must be a finite value from 0 to 2.');
+      }
+      parameterValues.riRatio = value;
+      continue;
+    }
     const spec = PARAM_BY_ID.get(id);
     if (!spec) {
       ignored.push(id);
@@ -82,11 +90,19 @@ export function parsePatientState(candidate) {
     parameterValues[id] = value;
   }
 
-  const params = { ...defaultParams(), ...parameterValues };
+  // Version 1 used R/I 0.5 when that optional field was absent. Convert against
+  // the full supine prescription, before applying any positional transform.
+  const legacy = candidate.version === 1 ? { riRatio: 0.5 } : {};
+  const merged = { ...defaultParams(), ...legacy, ...parameterValues };
+  if (candidate.version === 2 && merged.pClose > merged.pOpen) {
+    throw new Error('Closing midpoint must not exceed opening midpoint.');
+  }
+  const params = normalizeRecruitmentParameters(merged);
 
   return {
     params,
     overrides: patientParameterOverrides(params),
     ignored,
+    migrated: candidate.version === 1,
   };
 }

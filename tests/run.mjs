@@ -18,6 +18,7 @@ const SUITES = [
   './suites/cardiac-response.test.mjs',
   './suites/lung-mechanics.test.mjs',
   './suites/recruitment.test.mjs',
+  './suites/opening-profiles.test.mjs',
   './suites/hysteresis-numerics.test.mjs',
   './suites/scenario-interpretability.test.mjs',
   './suites/contracts.test.mjs',

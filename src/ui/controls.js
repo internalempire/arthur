@@ -17,6 +17,7 @@ export function parameterDiffersFromReference(current, reference, id) {
 
 export function createControls(container, sim, onChange) {
   const rows = new Map();
+  let profileSummary = null;
   const reference = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
   const changeSummary = document.createElement('p');
   changeSummary.className = 'control-change-summary';
@@ -30,9 +31,28 @@ export function createControls(container, sim, onChange) {
     h.textContent = group.label;
     section.appendChild(h);
 
+    let advanced = null;
     for (const spec of PARAMETERS.filter((s) => s.group === group.id)) {
-      section.appendChild(buildRow(spec));
+      if (spec.advanced === 'recruitment') {
+        if (!advanced) {
+          advanced = document.createElement('details');
+          advanced.className = 'recruitment-advanced';
+          const summary = document.createElement('summary');
+          summary.textContent = 'Advanced opening settings';
+          advanced.appendChild(summary);
+        }
+        advanced.appendChild(buildRow(spec));
+      } else {
+        section.appendChild(buildRow(spec));
+        if (spec.id === 'recruitmentProfile') {
+          profileSummary = document.createElement('p');
+          profileSummary.className = 'opening-profile-summary';
+          profileSummary.setAttribute('aria-live', 'polite');
+          section.appendChild(profileSummary);
+        }
+      }
     }
+    if (advanced) section.appendChild(advanced);
     container.appendChild(section);
   }
 
@@ -96,7 +116,7 @@ export function createControls(container, sim, onChange) {
         : spec.type === 'checkbox' ? input.checked
           : parseFloat(input.value);
       sim.setParam(spec.id, v);
-      paint(spec, input, value);
+      sync();
       // One control can decide whether another applies at all, so relevance is
       // recomputed on every change rather than only when a scenario is loaded.
       // Without this, turning hysteresis on left its closing pressure greyed out
@@ -126,7 +146,8 @@ export function createControls(container, sim, onChange) {
       value.textContent = v ? 'On' : 'Off';
     } else {
       const decimals = spec.step < 0.01 ? 3 : spec.step < 1 ? 2 : 0;
-      value.textContent = `${Number(v).toFixed(decimals)}${spec.unit ? ' ' + spec.unit : ''}`;
+      const shown = Number(v) * (spec.displayScale ?? 1);
+      value.textContent = `${shown.toFixed(spec.displayScale ? 1 : decimals)}${spec.unit ? ' ' + spec.unit : ''}`;
     }
   }
 
@@ -137,15 +158,17 @@ export function createControls(container, sim, onChange) {
    * another switch has turned it off — closing pressure with hysteresis off is
    * the second kind: the slider would move and nothing would happen.
    *
-   * Kept apart from `sync` because this runs on every change, and `sync` writes
-   * values back into the inputs, which is the wrong thing to do to a control
-   * somebody is in the middle of dragging.
+   * Profiles and constrained midpoints can update several controls together;
+   * synchronization keeps their displayed values and applicability consistent.
    */
   function refreshRelevance() {
     const mode = sim.params.mode;
     for (const { spec, row, input } of rows.values()) {
+      if (spec.id === 'pClose') input.max = String(sim.params.pOpen);
       const relevant = (!spec.appliesTo || spec.appliesTo.includes(mode))
-        && (!spec.requires || sim.params[spec.requires.id] === spec.requires.value);
+        && (!spec.requires || sim.params[spec.requires.id] === spec.requires.value)
+        && (!(spec.advanced === 'recruitment' && spec.id !== 'reopenable')
+          || (sim.params.collapsed > 0 && sim.params.reopenable > 0));
       row.classList.toggle('inactive', !relevant);
       input.disabled = !relevant;
     }
@@ -180,6 +203,15 @@ export function createControls(container, sim, onChange) {
     }
     refreshRelevance();
     refreshModified();
+    const p = sim.params;
+    if (profileSummary) profileSummary.textContent = p.collapsed === 0
+      ? 'No compromised component. The selected profile will apply if one is added.'
+      : p.reopenable === 0 ? 'The compromised component cannot reopen; the aerated tissue still distends.'
+        : `${(p.reopenable * 100).toFixed(1)}% of the compromised component can reopen `
+          + `(${(p.collapsed * p.reopenable * 100).toFixed(1)}% of the whole lung). `
+          + `Opening midpoint ${p.pOpen} cmH₂O transpulmonary; `
+          + (p.hysteresis === 'on' && p.pClose < p.pOpen
+            ? `closing midpoint ${p.pClose} cmH₂O.` : 'opening and closing share the same range.');
   }
 
   sync();
