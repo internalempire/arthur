@@ -43,6 +43,14 @@ The compromised fraction specifies the size of the diseased component; its reope
 
 Opening and closing pressures are the centres of broad recruitment ranges, not single thresholds at which the entire lung flips state. Hysteresis applies only to the recruitable diseased population; already aerated lung follows the ordinary pressure–volume relation without recruitment memory.
 
+### Why an opening control is grey
+
+**Custom** lets you choose individual values; it does not create a compromised component or enable memory automatically. Opening midpoint and Opening memory are editable only when both **Compromised lung** and **Reopenable share of compromised lung** are above 0%. Closing midpoint additionally requires Opening memory to be On. The reopenable-share control remains editable at zero compromised lung so a potential share can be prepared, but it has no effect until a compromised component is present.
+
+Hover over a disabled opening control or its label to see the reason and the setting needed to enable it. The same explanation is available through its **i** button, including keyboard focus or a tap. The message updates immediately when a setting or profile changes. If several conditions are absent, it explains the first prerequisite: compromised component, then reopenable share, then memory.
+
+For example, a 50% reopenable share with Compromised lung at 0% still gives no reopenable lung. Setting Compromised lung above zero enables Opening midpoint and Opening memory; turning memory On also enables Closing midpoint. These conditions apply equally to Custom and the predefined profiles.
+
 ## Abdomen and thorax
 
 | control | range | model meaning |

@@ -648,7 +648,12 @@ select { min-width: 150px; }
   content: '';
 }
 
-.ctrl.inactive { opacity: 0.38; }
+.ctrl.inactive .ctrl-head > label,
+.ctrl.inactive .ctrl-value,
+.ctrl.inactive > .ctrl-input { opacity: 0.38; }
+/* Let the wrapper receive hover for disabled-control explanations. The info
+   button stays interactive for keyboard and touch access to the same reason. */
+.ctrl.inactive .ctrl-input:disabled { pointer-events: none; }
 
 .ctrl-head {
   display: flex;

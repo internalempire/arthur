@@ -2,6 +2,31 @@
 
 Updated: 2026-09-17
 
+## Disabled opening controls explained — September 17
+
+Following the clinician's report about Custom, opening controls now state why
+an input is unavailable on hover, in the info button's accessible name and in
+its expanded help. The prerequisite order is: Compromised lung above zero,
+reopenable share above zero, and (for closing midpoint) Opening memory On.
+Messages update and clear with settings, profiles and patient/scenario loads.
+Disabled inputs let pointer events reach the wrapper so its native tooltip is
+available across the control area; the info button remains operable. Disabled
+labels, values and inputs stay grey while the info button and expanded help
+retain normal legibility.
+
+Custom does not bypass applicability. The reopenable share remains editable
+when compromised extent is zero, but has no physiological effect then. No
+model, coefficient, enabling condition or saved-file behavior was changed.
+The mechanics and opening-profile manual pages document the complete behavior.
+Verification: `npm run test:ui` passed all 44 contracts; a Chromium browser
+check passed hover targeting, native titles, keyboard access, help legibility,
+prerequisite priority, immediate clearing, profile/scenario changes and manual
+rendering. `npm run manual:build` and `npm run manual:lint` passed (18 numerical
+blocks agree with the model; 0 errors and 0 warnings). Logs, browser results and
+a screenshot are private in `outputs/Arthur-opening-disabled-help-2026-09-17/`.
+The model is unchanged; the full model suite was not rerun for this UI-only fix.
+Windows synchronization is not verified.
+
 ## Explicit opening profiles adopted — September 17
 
 The clinician authorized adoption after the private September 13–17 R/I,

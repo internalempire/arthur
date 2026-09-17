@@ -37,6 +37,8 @@ Selecting a profile leaves ventilation, aerated-tissue compliance, maximum capac
 
 Editing one of these details selects **Custom**. Their numerical values are saved without rounding to the displayed percentage. Changing a preset selects its specified values again. Distribution width and solver settings are not exposed as advanced controls.
 
+**Grey controls indicate an absent prerequisite.** Opening midpoint and Opening memory require both Compromised lung and its reopenable share to be above 0%; Closing midpoint also requires memory On. Custom does not bypass these conditions. Hover over a disabled control or its label, or open its **i** explanation, to see the current reason and how to enable it. See [mechanics controls](controls-mechanics.md#why-an-opening-control-is-grey) for the complete rules, including why the share itself remains editable when the compromised component is zero.
+
 ### Why the chest wall matters
 
 The potential reopenable share is fixed when chest-wall compliance or load changes. The actual fraction open may change because transpulmonary pressure is alveolar minus pleural pressure. A chest-wall intervention can therefore change the pressure available to open the lung without changing which units are capable of opening. Prone position retains the same potential share while applying its documented coarse changes to chest wall, abdominal pressure and opening midpoint.

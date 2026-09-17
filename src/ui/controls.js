@@ -15,6 +15,20 @@ export function parameterDiffersFromReference(current, reference, id) {
   return !Object.is(current[id], reference[id]);
 }
 
+function openingDisabledReason(spec, params) {
+  if (spec.advanced !== 'recruitment' || spec.id === 'reopenable') return '';
+  if (params.collapsed <= 0) {
+    return 'Not editable because Compromised lung is 0%. Set it above 0% to define a compromised component.';
+  }
+  if (params.reopenable <= 0) {
+    return 'Not editable because Reopenable share of compromised lung is 0%. Set it above 0% to allow that component to reopen.';
+  }
+  if (spec.id === 'pClose' && params.hysteresis !== 'on') {
+    return 'Not editable because Opening memory is Off. Turn it On to set a separate closing midpoint.';
+  }
+  return '';
+}
+
 export function createControls(container, sim, onChange) {
   const rows = new Map();
   let profileSummary = null;
@@ -72,8 +86,10 @@ export function createControls(container, sim, onChange) {
     value.className = 'ctrl-value';
     head.appendChild(value);
 
+    let info = null;
+    let help = null;
     if (spec.help) {
-      const info = document.createElement('button');
+      info = document.createElement('button');
       info.type = 'button';
       info.className = 'ctrl-info';
       info.setAttribute('aria-label', `About ${spec.label}`);
@@ -128,13 +144,13 @@ export function createControls(container, sim, onChange) {
     row.appendChild(input);
 
     if (spec.help) {
-      const help = document.createElement('p');
+      help = document.createElement('p');
       help.className = 'ctrl-help';
       help.textContent = spec.help;
       row.appendChild(help);
     }
 
-    rows.set(spec.id, { spec, row, input, value });
+    rows.set(spec.id, { spec, row, input, value, info, help });
     return row;
   }
 
@@ -163,7 +179,7 @@ export function createControls(container, sim, onChange) {
    */
   function refreshRelevance() {
     const mode = sim.params.mode;
-    for (const { spec, row, input } of rows.values()) {
+    for (const { spec, row, input, info, help } of rows.values()) {
       if (spec.id === 'pClose') input.max = String(sim.params.pOpen);
       const relevant = (!spec.appliesTo || spec.appliesTo.includes(mode))
         && (!spec.requires || sim.params[spec.requires.id] === spec.requires.value)
@@ -171,6 +187,15 @@ export function createControls(container, sim, onChange) {
           || (sim.params.collapsed > 0 && sim.params.reopenable > 0));
       row.classList.toggle('inactive', !relevant);
       input.disabled = !relevant;
+      const reason = relevant ? '' : openingDisabledReason(spec, sim.params);
+      // Put the native tooltip on the wrapper as well: disabled form controls
+      // do not consistently receive pointer events across browsers.
+      for (const element of [row, input, info].filter(Boolean)) {
+        if (reason) element.title = reason;
+        else element.removeAttribute('title');
+      }
+      if (info) info.setAttribute('aria-label', `About ${spec.label}${reason ? `. ${reason}` : ''}`);
+      if (help) help.textContent = reason ? `${reason} ${spec.help}` : spec.help;
     }
   }
 
