@@ -24,6 +24,8 @@ High aerated-lung compliance means low elastic recoil. The pressure–volume cur
 
 Chest-wall compliance and chest-wall load answer different questions. Reducing `ccw` makes the pleural-pressure swing larger for a given delivered volume. Raising `cwLoad` changes the resting relation, making pleural pressure less negative or positive and moving the passive lung–wall equilibrium. Obesity and intra-abdominal hypertension can contain both changes, but the model does not assume a fixed conversion from body mass or abdominal pressure to thoracic load.
 
+A larger pleural-pressure swing does not necessarily mean a higher mean pleural pressure. Changing wall stiffness preserves its pressure at the fixed reference volume. Below that reference, making the wall stiffer makes its recoil more outward at the same lung volume; the resulting mean pressure also depends on the new lung–wall equilibrium. Increasing chest-wall load instead shifts pressure upward at every volume. The stiffness control alone therefore does not represent all the mechanical changes of a compressed thorax.
+
 The wall is nonlinear at the volume extremes and approximately linear around tidal breathing. The displayed compliance control is therefore a **reference local slope**, not one value imposed at every volume. See [pleural pressure](pleural-pressure.md).
 
 Airway resistance remains linear; EFL adds a separate expiratory choke. This distinction matters because increasing expiratory driving pressure still raises flow through a linear resistor but not once a waterfall is active.
@@ -41,7 +43,7 @@ Airway resistance remains linear; EFL adds a separate expiratory choke. This dis
 
 The compromised fraction specifies the size of the diseased component; its reopenable share specifies potential, and the pressure history determines actual opening. These are separate questions. Advanced edits select Custom; selecting a profile restores its prescribed values. See [opening profiles](recruitment-and-ri.md) for the exact prescriptions and the complete-breath readouts.
 
-Opening and closing pressures are the centres of broad recruitment ranges, not single thresholds at which the entire lung flips state. Hysteresis applies only to the recruitable diseased population; already aerated lung follows the ordinary pressure–volume relation without recruitment memory.
+Opening and closing pressures are the centres of distributed recruitment ranges, not single thresholds at which the entire lung flips state. Hysteresis applies only to the recruitable diseased population; already aerated lung follows the ordinary pressure–volume relation without recruitment memory.
 
 ### Why an opening control is grey
 

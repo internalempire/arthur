@@ -18,6 +18,17 @@ Before changing the project, read these files in order:
 Use `manual/_log.md` when reconstructing why an existing implementation or
 documentation choice was made.
 
+## Communication with the clinician
+
+- The user knows physiology but does not know the code or the model’s internal
+  logic. Never assume implementation knowledge in an explanation.
+- Explain the observed behaviour first, then the physiological mechanism, the
+  model assumption responsible, the practical consequence and the possible
+  solutions. Define unfamiliar terms; use code details only when they help.
+- Distinguish a numerical defect, an intentional simplification and an externally
+  unvalidated effect size. Explain expected teaching benefit and computational
+  cost before proposing substantive changes.
+
 ## Scope and implementation
 
 - Keep the runtime dependency-free and written in vanilla JavaScript unless the

@@ -51,6 +51,8 @@ Both values describe the whole model lung, including its normal pressure-depende
 
 The instantaneous open fraction remains available beside respiratory compliance. Compare pressures, volume, derived PVR, RV/LV volumes and output together; a higher open fraction does not guarantee a haemodynamic benefit.
 
+**A lower plateau does not by itself mean more stable aeration.** With memory off, units can open during inspiration and close again over the same pressure range during expiration. That opening can account for a substantial part of the volume gained during the breath, increasing respiratory-system compliance without making the already aerated tissue more compliant. With memory on, previously opened units may remain open at end expiration. When little additional opening occurs during the next inspiration, the tidal volume mainly distends the open lung. The balance depends on the pressure trajectory and closing setting. Read plateau and compliance together with end-expiratory closure and within-breath excursion. The magnitude of this contribution is a model result, not a clinically validated partition of tidal volume.
+
 ## How the model represents opening
 
 The lung contains a normal population and a compromised population sharing one gas volume. Only the specified reopenable share of the latter follows its diseased opening distribution. The distribution width is <!-- CONSISTENCY: diseased-recruitment-width -->0.75 cmH₂O<!-- /CONSISTENCY -->, an internal shape coefficient rather than a measured anatomical variance. [The two-population lung](two-population-lung.md) gives the equation.

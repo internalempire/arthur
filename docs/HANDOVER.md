@@ -1,6 +1,54 @@
 # Project handover
 
-Updated: 2026-09-17
+Updated: 2026-09-18
+
+## Within-breath opening assessed — September 18
+
+The clinician authorized roadmap point 1: test the magnitude of inspiratory
+opening and its consequences before considering changes. The current model at
+`bdb645fc91b8fcbb0660b09c8b6a9fb24be59a56` was used without changing equations,
+coefficients, profiles, presets or UI. A private observer separated the gas-volume
+increment associated with opening from that associated with distension, using
+the existing product relation and directly integrated inspiratory flow.
+
+Three profiles were tested with one-factor changes in PEEP, VT, chest-wall
+compliance and chest-wall load. Independent reset/preparation and consecutive
+settled windows were repeated at two timesteps. All 48 cases passed conservation,
+pressure–volume agreement, plateau timing, whole-cycle positive-flow accounting,
+settlement and refinement checks. The opening contribution can dominate tidal
+compliance without memory while becoming very small with retained opening.
+This is an effect of the represented law, not evidence of a numerical defect
+or a quantitatively validated partition of patient tidal volume.
+
+The initial observer wrongly equated the inspiratory gas-volume gain with the
+latched VT, which integrates all positive flow over the full cycle. Matching
+those definitions resolved the observer assertion; the small additional
+positive volume and both initial failed logs remain in the private evidence.
+No production tolerance or source was changed to pass the experiment.
+
+Primary human studies support the distinction between opening, retention and
+distension but do not calibrate the model's gas-volume contribution or narrow
+transpulmonary opening distribution: CT tissue mass, airway pressure and
+manoeuvre-derived gas volume are not interchangeable. The current law remains.
+A bounded sensitivity experiment on distribution width is a proposal for the
+clinician, not an adopted variant or an instruction to retune a target.
+The retained chest-wall reference also explains why greater stiffness at low
+volumes need not raise mean pleural pressure; a compressive load is a separate
+intervention. The explanatory manual documents only those current mechanisms.
+
+Private report: `codex-notes/Arthur-apertura-inspiratoria-verifica-2026-09-18.md`.
+Scripts, raw data and verification: `outputs/Arthur-tidal-opening-review-2026-09-18/`.
+The standing clinician-first explanation rule is now explicit in `AGENTS.md`:
+assume physiological knowledge, not knowledge of code or internal model logic.
+VPS remains the working environment; the user updates the Mac manually from
+GitHub using gh. Windows is excluded from the workflow.
+
+Verification completed: private 48-case experiment and analysis passed, as did
+18 comparisons with the preceding protocol. Source hashes confirm 68 executable
+files unchanged from the completed product verification. `npm run manual:build`
+and `npm run manual:lint` passed: eighteen generated blocks agree with the model,
+zero errors and warnings. `git diff --check` passed. The full model and UI suites
+were not repeated because this revision changes only instructions/documentation.
 
 ## Joint pulmonary mechanics and circulation review — September 17
 
