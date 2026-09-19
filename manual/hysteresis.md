@@ -82,6 +82,14 @@ The two paths meet at high pressure, where almost all recruitable units are open
 
 The vertical axis is open fraction, not lung volume. The figure is therefore **not** the classical inflation–deflation pressure–volume loop and should not be interpreted as one. Its narrower vertical scale is a display choice that makes the separation visible; it is not a physiological boundary.
 
+### Interpreting the mechanical response
+
+For a before/after comparison, the lung must retain the same compromised fraction, reopenable share, opening and closing pressures, tissue properties and chest wall. Keep memory enabled throughout and return to the original PEEP, tidal volume, rate and inspiratory time. Compare complete settled breaths and use a parallel simulation without the manoeuvre to distinguish its effect from continued settling. Switching memory off and on instead compares different closure rules; it does not isolate the effect of a pressure history in one lung.
+
+When a manoeuvre leaves additional units open, the same tidal volume can be distributed across more aerated tissue. In the retained-opening example above, this lowers plateau and driving pressure and raises respiratory-system compliance. End-expiratory gas volume increases, but that does not mean each open unit is stretched more: read gas volume together with the amount of open lung. Distension is the normal expansion of open units; it is not synonymous with overdistension or evidence of injury.
+
+The benefit can be small or absent if ordinary breaths already open the available compartment, or if the final pressure permits it to close again. Substantial opening during the comparison breath can also raise its apparent compliance, so plateau alone cannot distinguish stable aeration from cyclic opening. These are conditional model responses, not a universal direction or a clinically calibrated effect size. Increased aeration and a lower pulmonary resistance coefficient also do not guarantee greater cardiac output, because changes in pleural pressure and filling act at the same time.
+
 ### When the manoeuvre leaves little or nothing
 
 Three examples are useful at the bedside:

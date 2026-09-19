@@ -1,6 +1,46 @@
 # Project handover
 
-Updated: 2026-09-18
+Updated: 2026-09-19
+
+## Matched before/after recruitment comparison — September 19
+
+The clinician challenged the suggestion that retaining opening raises plateau:
+the preceding discussion had compared memory-off and memory-on profiles as if
+that were a manoeuvre in the same lung. That inference is withdrawn. Switching
+memory changes the closure law. Normal tidal distension also does not establish
+overdistension or injury.
+
+The authorized private experiment uses the unchanged model at `2149767`.
+Within each pair, parameters, initial dynamic state and clocks are identical;
+only one arm undergoes the existing manual PEEP 10→35 for 30 s→10 protocol.
+The control stays at PEEP 10. Memory and all lung/chest-wall properties remain
+fixed throughout each run. Before/after windows retain the same VT, timing and
+PEEP. The ARDS/RV memory case and the existing manual hysteresis phenotype at
+VT 250 and 400 mL are complemented by a memory-off control. Four conditions,
+two arms and two timesteps give sixteen runs.
+
+The manual phenotype at VT 250 retains additional opening, lowers plateau and
+raises compliance. With VT 400, preceding breaths leave less potential for the
+manoeuvre. The ARDS/RV case has no persistent additional opening or mechanical
+change; neither does the memory-off control. Lower vascular coefficient in the
+retained-opening case coexists with a small reduction in output, so the result
+is not a universal circulatory benefit. No numerical defect was found in these
+comparisons. The magnitude of cyclic opening in the memory-off law remains
+externally unvalidated; a distribution-width change is still only a proposal.
+
+All 96 observation windows passed the existing conservation and validity checks.
+Matched initial-state/clock checks, repeated settled windows and timestep
+refinement passed. Runtime and executable-example hashes are unchanged. The
+manual clarifies the current comparison and distinguishes normal expansion from
+overdistension, without changing generated examples. The full model/UI suites
+are not repeated for this documentation-only revision; manual build/lint and
+diff checks are recorded with the private evidence.
+
+Private report: `codex-notes/Arthur-reclutamento-prima-dopo-2026-09-19.md`.
+Protocol, scripts, raw results and verification:
+`outputs/Arthur-matched-recruitment-2026-09-19/`.
+VPS/GitHub synchronization is verified after the documentation commit; the Mac
+remains the user's manual backup and is not claimed updated.
 
 ## Within-breath opening assessed — September 18
 
