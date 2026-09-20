@@ -1,6 +1,53 @@
 # Project handover
 
-Updated: 2026-09-19
+Updated: 2026-09-20
+
+## Opening-width sensitivity assessed privately — September 20
+
+The clinician authorized a bounded experiment on the magnitude of cyclic
+opening and its macro-circulatory consequences. Three isolated copies of the
+unchanged `b7af9a4` model differ only in diseased-distribution width: current,
+doubled and quadrupled. No variant is adopted. All experimental cases keep
+memory off, so opening and closure follow the same equilibrium relation;
+the retained-memory law is outside this comparison. Midpoint, potential,
+tissue compliance, capacity, wall and circulation remain fixed within each
+phenotype. The normal-unit distribution and numerical tolerances are unchanged.
+
+The prior ARDS/RV and manual phenotypes were independently settled at PEEP
+5, 10 and 15 with fixed VT and timing, at two timesteps. A non-reopenable
+negative control accompanies all widths. This measures differences between
+settled PEEP levels, not a manoeuvre or a transient PEEP sequence. Forty-two
+runs passed conservation, validity, repeated-window and refinement checks.
+The six matched ARDS reference cases reproduce the September 18 observations;
+negative controls are exactly identical across widths. Each private observer
+imports its own variant's lung law, avoiding a mixed baseline/variant check.
+
+Wider distributions materially change plateau and compliance. They do not
+uniformly reduce cyclic opening, because lower-pressure units also start opening
+earlier. Cardiac-output differences at the same PEEP remain below one percent
+in these cases. The magnitude of the settled PEEP response changes modestly,
+without reversing the output, filling or internal vascular-coefficient response
+between PEEP 5 and 15. This does not establish that respiratory differences are
+unimportant, or that either distribution is externally validated. The internal
+vascular coefficient and RV ejection-pressure surrogate remain distinct from
+catheter PVR and complete pulsatile afterload.
+
+The private benchmark measures ordinary simulation CPU time in alternated runs;
+no extra state, compartment, time constant or Deep CO calculation is introduced.
+Production code, profiles and presets remain unchanged. The next decision is
+whether a specific respiratory teaching target warrants better quantitative
+constraints; sensitivity alone supplies no preferred replacement width.
+Any adoption would also require separate checks of retained-opening behavior.
+Explanatory manual pages retain only current behavior; evidence and development
+history are recorded here and in the log. Manual build/lint and Git checks are
+recorded with the private evidence; full product suites are not repeated for
+this documentation-only revision.
+
+Private report: `codex-notes/Arthur-ampiezza-apertura-2026-09-20.md`.
+Scripts, isolated variants, numerical results, verification and benchmark:
+`outputs/Arthur-opening-width-2026-09-20/`. None is committed to GitHub.
+VPS/GitHub synchronization is checked after the documentation commit. Mac
+backup remains manual and unverified; Windows remains excluded.
 
 ## Matched before/after recruitment comparison — September 19
 
