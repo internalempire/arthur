@@ -2,6 +2,61 @@
 
 Updated: 2026-09-23
 
+## Conditions for greater output under CPAP explored privately — September 23
+
+The clinician authorized searching for conditions that permit greater output,
+without changing physiology to obtain that result. The unchanged `73d0c44`
+model was screened using existing controls and fixed prescribed effort. A
+predefined 25-case matrix varied systemic resistance/volume and individual
+venous, cardiac, wall, abdominal and pulmonary controls around the failing-LV
+CPAP reference. Twenty-four accepted cases all reduced output at CPAP 0→10;
+one higher-LV-stiffness case was excluded for ventricular phase/flow violations.
+The final instantaneous validity flag did not describe that whole window; the
+independent observer detected and retained the exclusion.
+
+A separate four-case matrix combined the shipped ARDS lung/vascular prescription
+with the same LV reference, two RV contractilities and reopenable/non-reopenable
+lung. This is a combined mechanical phenotype, not pulmonary edema generated
+by heart failure. The weak-RV/reopenable case gives approximately +0.47% output
+at CPAP 0→10, with about 12% lower internal pulmonary resistance coefficient.
+Its non-reopenable and more-contractile-RV controls give approximately −0.32%
+and −0.29%. The positive case preserves LV filling while RV volume and additional
+pericardial pressure decrease; LV end-systolic volume does not decrease. It is
+not evidence of an isolated LV-ejection benefit. These comparisons do not
+separate pulmonary resistance, pleural pressure and ventricular interaction.
+
+Because tidal volume falls from about 312 to 144 mL in that positive case,
+two robustness screens use a larger muscle-pressure scale held fixed throughout
+each sequence. With the reopenable lung, CPAP 0→10 then gives approximately
+−0.13%, although 0→5 retains about +0.10%. Opening is already greater before
+CPAP. The small favorable response is therefore not a robust or quantitatively
+validated clinical demonstration, and no new preset is adopted.
+
+The positive case, its two controls and the larger-effort reopenable case were
+confirmed with CPAP 0→5→10→15→0 at two timesteps. Each level uses 120 s preparation
+and two 60 s windows. Across screening and confirmation, 224 accepted windows
+pass conservation, pressure-volume, ventricular-phase and flow checks. Repeated
+windows, reversal, refinement and reproduction of two previous reference cases
+pass. All 32 production hashes are unchanged. The initial private runner's
+muscle-waveform sampling tolerance was restored to the preceding protocol's
+relative criterion; its stricter absolute assertion and failure log are retained.
+No production threshold or law was changed.
+
+Primary abstracts by Pinsky (1985, PMID 3988674), Yoshida (2024, online 2023,
+PMID 37979504) and Nishikawa (2025, PMID 39812692) motivate distinct mechanical
+questions. Different preparations and pressure references prevent treating them
+as quantitative validation. In particular, a clinical association with reduced
+catheter-derived PVR does not establish recruitment as its cause or equate it
+with Arthur's internal coefficient. Further work should identify the limiting
+pathway, not expand a blind search or add effort adaptation to force success.
+
+Private report: `codex-notes/Arthur-CPAP-condizioni-beneficio-2026-09-23.md`.
+Protocols, all results including exclusions, and verification:
+`outputs/Arthur-CPAP-conditions-2026-09-23/`. No physiological or UI change;
+explanatory manual pages retain current behavior. Manual build/lint and Git
+checks accompany this history/todo update. Full model/UI suites are not repeated
+for unchanged executable sources. Mac backup remains manual and unverified.
+
 ## Fixed-effort CPAP assessed privately — September 23
 
 The clinician explicitly narrowed the next experiment to mechanical interaction:
