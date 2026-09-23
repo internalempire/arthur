@@ -2,6 +2,64 @@
 
 Updated: 2026-09-23
 
+## Fixed-effort CPAP assessed privately — September 23
+
+The clinician explicitly narrowed the next experiment to mechanical interaction:
+keep prescribed effort unchanged and exclude fatigue or automatic effort
+adaptation. Reproducing the complete clinical CPAP response, or forcing output
+to increase, is not the objective. After a separate review of Neel Clinical
+Skills, the clinician confirmed resuming this experiment and asked for a later
+reminder to discuss its teaching ideas; that discussion remains pending in the
+todo list and no UI implementation is authorized by it.
+
+The unchanged `9560f1c` model was run in spontaneous mode with CPAP 0→5→10→0,
+respiratory rate 18/min, neural inspiratory time 1.2 s and muscle-pressure scale
+10 cmH₂O, all fixed except CPAP. A feasibility pilot at scale 6 produced about
+270 mL tidal volume; scale 10 was selected before the main comparison to obtain
+an ordinary tidal excursion with these mechanics, without optimizing output.
+Four conditions combine LV Ees 0.6 or 3 mmHg/mL with baseline stressed-volume
+settings 550 or 1050 mL. Other properties retain those of LV failure; the more
+contractile comparator is not a healthy person and also changes the existing
+LV contribution to RV systole. The lower-volume failing-LV condition still has
+high transmural LA pressure and is not a normal-filling clinical control.
+
+Each level includes 30 s of recorded transition, 90 s further preparation and
+two 60 s settled windows. Two timesteps yield eight sequences, 32 levels,
+64 settled windows and 32 transition windows. Airway pressure remains equal
+to prescribed CPAP; the actual muscle-pressure waveform remains unchanged.
+Blood/gas conservation, pressure-volume consistency, cardiac phases, settled
+series flows, repeated windows, return to baseline and timestep refinement
+pass. Transition flows are additionally recorded in five-second bins and pass
+refinement, but these bins are not beat/breath matched and have no sham arm;
+they do not establish an isolated transient LV benefit.
+
+At CPAP 0→10, the failing-LV cases lose approximately 4.0% and 2.9% output at
+lower and higher baseline volume; the more contractile comparators lose about
+16.5% and 9.1%. All lower transmural LA and LV ejection pressures. End-diastolic
+volume falls more than end-systolic volume. Tidal volume decreases from about
+447 to 438 mL while end-expiratory lung volume rises about 549 mL, identically
+across the four circulatory conditions. Thus respiratory input and mechanical
+response remain shared while the circulation reaches different equilibria.
+Blood redistributes toward systemic veins, with total volume conserved.
+The pulmonary resistance coefficient changes little and does not independently
+specify RV afterload. Active-breath plateau, passive auto-PEEP and PPV are not
+used as interpretable endpoints.
+
+No numerical defect requiring a product correction is identified here, and no
+physiological or interface change is adopted. Clinical effects absent from this
+mechanical experiment do not automatically earn new model components. The
+prior passive-VCV experiment differs in effort, pressure history and volume
+control; differences in output response between protocols cannot establish
+clinical superiority of one modality. The manual clarifies the implemented
+CPAP boundary and prescribed-effort behavior. Numerical artifacts remain private.
+
+Report: `codex-notes/Arthur-CPAP-sforzo-fisso-2026-09-23.md`.
+Protocol, observers, results and verification:
+`outputs/Arthur-CPAP-fixed-effort-2026-09-23/`.
+Manual build/lint and Git checks are recorded there. Full product/UI suites are
+not repeated for documentation-only tracked changes. VPS/GitHub synchronization
+is checked after commit; the Mac backup remains manual and unverified.
+
 ## LV positive-pressure balance assessed privately — September 23
 
 The clinician authorized only the first area of the general review: distinguish
