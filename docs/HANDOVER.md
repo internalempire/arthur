@@ -1,6 +1,59 @@
 # Project handover
 
-Updated: 2026-09-20
+Updated: 2026-09-23
+
+## LV positive-pressure balance assessed privately — September 23
+
+The clinician authorized only the first area of the general review: distinguish
+lower filling pressure, lower LV ejection-pressure burden and preserved or
+increased output. The unchanged `2c0641f` model was observed in six passive-VCV
+conditions: LV Ees 0.6 or 3 mmHg/mL, each with baseline stressed-volume settings
+550, 1050 and 1300 mL. Other properties remain those of LV failure. The stronger
+comparator is not a healthy control: it retains the preset's passive stiffness,
+systemic resistance and heart rate, and changing LV contractility also changes
+the existing systolic contribution to RV contraction.
+
+Each closed circulation follows PEEP 0→5→10→0 cmH₂O without changing blood
+volume, with 120 s preparation and two 60 s observation windows at each level.
+Repeating at 0.00025 and 0.000125 s gives twelve sequences and 96 windows.
+Independent flow, compartment-volume and gas accounting, cardiac-phase checks,
+pressure-reference identities, repeated windows, reversibility and refinement
+all pass. Production hashes are unchanged. An initial run was stopped to fix
+a nullable opening-fraction field in the private observer; its partial evidence
+is retained and the complete experiment was rerun without changing the model
+or acceptance thresholds.
+
+All six conditions lower transmural LA and LV ejection pressures but lose
+settled output as PEEP rises. With reduced contractility, the PEEP 0→10 output
+decrease becomes smaller at larger baseline stressed volume. In the preset,
+end-diastolic volume falls more than end-systolic volume. This volume identity
+describes the result; it is not an independent causal decomposition of preload
+and afterload. Blood redistributes from pulmonary vessels and cardiac chambers
+to systemic veins and the IVC. Both elastic and abdominal contributions to
+systemic filling pressure increase with the autonomic reflex disabled. This
+partially supports return without restoring the original flow.
+
+Lower ejection pressure is distinct from lower net pressure–volume work; the
+latter includes the filling limb and increases slightly in the preset. Neither
+quantity establishes myocardial oxygen savings, which are not simulated.
+Primary abstracts from De Hoyos (1995), Naughton (1995) and Schuster (1990)
+provide examples of increased, preserved and decreased output under different
+positive-pressure protocols. Their populations, effort, pressure references and
+timing are not matched to this passive model experiment. No quantitative external
+validation or universal response is claimed, and no coefficient is adjusted to
+force output to rise. A sustained-output teaching target still requires a
+specified clinical comparison. The second review area, respiratory effort and
+ventilatory-mode comparison, has not been started.
+
+The manual explains current pressure, filling, redistribution and work meanings;
+no physiology, preset or interface change is adopted. Manual build/lint and Git
+checks are recorded with the private evidence; full model/UI suites are not
+repeated for this documentation-only revision.
+
+Private report: `codex-notes/Arthur-bilancio-LV-pressione-positiva-2026-09-23.md`.
+Protocol, observers, results and checks: `outputs/Arthur-LV-balance-2026-09-23/`.
+These remain outside Git. VPS/GitHub synchronization is checked after the
+documentation commit; the manual Mac backup remains unverified.
 
 ## Opening-width sensitivity assessed privately — September 20
 
