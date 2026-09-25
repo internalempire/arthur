@@ -53,7 +53,7 @@ This preset combines high aggregate pulmonary vascular load with a vulnerable ri
 - Controls with a coloured dot differ from the model's neutral reference parameter set. The mark explains how the present phenotype was constructed; it does not label that setting abnormal or unsafe.
 - Reset before beginning a new comparison. Reset also clears occlusion points from the Guyton panel.
 - Use Play/Pause and the waveform time cursor to inspect a frame; pausing does not create a physiological hold.
-- Use **Pin** to retain the tile values from one instant while inspecting another state.
+- Use **Pin** to create up to four independently evolving references. Select a row below the tiles to show that state beneath the current values; each row has **Unpin**, and **Unpin all** clears the comparison. [Live comparisons](numeric-tiles.md#pin-values-for-a-comparison) explains timing and parameter differences.
 - Absolute numbers are model outputs, not patient targets.
 
 ## Save and reload a custom patient

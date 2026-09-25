@@ -27,11 +27,23 @@ An exactly known latent model state can still be clinically unmeasurable. Conver
 
 ## Pin values for a comparison
 
-**Pin** stores the values currently displayed in the numerical tiles. This can be the live state or an instant selected with the paused [waveform cursor](panel-waveforms.md#pause-and-inspect-one-instant). Each tile then keeps a small `Pinned` line while the live or selected value continues to change. Press **Unpin** to remove the comparison.
+**Pin** creates a live reference from the current patient, with the same blood distribution, lung-opening memory, reflex state and measurement history at that instant. The reference then continues to breathe and circulate independently with its own settings. Changing a control or starting a new manoeuvre affects the current patient; existing references continue along their own course. A manoeuvre already pending or running when Pin is pressed is inherited by that reference and finishes according to its own simulated clock.
 
-Only tile values are pinned. A point from one instant is not a complete heartbeat or breath, so the interface does not draw it as a ghost pressure–volume loop, Campbell loop or Guyton path. This avoids presenting a partial trajectory as though it were a measured cycle.
+Up to **four references** can run alongside the current patient. Pin creates and selects a new numbered state. In each tile, the **large value is the current patient**; the smaller `State N` line is the selected reference, updated at the same readable rate as the main value. Each quantity retains its own measurement window: an instantaneous pressure moves within the breath, whereas output changes with completed beats and a mean pressure retains its averaging window. Each reference also has its own validity checks: a suppressed result remains unavailable even if the current patient's result is valid; caution is indicated beside the reference value, with its reason available on hover.
 
-Pinning is visual memory, not physiological memory. It does not affect the simulator, survive a page reload or become part of a saved patient file.
+The table below the tiles selects which reference is displayed. Its differences always read **reference → current**, using the control labels and units. For example, `PEEP: 5 → 10 cmH₂O` means that row's reference continues with PEEP 5 while the current patient has PEEP 10. The list updates when current settings change; it is not a chronological log of interventions. “Same control settings” does not establish identical physiology: different preceding pressure histories or manoeuvres can leave different volumes or opening memory.
+
+Each row has **Unpin** to stop and remove that reference. **Unpin all** removes all references. Selecting or removing a reference does not change the current patient's settings. The graphs and waveform traces continue to describe the current patient; the comparison is displayed in the tiles.
+
+### Time, phases and paused inspection
+
+All references advance by the same simulated elapsed time as the current patient. **Pause**, **Play** and **Speed** act on them together. A new reference starts at the current patient's cardiac and respiratory phase, without an extra equilibration period. It can therefore contain an ongoing transient; pinning does not certify equilibrium. If heart rate, breathing rate, ventilatory mode or reflex responses differ later, the cycles may drift apart. Values at the same elapsed time are not necessarily values at matching points of inspiration or systole.
+
+You can pin the latest instant while paused. When the [waveform cursor](panel-waveforms.md#pause-and-inspect-one-instant) selects an earlier instant, **Pin** is disabled and reference lines are hidden: that lightweight presentation history cannot restart a complete physiological simulation. Return to the latest instant or press Play to resume the live comparison.
+
+### Lifetime and computational scope
+
+Choosing a preset, loading a patient file or resetting the simulation clears the references. They are not saved in patient files and do not survive page reloads. References run the same physiological equations and integration step as the current patient, without additional plotted traces or a Deep CO calculation. Computational work grows with the number of references; the four-reference limit bounds this cost. Removing an unused reference releases its simulation.
 
 ---
 

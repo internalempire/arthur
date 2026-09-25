@@ -46,7 +46,8 @@
           </select>
         </label>
         <button id="playpause" class="btn btn-primary" type="button">Pause</button>
-        <button id="pin-state" class="btn" type="button" aria-pressed="false" title="Keep the displayed tile values for comparison">Pin</button>
+        <button id="pin-state" class="btn" type="button" title="Create a live reference that keeps evolving with these settings">Pin</button>
+        <button id="unpin-states" class="btn" type="button" title="Remove all live references" disabled>Unpin all</button>
         <button id="hold-exp" class="btn" type="button" title="Occlude at end-expiration and plot the resulting pressure and flow">Exp hold</button>
         <button id="hold-insp" class="btn" type="button" title="Occlude at end-inspiration and plot the resulting pressure and flow">Insp hold</button>
         <button id="reset" class="btn" type="button">Reset</button>
@@ -69,6 +70,8 @@
         <p class="invalid-banner" id="invalid-banner" role="status" hidden></p>
 
         <div class="tiles" id="stats"></div>
+
+        <section id="pinned-states" class="pinned-states" aria-label="Live state comparisons" hidden></section>
 
         <p class="tile-legend">
           Readouts are classified by what they are:

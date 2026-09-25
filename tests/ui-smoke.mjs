@@ -52,7 +52,7 @@ const css = readFileSync(new URL('../styles/app.css', import.meta.url), 'utf8');
 const descriptions = readFileSync(new URL('../src/ui/descriptions.js', import.meta.url), 'utf8');
 const anchors = [
   'scenario', 'speed', 'playpause', 'hold-exp', 'hold-insp', 'reset',
-  'pin-state', 'save-patient', 'load-patient', 'patient-state-file', 'patient-state-status', 'theme',
+  'pin-state', 'unpin-states', 'pinned-states', 'save-patient', 'load-patient', 'patient-state-file', 'patient-state-status', 'theme',
   'sidebar-toggle', 'scenario-note', 'controls', 'invalid-banner', 'stats',
   'waveforms', 'guyton', 'campbell', 'pvloops', 'pvr', 'thorax',
 ];
@@ -180,7 +180,8 @@ const waveformSource = readFileSync(new URL('../src/ui/panels/waveforms.js', imp
 check('pause inspection synchronises snapshots, tiles and analytical panels',
   mainSource.includes('selectedSnapshot = presentationHistory.atFraction(fraction)')
     && mainSource.includes('const view = selectedSnapshot ?? sim')
-    && mainSource.includes('stats.setPinned(pinnedSnapshot.metrics)')
+    && mainSource.includes('renderComparison(view)')
+    && mainSource.includes('const reference = historical ? null : livePins.selected')
     && waveformSource.includes("timelineInput.type = 'range'")
     && waveformSource.includes("plot.addEventListener('pointerdown'"));
 check('diagram warnings name the qualified interpretation rather than the whole panel',

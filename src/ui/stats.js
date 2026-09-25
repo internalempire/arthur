@@ -322,13 +322,18 @@ export function tilePrimaryValue(id, metrics) {
 }
 
 /** The compact comparison line used when a state has been pinned. */
-export function pinnedTilePresentation(id, metrics) {
+export function pinnedTilePresentation(id, metrics, label = 'Pinned') {
   const tile = TILE_BY_ID.get(id);
   if (!tile || !metrics) return null;
   const value = tilePrimaryValue(id, metrics);
+  const quality = tile.quality?.(metrics) ?? { level: 'ok', reasons: [] };
+  const level = metrics.valid ? quality.level : 'unavailable';
+  const reasons = metrics.valid ? (quality.reasons ?? []) : (metrics.invalidReasons ?? []);
+  const warning = level === 'caution' ? ' · caution' : level === 'unavailable' ? ' · unavailable' : '';
   return {
-    compact: `Pinned ${value}`,
-    accessible: `Pinned ${tile.liveLabel?.(metrics) ?? tile.label}: ${value}${tile.unit ? ` ${tile.unit}` : ''}`,
+    compact: `${label}: ${value}${warning}`,
+    accessible: `${label}, ${tile.liveLabel?.(metrics) ?? tile.label}: ${value}${tile.unit ? ` ${tile.unit}` : ''}${warning}${reasons.length ? ` — ${reasons.join('; ')}` : ''}`,
+    level,
   };
 }
 
@@ -340,6 +345,7 @@ export function createStats(container, { banner } = {}) {
   // tile getters (m.co.toFixed → undefined.toFixed).
   let currentMetrics = null;
   let pinnedMetrics = null;
+  let pinnedLabel = 'Pinned';
 
   // --- Build a single tile element -------------------------------------------
   function buildTile(tile) {
@@ -431,11 +437,12 @@ export function createStats(container, { banner } = {}) {
     n.number.textContent = suppress ? '—' : tilePrimaryValue(n.tile.id, metrics);
     n.sub.textContent = suppress ? '' : (n.tile.sub ? n.tile.sub(metrics) : '');
 
-    const pin = pinnedTilePresentation(n.tile.id, pinnedMetrics);
+    const pin = pinnedTilePresentation(n.tile.id, pinnedMetrics, pinnedLabel);
     n.pinned.hidden = !pin;
     n.pinned.textContent = pin?.compact ?? '';
     n.pinned.setAttribute('aria-label', pin?.accessible ?? '');
     n.pinned.title = pin?.accessible ?? '';
+    n.pinned.dataset.quality = pin?.level ?? '';
 
     const status = suppress ? null : n.tile.status?.(metrics);
     n.el.dataset.status = status ? status[0] : '';
@@ -593,7 +600,9 @@ export function createStats(container, { banner } = {}) {
   }
 
   // --- Public render ---------------------------------------------------------
-  function render(metrics) {
+  function render(metrics, reference = pinnedMetrics, label = pinnedLabel) {
+    pinnedMetrics = reference;
+    pinnedLabel = label;
     currentMetrics = metrics;
     if (banner) {
       banner.textContent = metrics.valid ? ''
@@ -607,12 +616,7 @@ export function createStats(container, { banner } = {}) {
     }
   }
 
-  function setPinned(metrics) {
-    pinnedMetrics = metrics ? structuredClone(metrics) : null;
-    for (const n of nodeMap.values()) renderTile(n, currentMetrics);
-  }
-
   rebuild();
 
-  return { render, setPinned };
+  return { render };
 }

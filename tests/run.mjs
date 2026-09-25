@@ -22,6 +22,7 @@ const SUITES = [
   './suites/ri-retirement.test.mjs',
   './suites/hysteresis-numerics.test.mjs',
   './suites/scenario-interpretability.test.mjs',
+  './suites/live-pins.test.mjs',
   './suites/contracts.test.mjs',
   './suites/documentation-examples.test.mjs',
 ];

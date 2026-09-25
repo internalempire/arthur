@@ -1,5 +1,16 @@
 # Model decisions
 
+## 2026-09-25 — Bound live comparisons without simplifying their physiology
+
+Pin references continue exact copies of the full integrator state, using the same
+step and physiological calculation as the current patient. The four-reference cap
+bounds computational work; unselected references also advance. No reduced surrogate,
+equilibration job or phase-forcing is introduced. Traces and analytical panels are
+rendered for the current patient only; the selected reference supplies tile values.
+The table compares reference controls to current controls, not changes between
+successive pins. Presentation-history snapshots cannot be restarted as full worlds.
+
+
 ## 2026-09-17 — Retire R/I and isolate its recovery code
 
 The clinician explicitly chose to abandon R/I. The active lung has no static

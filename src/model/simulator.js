@@ -98,6 +98,16 @@ export class Simulator {
     this.reset();
   }
 
+  /** Continue an independent world from this exact integrator state, without settling. */
+  fork() {
+    const copy = Object.assign(Object.create(Simulator.prototype), structuredClone(this));
+    // structuredClone copies buffers and data, but not application prototypes.
+    // Keep the complete averaging/beat history, reflex and opening memory.
+    for (const ring of Object.values(copy.traces)) Object.setPrototypeOf(ring, Ring.prototype);
+    for (const ring of Object.values(copy.cycle)) Object.setPrototypeOf(ring, CycleRing.prototype);
+    return copy;
+  }
+
   reset() {
     this.params = normalizeRecruitmentParameters(this.params);
     this.resp = createRespiratoryState();

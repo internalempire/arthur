@@ -1,6 +1,71 @@
 # Project handover
 
-Updated: 2026-09-23
+Updated: 2026-09-25
+
+## Multiple live pin comparisons — September 25
+
+The clinician authorized extending Pin to multiple independent, evolving states,
+with individual removal, an all-reference removal button and a parameter-difference
+table. The explicit display preference is current values in large type, with the
+selected reference below. Up to four references run alongside the current patient;
+all references advance, including unselected ones. This replaces the single frozen
+tile snapshot. No physiological equation, coefficient, integration step, scenario
+or Deep CO protocol changes.
+
+`Simulator.fork()` copies the complete integrator state and its averaging buffers,
+without construction, reset or equilibration. It restores the prototypes of the
+copied trace and cycle rings. Blood distribution, pulmonary transit, opening memory,
+reflex state, beat history and pending/running holds continue independently.
+Reference traces are not sampled or plotted, but their physiology and tile summaries
+use the ordinary calculation. Pinning can preserve a transient; it is not a steady
+state acceptance test.
+
+The table states its direction explicitly: reference settings → current settings.
+Differences update when current controls change; they are not an intervention log.
+Identical prescriptions can retain different pressure/manoeuvre histories. Selecting
+a row affects only subordinate tile values, with separate validity/caution handling.
+All worlds share elapsed simulated time, pause and speed, but are not phase-locked
+when their rates, modes or reflex responses differ. There is no added Deep CO job.
+
+Historical waveform inspection hides reference lines and disables Pin until the
+latest instant is selected or Play resumes. Presentation-only history is not used
+as a resumable integrator state. Reset, preset selection and patient loading clear
+references; references are not persisted in patient files or across page reloads.
+Removing a state stops its computation; the four-reference cap bounds CPU work.
+
+Permanent regressions cover exact continuation through holds, reflex activity and
+opening memory in three phenotypes; silent-versus-drawn metrics; bidirectional
+mutation isolation; buffers; selection/removal/cap; clinical parameter-difference
+formatting; and independent reference validity. Private browser scenarios cover
+actual control edits, independent predicted tile values, selection, pause/history,
+keyboard removal, the cap and identity reuse policy, resets/loading, desktop/dark
+and mobile layouts. Scripts, measurements and screenshots are in
+`outputs/Arthur-live-pins-2026-09-25/`; the private report belongs in
+`codex-notes/Arthur-live-pins-2026-09-25.md`. The first browser probe waited for an
+already-disabled capped Pin button instead of the next historical render; the
+probe now waits for reference suppression. Its initial failure log is retained.
+
+Verification: all 437 model assertions completed without failure across the two
+runs. The one-shot `npm test` process ended with SIGTERM/exit 143 during the
+contracts suite, after all 336 assertions of the first fourteen suites passed.
+The two final suites were then run together by the private
+`remaining-model-tests.mjs` runner: 101 passed, zero failed, exit zero. This is
+complete suite coverage, not a claimed zero exit from the interrupted command.
+`npm run test:ui` passes 44 contracts. `npm run manual:build` and
+`npm run manual:lint` pass, with 18 generated blocks unchanged and 53/53 manual
+pages, no errors or warnings. Browser interaction, screenshot and performance
+checks pass; snapshots are not regenerated because equations are unchanged.
+
+On the VPS, without concurrent test jobs, four distinct references plus the
+current patient sustain about 59–60 frames/s in the two standard cases and
+49 frames/s in the opening-memory case. The simulated clock remains near real
+time. Mean simulation CPU per displayed frame is approximately 4.0, 4.4 and
+8.5 ms respectively; drawing is excluded from those CPU figures but included
+in the frame intervals. Pin creation takes a few milliseconds. These short,
+representative browser measurements do not validate Mac/mobile performance
+or every extreme parameter combination. The higher-load measurement with tests
+running concurrently is also retained privately. Work remains on the VPS;
+the Mac backup is updated manually and has not been verified in this session.
 
 ## Conditions for greater output under CPAP explored privately — September 23
 

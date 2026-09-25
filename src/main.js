@@ -11,14 +11,15 @@ import { createPvLoops } from './ui/panels/pvloops.js';
 import { createPvrCurve } from './ui/panels/pvrcurve.js';
 import { createThorax } from './ui/panels/thorax.js';
 import { createDescriptions } from './ui/descriptions.js';
-import { PresentationHistory, presentationSnapshot } from './ui/presentation-history.js';
+import { PresentationHistory } from './ui/presentation-history.js';
+import { LivePins, MAX_LIVE_PINS, createLivePinTable } from './ui/live-pins.js';
 
 theme.init();
 
 const sim = new Simulator();
 const presentationHistory = new PresentationHistory();
 let selectedSnapshot = null;
-let pinnedSnapshot = null;
+const livePins = new LivePins();
 let running = true;
 let dirty = true;
 
@@ -39,6 +40,10 @@ const pvLoops = createPvLoops(el('pvloops'));
 const pvrCurve = createPvrCurve(el('pvr'), { onViewChange: invalidate });
 const thorax = createThorax(el('thorax'));
 const stats = createStats(el('stats'), { banner: el('invalid-banner') });
+const pinTable = createLivePinTable(el('pinned-states'), livePins, () => {
+  renderComparison(selectedSnapshot ?? sim);
+  dirty = true;
+});
 const descriptions = createDescriptions({ getGuytonMode: guyton.responseMode, getGuytonClock: guyton.curveClock });
 const controls = createControls(el('controls'), sim, (id) => {
   if (id === 'mode') controls.sync();
@@ -174,6 +179,8 @@ function clearTrails() {
 }
 
 function resetPresentationHistory() {
+  livePins.clear();
+  dirty = true;
   presentationHistory.clear();
   const snapshot = presentationHistory.capture(sim, { force: true });
   selectedSnapshot = running ? null : snapshot;
@@ -197,22 +204,40 @@ playPause.addEventListener('click', () => {
 });
 
 const pinState = el('pin-state');
+const unpinStates = el('unpin-states');
+
+function inspectingPast() {
+  return !!selectedSnapshot && (Math.abs(selectedSnapshot.time - sim.time) > 1e-6
+    || JSON.stringify(selectedSnapshot.params) !== JSON.stringify(sim.params));
+}
+
+function renderComparison(view) {
+  const historical = inspectingPast();
+  const reference = historical ? null : livePins.selected;
+  stats.render(view.metrics, reference?.sim.metrics ?? null, reference ? `State ${reference.id}` : '');
+  pinTable.render(sim.params, { historical, running });
+  pinState.disabled = historical || livePins.states.length >= MAX_LIVE_PINS;
+  pinState.title = historical
+    ? 'Return to the latest instant or press Play before creating a live reference'
+    : livePins.states.length >= MAX_LIVE_PINS
+      ? `Limit of ${MAX_LIVE_PINS} live references reached. Unpin a state to add another.`
+      : 'Create a live reference that keeps evolving with these settings';
+  unpinStates.disabled = livePins.states.length === 0;
+}
+
 pinState.addEventListener('click', () => {
-  if (pinnedSnapshot) {
-    pinnedSnapshot = null;
-    stats.setPinned(null);
-    pinState.textContent = 'Pin';
-    pinState.setAttribute('aria-pressed', 'false');
-    pinState.title = 'Keep the displayed tile values for comparison';
-    showStateStatus('Pinned values cleared.');
-  } else {
-    pinnedSnapshot = selectedSnapshot ?? presentationSnapshot(sim);
-    stats.setPinned(pinnedSnapshot.metrics);
-    pinState.textContent = 'Unpin';
-    pinState.setAttribute('aria-pressed', 'true');
-    pinState.title = 'Remove the pinned tile values';
-    showStateStatus('State pinned. Tile values remain visible for comparison.');
-  }
+  if (inspectingPast()) return;
+  const state = livePins.add(sim);
+  if (!state) return;
+  renderComparison(selectedSnapshot ?? sim);
+  showStateStatus(`State ${state.id} pinned. It keeps evolving independently with these settings.`);
+  dirty = true;
+});
+unpinStates.addEventListener('click', () => {
+  livePins.clear();
+  renderComparison(selectedSnapshot ?? sim);
+  (pinState.disabled ? playPause : pinState).focus();
+  showStateStatus('All live references removed.');
   dirty = true;
 });
 
@@ -310,7 +335,7 @@ function draw() {
   pvLoops.render(view, colors);
   pvrCurve.render(view, colors);
   thorax.render(view, colors);
-  stats.render(view.metrics);
+  renderComparison(view);
   descriptions.render(view);
   dirty = false;
 }
@@ -336,6 +361,7 @@ function frame(now) {
 
   if (running) {
     sim.advance(dtWall * speed);
+    livePins.advance(dtWall * speed);
     presentationHistory.capture(sim);
     dirty = true;
   }
@@ -356,7 +382,7 @@ function frame(now) {
     statsClock += dtWall;
     if (statsClock > 0.12 || !running) {
       waveforms.renderReadouts(view.metrics, colors);
-      stats.render(view.metrics);
+      renderComparison(view);
       descriptions.render(view);
       syncManoeuvreButtons();
       statsClock = 0;
@@ -378,6 +404,8 @@ window.heartLung = {
   /** Advance the model by `seconds` of simulated time and repaint. */
   step(seconds = 1) {
     sim.advance(seconds);
+    livePins.advance(seconds);
+    selectedSnapshot = null;
     presentationHistory.capture(sim, { force: true });
     draw();
     return sim.metrics;

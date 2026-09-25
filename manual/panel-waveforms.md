@@ -50,6 +50,8 @@ Static relations are recalculated from the parameters stored at the selected ins
 
 The parameter sidebar always remains an editor for the **current** patient. It does not move back to historical settings while the cursor is inspecting an older state; the cursor time and diagram positions identify that the displayed readouts are historical.
 
+[Live pin comparisons](numeric-tiles.md#pin-values-for-a-comparison) use the current simulated clock. While the cursor inspects an earlier instant, their tile lines are hidden and Pin is disabled. Returning to the latest instant or pressing Play restores the comparison. Pause stops the current patient and every reference together; the reference simulations do not have separate historical cursors.
+
 ## Useful comparisons
 
 - In spontaneous breathing at Paw zero, watch Palv become negative during inspiration and positive during expiration. This Paw–Palv gradient explains why $P_L$ is not an exact mirror of Ppl while gas is flowing.
