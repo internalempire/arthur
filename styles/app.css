@@ -1219,3 +1219,45 @@ input[type="range"]:disabled { cursor: not-allowed; }
   .pin-table th:last-child { width: 65px; }
   .pin-table th, .pin-table td { padding: 7px 4px; }
 }
+
+/* Optional mechanisms DOM is constructed only after the user opens it. */
+.mechanisms { container-type: inline-size; margin: 12px 0; padding: 18px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font-size: 12px; }
+.mechanisms[hidden], .mechanisms [hidden] { display: none; }
+.mechanisms h2 { font-size: 17px; margin: 0; }
+.mechanism-context { color: var(--ink-secondary); margin: 4px 0; }
+.mechanism-settings { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; }
+.mechanism-settings li { border: 1px solid var(--border); border-radius: 6px; padding: 5px 9px; background: var(--wash); overflow-wrap: anywhere; }
+.mechanism-timing, .mechanism-clock { color: var(--ink-secondary); font-size: 11px; }
+.mechanism-map { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 28px; margin: 20px 0; padding-right: 22px; }
+.mechanism-edges { position: absolute; width: 100%; height: 100%; overflow: visible; pointer-events: none; color: var(--ink-secondary); }
+.mechanism-edges > path { fill: none; stroke: currentColor; stroke-width: 1.2; }
+.mechanism-node { position: relative; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: var(--surface); color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.mechanism-node:hover { background: var(--wash); }
+.mechanism-node[aria-pressed="true"] { outline: 2px solid var(--text-flow); outline-offset: 2px; }
+.mechanism-node:focus-visible { outline: 3px solid var(--text-flow); outline-offset: 3px; }
+.mechanism-title { font-weight: 600; min-height: 36px; }
+.mechanism-signal { font-size: 10px; color: var(--ink-secondary); min-height: 30px; }
+.mechanism-value { font-size: 24px; font-variant-numeric: tabular-nums; line-height: 1.3; }
+.mechanism-reference, .mechanism-delta { font-variant-numeric: tabular-nums; }
+.mechanism-reference { margin-top: 5px; color: var(--ink-secondary); }
+.mechanism-unit { font-size: 10px; min-height: 30px; }
+.mechanism-clock { margin-top: 5px; }
+.mechanism-node[data-mechanism="reservoir"] { grid-column: 3; }
+.mechanism-node[data-mechanism="lvfill"] { grid-column: 2; }
+.mechanism-node[data-mechanism="output"] { grid-column: 3; }
+.mechanism-detail { padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--wash); }
+.mechanism-detail h3 { margin: 0 0 8px; font-size: 14px; }
+.mechanism-detail dl { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 16px; }
+.mechanism-detail dt, .mechanism-detail dd { margin: 0; overflow-wrap: anywhere; }
+.mechanism-detail dd { font-variant-numeric: tabular-nums; }
+@container (max-width: 639px) {
+  .mechanism-map { grid-template-columns: 1fr; gap: 12px; padding-right: 0; }
+  .mechanism-node[data-mechanism] { grid-column: 1; }
+  .mechanism-node { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; }
+  .mechanism-title, .mechanism-signal { grid-column: 1 / -1; min-height: 0; }
+  .mechanism-unit { min-height: 0; align-self: center; }
+  .mechanism-reference { margin-top: 0; }
+  .mechanism-edges { display: none; }
+  .mechanism-detail dl { grid-template-columns: 1fr; }
+  .mechanism-detail dd { margin-bottom: 8px; }
+}

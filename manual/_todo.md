@@ -20,4 +20,9 @@ Constrain the magnitude of within-breath opening and its plateau/compliance cons
 
 ## Teaching presentation — discuss before implementation
 
-Discuss three remaining teaching views before implementation: blood-volume redistribution across existing compartments, pressure history across a manoeuvre, and a visible chain linking respiratory pressures, filling, RV loading and delayed left-sided consequences. A separate venous-capacity intervention requires an explicit proposal distinct from adding/removing blood or changing venous compliance. These views must show observed changes without implying that a causal contribution has been quantitatively isolated. Do not add quizzes, blood-gas calculations or automatic pressure selection. The private discussion is `codex-notes/Arthur-discussione-spunti-didattici-2026-09-24.md`; it does not authorize these remaining model or interface changes.
+Discuss blood-volume redistribution across existing compartments and pressure history across a manoeuvre before implementation. Quantifying the separate effects of simultaneous interventions would require specifically controlled experiments; the Mechanisms view reports their combined state differences and does not perform that attribution. A separate venous-capacity intervention requires an explicit proposal distinct from adding/removing blood or changing venous compliance. These views must show observed changes without implying that a causal contribution has been quantitatively isolated. Do not add quizzes, blood-gas calculations or automatic pressure selection. The private discussion is `codex-notes/Arthur-discussione-spunti-didattici-2026-09-24.md`; it does not authorize these remaining model or interface changes.
+
+
+### Fit the waveform cursor status on very narrow screens
+
+At a 320 px viewport the waveform cursor status extends the page to approximately 353 px. The September 27 browser check reproduced this in the September 25 revision, independently of the Mechanisms view; its cards and container fit the viewport. Constrain or wrap that existing timeline readout in a focused UI correction.

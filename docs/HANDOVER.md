@@ -1,6 +1,65 @@
 # Project handover
 
-Updated: 2026-09-25
+Updated: 2026-09-27
+
+## Optional shared mechanisms comparison — September 27
+
+The clinician authorized implementing the optional mechanism map, with explicit
+constraints: construct the view only on request, keep vanilla JavaScript without
+external dependencies, and defer experiments separating individual intervention
+effects. The current patient is compared with the selected live pin. Physiological
+equations, coefficients, integration, scenarios and Deep CO remain unchanged.
+
+The Mechanisms button is in the live comparison table. A small disclosure controller
+dynamically imports `src/ui/mechanisms-panel.js` on first opening. Before that request
+there is no map DOM or panel-module fetch. Closing destroys the map and disconnects
+its ResizeObserver. The panel reuses the tile refresh schedule (about 8 Hz while
+running); numeric updates do not measure layout, and connectors redraw only on size
+changes. No simulation, fork, worker, parameter sweep or new timer is introduced.
+The existing references continue to run independently while the map is closed.
+
+Eleven selectable cards link pleural pressure, venous driving gradient, RV filling
+and forward output, lung inflation, pulmonary resistance/storage, systemic arterial
+pressure, LV filling/ejection conditions and systemic output. Labels specify the
+actual measure, unit and time window; details explain limitations and link to the
+manual. The venous gradient is calculated from matched mean determinants with the
+existing smooth caval back-pressure law. PVR is explicitly the internal coefficient.
+LV end-ejection transmural pressure is a measured outcome, not an independently
+controlled afterload or proof of benefit. RV output reads existing forward stroke
+volume and measured beat duration. No model measurement is added or recalibrated.
+
+Changed settings are listed together, reference → current. All differences represent
+the combined state; arrows are physiological links, not isolated contributions or
+predicted effect signs. Each unavailable/invalid state is suppressed independently,
+and delta requires both readings. Delta uses displayed precision. Multiple control
+changes, differing histories, asynchronous phases and mixed measurement windows are
+explicitly qualified. Past waveform inspection hides live values and setting
+comparisons. Last unpin, reset, preset selection and patient loading close the map.
+
+Verification: `npm run test:ui` (54 contracts), browser checks, `npm run manual:build`
+and `npm run manual:lint` (18 generated blocks, 0 errors and 0 warnings). The full
+model suite and snapshot regeneration are not required for this UI-only change;
+no model, scenario or shared physiological logic changed. Browser checks cover lazy
+loading, absence of new forks/workers, exact current/reference readouts, independent
+invalidity, pin selection/removal, keyboard use, every linked manual page, pause,
+history, lifecycle resets, and desktop/dark/narrow layouts. The 320 px check exposed
+an existing waveform-cursor status overflow (353 px page width), reproduced with
+HEAD 1403f39 served in the browser; the new map and cards fit. It is recorded in the
+manual backlog without changing that separate control.
+
+Private evidence: `outputs/Arthur-mechanisms-2026-09-27/` and
+`codex-notes/Arthur-mechanisms-2026-09-27.md`, excluded from Git. With four live pins,
+healthy VCV and ARDS with opening memory, measured map update work averaged about
+0.185 ms (95th percentile 0.30 ms) in headless Chromium on this ARM VPS. This is
+JavaScript/DOM update time, excluding final browser layout/paint. Closed windows had
+zero panel renders and zero panel descendants; all conditions advanced exactly five
+simulations equally and created no forks. Whole-page frame intervals varied across
+successive windows, including after closing, so these short runs do not establish
+an isolated total-rendering overhead or guarantee performance on Mac/mobile.
+
+VPS remains the working session. Commit/push only reviewed project files and
+versioned manual/handover; private evidence and the unrelated untracked physiological
+review remain local. Do not claim the Mac backup is current without verification.
 
 ## Multiple live pin comparisons — September 25
 

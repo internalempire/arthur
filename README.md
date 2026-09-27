@@ -140,6 +140,9 @@ These include:
 
 Values can be marked *caution* or withheld as *unavailable* when their assumptions are absent. See **[Numerical tiles](manual/numeric-tiles.md)** and **[Interpretability](manual/interpretability.md)**.
 
+With a live reference pinned, **Mechanisms** opens an optional comparison map of venous return, pulmonary loading and storage, ventricular filling and ejection, and systemic output. It shows combined state differences, not the isolated contribution of individual interventions. The vanilla-JavaScript module and map are created on request; closing removes the view, and no additional simulations or Deep CO jobs run. See [Numerical tiles](manual/numeric-tiles.md#read-the-shared-mechanisms).
+
+
 End-expiratory and end-inspiratory holds can also generate measured pressure–flow points for an occlusion-based Guyton construction. See **[Manoeuvres](manual/manoeuvres.md)** and **[Pmsf and occlusions](manual/pmsf-and-occlusions.md)**.
 
 ---

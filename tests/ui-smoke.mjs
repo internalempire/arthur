@@ -351,6 +351,9 @@ optionalResponse.setEnabled(false);
 check('returning to fast mode terminates an active worker immediately',
   responseWorkers.length === 2 && responseWorkers[1].terminated && !optionalResponse.isEnabled());
 
+const { checkMechanismsUI } = await import('./mechanisms-ui.mjs');
+await checkMechanismsUI(check);
+
 if (failures.length) {
   console.error(`\n${failures.length} UI smoke failure(s):`);
   for (const failure of failures) console.error(`- ${failure}`);

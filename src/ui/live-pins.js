@@ -45,7 +45,7 @@ export function pinSettingChanges(reference, current) {
 
 export function createLivePinTable(container, pins, onChange) {
   container.innerHTML = `
-    <div class="pin-heading"><h2>Live comparisons</h2><span class="pin-summary"></span></div>
+    <div class="pin-heading"><h2>Live comparisons</h2><span class="pin-summary"></span><button type="button" class="btn" id="show-mechanisms" aria-controls="mechanisms" aria-expanded="false">Mechanisms</button></div>
     <p class="pin-message"></p>
     <table class="pin-table">
       <thead><tr><th scope="col">Tile reference</th><th scope="col">Settings: reference → current</th><th scope="col"><span class="visually-hidden">Remove reference</span></th></tr></thead>

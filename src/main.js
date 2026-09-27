@@ -12,6 +12,7 @@ import { createPvrCurve } from './ui/panels/pvrcurve.js';
 import { createThorax } from './ui/panels/thorax.js';
 import { createDescriptions } from './ui/descriptions.js';
 import { PresentationHistory } from './ui/presentation-history.js';
+import { createMechanismsDisclosure } from './ui/mechanisms-disclosure.js';
 import { LivePins, MAX_LIVE_PINS, createLivePinTable } from './ui/live-pins.js';
 
 theme.init();
@@ -44,6 +45,9 @@ const pinTable = createLivePinTable(el('pinned-states'), livePins, () => {
   renderComparison(selectedSnapshot ?? sim);
   dirty = true;
 });
+const mechanisms = createMechanismsDisclosure(el('show-mechanisms'), el('mechanisms'), () => ({
+  current: sim, reference: livePins.selected, historical: inspectingPast(), running,
+}));
 const descriptions = createDescriptions({ getGuytonMode: guyton.responseMode, getGuytonClock: guyton.curveClock });
 const controls = createControls(el('controls'), sim, (id) => {
   if (id === 'mode') controls.sync();
@@ -216,6 +220,7 @@ function renderComparison(view) {
   const reference = historical ? null : livePins.selected;
   stats.render(view.metrics, reference?.sim.metrics ?? null, reference ? `State ${reference.id}` : '');
   pinTable.render(sim.params, { historical, running });
+  mechanisms.sync({ current: sim, reference: livePins.selected, historical, running });
   pinState.disabled = historical || livePins.states.length >= MAX_LIVE_PINS;
   pinState.title = historical
     ? 'Return to the latest instant or press Play before creating a live reference'

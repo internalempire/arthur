@@ -33,13 +33,34 @@ Up to **four references** can run alongside the current patient. Pin creates and
 
 The table below the tiles selects which reference is displayed. Its differences always read **reference → current**, using the control labels and units. For example, `PEEP: 5 → 10 cmH₂O` means that row's reference continues with PEEP 5 while the current patient has PEEP 10. The list updates when current settings change; it is not a chronological log of interventions. “Same control settings” does not establish identical physiology: different preceding pressure histories or manoeuvres can leave different volumes or opening memory.
 
-Each row has **Unpin** to stop and remove that reference. **Unpin all** removes all references. Selecting or removing a reference does not change the current patient's settings. The graphs and waveform traces continue to describe the current patient; the comparison is displayed in the tiles.
+Each row has **Unpin** to stop and remove that reference. **Unpin all** removes all references. Selecting or removing a reference does not change the current patient's settings. The graphs and waveform traces continue to describe the current patient; the comparison is displayed in the tiles and, on request, in the Mechanisms view.
 
 ### Time, phases and paused inspection
 
 All references advance by the same simulated elapsed time as the current patient. **Pause**, **Play** and **Speed** act on them together. A new reference starts at the current patient's cardiac and respiratory phase, without an extra equilibration period. It can therefore contain an ongoing transient; pinning does not certify equilibrium. If heart rate, breathing rate, ventilatory mode or reflex responses differ later, the cycles may drift apart. Values at the same elapsed time are not necessarily values at matching points of inspiration or systole.
 
 You can pin the latest instant while paused. When the [waveform cursor](panel-waveforms.md#pause-and-inspect-one-instant) selects an earlier instant, **Pin** is disabled and reference lines are hidden: that lightweight presentation history cannot restart a complete physiological simulation. Return to the latest instant or press Play to resume the live comparison.
+
+### Read the shared mechanisms
+
+After pinning a state, **Mechanisms** in the comparison table opens a map below it. The map compares the **current patient with the selected reference**. The large number is current, the smaller line belongs to `State N`, and Δ is current minus reference, in the stated unit. Δ is calculated from the displayed, rounded values: zero means no difference at that display precision. Selecting another reference updates both the tiles and the map. Selecting a map card opens its explanation and related measurements; it does not alter the patient.
+
+The changed controls are listed together as **reference → current**. The map follows their combined effects through pressure around the heart, venous driving pressure, RV filling and ejection, pulmonary vascular loading and blood storage, LV filling and ejection conditions, and systemic output. Arrows indicate physiological connections, not the direction or size of the contribution of an individual intervention. Dashed connections draw attention to surrounding pressure and LV ejection. This is a selection of pathways; cardiac contractility, diastolic properties, ventricular interaction and any enabled reflex remain part of the underlying circulation. On narrow screens the cards form a list, with the named connections available in each card's explanation.
+
+Read each card's measurement label and time window:
+
+- Pleural pressure is instantaneous, in cmH₂O relative to atmosphere. Lung gas volume, open fraction, the internal PVR coefficient and pulmonary blood volume are instantaneous model states.
+- The venous forward-driving gradient uses three-second exponential mean determinants: systemic filling pressure minus effective downstream pressure, which uses a smooth transition between right atrial and caval critical pressure. This is a gradient calculated from mean determinants, not a time average of the instantaneous gradient. It is not a measurement of net flow; resistance, collapse and backflow also matter.
+- RV and LV end-diastolic volumes and forward outputs refer to the latest completed beat. RV output divides integrated forward pulmonary-valve volume by that beat's measured duration; systemic output uses forward aortic volume. These outputs can differ during redistribution.
+- Mean arterial and pulmonary arterial pressures are three-second exponential means referenced to atmosphere. The internal PVR coefficient is not catheter-derived PVR and does not describe the whole RV afterload.
+- LV end-ejection transmural pressure is the pressure at the last forward-ejection sample in the completed beat, after subtracting pleural and additional pericardial pressure. It is a measured outcome of loading and contraction, not an independently prescribed afterload or proof of improved ejection. Read it alongside filling, stroke volume and output.
+- Pulmonary blood volume includes arteries, the transport buffer and veins. The displayed transport-buffer mean time is an internal timescale, not a fixed delay or a clinical transit measurement.
+
+The same elapsed time does not guarantee matched cardiac or respiratory phases. Different histories may also leave different states despite identical control settings. Therefore a difference at one instant is neither a steady-state conclusion nor an isolated causal effect. Invalid states and missing measurements are withheld independently for each patient; Δ is withheld if either value is unavailable.
+
+**Pause** freezes the comparison. Inspecting a past waveform instant hides the live map and its setting differences until the latest instant is restored or Play resumes. Removing the selected reference switches to the remaining selected state. Removing all references, resetting, choosing a preset or loading a patient closes and clears the map.
+
+The map is **created only on request**. Its module is loaded at the first opening; closing removes its display and disconnects its layout observer. Open values share the tile refresh schedule, approximately eight updates per second while running. Connectors are redrawn only when layout dimensions change. The view reads already available state and measurements; it starts no simulation, worker, independent intervention experiment or Deep CO calculation. The existing live references keep their usual computational cost whether the map is open or closed.
 
 ### Lifetime and computational scope
 
