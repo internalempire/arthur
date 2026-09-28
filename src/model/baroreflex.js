@@ -78,7 +78,8 @@ export function applyBaroreflex(effective, base, outflow) {
   // outflow returns some volume to it. Total blood volume and the user-selected
   // venous compliance remain unchanged in both directions.
   effective.csv = base.csv;
-  effective.venousToneVolume = BARO.venousRecruitment * outflow;
+  effective.venousReflexVolume = BARO.venousRecruitment * outflow;
+  effective.venousToneVolume = (base.venousCapacityReduction ?? 0) + effective.venousReflexVolume;
   effective.eesLv = base.eesLv * (1 + BARO.inotropy * outflow);
   effective.eesRv = base.eesRv * (1 + BARO.inotropy * outflow);
 }

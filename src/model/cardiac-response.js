@@ -64,10 +64,11 @@ export function cardiacResponseCurve(params, {
   // Freeze autonomic drive at the supplied effective parameters. A filling
   // experiment must not silently change contractility/rate through feedback.
   reference.applyScenario({ params: { ...params, baroreflexEnabled: false } });
-  const p = { ...reference.effective, venousToneVolume: params.venousToneVolume ?? 0 };
+  const p = { ...reference.effective, venousToneVolume: params.venousToneVolume ?? reference.effective.venousToneVolume ?? 0 };
   reference.effective = p;
-  // The ordinary integrator resets venous tone when the reflex is disabled.
-  // Here all frozen effectors, including venous recruitment, must persist.
+  // The ordinary integrator removes the reflex contribution when disabled.
+  // Here the supplied total capacity shift (manual + reflex) must persist,
+  // taking precedence over the manual setting rather than adding it twice.
   for (let i = 0; i < Math.round(120 / dt); i++) {
     stepRespiratory(p, reference.resp, dt);
     stepCirculation(p, reference.circ, reference.resp, dt);

@@ -104,7 +104,7 @@ The cardiovascular model includes:
 - time-varying ventricular elastance;
 - preload-, contractility- and afterload-dependent ejection;
 - stressed and unstressed systemic venous volume;
-- venous tone, venous compliance and resistance to venous return as separate mechanisms;
+- independent venous capacity reduction, venous compliance and resistance to venous return, with a separately additive baroreflex capacity shift;
 - systemic vascular resistance;
 - ventricular septal interaction, shared nonlinear pericardial pressure and adjustable pericardial capacity;
 - an optional, bounded aggregate baroreflex acting on effective heart rate, vascular tone, resistance and contractility; it is off by default so the initial view exposes uncompensated mechanical interaction.
@@ -159,7 +159,7 @@ Five control groups are generated from a single parameter registry:
 |---|---|---|
 | ventilation | mode, rate, tidal volume or pressure, PEEP, timing and effort | [Ventilation controls](manual/controls-ventilation.md) |
 | respiratory mechanics | lung compliance and capacity, chest-wall compliance and load, resistance, collapse, recruitment, EFL and abdomen | [Mechanics controls](manual/controls-mechanics.md) |
-| volume and vascular tone | stressed volume, venous compliance, venous-return resistance and SVR | [Volume controls](manual/controls-volume.md) |
+| volume and vascular tone | stressed volume, venous capacity reduction, venous compliance, venous-return resistance and SVR | [Volume controls](manual/controls-volume.md) |
 | cardiac function | heart rate, contractility, LV stiffness, baroreflex and ventricular interaction | [Heart controls](manual/controls-heart.md) |
 | pulmonary circulation | vascular resistance, hypoxic vasoconstriction and pulmonary capacitance coupling | [Pulmonary controls](manual/controls-pulmonary.md) |
 

@@ -12,7 +12,7 @@ In pressure-volume terms, venoconstriction shifts the relation left. A fluid bol
 
 ![Venous tone shifting the pressure-volume relation while reservoir volume remains fixed](figure/venous-tone.svg)
 
-At the marked 3,500 mL reservoir volume, mobilising 200 mL lowers the zero-pressure volume from 2,800 to 2,600 mL and raises elastic filling pressure from 7 to 9 mmHg. The operating point moves vertically because no blood has been added. Both relations retain the same 100 mL/mmHg compliance; on these axes that corresponds to the same 0.01 mmHg/mL slope.
+At the marked 3,450 mL reservoir volume, mobilising 200 mL lowers the zero-transmural-pressure volume from 2,750 to 2,550 mL and raises elastic filling pressure from 7 to 9 mmHg. The operating point moves vertically because no blood has been added. Both relations retain the same 100 mL/mmHg compliance; on these axes that corresponds to the same 0.01 mmHg/mL slope.
 
 This is why norepinephrine can have a clinically useful “fluid-like” venous effect without being fluid. Human septic-shock studies show that changing norepinephrine modifies mean systemic pressure and the haemodynamic response to a reversible volume challenge. That does not make venous tone equivalent to volume expansion: norepinephrine simultaneously alters arterial resistance, cardiac loading and sometimes contractility.
 
@@ -20,17 +20,22 @@ This is why norepinephrine can have a clinically useful “fluid-like” venous 
 
 ## In the model
 
-Venous tone is not an independent drug control. It is one of four effectors driven together by the aggregate [baroreflex](baroreflex.md). Positive reflex outflow lowers the zero-pressure volume of the systemic venous reservoir:
+The **Venous capacity reduction** control independently changes the systemic venous zero-transmural-pressure volume. Positive values reduce capacity; negative values increase it. The range is −200 to +200 mL in 25 mL steps, with a neutral default of 0. It changes neither actual blood volume nor the venous compliance slope. It represents a mechanical intervention, not a drug dose.
+
+When enabled, the aggregate [baroreflex](baroreflex.md) adds its own capacity shift alongside its other three effectors. The total reduction is:
 
 $$
-V_{tone} = 200\,S
+V_{tone} = \Delta V_{manual} + 200\,S
 $$
 
 - $V_{tone}$ — volume shifted from unstressed to stressed, mL
+- $\Delta V_{manual}$ — selected manual capacity reduction, mL, bounded between −200 and +200
 - $S$ — aggregate sympathetic outflow, dimensionless, bounded between −0.25 and 1
-- $200$ — maximum positive mobilisation, mL; a didactic shape coefficient rather than a human dose-response estimate
+- $200$ — maximum positive reflex mobilisation, mL; a didactic shape coefficient rather than a human dose-response estimate
 
-Total blood volume and selected venous compliance remain unchanged. At full positive outflow, 200 mL is reclassified as stressed; at maximum withdrawal, 50 mL moves in the opposite direction.
+Total blood volume and selected venous compliance remain unchanged. The reflex contribution ranges from −50 to +200 mL; combined with the manual setting, the total can range from −250 to +400 mL. Turning the baroreflex off sets its contribution to zero while preserving the manual shift. A manual intervention does not directly change resistance or contractility; an active baroreflex can respond to the resulting pressure change.
+
+At the same starting state and compliance, adding 200 mL of blood or reducing capacity by 200 mL gives the same initial elastic pressure rise. In this aggregate model, their pressure and flow trajectories can also coincide while their blood totals differ, as long as donor-volume limits are not reached. This is a property of the reservoir law, not equivalence between fluids and vasoactive drugs. The plotted 7→9 mmHg example is instantaneous elastic reservoir pressure before redistribution and excludes abdominal pressure; it does not predict settled CVP or cardiac output.
 
 In the shipped septic phenotype, enabling the aggregate baroreflex raises output, arterial pressure and mean systemic filling pressure. Those changes are the composite result of simultaneous chronotropy, arterial constriction, venous mobilisation and inotropy; they do not isolate the venous contribution. The current executable comparison is shown on the [baroreflex](baroreflex.md) page rather than being copied into several pages.
 
@@ -49,8 +54,8 @@ The model therefore uses the smallest mechanism that expresses the central princ
 ### Of the construction
 
 - All capacitance vessels respond as one reservoir; regional redistribution is absent.
-- The 200 mL maximum is an internal calibration, not a universal sympathetic reserve and not a norepinephrine-equivalent dose.
-- Tone changes only through the aggregate baroreflex and cannot be manipulated independently of its other effectors.
+- The manual ±200 mL range and the reflex +200 mL coefficient are didactic choices, not validated human reserves or norepinephrine-equivalent doses.
+- The independent control isolates a capacity shift; it does not reproduce the simultaneous effects of a vasoactive drug.
 - Venous compliance is held fixed during tone changes, although real vascular pressure-volume relations can change shape.
 - There is no venous drug kinetics, receptor pharmacology or delayed recruitment from splanchnic and cutaneous beds.
 

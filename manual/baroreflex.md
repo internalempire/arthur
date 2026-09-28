@@ -33,6 +33,8 @@ At full positive outflow, all four model effectors change together:
 | volume shifted from unstressed to stressed | +200 mL |
 | LV and RV end-systolic elastance | +30% |
 
+The venous shift in this table is the **reflex contribution**. It adds to the independent [Venous capacity reduction](controls-volume.md) setting without changing total blood or selected compliance. Switching the reflex off removes only its own shift; the manual setting remains active.
+
 These are didactic aggregate coefficients. They preserve a readable compensatory response across the control space; they are not fitted human gains and should not be compared with an autonomic function test.
 
 The heart-rate control is the **baseline rate** selected for the phenotype. When the reflex is active, the circulation uses

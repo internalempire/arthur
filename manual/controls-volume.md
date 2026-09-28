@@ -9,6 +9,7 @@
 | control | range | model meaning |
 |---|---:|---|
 | baseline stressed volume | 200–1,800 mL | adds or removes actual blood from the systemic venous reservoir |
+| venous capacity reduction | −200 to +200 mL, in 25 mL steps; default 0 | positive reduces zero-transmural-pressure volume; negative increases it, at unchanged total blood volume |
 | venous compliance | 30–200 mL/mmHg | converts stressed volume into elastic filling pressure |
 | resistance to venous return | 0.020–0.300 mmHg·s/mL | sets the falling slope of the aggregate venous-return relation |
 | systemic vascular resistance | 0.25–3.00 mmHg·s/mL | aggregate resistance opposing LV outflow |
@@ -17,9 +18,17 @@
 
 Changing baseline stressed volume changes total circulating blood volume one-for-one at the moment of adjustment. The circulation then redistributes it. This is the model's fluid-volume intervention, but it is not a crystalloid or blood-product simulation. See [stressed volume](stressed-volume.md).
 
+### Venous capacity reduction
+
+This control changes the size of the systemic venous reservoir at zero transmural pressure. Positive values make it smaller and convert existing unstressed volume into stressed volume; negative values do the reverse. Zero means no manual shift. Blood is neither added nor removed, and the compliance slope stays fixed. The circulation then redistributes the existing blood according to the resulting pressures. A rise in filling pressure does not guarantee a rise in cardiac output.
+
+The manual shift remains present with the baroreflex off. With it on, the manual and reflex shifts add; the Guyton panel’s **?** values-and-description view lists each contribution and their total. Turning the reflex off removes only its contribution. Pin preserves the selected capacity in each evolving reference; saved version-2 patient files preserve it too, and a file without this setting uses zero. Deep CO freezes the combined shift once.
+
+To isolate the mechanism, leave the baroreflex off, Pin the baseline and change capacity while keeping baseline stressed volume and compliance fixed. The ±200 mL range is a teaching exploration range, not a drug-dose conversion or a validated human reserve. See [venous tone](venous-tone.md).
+
 ### Venous compliance
 
-At the same stressed volume, lower compliance generates higher elastic filling pressure. It does not itself reclassify blood from unstressed to stressed. The autonomous venous-tone shift is separate and explained under [venous tone](venous-tone.md).
+At the same stressed volume, lower compliance generates higher elastic filling pressure. It does not itself reclassify blood from unstressed to stressed. The manual and reflex venous-capacity shifts are separate and explained under [venous tone](venous-tone.md).
 
 ### Resistance to venous return
 

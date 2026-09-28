@@ -1,5 +1,24 @@
 # Model decisions
 
+## 2026-09-28 — Independent systemic venous capacity
+
+The clinician authorized a signed capacity-reduction control, −200 to +200 mL
+in 25 mL steps, neutral at zero. It reduces the systemic venous zero-transmural-
+pressure volume without changing actual blood or compliance. It adds to the
+existing reflex shift, including when feedback is disabled; no new state,
+compartment, integrator or drug model is introduced. The total is not capped at
+the reflex-only bound. Deep CO freezes the combined shift once. Existing presets
+remain neutral and version-2 files without the field receive zero.
+
+The range is a didactic exploration range, not externally validated human reserve.
+Under the aggregate reservoir law, equal additions of blood and reductions of
+capacity can have identical pressure/flow trajectories outside donor-volume
+limits while their blood totals differ. Tests preserve this symmetry rather than
+manufacturing a haemodynamic distinction. The separate blood-distribution view
+remains future work. Manual figures derive their intercepts from the actual
+2,750 mL systemic reservoir, with the 50 mL IVC conduit documented separately.
+
+
 ## 2026-09-25 — Bound live comparisons without simplifying their physiology
 
 Pin references continue exact copies of the full integrator state, using the same

@@ -14,6 +14,7 @@ const SUITES = [
   './suites/regulation-and-transit.test.mjs',
   './suites/circulation.test.mjs',
   './suites/venous-flow.test.mjs',
+  './suites/venous-capacity.test.mjs',
   './suites/cardiac-flow.test.mjs',
   './suites/cardiac-response.test.mjs',
   './suites/lung-mechanics.test.mjs',

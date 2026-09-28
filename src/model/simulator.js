@@ -762,6 +762,8 @@ export class Simulator {
       stressedVenous: venousVolume.stressedVolume,
       unstressedVenous: venousVolume.unstressedVolume,
       venousToneVolume: venousVolume.toneVolume,
+      venousCapacityReduction: p.venousCapacityReduction ?? 0,
+      venousReflexVolume: venousVolume.toneVolume - (p.venousCapacityReduction ?? 0),
       effectiveCsv: p.csv,
     };
   }

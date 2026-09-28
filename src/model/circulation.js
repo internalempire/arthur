@@ -198,7 +198,7 @@ export function createCirculationState(p) {
  * converts that stressed volume into elastic filling pressure.
  */
 export function systemicVenousVolumeState(p, c) {
-  const toneVolume = p.venousToneVolume ?? 0;
+  const toneVolume = p.venousToneVolume ?? p.venousCapacityReduction ?? 0;
   const unstressedVolume = VASC.vuSv - toneVolume;
   const stressedVolume = c.vSv - unstressedVolume;
   return {

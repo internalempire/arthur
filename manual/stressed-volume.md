@@ -24,7 +24,7 @@ This equation separates three interventions that are often blurred together. Add
 
 ![Added fluid moving the model state along a fixed systemic venous pressure-volume relation](figure/stressed-volume.svg)
 
-The relation is held fixed while 500 mL is added to the reservoir: the point moves from 3,500 mL and 7 mmHg to 4,000 mL and 12 mmHg. The compliance is 100 mL/mmHg; because pressure is on the vertical axis, the visible slope is its inverse, 0.01 mmHg/mL. This straight line is the model's deliberately simple reservoir, not a claim that the human venous pressure-volume relation is perfectly linear.
+The relation is held fixed while 500 mL is added to the reservoir: the point moves from 3,450 mL and 7 mmHg to 3,950 mL and 12 mmHg. The compliance is 100 mL/mmHg; because pressure is on the vertical axis, the visible slope is its inverse, 0.01 mmHg/mL. This straight line is the model's deliberately simple reservoir, not a claim that the human venous pressure-volume relation is perfectly linear.
 
 ### Stressed volume is not fluid responsiveness
 
@@ -36,7 +36,7 @@ A rise in stressed volume usually raises the pressure available to drive venous 
 
 `Baseline stressed volume` is an actual-volume control. Moving it by 500 mL immediately adds or removes 500 mL from the systemic venous reservoir and therefore changes total model blood volume by the same amount. Subsequent circulation redistributes some of that blood among compartments, so the settled stressed-volume readout need not differ by exactly 500 mL.
 
-At neutral tone the systemic venous zero-pressure volume is 2,800 mL. The default selected stressed volume is 700 mL and the default venous compliance is 100 mL/mmHg. These are aggregate teaching values for one reservoir, not estimates of a patient's total unstressed or stressed volume.
+At neutral tone the systemic venous zero-transmural-pressure volume is 2,750 mL. The separate inferior vena cava conduit has another 50 mL of zero-pressure volume; it is not part of this reservoir. The default selected stressed volume is 700 mL and the default venous compliance is 100 mL/mmHg. These are aggregate teaching values for one reservoir, not estimates of a patient's total unstressed or stressed volume.
 
 The model calculates the reservoir's current partition as:
 
@@ -46,8 +46,8 @@ $$
 
 - $V_s$ — current systemic venous stressed volume, mL
 - $V_{sv}$ — blood physically present in the systemic venous compartment, mL
-- $V_{u,0}$ — neutral-tone zero-pressure volume, fixed at 2,800 mL
-- $V_{tone}$ — volume mobilised by [venous tone](venous-tone.md), mL
+- $V_{u,0}$ — neutral-tone zero-pressure volume, fixed at 2,750 mL
+- $V_{tone}$ — combined manual and reflex reduction in venous capacity, described under [venous tone](venous-tone.md), mL
 
 [Abdominal pressure](abdominal-pressure.md) contributes separately to mean systemic filling pressure when the splanchnic reservoir is sufficiently distended. Consequently, the displayed Pmsf is not always equal to stressed volume divided by compliance.
 

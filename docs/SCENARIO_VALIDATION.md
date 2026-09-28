@@ -117,7 +117,9 @@ stressed volume by 500 mL produces a further substantial rise in output. The
 fluid control adds blood to the venous reservoir; the baroreflex instead shifts
 volume from unstressed to stressed without changing total blood volume. Exact
 baroreflex-on and -off values are generated from the current executable model in
-the manual rather than copied here.
+the manual rather than copied here. The independent venous-capacity control is
+neutral in this preset; it can isolate a capacity shift without the other reflex
+effectors, but its ±200 mL range is not a clinical calibration.
 
 **Assessment — qualified.** These directions are coherent with the physiology of
 venous recruitment and the human observation that norepinephrine can increase

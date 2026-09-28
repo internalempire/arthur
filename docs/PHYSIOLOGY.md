@@ -115,26 +115,30 @@ venous zero-pressure volume. Moving the control by 500 mL adds or removes 500 mL
 of actual blood from that reservoir. It is an instantaneous teaching manoeuvre,
 not a model of infusion kinetics or transcapillary redistribution.
 
-When enabled, the baroreflex does something different. Each unit of positive sympathetic
-outflow lowers the unstressed volume by 200 mL and therefore mobilises the same
-amount as stressed volume. The checkbox is off by default; the retained
-user-facing sensitivity changes how rapidly a
-pressure error approaches full response, but the outflow is bounded and cannot
-mobilise more than 200 mL. Total blood and the selected compliance remain
-unchanged.
-The elastic component of mean systemic filling pressure is then stressed volume
-divided by compliance; abdominal pressure contributes separately through the
-splanchnic coupling already present in the model.
+The independent `venousCapacityReduction` control shifts the systemic venous
+zero-transmural-pressure volume, whose neutral value is 2,750 mL (the separate
+IVC conduit has another 50 mL). Positive settings reduce capacity, negative
+settings increase it: −200 to +200 mL in 25 mL steps, default zero. Actual blood
+volume and the selected compliance are unchanged. The optional baroreflex adds
+200 mL per unit of bounded sympathetic outflow (−0.25 to 1), so its contribution
+ranges from −50 to +200 mL. Disabling it removes only that contribution.
 
-This is the important physiological distinction. Increased vascular tone shifts
-the volume–pressure relation left with little change in slope, and human septic
-shock data support the “fluid-like” increase in stressed volume and mean
-systemic pressure produced by norepinephrine. The model does not claim that 200
-mL is a measured universal value: it was selected to preserve the prior
-macroscopic response while correcting the mechanism. In the shipped septic
-phenotype, the optional reflex mobilises part of that reserve at unchanged
-total blood volume and venous compliance. Exact scenario values belong to the
-executable scenario checks rather than this mechanistic summary.
+The elastic component of mean systemic filling pressure is current stressed
+volume divided by compliance; abdominal pressure contributes separately.
+At equal compliance, adding a volume to the reservoir and reducing its capacity
+by the same amount yield the same elastic pressure. Their full pressure/flow
+trajectories can coincide under this aggregate law outside donor-volume limits,
+while total blood differs. This symmetry is intentional, not a therapeutic
+comparison. Returning capacity to zero restores the pressure-volume relation;
+redistribution from the preceding intervention resolves dynamically.
+
+Human septic-shock data support a fluid-like effect of venoconstriction, but
+norepinephrine also changes resistance and cardiac loading. Neither the manual
+range nor the reflex coefficient is a calibrated human dose-response or reserve.
+Pin copies the capacity setting and full state; version-2 patient files retain
+the setting, with absent values defaulting to zero. Deep CO freezes the combined
+manual-plus-reflex shift once. The independent control adds only algebra, with
+no new dynamic state, compartment, worker or integration pass.
 
 ---
 

@@ -35,12 +35,12 @@ check('an invalid overloaded tail is reported and never plotted as a plateau',
     && !failing.segments.flat().some((v, i) => i % 2 === 0 && v === tail.ra));
 
 const prone = new Simulator();
-prone.applyScenario({ params: { ...healthy, position: 'prone' } });
-const effective = { ...prone.effective, venousToneVolume: 100 };
+prone.applyScenario({ params: { ...healthy, position: 'prone', venousCapacityReduction: 150 } });
+const effective = { ...prone.effective, venousToneVolume: 250 };
 const frozen = cardiacResponseParameters(prone.params, effective);
 const compensated = cardiacResponseCurve(frozen, { scales: [0.6, 1] });
-check('a frozen response preserves venous recruitment and applies posture exactly once',
-  compensated.valid && compensated.conditions.venousToneVolume === 100
+check('a frozen response preserves total manual-plus-reflex capacity without double counting and applies posture once',
+  compensated.valid && compensated.conditions.venousToneVolume === 250
     && compensated.conditions.ccw === resolveParams(prone.params).ccw
     && compensated.conditions.pab0 === resolveParams(prone.params).pab0
     && frozen.ccw === prone.params.ccw);

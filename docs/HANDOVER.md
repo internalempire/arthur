@@ -2,6 +2,54 @@
 
 Updated: 2026-09-28
 
+## Independent venous capacity — September 28
+
+The clinician approved the proposal to separate reservoir capacity from actual
+blood addition. **Venous capacity reduction** is in Volume & vascular tone:
+−200 to +200 mL, 25 mL steps, default zero. Positive values reduce systemic
+venous zero-transmural-pressure volume, negative values increase it. No actual
+blood is added/removed and the selected compliance remains fixed. The manual
+shift adds to the existing reflex contribution (−50 to +200 mL); disabling the
+reflex preserves the manual setting. The Guyton `?` disclosure shows manual,
+reflex and total shifts separately. This is a mechanical teaching intervention,
+not pharmacology or a calibrated human reserve.
+
+Registry-based Pin differences and version-2 patient files include the setting;
+older version-2 files without it use zero. Deep CO freezes the combined shift
+once, including a newly selected manual value while paused, with the sampled
+reflex contribution retained. No dynamic state, compartment, additional worker
+or integration pass is introduced. Existing preset snapshots remain identical.
+
+Focused tests cover signs, conservation, additive reflex behavior, legacy files,
+Pin independence and Deep CO parameter transfer. Private paired trajectories at
+both endpoints in healthy passive ventilation and LV failure preserve volume and
+flow equivalence with equal blood addition/removal, including removal of each
+intervention. All four pairs stay valid; actual blood totals differ during the
+intervention and conserve their respective amounts. This symmetry follows from
+the aggregate reservoir law and is documented rather than artificially removed.
+It does not establish therapeutic equivalence or an externally validated effect
+size. The next planned topic is **where the blood goes**, not implemented here.
+
+Corrected a documentation discrepancy without changing reservoir constants:
+the systemic venous zero-pressure volume is 2,750 mL, and the separate IVC conduit
+has 50 mL. The two figure generators now derive intercepts, marker positions and
+pressure labels from the model. Explanatory pages describe only current behavior;
+the development correction is recorded here and in `manual/_log.md`.
+
+Verification: `npm test` completed with 476 passes and no failures (after an
+initial environment SIGTERM/143 interruption); `npm run test:ui` passed all
+54 contracts. Browser checks cover keyboard/range/help, conserved volume, Pin,
+reflex on/off, real patient download/import and older files, preset neutrality,
+390/1440 px layouts and the Deep CO request/cancellation after a paused change.
+The real Deep CO suite separately passed the combined-shift calculation.
+`npm run snapshots` regenerated all 12 presets with no diff.
+`npm run manual:figures`, `npm run manual:build` and `npm run manual:lint`
+passed; all 18 generated numerical blocks agree, with no lint errors or warnings.
+No tolerance, scenario target or physiological coefficient was changed.
+
+Private evidence: `outputs/Arthur-venous-capacity-2026-09-28/` and
+`codex-notes/Arthur-capacita-venosa-implementazione-2026-09-28.md`.
+
 ## B2b sky-blue/red palette — September 28
 
 The clinician explicitly replaced the digital identity colours with sky blue for

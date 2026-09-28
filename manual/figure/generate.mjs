@@ -25,7 +25,7 @@ import { SCENARIOS } from '../../src/model/scenarios.js';
 import { createBaroreflexState, stepBaroreflex } from '../../src/model/baroreflex.js';
 import {
   venousReturnCurve, cardiacFunctionCurve, curveIntersection,
-  systemicVenousVolumeState, pericardialPressure, PRELOAD_STEEP,
+  systemicVenousVolumeState, pericardialPressure, PRELOAD_STEEP, VASC,
 } from '../../src/model/circulation.js';
 import {
   HYSTERESIS_EXAMPLE, STRESS_INDEX_BASE, STRESS_INDEX_CASES, runOcclusionExample,
@@ -408,8 +408,10 @@ function stressedVolumeFigure() {
   // Start at the model's zero-pressure volume. Extending the algebra below
   // that intercept would draw negative elastic recoil, while flooring it would
   // no longer be the equation the running model uses.
-  for (let volume = 2800; volume <= 4100; volume += 20) volumes.push(volume);
+  for (let volume = VASC.vuSv; volume <= 4100; volume += 20) volumes.push(volume);
   const relation = volumes.map((volume) => [volume, pressureAt(volume)]);
+  const baseline = VASC.vuSv + p.stressedVolume;
+  const filled = baseline + 500;
   return chart({
     title: 'Added fluid moves the state along one venous pressure-volume relation',
     xLabel: 'Blood in the systemic venous reservoir (mL)',
@@ -417,8 +419,8 @@ function stressedVolumeFigure() {
     series: [{ label: 'neutral-tone relation', points: relation }],
     xTick: 300, yTick: 2, xDomain: [2750, 4100], yDomain: [0, 14], padRight: 210,
     markers: [
-      { x: 3500, y: pressureAt(3500), label: '3,500 mL · 7 mmHg' },
-      { x: 4000, y: pressureAt(4000), label: '+500 mL · 12 mmHg', dx: -116 },
+      { x: baseline, y: pressureAt(baseline), label: `${baseline.toLocaleString('en-US')} mL · ${pressureAt(baseline)} mmHg` },
+      { x: filled, y: pressureAt(filled), label: `+500 mL · ${pressureAt(filled)} mmHg`, dx: -116 },
     ],
     notes: ['C = 100 mL/mmHg', 'slope = 0.01 mmHg/mL', '+500 mL → +5 mmHg'],
   });
@@ -430,11 +432,10 @@ function venousToneFigure() {
     systemicVenousVolumeState({ ...p, venousToneVolume: toneVolume }, { vSv }).elasticPressure;
   const neutral = [];
   const constricted = [];
-  // Each relation starts at its own zero-pressure volume: 2,800 mL at neutral
-  // tone and 2,600 mL after 200 mL has been mobilised.
-  for (let volume = 2800; volume <= 4100; volume += 20) neutral.push([volume, pressureAt(volume, 0)]);
-  for (let volume = 2600; volume <= 4100; volume += 20) constricted.push([volume, pressureAt(volume, 200)]);
-  const fixedVolume = 3500;
+  // Each relation starts at its own model-derived zero-pressure volume.
+  for (let volume = VASC.vuSv; volume <= 4100; volume += 20) neutral.push([volume, pressureAt(volume, 0)]);
+  for (let volume = VASC.vuSv - 200; volume <= 4100; volume += 20) constricted.push([volume, pressureAt(volume, 200)]);
+  const fixedVolume = VASC.vuSv + p.stressedVolume;
   return chart({
     title: 'Venous tone raises elastic pressure without adding blood',
     xLabel: 'Blood in the systemic venous reservoir (mL)',
@@ -442,17 +443,17 @@ function venousToneFigure() {
     series: [
       { label: 'neutral tone', points: neutral },
       { label: '200 mL mobilised', points: constricted },
-      { label: 'same 3,500 mL', points: [
+      { label: `same ${fixedVolume.toLocaleString('en-US')} mL`, points: [
         [fixedVolume, pressureAt(fixedVolume, 0)],
         [fixedVolume, pressureAt(fixedVolume, 200)],
       ] },
     ],
     xTick: 300, yTick: 2, xDomain: [2550, 4100], yDomain: [0, 16], padRight: 205,
     markers: [
-      { x: fixedVolume, y: pressureAt(fixedVolume, 0), label: 'neutral · 7 mmHg', dy: 18 },
-      { x: fixedVolume, y: pressureAt(fixedVolume, 200), label: 'with tone · 9 mmHg', color: 'alv' },
+      { x: fixedVolume, y: pressureAt(fixedVolume, 0), label: `neutral · ${pressureAt(fixedVolume, 0)} mmHg`, dy: 18 },
+      { x: fixedVolume, y: pressureAt(fixedVolume, 200), label: `with tone · ${pressureAt(fixedVolume, 200)} mmHg`, color: 'alv' },
     ],
-    notes: ['blood volume unchanged', 'C = 100 mL/mmHg', 'V₀: 2,800 → 2,600 mL'],
+    notes: ['blood volume unchanged', 'C = 100 mL/mmHg', `V₀: ${VASC.vuSv.toLocaleString('en-US')} → ${(VASC.vuSv - 200).toLocaleString('en-US')} mL`],
   });
 }
 

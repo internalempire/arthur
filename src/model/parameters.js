@@ -148,6 +148,11 @@ export const PARAMETERS = [
     help: 'The adjustable baseline volume above the systemic venous zero-pressure volume. Changing it adds or removes the same amount of blood from the venous reservoir; venous tone can then mobilise an additional amount without adding blood.',
   },
   {
+    id: 'venousCapacityReduction', group: 'volume', label: 'Venous capacity reduction', unit: 'mL',
+    min: -200, max: 200, step: 25, default: 0,
+    help: 'Positive values reduce the systemic venous zero-transmural-pressure volume; negative values increase it. No blood is added or removed, and venous compliance is unchanged. This manual shift remains active with the baroreflex off and adds to its contribution when on. It is a mechanical intervention, not a drug dose.',
+  },
+  {
     id: 'csv', group: 'volume', label: 'Venous compliance (slope)', unit: 'mL/mmHg',
     min: 30, max: 200, step: 5, default: 100,
     help: 'The change in venous volume per mmHg. It converts stressed volume into elastic filling pressure, but is independent of the venous-tone shift between unstressed and stressed volume.',
