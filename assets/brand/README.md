@@ -13,7 +13,7 @@ No font, external image service or JavaScript is required to display the logo.
 | --- | --- |
 | App/manual header, slides, digital documents | `logo-color.svg`, `logo-color-dark.svg` |
 | Symbol without lettering | `symbol-*.svg` / `symbol-*.png` |
-| Monochrome | `*-black.svg`, `*-white.svg`, `*-teal.svg` |
+| Monochrome | `*-black.svg`, `*-white.svg`, `*-blue.svg`, `*-red.svg` |
 | Vertical composition / lettering alone | `stacked-*.svg`, `wordmark-*.svg` |
 | GitHub README header | `banner-light.svg`, `banner-dark.svg` |
 | Link preview, 1200 × 630 | `social-card.png` (editable `social-card.svg`) |
@@ -28,13 +28,18 @@ system fonts; the logo lettering itself consists entirely of paths.
 
 | Role | Light background | Dark background |
 | --- | --- | --- |
-| Left form, petrol | `#176B68` · RGB 23,107,104 | `#70C7BA` · RGB 112,199,186 |
-| Right form, indigo | `#555A8D` · RGB 85,90,141 | `#A8AFE0` · RGB 168,175,224 |
-| Lettering | `#172B31` · RGB 23,43,49 | `#FFFFFF` · RGB 255,255,255 |
+| Left form, sky blue (air/lungs) | `#1689C5` · RGB 22,137,197 | `#65C6F0` · RGB 101,198,240 |
+| Right form, red (blood/heart) | `#D4434B` · RGB 212,67,75 | `#FF8088` · RGB 255,128,136 |
+| Lettering | `#182B3A` · RGB 24,43,58 | `#FFFFFF` · RGB 255,255,255 |
 
-Monochrome: `#111111`, `#FFFFFF`, or petrol `#176B68`. Banner backgrounds:
-`#F6FAF9` and `#142525`. These colours identify the project; they do not represent
-oxygenation, organs, pressures or the simulator's clinical signal colours.
+Monochrome: black `#111111`, white `#FFFFFF`, blue `#087DB5` or red `#C93642`.
+The monochrome blue/red tones are slightly deeper to keep the small lettering
+legible. Banner backgrounds: `#F5F8FC` and `#15232E`.
+
+Sky blue evokes air and the lungs; red evokes blood and the heart. The two forms
+symbolise their interaction. These are identity colours, not a key to measured
+signals, oxygen saturation or the current physiological state. The simulator's
+clinical signal colours are specified separately.
 
 ## Display rules
 

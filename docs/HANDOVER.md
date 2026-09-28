@@ -2,6 +2,22 @@
 
 Updated: 2026-09-28
 
+## B2b sky-blue/red palette — September 28
+
+The clinician explicitly replaced the digital identity colours with sky blue for
+air/lungs and red for blood/heart. All coloured SVG/PNG compositions, README
+banners, social card, browser/shortcut icons and the gallery use this palette.
+Black/white masters retain their geometry; monochrome blue and red replace the
+petrol variant, whose files are removed. The neutral backgrounds and colour guide
+are updated consistently. Existing app/manual/README/gallery asset references
+carry a palette revision to avoid reusing cached artwork from the prior release.
+The two original paths, outlined lettering, theme behavior and clinical signal
+palette are unchanged. The generator and guide describe the current identity.
+
+Verification and publication evidence are retained privately under
+`outputs/Arthur-brand-blue-red-2026-09-28/` and
+`codex-notes/Arthur-logo-azzurro-rosso-2026-09-28.md`.
+
 ## B2b digital identity — September 28
 
 The clinician chose B2b “Fluida” and explicitly authorized monochrome/colour

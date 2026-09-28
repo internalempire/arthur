@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/banner-dark.svg">
-    <img src="assets/brand/banner-light.svg" width="960" alt="arthur — a teaching model of heart–lung interaction">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/banner-dark.svg?v=2">
+    <img src="assets/brand/banner-light.svg?v=2" width="960" alt="arthur — a teaching model of heart–lung interaction">
   </picture>
 </p>
 

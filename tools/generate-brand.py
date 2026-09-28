@@ -22,11 +22,12 @@ ET.register_namespace('', NS)
 MASTER = ET.parse(OUT / 'source/arthur-master.svg').getroot()
 SYMBOL, WORD = MASTER.findall(f'{{{NS}}}g')
 PALETTES = {
-    'color': ('#176B68', '#555A8D', '#172B31'),
-    'color-dark': ('#70C7BA', '#A8AFE0', '#FFFFFF'),
+    'color': ('#1689C5', '#D4434B', '#182B3A'),
+    'color-dark': ('#65C6F0', '#FF8088', '#FFFFFF'),
     'black': ('#111111',) * 3,
     'white': ('#FFFFFF',) * 3,
-    'teal': ('#176B68',) * 3,
+    'blue': ('#087DB5',) * 3,
+    'red': ('#C93642',) * 3,
 }
 
 
@@ -61,17 +62,17 @@ def build():
     # Transparent SVG favicon responds to the browser/OS theme, independently
     # from the application's theme toggle. PNG/ICO fallbacks use a light tile.
     mark = group(SYMBOL, list(PALETTES['color'][:2]))
-    mark = mark.replace('fill="#176B68"', 'class="left" fill="#176B68"')
-    mark = mark.replace('fill="#555A8D"', 'class="right" fill="#555A8D"')
+    mark = mark.replace('fill="#1689C5"', 'class="left" fill="#1689C5"')
+    mark = mark.replace('fill="#D4434B"', 'class="right" fill="#D4434B"')
     svg('favicon', 256, 256,
-        '<style>@media(prefers-color-scheme:dark){.left{fill:#70C7BA}.right{fill:#A8AFE0}}</style>' + mark)
+        '<style>@media(prefers-color-scheme:dark){.left{fill:#65C6F0}.right{fill:#FF8088}}</style>' + mark)
     svg('app-icon', 256, 256,
-        '<rect width="256" height="256" rx="48" fill="#F6FAF9"/>' +
+        '<rect width="256" height="256" rx="48" fill="#F5F8FC"/>' +
         group(SYMBOL, list(PALETTES['color'][:2]), 'translate(20.48 20.48) scale(.84)'))
 
     for mode, variant, bg, muted in [
-        ('light', 'color', '#F6FAF9', '#47605F'),
-        ('dark', 'color-dark', '#142525', '#B2C9C7'),
+        ('light', 'color', '#F5F8FC', '#516574'),
+        ('dark', 'color-dark', '#15232E', '#B8CDD9'),
     ]:
         a, b, ink = PALETTES[variant]
         body = (group(SYMBOL, [a, b]) + group(WORD, [ink]))
@@ -83,12 +84,12 @@ def build():
             'arthur — a teaching model of heart–lung interaction')
     a, b, ink = PALETTES['color-dark']
     svg('social-card', 1200, 630,
-        '<rect width="1200" height="630" fill="#142525"/>'
+        '<rect width="1200" height="630" fill="#15232E"/>'
         '<g transform="translate(156 146)">' + group(SYMBOL, [a, b]) + group(WORD, [ink]) + '</g>'
         '<text x="600" y="457" text-anchor="middle" font-family="system-ui,sans-serif" '
-        'font-size="30" fill="#B2C9C7">A teaching model of heart–lung interaction</text>'
+        'font-size="30" fill="#B8CDD9">A teaching model of heart–lung interaction</text>'
         '<text x="600" y="560" text-anchor="middle" font-family="system-ui,sans-serif" '
-        'font-size="20" fill="#B2C9C7">internalempire.github.io/arthur</text>',
+        'font-size="20" fill="#B8CDD9">internalempire.github.io/arthur</text>',
         'arthur — a teaching model of heart–lung interaction')
     (OUT / 'palette.json').write_text(json.dumps(PALETTES, indent=2) + '\n')
 
@@ -115,7 +116,7 @@ def raster(browser):
             render('app-icon', f'favicon-{size}.png', size, size)
         for size in (180, 192, 512):
             render('app-icon', f'icon-{size}.png', size, size)
-        for variant in ('color', 'color-dark', 'black', 'white', 'teal'):
+        for variant in PALETTES:
             render(f'symbol-{variant}', f'symbol-{variant}.png', 512, 512)
             render(f'logo-{variant}', f'logo-{variant}.png', 1332, 384)
         render('social-card', 'social-card.png', 1200, 630)
