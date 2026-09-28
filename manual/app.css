@@ -90,8 +90,8 @@ body {
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--rule);
 }
-.brand { display: flex; align-items: baseline; gap: .45rem; text-decoration: none; color: var(--text); }
-.brand strong { font-size: 1.05rem; letter-spacing: -.01em; }
+.brand { display: flex; flex-shrink: 0; align-items: center; gap: .45rem; text-decoration: none; color: var(--text); }
+.brand .arthur-logo { width: 90px; }
 .brand span { color: var(--text-faint); font-size: .82rem; }
 
 .icon {
@@ -101,7 +101,7 @@ body {
 .icon:hover { background: var(--bg-sink); color: var(--text); }
 #menu { display: none; }
 
-.search { position: relative; margin-left: auto; width: min(22rem, 45vw); }
+.search { min-width: 0; position: relative; margin-left: auto; width: min(22rem, 45vw); }
 #q {
   width: 100%; padding: .42rem .7rem; font: inherit; font-size: .9rem;
   color: var(--text); background: var(--bg-soft);
@@ -280,4 +280,9 @@ main:focus { outline: none; }
   .search { width: auto; flex: 1 1 auto; }
   .seq { flex-direction: column; }
   #next { text-align: left; }
+}
+
+/* Keep the search usable beside the digital mark on narrow phones. */
+@media (max-width: 480px) {
+  .brand .manual-label { display: none; }
 }

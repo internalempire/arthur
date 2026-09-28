@@ -1,6 +1,38 @@
 # Project handover
 
-Updated: 2026-09-27
+Updated: 2026-09-28
+
+## B2b digital identity — September 28
+
+The clinician chose B2b “Fluida” and explicitly authorized monochrome/colour
+variants and production use for digital media only. The approved geometry is
+preserved: two filled forms with a transparent channel of constant 32-unit normal
+width. Outlined lettering requires no font. Petrol/indigo artwork, its light-on-dark
+counterpart, and black, white and petrol monochromes are in `assets/brand/` with
+horizontal, stacked, symbol and wordmark compositions, transparent PNGs, README
+banners, a social preview and SVG/ICO/PNG icons. A public gallery provides downloads;
+its README documents colours, sizing, theme behavior and rebuilding.
+
+App and manual headers reuse their existing theme state through static CSS. The
+favicon follows browser/OS appearance; raster icons have a light tile. GitHub's
+README uses light/dark artwork. Pages assembly now includes the assets directory.
+No physiological code, signal palette, simulation schedule or dependency changes.
+The manual hides its redundant visible “manual” label on narrow phones to leave
+room for search; the link retains its complete accessible name. No offline/PWA or
+print/merchandising deliverables are introduced.
+
+`tools/generate-brand.py` regenerates SVG from the checked-in approved master using
+Python's standard library; optional local Chromium exports PNG and ICO. The browser
+application does not load this tool. Design experiments, browser screenshots and
+verification records remain private in `outputs/Arthur-brand-production-2026-09-28/`
+and `codex-notes/Arthur-identita-digitale-2026-09-28.md`.
+
+Verification: UI smoke contracts, manual build/lint and browser checks cover app
+and manual light/dark overrides, desktop/phone headers, asset loading, downloads,
+favicons and the accessible app heading. SVG auditing and screen contrast checks
+cover the production marks. The pre-existing 320-px waveform overflow is outside
+this branding change. Publication status is recorded in the private delivery note;
+no Mac or Windows synchronization is claimed.
 
 ## Optional shared mechanisms comparison — September 27
 

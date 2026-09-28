@@ -1,0 +1,10 @@
+/* Static artwork only. Explicit application/manual theme overrides the OS. */
+.arthur-logo { display: inline-block; vertical-align: middle; }
+.arthur-logo img { display: block; width: 100%; height: auto; }
+.arthur-logo .arthur-logo-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .arthur-logo .arthur-logo-light { display: none; }
+  :root:not([data-theme="light"]) .arthur-logo .arthur-logo-dark { display: block; }
+}
+:root[data-theme="dark"] .arthur-logo .arthur-logo-light { display: none; }
+:root[data-theme="dark"] .arthur-logo .arthur-logo-dark { display: block; }

@@ -1,5 +1,11 @@
-<h2 align="center">arthur</h2>
-<p align="center"><img src="https://i.imgur.com/ywckYxf.gif" /></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/brand/banner-dark.svg">
+    <img src="assets/brand/banner-light.svg" width="960" alt="arthur — a teaching model of heart–lung interaction">
+  </picture>
+</p>
+
+<p align="center"><a href="https://internalempire.github.io/arthur/assets/brand/">Digital logos and banners</a></p>
 
 <h3 align="center">ARTificial intelligence Heart–lUng Relationship model</h3>
 

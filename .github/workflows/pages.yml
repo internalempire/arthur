@@ -45,7 +45,7 @@ jobs:
         run: |
           mkdir -p _site
           cp index.html _site/
-          cp -R src styles manual docs _site/
+          cp -R src styles assets manual docs _site/
           touch _site/.nojekyll
 
       - name: Configure GitHub Pages
