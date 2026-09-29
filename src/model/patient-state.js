@@ -36,13 +36,15 @@ export function patientParameterOverrides(params) {
 }
 
 /** Build the portable, versioned JSON representation used by Save patient. */
-export function createPatientState(params, savedAt = new Date().toISOString()) {
+export function createPatientState(params, savedAt = new Date().toISOString(), bloodVolumeReference = params.stressedVolume) {
   const parameters = {};
   for (const spec of PARAMETERS) parameters[spec.id] = params[spec.id];
   return {
     format: PATIENT_STATE_FORMAT,
     version: PATIENT_STATE_VERSION,
     savedAt,
+    // Presentation reference only: parameters still prescribe the actual volume.
+    bloodVolumeReference,
     // Store the complete vector so a later change in application defaults
     // cannot silently change an old debugging case. `modified` is descriptive
     // metadata for people reading the file; loading trusts the validated vector.
@@ -95,7 +97,14 @@ export function parsePatientState(candidate) {
   }
   const params = normalizeRecruitmentParameters(merged);
 
+  const bloodVolumeReference = candidate.bloodVolumeReference === undefined
+    ? params.stressedVolume : candidate.bloodVolumeReference;
+  if (!validParameterValue(PARAM_BY_ID.get('stressedVolume'), bloodVolumeReference)) {
+    throw new Error('The saved starting blood-volume reference is invalid.');
+  }
+
   return {
+    bloodVolumeReference,
     params,
     overrides: patientParameterOverrides(params),
     ignored,

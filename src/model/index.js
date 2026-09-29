@@ -16,6 +16,8 @@ export {
   patientParameterOverrides, createPatientState, parsePatientState,
 } from './patient-state.js';
 
+export { bloodVolumeReadings } from './blood-volume.js';
+
 // Read-only analyses used to draw the model's physiological constructions.
 export {
   venousReturnCurve, cardiacFunctionCurve, curveIntersection, preloadLimbs,

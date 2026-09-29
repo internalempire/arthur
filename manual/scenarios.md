@@ -33,7 +33,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Question.** Can an apparently survivable arterial pressure conceal low effective filling?
 
-**Try.** Increase stressed volume, then return to the preset and switch the baroreflex off.
+**Try.** Add blood with **Blood added/removed**, then return to the preset and switch the baroreflex off.
 
 **Read.** Added [stressed volume](stressed-volume.md) raises Pmsf and output because the operating point has preload reserve. Removing the aggregate [baroreflex](baroreflex.md) exposes the pressure and flow that the selected circulation would generate without compensation. The fluid step and reflex coefficients are teaching choices, not resuscitation targets.
 
@@ -127,7 +127,7 @@ In the intact circulation, distinguish the first response from the settled respo
 
 **Question.** How can abdominal pressure both mobilise upstream venous pressure and obstruct venous return?
 
-**Try.** Change stressed volume at high abdominal pressure, then compare with normal abdominal pressure.
+**Try.** Add or remove blood at high abdominal pressure, then compare with normal abdominal pressure.
 
 **Read.** A filled abdominal venous reservoir can transmit pressure into Pmsf, while the same abdominal pressure raises the critical pressure for caval collapse. The preset also applies a separate positive chest-wall load to represent diaphragmatic transmission into the thorax. Filling determines which circulatory effect dominates. The pressure transfer is selected, not calculated from anatomy, and the model uses one aggregate venous-return pathway without separate SVC and IVC flow. See [abdominal pressure](abdominal-pressure.md), [pleural pressure](pleural-pressure.md) and [venous return](venous-return.md).
 
@@ -136,6 +136,8 @@ In the intact circulation, distinguish the first response from the settled respo
 Selecting a scenario first restores `defaultParams()` and then applies that scenario's explicit overrides. It does not inherit controls from the previously selected preset, apply a scripted sequence or force an outcome after selection. The application opens with *Healthy, breathing spontaneously*, but that opening preset is not the baseline from which the other scenarios are built. The code reference is the passive volume-control default shown below. Touching any control changes the label to *Custom* because the patient no longer matches the preset.
 
 The parameter sidebar marks every current setting that differs from this reference with a coloured dot and reports the total above the controls. The marks remain useful after the scenario label changes to *Custom*: they show which controls construct the present phenotype, not whether a value is abnormal or unsafe.
+
+Each loaded scenario starts with **Blood added/removed = 0 mL**, relative to its own starting patient volume. Where presets differ in blood volume, the table reports the **starting total blood volume in litres**, calculated by summing the compartments. That quantity can differ from the model reference while the intervention control reads zero.
 
 ### Preset parameter changes
 
@@ -151,7 +153,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | Ventilatory mode | Volume control | Spontaneous |
 | Ventilation | PEEP | 5 cmH₂O | 0 cmH₂O |
 | Ventilation | Inspiratory effort | 0.0 cmH₂O | 6.0 cmH₂O |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 850 mL |
+| Volume & vascular tone | Starting total blood volume | 5.08 L | 5.23 L |
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.90 mmHg·s/mL |
 | Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.35 mmHg/mL |
 
@@ -173,7 +175,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | Tidal volume | 450 mL | 560 mL |
 | Ventilation | PEEP | 5 cmH₂O | 8 cmH₂O |
 | Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 150 mL/cmH₂O |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 330 mL |
+| Volume & vascular tone | Starting total blood volume | 5.08 L | 4.71 L |
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.85 mmHg·s/mL |
 | Cardiac function | Baseline heart rate | 75 /min | 105 /min |
 | Cardiac function | Baroreflex | Off | On |
@@ -189,7 +191,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Respiratory mechanics | Aerated-lung compliance | 200 mL/cmH₂O | 60 mL/cmH₂O |
 | Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 120 mL/cmH₂O |
 | Respiratory mechanics | Airway resistance | 5.0 cmH₂O/L/s | 15.0 cmH₂O/L/s |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 1300 mL |
+| Volume & vascular tone | Starting total blood volume | 5.08 L | 5.68 L |
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 0.75 mmHg·s/mL |
 | Cardiac function | Baseline heart rate | 75 /min | 70 /min |
 
@@ -205,7 +207,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Respiratory mechanics | Compromised lung | 0.0% | 42.0% |
 | Respiratory mechanics | Opening profile | Non-reopenable | Reopenable, no memory |
 | Respiratory mechanics | Reopenable share of compromised lung | 0.0% | 38.9% |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 900 mL |
+| Volume & vascular tone | Starting total blood volume | 5.08 L | 5.28 L |
 | Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.26 mmHg/mL |
 | Pulmonary circulation | Open-lung PVR at FRC | 0.07 mmHg·s/mL | 0.19 mmHg·s/mL |
 | Respiratory mechanics | Opening midpoint (transpulmonary) | 20.0 cmH₂O | 15.5 cmH₂O |
@@ -219,7 +221,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | Respiratory rate | 14 /min | 24 /min |
 | Ventilation | PEEP | 5 cmH₂O | 0 cmH₂O |
 | Ventilation | Inspiratory effort | 0.0 cmH₂O | 6.0 cmH₂O |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 1050 mL |
+| Volume & vascular tone | Starting total blood volume | 5.08 L | 5.43 L |
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 1.25 mmHg·s/mL |
 | Cardiac function | Baseline heart rate | 75 /min | 118 /min |
 | Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.32 mmHg/mL |
@@ -233,7 +235,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | Respiratory rate | 14 /min | 20 /min |
 | Ventilation | PEEP | 5 cmH₂O | 0 cmH₂O |
 | Ventilation | Inspiratory effort | 0.0 cmH₂O | 10.0 cmH₂O |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 1050 mL |
+| Volume & vascular tone | Starting total blood volume | 5.08 L | 5.43 L |
 | Cardiac function | Baseline heart rate | 75 /min | 105 /min |
 | Cardiac function | Pericardial constraint | 1.0 × | 4.0 × |
 | Cardiac function | Pericardial capacity | 430 mL | 100 mL |
@@ -245,7 +247,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Ventilation | Respiratory rate | 14 /min | 18 /min |
 | Ventilation | PEEP | 5 cmH₂O | 10 cmH₂O |
 | Respiratory mechanics | Chest wall compliance | 200 mL/cmH₂O | 75 mL/cmH₂O |
-| Volume & vascular tone | Baseline stressed volume | 700 mL | 1050 mL |
+| Volume & vascular tone | Starting total blood volume | 5.08 L | 5.43 L |
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 1.25 mmHg·s/mL |
 | Cardiac function | Baseline heart rate | 75 /min | 95 /min |
 | Cardiac function | LV contractility (Ees) | 3.0 mmHg/mL | 0.6 mmHg/mL |

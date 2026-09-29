@@ -1,6 +1,44 @@
 # Project handover
 
-Updated: 2026-09-28
+Updated: 2026-09-29
+
+## Blood intervention and venous partition presentation — September 29
+
+The clinician approved replacing the ambiguous baseline-stressed control with
+**Blood added/removed**, a signed change from an explicit starting-patient volume,
+with the independently summed **Current total blood volume** shown in litres.
+The physiological `stressedVolume` prescription, its absolute bounds and the
+one-for-one reservoir addition/removal law are unchanged. An independent
+presentation reference is established by scenario selection, retained by Custom
+reset and full-state Pin, and saved as optional validated version-2 metadata.
+Older files start at zero at their own prescribed volume. The signed slider uses
+25 mL increments around zero and supports exact endpoints even for off-grid
+starting prescriptions (including the septic preset). Pin and Mechanisms display
+the same intervention reference as the controls.
+
+Beside venous capacity, show stressed blood as a percentage of current systemic
+venous reservoir blood, with numerator/denominator in mL. This excludes the IVC
+and other compartments, evolves with redistribution, and supplies no feedback.
+Both sidebar readouts reflect current state/controls, including paused edits;
+invalid partitions are withheld. Capacity help now explains the pressure-generating
+share in clinical language. Generated scenario tables report real starting total
+blood in litres instead of relabelling internal stressed-volume numbers as added
+blood. No physiological law, coefficient, preset or integration work is changed.
+The broader blood-distribution visualisation remains a separate next task.
+
+Verification: `npm test` passed 493 checks, including 17 targeted reference,
+conservation, file-compatibility and partition checks. `npm run test:ui` passed
+all 54 contracts after keeping the new read-only calculation behind the public
+model API. A real browser check passed signed keyboard/slider input and endpoints,
+immediate paused readings, evolving fractions, Pin/Mechanisms, patient download,
+reload, Custom reset, legacy files and 1440/390 px layouts. `npm run manual:examples`,
+`npm run manual:build` and `npm run manual:lint` passed; all 18 numerical blocks
+agree, with no lint errors or warnings. Existing scenario regressions passed;
+no snapshot targets or physiological tolerances were changed.
+
+Private evidence: `outputs/Arthur-volume-controls-2026-09-29/`
+and `codex-notes/Arthur-comandi-volume-2026-09-29.md`.
+
 
 ## Independent venous capacity — September 28
 

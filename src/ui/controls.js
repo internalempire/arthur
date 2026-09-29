@@ -1,4 +1,5 @@
 import { PARAMETERS, GROUPS } from '../model/index.js';
+import { bloodVolumeControl, volumeControlReadings, signedVolume, snapBloodVolumeChange } from './volume-controls.js';
 
 /** Return the typed value represented by a choice element's option index. */
 export function choiceValue(spec, selectedIndex) {
@@ -32,6 +33,7 @@ function openingDisabledReason(spec, params) {
 export function createControls(container, sim, onChange) {
   const rows = new Map();
   let profileSummary = null;
+  let bloodTotal, bloodReference, venousFraction;
   const reference = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
   const changeSummary = document.createElement('p');
   changeSummary.className = 'control-change-summary';
@@ -123,14 +125,28 @@ export function createControls(container, sim, onChange) {
       input.type = 'range';
       input.min = spec.min;
       input.max = spec.max;
-      input.step = spec.step;
+      input.step = spec.id === 'stressedVolume' ? 'any' : spec.step;
     }
     input.id = `ctrl-${spec.id}`;
     input.className = 'ctrl-input';
+    if (spec.id === 'stressedVolume') {
+      input.addEventListener('keydown', event => {
+        const direction = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1,
+          PageUp: 10, PageDown: -10 }[event.key];
+        if (!direction) return;
+        event.preventDefault();
+        const control = bloodVolumeControl(sim.params, sim.bloodVolumeReference);
+        const tick = direction > 0 ? Math.floor(control.value / spec.step) : Math.ceil(control.value / spec.step);
+        input.value = Math.max(control.min, Math.min(control.max, (tick + direction) * spec.step));
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    }
     input.addEventListener('input', () => {
       const v = spec.type === 'choice' ? choiceValue(spec, input.value)
         : spec.type === 'checkbox' ? input.checked
-          : parseFloat(input.value);
+          : spec.id === 'stressedVolume'
+            ? snapBloodVolumeChange(parseFloat(input.value), bloodVolumeControl(sim.params, sim.bloodVolumeReference)) + sim.bloodVolumeReference
+            : parseFloat(input.value);
       sim.setParam(spec.id, v);
       sync();
       // One control can decide whether another applies at all, so relevance is
@@ -150,13 +166,32 @@ export function createControls(container, sim, onChange) {
       row.appendChild(help);
     }
 
+    if (spec.id === 'stressedVolume' || spec.id === 'venousCapacityReduction') {
+      const reading = document.createElement('p');
+      reading.className = 'ctrl-reading';
+      reading.id = spec.id === 'stressedVolume' ? 'blood-volume-total' : 'venous-stressed-fraction';
+      row.appendChild(reading);
+      if (spec.id === 'stressedVolume') {
+        bloodTotal = reading;
+        bloodReference = document.createElement('p');
+        bloodReference.className = 'ctrl-reading ctrl-reference';
+        bloodReference.id = 'blood-volume-reference';
+        row.appendChild(bloodReference);
+        input.setAttribute('aria-describedby', 'blood-volume-reference blood-volume-total');
+      } else {
+        venousFraction = reading;
+        input.setAttribute('aria-describedby', 'venous-stressed-fraction');
+      }
+    }
     rows.set(spec.id, { spec, row, input, value, info, help });
     return row;
   }
 
   function paint(spec, input, value) {
     const v = sim.params[spec.id];
-    if (spec.type === 'choice') {
+    if (spec.id === 'stressedVolume') {
+      value.textContent = `${signedVolume(v - sim.bloodVolumeReference)} mL`;
+    } else if (spec.type === 'choice') {
       value.textContent = spec.options.find((option) => Object.is(option.value, v))?.label ?? v;
     } else if (spec.type === 'checkbox') {
       value.textContent = v ? 'On' : 'Off';
@@ -221,13 +256,19 @@ export function createControls(container, sim, onChange) {
   /** Reflect the simulator's parameters back into the inputs. */
   function sync() {
     for (const { spec, input, value } of rows.values()) {
-      if (spec.type === 'checkbox') input.checked = Boolean(sim.params[spec.id]);
+      if (spec.id === 'stressedVolume') {
+        const volume = bloodVolumeControl(sim.params, sim.bloodVolumeReference);
+        input.min = volume.min;
+        input.max = volume.max;
+        input.value = volume.value;
+      } else if (spec.type === 'checkbox') input.checked = Boolean(sim.params[spec.id]);
       else if (spec.type === 'choice') input.value = String(choiceIndex(spec, sim.params[spec.id]));
       else input.value = sim.params[spec.id];
       paint(spec, input, value);
     }
     refreshRelevance();
     refreshModified();
+    renderReadouts();
     const p = sim.params;
     if (profileSummary) profileSummary.textContent = p.collapsed === 0
       ? 'No compromised component. The selected profile will apply if one is added.'
@@ -239,6 +280,17 @@ export function createControls(container, sim, onChange) {
             ? `closing midpoint ${p.pClose} cmH₂O.` : 'opening and closing share the same range.');
   }
 
+  function renderReadouts() {
+    const reading = volumeControlReadings(sim);
+    const litres = value => Number.isFinite(value) ? `${(value / 1000).toFixed(2)} L` : '—';
+    bloodTotal.textContent = `Current total blood volume: ${litres(reading.total)}`;
+    bloodReference.textContent = `Zero = starting patient volume (${litres(reading.initialTotal)}).`;
+    venousFraction.textContent = reading.fraction === null
+      ? 'Stressed fraction unavailable: venous partition outside its range.'
+      : `Stressed: ${(100 * reading.fraction).toFixed(1)}% of current systemic venous blood `
+        + `(${reading.stressed.toFixed(0)} / ${reading.reservoir.toFixed(0)} mL).`;
+  }
+
   sync();
-  return { sync };
+  return { sync, renderReadouts };
 }

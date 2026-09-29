@@ -4,7 +4,8 @@
 // manoeuvre, its parameters, formatting and prose-facing label together here.
 // The writer and test suite both regenerate these blocks from a fresh Simulator.
 
-import { Simulator } from '../src/model/simulator.js';
+import { Simulator, COMPARTMENTS } from '../src/model/simulator.js';
+import { createCirculationState } from '../src/model/circulation.js';
 import { defaultParams, GROUPS, PARAMETERS } from '../src/model/parameters.js';
 import { SCENARIOS } from '../src/model/scenarios.js';
 import { RECRUITMENT_PROFILES } from '../src/model/recruitment.js';
@@ -476,6 +477,11 @@ function ivcRespiratoryBlock() {
 }
 
 function scenarioValue(spec, value) {
+  if (spec.id === 'stressedVolume') {
+    const circulation = createCirculationState({ ...defaultParams(), stressedVolume: value });
+    const total = COMPARTMENTS.reduce((sum, key) => sum + circulation[key], 0);
+    return `${(total / 1000).toFixed(2)} L`;
+  }
   if (spec.type === 'choice') {
     return spec.options.find((option) => option.value === value)?.label ?? String(value);
   }
@@ -510,7 +516,7 @@ function scenarioOverridesBlock() {
       '',
       '| domain | control | model reference | preset value |',
       '|---|---|---:|---:|',
-      ...changed.map((spec) => `| ${groupNames.get(spec.group)} | ${spec.label} | ${scenarioValue(spec, reference[spec.id])} | ${scenarioValue(spec, scenario.params[spec.id])} |`),
+      ...changed.map((spec) => `| ${groupNames.get(spec.group)} | ${spec.id === 'stressedVolume' ? 'Starting total blood volume' : spec.label} | ${scenarioValue(spec, reference[spec.id])} | ${scenarioValue(spec, scenario.params[spec.id])} |`),
       '',
     ];
   });

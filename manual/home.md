@@ -26,7 +26,7 @@ Play/Pause stops or resumes simulated time. The speed selector changes how quick
 |---|---|---|
 | ventilation | mode, rate, tidal volume or inspiratory pressure, PEEP, inspiratory time and effort | [Ventilation controls](controls-ventilation.md) |
 | respiratory mechanics | lung and chest-wall mechanics, collapse, recruitment, hysteresis, flow limitation and abdominal coupling | [Mechanics controls](controls-mechanics.md) |
-| volume and vascular tone | stressed volume, venous compliance, resistance to venous return and systemic vascular resistance | [Volume controls](controls-volume.md) |
+| volume and vascular tone | blood added/removed, venous capacity and compliance, resistance to venous return and systemic vascular resistance | [Volume controls](controls-volume.md) |
 | cardiac function | rate, biventricular contractility, LV diastolic stiffness, baroreflex and ventricular interaction | [Heart controls](controls-heart.md) |
 | pulmonary circulation | open-lung vascular resistance, hypoxic vasoconstriction and pulmonary capacitance coupling | [Pulmonary controls](controls-pulmonary.md) |
 

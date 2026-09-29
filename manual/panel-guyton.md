@@ -90,7 +90,7 @@ Occlusion marks retain their measured pressure/venous-inflow meaning. Their extr
 
 ## Venous capacity in the data view
 
-The **?** values-and-description view separates the manual capacity reduction, the baroreflex contribution and their total, in mL. Positive values lower the systemic venous zero-transmural-pressure volume; negative values raise it. These are current model quantities, alongside the current stressed/unstressed partition and compliance. They are not catheter measurements or breath-mean volumes. Changing capacity conserves actual blood volume; changing **Baseline stressed volume** adds or removes blood. Neither intervention guarantees greater output. See [Volume controls](controls-volume.md).
+The **?** values-and-description view separates the manual capacity reduction, the baroreflex contribution and their total, in mL. Positive values lower the systemic venous zero-transmural-pressure volume; negative values raise it. These are current model quantities, alongside the current stressed/unstressed partition and compliance. They are not catheter measurements or breath-mean volumes. Changing capacity conserves actual blood volume; changing **Blood added/removed** adds or removes blood. Neither intervention guarantees greater output. See [Volume controls](controls-volume.md).
 
 ## References
 

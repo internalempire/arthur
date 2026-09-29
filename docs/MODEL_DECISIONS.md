@@ -1,5 +1,18 @@
 # Model decisions
 
+## 2026-09-29 — Separate volume intervention, actual total and observed venous fraction
+
+Expose the actual blood intervention as a signed difference from an explicit
+patient starting volume, and display the current summed blood total in litres.
+Keep the internal prescription and allowed physiological range unchanged. Store
+the zero reference as presentation metadata rather than a physiological effector;
+validate/preserve it in patient files and keep it in Pin copies and Custom resets.
+An older file without that metadata defines its own zero. The venous percentage
+is an observation of stressed volume/current reservoir volume, not a feedback
+target that would silently adjust capacity during redistribution. No extra
+simulation, dependency or integration state is needed.
+
+
 ## 2026-09-28 — Independent systemic venous capacity
 
 The clinician authorized a signed capacity-reduction control, −200 to +200 mL

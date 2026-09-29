@@ -199,7 +199,9 @@ export function createMechanismsPanel(host) {
     host.querySelector('.mechanism-settings').hidden = suspended;
     setText(host.querySelector('.mechanism-context'), `Current patient vs State ${next.reference.id} · ${next.running ? 'Running' : 'Paused'}`);
     if (suspended) return;
-    const changes = pinSettingChanges(next.reference.sim.params, next.current.params);
+    const changes = pinSettingChanges(next.reference.sim.params, next.current.params, {
+      referenceBloodVolume: next.reference.sim.bloodVolumeReference, currentBloodVolume: next.current.bloodVolumeReference,
+    });
     const key = JSON.stringify(changes);
     if (key !== settingsKey) {
       settingsKey = key;

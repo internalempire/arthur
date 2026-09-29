@@ -18,7 +18,7 @@ export const TRACE_SAMPLE_HZ = 250;
 export const TRACE_SECONDS = 12;
 const TRACE_LEN = TRACE_SAMPLE_HZ * TRACE_SECONDS;
 const MEAN_TIME_CONSTANT = 3; // s, for the mean-pressure moving averages
-const COMPARTMENTS = ['vSa', 'vSv', 'vIVC', 'vRa', 'vRv', 'vPa', 'vPt', 'vPv', 'vLa', 'vLv'];
+export const COMPARTMENTS = ['vSa', 'vSv', 'vIVC', 'vRa', 'vRv', 'vPa', 'vPt', 'vPv', 'vLa', 'vLv'];
 
 class Ring {
   constructor(n) { this.buf = new Float32Array(n); this.n = n; this.i = 0; this.filled = 0; }
@@ -95,6 +95,7 @@ export class Simulator {
   constructor({ dt = DEFAULT_DT } = {}) {
     this.dt = dt;
     this.params = defaultParams();
+    this.bloodVolumeReference = this.params.stressedVolume; // presentation zero, not physiology
     this.reset();
   }
 
@@ -244,6 +245,7 @@ export class Simulator {
    */
   applyScenario(scenario) {
     this.params = { ...defaultParams(), ...scenario.params };
+    this.bloodVolumeReference = this.params.stressedVolume;
     this.reset();
   }
 
@@ -252,8 +254,9 @@ export class Simulator {
    * Dynamic state is intentionally discarded: a portable debugging case must
    * reproduce the same inputs, not resume halfway through one particular beat.
    */
-  applyPatientParameters(parameters) {
+  applyPatientParameters(parameters, bloodVolumeReference = parameters.stressedVolume ?? defaultParams().stressedVolume) {
     this.params = { ...defaultParams(), ...parameters };
+    this.bloodVolumeReference = bloodVolumeReference;
     this.reset();
   }
 

@@ -20,7 +20,7 @@ This is why norepinephrine can have a clinically useful “fluid-like” venous 
 
 ## In the model
 
-The **Venous capacity reduction** control independently changes the systemic venous zero-transmural-pressure volume. Positive values reduce capacity; negative values increase it. The range is −200 to +200 mL in 25 mL steps, with a neutral default of 0. It changes neither actual blood volume nor the venous compliance slope. It represents a mechanical intervention, not a drug dose.
+The **Venous capacity reduction** control independently changes the systemic venous zero-transmural-pressure volume. Positive values reduce capacity; negative values increase it. The range is −200 to +200 mL in 25 mL steps, with a neutral default of 0. It changes neither actual blood volume nor the venous compliance slope. It represents a mechanical intervention, not a drug dose. Its adjacent stressed-percentage reading describes the current venous partition; it can change as blood redistributes and is not held at a chosen target. The separate **Blood added/removed** control changes actual circulating blood relative to the stated starting patient volume.
 
 When enabled, the aggregate [baroreflex](baroreflex.md) adds its own capacity shift alongside its other three effectors. The total reduction is:
 

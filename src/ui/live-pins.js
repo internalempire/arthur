@@ -1,4 +1,5 @@
 import { PARAMETERS } from '../model/index.js';
+import { signedVolume } from './volume-controls.js';
 
 export const MAX_LIVE_PINS = 4;
 
@@ -36,10 +37,16 @@ function displayValue(parameter, value) {
 }
 
 /** Differences always read from the row's fixed prescription toward the current one. */
-export function pinSettingChanges(reference, current) {
+export function pinSettingChanges(reference, current, {
+  referenceBloodVolume = reference.stressedVolume, currentBloodVolume = referenceBloodVolume,
+} = {}) {
   return PARAMETERS.filter(p => reference[p.id] !== current[p.id]).map(p => ({
     id: p.id,
-    text: `${p.label}: ${displayValue(p, reference[p.id])} → ${displayValue(p, current[p.id])}${p.unit ? ` ${p.unit}` : ''}`,
+    text: p.id === 'stressedVolume'
+      ? (referenceBloodVolume === currentBloodVolume
+        ? `${p.label}: ${signedVolume(reference.stressedVolume - referenceBloodVolume)} → ${signedVolume(current.stressedVolume - currentBloodVolume)} mL`
+        : `Blood volume difference: ${signedVolume(current.stressedVolume - reference.stressedVolume)} mL (different starting references)`)
+      : `${p.label}: ${displayValue(p, reference[p.id])} → ${displayValue(p, current[p.id])}${p.unit ? ` ${p.unit}` : ''}`,
   }));
 }
 
@@ -57,7 +64,7 @@ export function createLivePinTable(container, pins, onChange) {
   const message = container.querySelector('.pin-message');
   const rows = new Map();
 
-  function render(params, { historical = false, running = true } = {}) {
+  function render(params, { historical = false, running = true, bloodVolumeReference } = {}) {
     container.hidden = pins.states.length === 0;
     summary.textContent = `${pins.states.length}/${MAX_LIVE_PINS} references · ${running ? 'Running' : 'Paused'}`;
     const selected = pins.selected;
@@ -91,7 +98,9 @@ export function createLivePinTable(container, pins, onChange) {
       }
       row.querySelector('input').checked = pins.selectedId === state.id;
       row.classList.toggle('pin-selected', pins.selectedId === state.id);
-      const changes = pinSettingChanges(state.sim.params, params);
+      const changes = pinSettingChanges(state.sim.params, params, {
+        referenceBloodVolume: state.sim.bloodVolumeReference, currentBloodVolume: bloodVolumeReference,
+      });
       const cell = row.querySelector('.pin-changes');
       const text = changes.map(change => change.text).join('\n') || 'Same control settings';
       if (cell.textContent !== text) cell.textContent = text;

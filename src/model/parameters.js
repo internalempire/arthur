@@ -143,14 +143,16 @@ export const PARAMETERS = [
 
   // --------------------------------------------------------------------- volume
   {
-    id: 'stressedVolume', group: 'volume', label: 'Baseline stressed volume', unit: 'mL',
+    // Stored initial stressed-volume prescription. The UI subtracts the patient's
+    // presentation reference; these bounds/default remain physiological inputs.
+    id: 'stressedVolume', group: 'volume', label: 'Blood added/removed', unit: 'mL',
     min: 200, max: 1800, step: 25, default: 700,
-    help: 'The adjustable baseline volume above the systemic venous zero-pressure volume. Changing it adds or removes the same amount of blood from the venous reservoir; venous tone can then mobilise an additional amount without adding blood.',
+    help: 'Positive values add blood; negative values remove it, relative to the starting patient volume shown below. Blood enters or leaves the systemic venous reservoir and then redistributes. Zero is preserved through Reset, Pin and patient saving. This is a change in blood volume, not the total blood volume or the current stressed volume.',
   },
   {
     id: 'venousCapacityReduction', group: 'volume', label: 'Venous capacity reduction', unit: 'mL',
     min: -200, max: 200, step: 25, default: 0,
-    help: 'Positive values reduce the systemic venous zero-transmural-pressure volume; negative values increase it. No blood is added or removed, and venous compliance is unchanged. This manual shift remains active with the baroreflex off and adds to its contribution when on. It is a mechanical intervention, not a drug dose.',
+    help: 'Positive values reduce venous capacity: more of the blood already present generates filling pressure. Negative values increase capacity and have the opposite effect. No blood is added or removed; venous compliance stays unchanged. This manual shift adds to the baroreflex contribution. The stressed percentage below follows the blood currently in the systemic venous reservoir; it is not held fixed.',
   },
   {
     id: 'csv', group: 'volume', label: 'Venous compliance (slope)', unit: 'mL/mmHg',

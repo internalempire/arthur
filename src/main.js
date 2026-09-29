@@ -105,7 +105,7 @@ function showStateStatus(message, kind = 'ok') {
 }
 
 function applyLoadedPatientState(parsed) {
-  sim.applyPatientParameters(parsed.params);
+  sim.applyPatientParameters(parsed.params, parsed.bloodVolumeReference);
   sim.advance(20, true);
   controls.sync();
   scenarioSelect.value = '';
@@ -129,7 +129,7 @@ function applyLoadedPatientState(parsed) {
 }
 
 el('save-patient').addEventListener('click', () => {
-  const state = createPatientState(sim.params);
+  const state = createPatientState(sim.params, undefined, sim.bloodVolumeReference);
   const json = `${JSON.stringify(state, null, 2)}\n`;
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -219,7 +219,7 @@ function renderComparison(view) {
   const historical = inspectingPast();
   const reference = historical ? null : livePins.selected;
   stats.render(view.metrics, reference?.sim.metrics ?? null, reference ? `State ${reference.id}` : '');
-  pinTable.render(sim.params, { historical, running });
+  pinTable.render(sim.params, { historical, running, bloodVolumeReference: sim.bloodVolumeReference });
   mechanisms.sync({ current: sim, reference: livePins.selected, historical, running });
   pinState.disabled = historical || livePins.states.length >= MAX_LIVE_PINS;
   pinState.title = historical
@@ -342,6 +342,7 @@ function draw() {
   thorax.render(view, colors);
   renderComparison(view);
   descriptions.render(view);
+  controls.renderReadouts();
   dirty = false;
 }
 
@@ -389,6 +390,7 @@ function frame(now) {
       waveforms.renderReadouts(view.metrics, colors);
       renderComparison(view);
       descriptions.render(view);
+      controls.renderReadouts();
       syncManoeuvreButtons();
       statsClock = 0;
     }
@@ -416,7 +418,7 @@ window.heartLung = {
     return sim.metrics;
   },
   /** Return the same portable object written by the Save patient control. */
-  patientState() { return createPatientState(sim.params); },
+  patientState() { return createPatientState(sim.params, undefined, sim.bloodVolumeReference); },
   /** Load a parsed patient-state object from a console or embedding page. */
   loadPatientState(candidate) { return applyLoadedPatientState(parsePatientState(candidate)); },
 };

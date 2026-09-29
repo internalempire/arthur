@@ -1266,3 +1266,13 @@ input[type="range"]:disabled { cursor: not-allowed; }
   .mechanism-detail dl { grid-template-columns: 1fr; }
   .mechanism-detail dd { margin-bottom: 8px; }
 }
+
+/* Observed blood totals and venous partition stay distinct from prescriptions. */
+.ctrl-reading {
+  margin: 5px 0 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.ctrl-reference { color: var(--ink-muted); }

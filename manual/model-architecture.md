@@ -29,7 +29,7 @@ The public API is a deliberate boundary. Browser UI modules import model functio
 
 ## State and integration
 
-The circulation contains eight pressure-bearing compliant compartments—systemic artery and vein, both atria and ventricles, pulmonary artery and pulmonary vein—plus one pressureless pulmonary transport volume represented by eight mixing stages. Blood moves through one closed loop and total represented blood volume is conserved unless the user changes baseline stressed volume.
+The circulation contains eight pressure-bearing compliant compartments—systemic artery and vein, both atria and ventricles, pulmonary artery and pulmonary vein—plus one pressureless pulmonary transport volume represented by eight mixing stages. Blood moves through one closed loop and total represented blood volume is conserved unless the user adds or removes blood with the volume control.
 
 The ordinary differential equations use forward Euler integration with a fixed 0.25 ms step. The small step is required by low valve resistances. Protective flow limiting prevents a compartment from being drained below its numerical volume floor; reaching that protection marks the result invalid rather than silently treating the clipped state as physiology.
 

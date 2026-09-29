@@ -38,6 +38,7 @@ section('Public model API');
     'cardiacFunctionCurve', 'cardiacResponseParameters', 'createCardiacResponseWorker',
     'clamp', 'cmH2OtoMmHg', 'curveIntersection',
     'chestWallComplianceAt', 'chestWallNeutralVolume', 'chestWallPressure',
+    'bloodVolumeReadings',
     'createPatientState',
     'lungRegions', 'lungVolumeAtPl', 'openBand', 'openFractionFromRecruitmentState',
     'parsePatientState', 'patientParameterOverrides', 'pericardialPressure', 'preloadLimbs',

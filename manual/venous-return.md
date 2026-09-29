@@ -126,7 +126,7 @@ The resistance to venous return is a single control. One systemic reservoir keep
 
 - **No number on this diagram is a target.** The construction shows the shape of a patient's reserve, not a value to resuscitate towards.
 - The model's mean systemic filling pressure is exact and always available. At the bedside it is not measurable without a manoeuvre whose own assumptions are questionable, and the model deliberately shows how far that manoeuvre's estimate can sit from the truth.
-- Preload responsiveness in this model is a movement along its own curves in response to its own stressed-volume control. That is not the same as a patient's response to 500 mL of crystalloid, which redistributes.
+- Preload responsiveness in this model is a movement along its own curves in response to its own blood added/removed control. That is not the same as a patient's response to 500 mL of crystalloid, which redistributes.
 
 ---
 

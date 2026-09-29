@@ -110,10 +110,21 @@ the model's remote asymptotes as universal human constants.
 
 ## 3. Volume, venous tone and compliance are separate
 
-The adjustable `stressedVolume` is the baseline amount above the systemic
-venous zero-pressure volume. Moving the control by 500 mL adds or removes 500 mL
-of actual blood from that reservoir. It is an instantaneous teaching manoeuvre,
-not a model of infusion kinetics or transcapillary redistribution.
+The internal `stressedVolume` prescription sets the initial amount above the
+systemic venous zero-pressure volume. Its physiological range is unchanged.
+The UI presents **Blood added/removed** as its difference from a separately
+stored starting-patient reference. Adjusting it adds or removes actual blood
+one-for-one. The current total is independently summed across all ten blood
+compartments and displayed in litres. The reference is presentation metadata:
+changing it cannot alter pressure, volume or flow. Scenario selection establishes
+its own zero, Custom reset and Pin retain it, and version-2 files save it as
+optional metadata; older files use their prescribed volume as zero.
+
+The stressed percentage is current systemic venous stressed volume divided by
+current systemic venous blood volume, excluding IVC and all other compartments.
+It follows redistribution and is never used as feedback. An impossible fraction
+is unavailable. Sidebar observations use current controls/state even during
+historical waveform inspection and respond to paused volume/capacity edits.
 
 The independent `venousCapacityReduction` control shifts the systemic venous
 zero-transmural-pressure volume, whose neutral value is 2,750 mL (the separate
