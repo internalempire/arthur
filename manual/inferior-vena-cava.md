@@ -43,7 +43,7 @@ $$
 - $C_{IVC} = 20$ mL/mmHg — IVC compliance, within the published range of 15–40 mL/mmHg
 - $P_{ab}$ — abdominal pressure, mmHg; the IVC is intra-abdominal
 
-With both manual and reflex capacity shifts at zero, combined systemic venous unstressed volume is 2,800 mL: 2,750 mL in the splanchnic reservoir and 50 mL in the IVC. Manual and reflex capacity reductions change the reservoir intercept; the IVC zero-pressure volume stays at 50 mL. The **Blood added/removed** control adds blood to the splanchnic reservoir; IVC volume follows the balance of inflow and outflow and is not a second user input.
+With both manual and reflex capacity shifts at zero, combined systemic venous unstressed volume is 2,800 mL: 2,750 mL in the splanchnic reservoir and 50 mL in the IVC. Manual and reflex capacity reductions change the reservoir intercept; the IVC zero-pressure volume stays at 50 mL. Applying **Blood volume change** adds or removes blood in the splanchnic reservoir; IVC volume follows the balance of inflow and outflow and is not a second user input.
 
 ### Split resistance to venous return
 

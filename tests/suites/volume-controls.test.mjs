@@ -1,6 +1,6 @@
 import { section, check, near, Simulator, defaultParams, totalVolume } from '../support/model.mjs';
 import { SCENARIO_BY_ID } from '../../src/model/scenarios.js';
-import { bloodVolumeControl, volumeControlReadings, snapBloodVolumeChange } from '../../src/ui/volume-controls.js';
+import { bloodVolumeControl, bloodVolumeDoseControl, applyBloodVolumeDose, volumeControlReadings, snapBloodVolumeChange } from '../../src/ui/volume-controls.js';
 import { createPatientState, parsePatientState } from '../../src/model/patient-state.js';
 import { LivePins, pinSettingChanges } from '../../src/ui/live-pins.js';
 
@@ -39,10 +39,10 @@ restored.reset();
 check('Reset retains the zero reference of a custom patient', restored.bloodVolumeReference === reference
   && bloodVolumeControl(restored.params, restored.bloodVolumeReference).value === 200);
 const changes = pinSettingChanges(pin.sim.params, sim.params, {
-  referenceBloodVolume: pin.sim.bloodVolumeReference, currentBloodVolume: sim.bloodVolumeReference,
+  referenceTotal: totalVolume(pin.sim.circ), currentTotal: totalVolume(sim.circ),
 });
 check('Pin preserves the starting reference and reports additions rather than the internal prescription',
-  pin.sim.bloodVolumeReference === reference && changes.some(change => change.text === 'Blood added/removed: 0 → +200 mL'));
+  pin.sim.bloodVolumeReference === reference && changes.some(change => change.text === 'Total blood volume: 4.71 → 4.91 L (+200 mL)'));
 const legacy = { ...saved };delete legacy.bloodVolumeReference;
 const old = parsePatientState(legacy);
 check('older version-2 files start at zero without losing their prescribed blood',
@@ -62,3 +62,32 @@ check('an impossible stressed fraction is unavailable rather than clipped to a p
 sim.applyScenario(SCENARIO_BY_ID.get('healthy-vcv'));
 check('a newly selected scenario establishes its own zero', sim.bloodVolumeReference === defaultParams().stressedVolume
   && bloodVolumeControl(sim.params, sim.bloodVolumeReference).value === 0);
+
+section('Explicit blood applications and cumulative limits');
+const dosing = new Simulator();
+const initial = totalVolume(dosing.circ);
+const initialReference = dosing.bloodVolumeReference;
+check('two equal applications accumulate while preserving the patient reference',
+  applyBloodVolumeDose(dosing, 250) && applyBloodVolumeDose(dosing, 250)
+  && near(totalVolume(dosing.circ), initial + 500, 1e-7)
+  && dosing.bloodVolumeReference === initialReference);
+check('removal is an exact negative intervention', applyBloodVolumeDose(dosing, -100)
+  && near(totalVolume(dosing.circ), initial + 400, 1e-7));
+const limits = bloodVolumeDoseControl(dosing.params);
+const unchanged = totalVolume(dosing.circ);
+check('invalid or excessive doses are rejected without partial delivery',
+  [0, NaN, Infinity, limits.min - 1, limits.max + 1].every(dose => !applyBloodVolumeDose(dosing, dose))
+  && totalVolume(dosing.circ) === unchanged);
+check('the upper cumulative endpoint is reachable, then further addition is rejected',
+  applyBloodVolumeDose(dosing, limits.max) && bloodVolumeDoseControl(dosing.params).max === 0
+  && !applyBloodVolumeDose(dosing, 25) && dosing.params.stressedVolume === 1800);
+check('the lower endpoint remains reachable by removal and prevents excess withdrawal',
+  applyBloodVolumeDose(dosing, bloodVolumeDoseControl(dosing.params).min)
+  && dosing.params.stressedVolume === 200 && !applyBloodVolumeDose(dosing, -25));
+check('capacity alone creates no total-blood difference in Pin',
+  !pinSettingChanges(sim.params, { ...sim.params, venousCapacityReduction: 100 }, {
+    referenceTotal: 5080, currentTotal: 5080 + 1e-9,
+  }).some(change => change.id === 'totalBloodVolume'));
+check('actual blood differences are visible even with identical parameter vectors',
+  pinSettingChanges(sim.params, sim.params, { referenceTotal: 5080, currentTotal: 5330 })
+    .some(change => change.text === 'Total blood volume: 5.08 → 5.33 L (+250 mL)'));

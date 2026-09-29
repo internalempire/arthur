@@ -78,7 +78,7 @@ function applyScenario(id) {
   if (!scenario) { scenarioNote.textContent = ''; return; }
   sim.applyScenario(scenario);
   sim.advance(20, true);
-  controls.sync();
+  controls.sync({ resetBloodDose: true });
   clearTrails();
   resetPresentationHistory();
   dirty = true;
@@ -107,7 +107,7 @@ function showStateStatus(message, kind = 'ok') {
 function applyLoadedPatientState(parsed) {
   sim.applyPatientParameters(parsed.params, parsed.bloodVolumeReference);
   sim.advance(20, true);
-  controls.sync();
+  controls.sync({ resetBloodDose: true });
   scenarioSelect.value = '';
   scenarioNote.textContent = '';
   clearTrails();
@@ -219,7 +219,7 @@ function renderComparison(view) {
   const historical = inspectingPast();
   const reference = historical ? null : livePins.selected;
   stats.render(view.metrics, reference?.sim.metrics ?? null, reference ? `State ${reference.id}` : '');
-  pinTable.render(sim.params, { historical, running, bloodVolumeReference: sim.bloodVolumeReference });
+  pinTable.render(sim, { historical, running });
   mechanisms.sync({ current: sim, reference: livePins.selected, historical, running });
   pinState.disabled = historical || livePins.states.length >= MAX_LIVE_PINS;
   pinState.title = historical
@@ -297,7 +297,7 @@ el('reset').addEventListener('click', () => {
   sim.reset();
   if (current) applyScenario(current);
   else {
-    controls.sync();
+    controls.sync({ resetBloodDose: true });
     resetPresentationHistory();
   }
   clearTrails();

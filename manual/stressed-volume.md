@@ -34,7 +34,7 @@ A rise in stressed volume usually raises the pressure available to drive venous 
 
 ## In the model
 
-`Blood added/removed` is an actual-volume intervention relative to the starting patient volume. Increasing it by 500 mL immediately adds 500 mL to the systemic venous reservoir and therefore increases total model blood volume by the same amount. Decreasing it removes blood. The adjacent total is the sum of all circulating blood, expressed in litres. Subsequent circulation redistributes some of that blood among compartments, so the settled stressed-volume readout need not differ by exactly 500 mL.
+`Blood volume change` prepares a dose without changing the patient. Applying +500 mL immediately adds 500 mL to the systemic venous reservoir and therefore increases total model blood volume by the same amount. Applying a negative dose removes blood. The selector returns to zero after application; the separate cumulative balance retains the intervention relative to the starting patient volume. The adjacent total is the sum of all circulating blood, expressed in litres. Subsequent circulation redistributes some of that blood among compartments, so the settled stressed-volume readout need not differ by exactly 500 mL.
 
 At neutral tone the systemic venous zero-transmural-pressure volume is 2,750 mL. The separate inferior vena cava conduit has another 50 mL of zero-pressure volume; it is not part of this reservoir. The neutral model starts with 700 mL above that reservoir intercept and the default venous compliance is 100 mL/mmHg. These are aggregate teaching values for one reservoir, not estimates of a patient's total unstressed or stressed volume.
 
@@ -70,7 +70,7 @@ The control is instantaneous because the intended lesson is the new haemodynamic
 - There is one systemic venous reservoir rather than separate splanchnic, muscular, cutaneous and renal capacitance beds.
 - The venous pressure-volume relation is linear above one zero-pressure volume; real veins recruit, change shape and become progressively less compliant.
 - There is no stress relaxation, transcapillary fluid shift, glycocalyx, interstitial compartment or time-dependent distribution after a bolus.
-- The blood added/removed control changes blood directly in the reservoir; it is not a simulated crystalloid, colloid or transfusion.
+- The blood-volume application changes blood directly in the reservoir; it is not a simulated crystalloid, colloid or transfusion.
 - The numerical partition is exact inside the model but cannot be measured directly at the bedside.
 
 ### Of clinical application

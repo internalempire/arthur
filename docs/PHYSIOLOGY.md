@@ -112,10 +112,11 @@ the model's remote asymptotes as universal human constants.
 
 The internal `stressedVolume` prescription sets the initial amount above the
 systemic venous zero-pressure volume. Its physiological range is unchanged.
-The UI presents **Blood added/removed** as its difference from a separately
-stored starting-patient reference. Adjusting it adds or removes actual blood
-one-for-one. The current total is independently summed across all ten blood
-compartments and displayed in litres. The reference is presentation metadata:
+The UI prepares a **Blood volume change** dose; only pressing Apply or Remove
+adds or removes actual blood one-for-one. The selector returns to zero after
+application. A separate cumulative balance uses the stored starting-patient
+reference, while Pin compares actual total blood rather than a pending dose.
+The current total is independently summed across all ten blood compartments and displayed in litres. The reference is presentation metadata:
 changing it cannot alter pressure, volume or flow. Scenario selection establishes
 its own zero, Custom reset and Pin retain it, and version-2 files save it as
 optional metadata; older files use their prescribed volume as zero.

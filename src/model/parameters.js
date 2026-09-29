@@ -143,11 +143,11 @@ export const PARAMETERS = [
 
   // --------------------------------------------------------------------- volume
   {
-    // Stored initial stressed-volume prescription. The UI subtracts the patient's
-    // presentation reference; these bounds/default remain physiological inputs.
-    id: 'stressedVolume', group: 'volume', label: 'Blood added/removed', unit: 'mL',
+    // Stored absolute initial-volume prescription. The UI applies explicit doses
+    // to it and separately displays the balance from the patient's reference.
+    id: 'stressedVolume', group: 'volume', label: 'Blood volume change', unit: 'mL',
     min: 200, max: 1800, step: 25, default: 700,
-    help: 'Positive values add blood; negative values remove it, relative to the starting patient volume shown below. Blood enters or leaves the systemic venous reservoir and then redistributes. Zero is preserved through Reset, Pin and patient saving. This is a change in blood volume, not the total blood volume or the current stressed volume.',
+    help: 'Choose how much blood to add or remove, then press Apply or Remove. Total circulating blood changes by that amount. Blood enters or leaves the systemic venous reservoir, initially changing its stressed volume, then redistributes. The selector returns to zero after each application; the applied blood change remains. This is an instantaneous intravascular change, without infusion time or fluid escape into tissues.',
   },
   {
     id: 'venousCapacityReduction', group: 'volume', label: 'Venous capacity reduction', unit: 'mL',

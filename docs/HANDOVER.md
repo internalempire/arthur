@@ -2,6 +2,48 @@
 
 Updated: 2026-09-29
 
+## Explicit blood applications and Pin totals — September 29
+
+The clinician approved a prepared signed dose with a separate Apply/Remove
+button, returning the selector to zero after each intervention. Selecting a dose
+has no model effect and does not mark a preset Custom. Each application uses
+the existing one-for-one venous-reservoir volume change, accumulates in the
+physical prescription and marks the current patient Custom. The pending dose
+is UI-only; no new physiological state, equation, coefficient or integration
+work is added. The runtime remains dependency-free vanilla JavaScript.
+
+Current total blood (litres), cumulative net added/removed (mL) and the starting
+patient total are independent of the zeroed selector. Available dose bounds
+follow the current prescription, preserving its existing absolute limits and
+allowing exact off-grid endpoints. Out-of-range applications are rejected,
+never partially delivered. The zero-dose button is disabled. Scenario selection,
+Custom reset and patient loading discard pending doses; Custom reset and saved
+patients retain applied blood and its reference. Unsubmitted doses are not
+serialized or inherited by Pin. Existing version-2 compatibility is retained.
+
+Pin and Mechanisms compare actual summed total blood, reference → current in
+litres with signed mL difference, independently of the pending dose and its
+starting reference. Repeated applications remain visible; capacity-only changes
+do not imply added blood. Floating-point conservation noise below 1e-6 mL is
+ignored. No intervention history or separate attribution calculation is added.
+Manual pages explain current behavior and the idealized instantaneous,
+entirely intravascular intervention, without fluid pharmacology.
+
+Verification: `npm test` completed with 500 passes, no failures and exit zero.
+The seven new checks cover repeated doses, withdrawal, invalid requests,
+cumulative endpoints and actual Pin totals. `npm run test:ui` passed all 54
+contracts. Real-browser checks passed pending-dose isolation, keyboard delivery,
+two successive loads and removal, multiple Pin totals and Mechanisms, paused
+capacity readings, redistribution, Save/Load/Custom reset, legacy files,
+off-grid endpoints and desktop/mobile layouts, with no JavaScript errors.
+`npm run manual:build` and `npm run manual:lint` passed: 18 numerical blocks
+agree, 0 errors and 0 warnings. `git diff --check` is clean. No numerical
+snapshot or generated figure changed; physiological equations are unchanged.
+
+Private evidence:
+`outputs/Arthur-blood-bolus-2026-09-29/` and
+`codex-notes/Arthur-carichi-volemici-2026-09-29.md`.
+
 ## Blood intervention and venous partition presentation — September 29
 
 The clinician approved replacing the ambiguous baseline-stressed control with

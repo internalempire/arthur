@@ -18,3 +18,16 @@ export function snapBloodVolumeChange(value, control) {
   const step = volumeSpec.step;
   return Math.max(control.min, Math.min(control.max, Math.round(value / step) * step));
 }
+
+/** A prepared dose is separate from the cumulative, already applied prescription. */
+export function bloodVolumeDoseControl(params) {
+  return bloodVolumeControl(params, params.stressedVolume);
+}
+
+/** Apply exactly the requested dose, or reject it; never silently deliver less. */
+export function applyBloodVolumeDose(sim, dose) {
+  const { min, max } = bloodVolumeDoseControl(sim.params);
+  if (!Number.isFinite(dose) || dose === 0 || dose < min || dose > max) return false;
+  sim.setParam('stressedVolume', sim.params.stressedVolume + dose);
+  return true;
+}

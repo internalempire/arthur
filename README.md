@@ -159,7 +159,7 @@ Five control groups are generated from a single parameter registry:
 |---|---|---|
 | ventilation | mode, rate, tidal volume or pressure, PEEP, timing and effort | [Ventilation controls](manual/controls-ventilation.md) |
 | respiratory mechanics | lung compliance and capacity, chest-wall compliance and load, resistance, collapse, recruitment, EFL and abdomen | [Mechanics controls](manual/controls-mechanics.md) |
-| volume and vascular tone | blood added/removed, total blood volume, venous capacity reduction and current stressed fraction, venous compliance, venous-return resistance and SVR | [Volume controls](manual/controls-volume.md) |
+| volume and vascular tone | explicit blood addition/removal, total blood volume, venous capacity reduction and current stressed fraction, venous compliance, venous-return resistance and SVR | [Volume controls](manual/controls-volume.md) |
 | cardiac function | heart rate, contractility, LV stiffness, baroreflex and ventricular interaction | [Heart controls](manual/controls-heart.md) |
 | pulmonary circulation | vascular resistance, hypoxic vasoconstriction and pulmonary capacitance coupling | [Pulmonary controls](manual/controls-pulmonary.md) |
 

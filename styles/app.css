@@ -1276,3 +1276,6 @@ input[type="range"]:disabled { cursor: not-allowed; }
   font-variant-numeric: tabular-nums;
 }
 .ctrl-reference { color: var(--ink-muted); }
+
+.blood-apply { width: 100%; margin-top: 6px; }
+.blood-apply:disabled { opacity: 0.45; cursor: default; background: transparent; }

@@ -1,3 +1,4 @@
+import { volumeControlReadings } from './volume-controls.js';
 import { pinSettingChanges } from './live-pins.js';
 
 const instant = 'instantaneous';
@@ -200,14 +201,14 @@ export function createMechanismsPanel(host) {
     setText(host.querySelector('.mechanism-context'), `Current patient vs State ${next.reference.id} · ${next.running ? 'Running' : 'Paused'}`);
     if (suspended) return;
     const changes = pinSettingChanges(next.reference.sim.params, next.current.params, {
-      referenceBloodVolume: next.reference.sim.bloodVolumeReference, currentBloodVolume: next.current.bloodVolumeReference,
+      referenceTotal: volumeControlReadings(next.reference.sim).total, currentTotal: volumeControlReadings(next.current).total,
     });
     const key = JSON.stringify(changes);
     if (key !== settingsKey) {
       settingsKey = key;
       const list = host.querySelector('.mechanism-settings');
       list.replaceChildren();
-      for (const text of changes.length ? changes.map(change => change.text) : ['Same control settings; previous histories may differ.']) {
+      for (const text of changes.length ? changes.map(change => change.text) : ['Same settings and total blood volume; previous histories may differ.']) {
         const item = document.createElement('li'); item.textContent = text; list.appendChild(item);
       }
     }

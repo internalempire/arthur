@@ -33,7 +33,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Question.** Can an apparently survivable arterial pressure conceal low effective filling?
 
-**Try.** Add blood with **Blood added/removed**, then return to the preset and switch the baroreflex off.
+**Try.** Select a positive dose in **Blood volume change** and press **Apply**, then return to the preset and switch the baroreflex off.
 
 **Read.** Added [stressed volume](stressed-volume.md) raises Pmsf and output because the operating point has preload reserve. Removing the aggregate [baroreflex](baroreflex.md) exposes the pressure and flow that the selected circulation would generate without compensation. The fluid step and reflex coefficients are teaching choices, not resuscitation targets.
 
@@ -137,7 +137,7 @@ Selecting a scenario first restores `defaultParams()` and then applies that scen
 
 The parameter sidebar marks every current setting that differs from this reference with a coloured dot and reports the total above the controls. The marks remain useful after the scenario label changes to *Custom*: they show which controls construct the present phenotype, not whether a value is abnormal or unsafe.
 
-Each loaded scenario starts with **Blood added/removed = 0 mL**, relative to its own starting patient volume. Where presets differ in blood volume, the table reports the **starting total blood volume in litres**, calculated by summing the compartments. That quantity can differ from the model reference while the intervention control reads zero.
+Each loaded scenario starts with the **Blood volume change** selector at 0 mL and zero cumulative blood added/removed relative to its own starting patient volume. Where presets differ in blood volume, the table reports the **starting total blood volume in litres**, calculated by summing the compartments. That quantity can differ from the model reference while the intervention control reads zero.
 
 ### Preset parameter changes
 

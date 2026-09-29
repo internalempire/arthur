@@ -1,5 +1,5 @@
 import { PARAMETERS } from '../model/index.js';
-import { signedVolume } from './volume-controls.js';
+import { signedVolume, volumeControlReadings } from './volume-controls.js';
 
 export const MAX_LIVE_PINS = 4;
 
@@ -36,18 +36,22 @@ function displayValue(parameter, value) {
   return Number((value * (parameter.displayScale ?? 1)).toPrecision(6)).toString();
 }
 
-/** Differences always read from the row's fixed prescription toward the current one. */
-export function pinSettingChanges(reference, current, {
-  referenceBloodVolume = reference.stressedVolume, currentBloodVolume = referenceBloodVolume,
-} = {}) {
-  return PARAMETERS.filter(p => reference[p.id] !== current[p.id]).map(p => ({
+/** Compare applied settings and actual blood totals, never the pending UI dose. */
+export function pinSettingChanges(reference, current, { referenceTotal, currentTotal } = {}) {
+  const changes = PARAMETERS.filter(p => p.id !== 'stressedVolume' && reference[p.id] !== current[p.id]).map(p => ({
     id: p.id,
-    text: p.id === 'stressedVolume'
-      ? (referenceBloodVolume === currentBloodVolume
-        ? `${p.label}: ${signedVolume(reference.stressedVolume - referenceBloodVolume)} → ${signedVolume(current.stressedVolume - currentBloodVolume)} mL`
-        : `Blood volume difference: ${signedVolume(current.stressedVolume - reference.stressedVolume)} mL (different starting references)`)
-      : `${p.label}: ${displayValue(p, reference[p.id])} → ${displayValue(p, current[p.id])}${p.unit ? ` ${p.unit}` : ''}`,
+    text: `${p.label}: ${displayValue(p, reference[p.id])} → ${displayValue(p, current[p.id])}${p.unit ? ` ${p.unit}` : ''}`,
   }));
+  const totalsAvailable = Number.isFinite(referenceTotal) && Number.isFinite(currentTotal);
+  const difference = totalsAvailable ? currentTotal - referenceTotal : current.stressedVolume - reference.stressedVolume;
+  // Ignore floating-point conservation noise, far below the displayed precision.
+  if (Math.abs(difference) > 1e-6) changes.unshift({
+    id: 'totalBloodVolume',
+    text: totalsAvailable
+      ? `Total blood volume: ${(referenceTotal / 1000).toFixed(2)} → ${(currentTotal / 1000).toFixed(2)} L (${signedVolume(Number(difference.toFixed(3)))} mL)`
+      : `Total blood volume change: ${signedVolume(Number(difference.toFixed(3)))} mL`,
+  });
+  return changes;
 }
 
 export function createLivePinTable(container, pins, onChange) {
@@ -55,16 +59,18 @@ export function createLivePinTable(container, pins, onChange) {
     <div class="pin-heading"><h2>Live comparisons</h2><span class="pin-summary"></span><button type="button" class="btn" id="show-mechanisms" aria-controls="mechanisms" aria-expanded="false">Mechanisms</button></div>
     <p class="pin-message"></p>
     <table class="pin-table">
-      <thead><tr><th scope="col">Tile reference</th><th scope="col">Settings: reference → current</th><th scope="col"><span class="visually-hidden">Remove reference</span></th></tr></thead>
+      <thead><tr><th scope="col">Tile reference</th><th scope="col">Settings / blood volume: reference → current</th><th scope="col"><span class="visually-hidden">Remove reference</span></th></tr></thead>
       <tbody></tbody>
     </table>
-    <p class="pin-help">All states keep evolving; Pause stops them together. Different heart or breathing rates can shift their cycles. Settings alone do not describe previous manoeuvres or pressure history.</p>`;
+    <p class="pin-help">All states keep evolving; Pause stops them together. Different heart or breathing rates can shift their cycles. Settings and total blood volume do not describe previous manoeuvres or pressure history.</p>`;
   const body = container.querySelector('tbody');
   const summary = container.querySelector('.pin-summary');
   const message = container.querySelector('.pin-message');
   const rows = new Map();
 
-  function render(params, { historical = false, running = true, bloodVolumeReference } = {}) {
+  function render(sim, { historical = false, running = true } = {}) {
+    const params = sim.params;
+    const currentTotal = volumeControlReadings(sim).total;
     container.hidden = pins.states.length === 0;
     summary.textContent = `${pins.states.length}/${MAX_LIVE_PINS} references · ${running ? 'Running' : 'Paused'}`;
     const selected = pins.selected;
@@ -99,10 +105,10 @@ export function createLivePinTable(container, pins, onChange) {
       row.querySelector('input').checked = pins.selectedId === state.id;
       row.classList.toggle('pin-selected', pins.selectedId === state.id);
       const changes = pinSettingChanges(state.sim.params, params, {
-        referenceBloodVolume: state.sim.bloodVolumeReference, currentBloodVolume: bloodVolumeReference,
+        referenceTotal: volumeControlReadings(state.sim).total, currentTotal,
       });
       const cell = row.querySelector('.pin-changes');
-      const text = changes.map(change => change.text).join('\n') || 'Same control settings';
+      const text = changes.map(change => change.text).join('\n') || 'Same settings and total blood volume';
       if (cell.textContent !== text) cell.textContent = text;
     }
   }
