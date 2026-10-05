@@ -22,7 +22,7 @@ The afferent signal is a low-pass mean arterial pressure, not pulsatile vessel-w
 
 ![Steady aggregate baroreflex response at three selected sensitivities](figure/baroreflex.svg)
 
-Positive outflow is bounded at 1. Withdrawal is deliberately smaller and bounded at −0.25, reflecting low resting sympathetic tone and preventing a modest pressure excess from producing extreme bradycardia. The active outflow approaches its target with one 15-second time constant.
+Positive outflow is bounded at 1. Withdrawal is deliberately smaller and bounded at −0.25. This chosen asymmetry limits bradycardia in the teaching model; it is not a measurement of resting sympathetic tone or of human vagal reserve. The active outflow approaches its target with one 15-second time constant.
 
 At full positive outflow, all four model effectors change together:
 
@@ -57,6 +57,10 @@ The septic preset illustrates the difference. The model remains preload responsi
 <!-- END GENERATED: baroreflex-septic -->
 
 ---
+
+## Read the compensation, not MAP alone
+
+Create a Pin with the reflex off, then enable it without changing the other controls. Give the slow response several simulated time constants to develop. Compare MAP with output, effective heart rate, effective SVR and venous stressed fraction. Better preserved pressure can reflect more resistance as well as more flow. The Pin shows the combined response of all four effectors; it cannot attribute an output gain solely to venous mobilisation.
 
 ## Why this and not something else
 

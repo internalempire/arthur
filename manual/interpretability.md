@@ -6,14 +6,14 @@
 
 ## Physiology
 
-Haemodynamic numbers belong to different epistemic categories.
+A displayed number can describe a measured model state, a calculation from several measurements, or a coefficient chosen to define the model. These have different meanings:
 
 | category | example | what can invalidate it |
 |---|---|---|
 | direct model measurement | arterial pressure, chamber volume | the model leaving its numerical or physiological domain |
 | derived physiological index | PPV, stress index, catheter-derived PVR | the assumptions needed to interpret the calculation |
 | internal coefficient | the resistance used inside the pulmonary flow equation | confusing a model parameter with a bedside measurement |
-| model-only latent state | stressed volume, open fraction, true Pmsf | treating an exactly known simulation variable as something directly measurable in a patient |
+| model-only latent state | stressed volume, open fraction, reservoir-based Pmsf | treating an exactly known simulation variable as something directly measurable in a patient |
 
 The arithmetic of a derived index can remain correct while its clinical meaning disappears. PPV can still be calculated during spontaneous effort, but it no longer tests the controlled ventilation mechanism for which it was validated. Left atrial pressure can still be subtracted from mPAP, but it is not necessarily equivalent to an occluded pulmonary artery pressure outside West zone 3. A number should therefore be withheld or qualified at the point where its assumptions fail, not merely accompanied by a warning elsewhere.
 
@@ -37,13 +37,21 @@ The full reason remains on the numerical tile. Panels whose central reading depe
 |---|---|---|
 | stress index | not passive volume control, or no complete breath | — |
 | preload reserve | the Guyton curves have no finite crossing | — |
-| PPV | spontaneous effort | VT below 8 mL/kg for an assumed <!-- CONSISTENCY: reference-weight -->70 kg<!-- /CONSISTENCY --> reference, fewer than 3.6 beats/breath, RV/LV EDV ratio above 1.2, or abdominal pressure above 12 cmH₂O |
+| PPV | spontaneous effort | VT below 8 mL/kg for an assumed <!-- CONSISTENCY: reference-weight -->70 kg<!-- /CONSISTENCY --> reference, fewer than 3.6 beats/breath, RV/LV EDV ratio above 1.2, or selected baseline abdominal pressure above 12 cmH₂O |
 | closed at end expiration / opening excursion | no complete breath under the current settings, including after an occlusion | internal model quantities; no anatomical or bedside index interpretation |
 | plateau pressure | spontaneous effort | — |
 | wedge surrogate | — | the zone 3 pressure-margin index is below 0.95 |
 | derived PVR | no meaningful forward flow | the wedge surrogate is cautioned |
 
+For PPV and plateau, the implementation treats spontaneous mode or an effort setting above 0.5 cmH₂O as active breathing; the stress-index rule requires exactly zero selected effort. These are explicit model thresholds, not clinically validated limits below which patient activity becomes harmless.
+
 The list is intentionally inspectable rather than hidden in scenario-specific prose. Dependencies are propagated: derived PVR inherits the caution of its [wedge surrogate](pulmonary-artery-wedge-pressure.md), because valid arithmetic cannot repair an uncertain downstream pressure.
+
+### What a missing badge cannot tell you
+
+Read the description even when no caution is displayed. For example, the respiratory-system compliance tile can remain numerical during effort because it uses internally calculated passive recoil; it does not become a measured assisted-breath compliance. Derived PVR combines smoothed pressures and the latest beat’s output, so abrupt transients can change the ratio without a corresponding change in the internal resistance coefficient. The global validity banner and the index badges do not test whether the patient has reached a settled state.
+
+When comparing Pins, apply these checks separately to the current patient and the reference. One valid number cannot rescue an unavailable comparator. A current-minus-reference difference also requires attention to respiratory phase, elapsed time and preceding pressure history.
 
 ### Similar names that are deliberately separated
 
@@ -70,7 +78,7 @@ The rules are mechanism-specific rather than scenario-specific. A spontaneous pa
 - Interpretability rules cover known, encoded confounders only; they cannot detect phenomena the model does not contain, such as arrhythmia or measurement artefact.
 - Several thresholds are pragmatic model rules rather than universal clinical boundaries.
 - A green badge means the model has the required conditions, not that the model is quantitatively validated for that use.
-- The current linter checks rendering and links, not contradictions between the manual, code and literature.
+- Automated documentation checks verify rendering, links, generated numerical examples and selected repeated facts; they cannot establish general agreement between prose, code and literature.
 - The zone 3 rule is a conservative pressure-margin heuristic in a non-regional lung, not a measured fraction of perfused human lung.
 
 ### Of clinical application

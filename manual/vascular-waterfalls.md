@@ -8,7 +8,7 @@
 
 Rigid tubes obey a simple rule: flow is the pressure difference across the tube divided by its resistance. Collapsible tubes surrounded by a pressure do not.
 
-Consider a floppy vessel passing through a chamber held at pressure $P_c$. While the pressure inside the vessel exceeds $P_c$ everywhere along it, the vessel is open and behaves normally. As the downstream pressure falls below $P_c$, the vessel's downstream end is squeezed shut. Flow does not stop — inflow pushes it open again — but the vessel now flutters at the point of closure, and the effective downstream pressure is pinned at $P_c$:
+Consider a floppy vessel passing through a chamber held at pressure $P_c$. While the pressure inside the vessel exceeds $P_c$ everywhere along it, the vessel is open and behaves normally. As downstream pressure falls sufficiently below the pressure surrounding a compliant segment, narrowing can make flow insensitive to further downstream pressure reduction. Flow can continue; flutter is possible but is not required to explain a plateau. An idealised relation is:
 
 $$
 \dot{Q} = \frac{P_{\text{up}} - \max(P_{\text{down}},\ P_c)}{R}
@@ -25,9 +25,9 @@ The critical point for clinical reasoning is that downstream pressure ceases to 
 
 ### Two places it happens
 
-**The great veins at the thoracic inlet.** Venous return rises as right atrial pressure falls — until right atrial pressure drops below the pressure surrounding the veins, at which point the vessels collapse and flow plateaus. This is the flat part of the venous return curve, and it is a property of the veins, not of the heart. The surrounding pressure is [pleural](pleural-pressure.md) for the superior route and [abdominal](abdominal-pressure.md) for the inferior one, which is why raising intra-abdominal pressure raises the closing pressure and truncates venous return earlier.
+**The great veins entering the thorax.** Venous return rises as right atrial pressure falls — until right atrial pressure drops below the pressure surrounding the veins, at which point the vessels collapse and flow plateaus. This is the flat part of the venous return curve, and it is a property of the veins, not of the heart. The surrounding pressure is [pleural](pleural-pressure.md) for the superior route and [abdominal](abdominal-pressure.md) for the inferior one, which is why raising intra-abdominal pressure raises the closing pressure and truncates venous return earlier.
 
-**The pulmonary capillaries in the alveolus.** Where alveolar pressure exceeds pulmonary venous pressure, the alveolar vessels are compressed and the effective downstream pressure becomes alveolar. This is West zone 2. Its consequences are that pulmonary vascular resistance rises with lung inflation, and that a wedge pressure stops reporting left atrial pressure — the catheter is now reading alveolar pressure through a column of blood interrupted by a waterfall.
+**The pulmonary capillaries in the alveolus.** Where alveolar pressure exceeds pulmonary venous pressure, the alveolar vessels are compressed and the effective downstream pressure becomes alveolar. This is West zone 2. This can increase the effective opposition to flow without being identical to a rise in the intrinsic resistance coefficient. If the occluded catheter branch loses a patent column to the left atrium, wedge pressure can become influenced by alveolar pressure and cease to represent left atrial pressure reliably. Regional catheter position matters; a high PEEP does not invalidate every wedge measurement.
 
 The two are the same physics in different vessels, which is why they are one page.
 
@@ -97,20 +97,11 @@ The weighted relation applies alveolar compression to a fixed share of the aggre
 
 The model also tracks a **zone III index** — how far pulmonary venous pressure sits above alveolar pressure — and uses it to qualify the displayed [wedge surrogate](pulmonary-artery-wedge-pressure.md) rather than to switch the vascular behaviour. It is a normalised pressure margin, not the anatomical fraction of lung in zone III.
 
-### What the model shows
+### Recognise a plateau without calling it zero flow
 
-Raising baseline abdominal pressure in a passive patient at PEEP 5:
+In the **Mean** Guyton view, inspect the flat part of the venous-return relation at low right atrial pressure. It means that lowering atrial pressure further buys little additional return; it does not mean that return has stopped. Raise abdominal pressure and watch the closing-pressure marker and effective gradient as well as Pmsf. A higher Pmsf can coexist with lower flow if the effective back-pressure also rises.
 
-| `pab0` | P<sub>crit</sub> | mean P<sub>ra</sub> | P<sub>msf</sub> | cardiac output |
-|---|---|---|---|---|
-| 0 | −1.95 mmHg | 1.1 mmHg | 7.1 mmHg | 4.89 L/min |
-| 5 | 1.73 | 1.0 | 9.0 | 4.82 |
-| 12 | 6.88 | 0.4 | 13.1 | 4.19 |
-| 20 | 12.76 | −0.1 | 17.9 | 3.56 |
-
-By `pab0` 12 the closing pressure has risen above right atrial pressure: the veins are collapsed and the circulation is sitting on the plateau. Output falls even though the filling pressure has risen by 6 mmHg, because the head is being measured against a floor that rose faster.
-
-On the pulmonary side, the zone III index falls from 0.53 at PEEP 5 to 0.00 at PEEP 15 in the same patient. At that point the model marks the wedge surrogate with a caution: left atrial pressure can stand in for an occlusion pressure only under the zone III assumption, and that assumption no longer holds.
+For the pulmonary counterpart, compare PEEP states using the worked examples on [wedge pressure](pulmonary-artery-wedge-pressure.md#worked-examples). Follow the zone index and caution badge alongside the actual LA pressure surrogate. The model does not replace that surrogate with alveolar pressure: it flags the limits of its catheter-like interpretation.
 
 ---
 
@@ -138,7 +129,7 @@ The executable checks do not compare separate superior and inferior caval closin
 
 - **One closing pressure for all venous return.** No separate superior and inferior caval routes, no hepatic waterfall, no azygos rerouting. A real hold manoeuvre recruits these differently, which is one reason the model's [extrapolated intercept](pmsf-and-occlusions.md) does not match the porcine measurement.
 - **The 5 cmH₂O of tolerated transmural compression is a single coefficient**, not a measured caval property, and does not vary with vessel filling or tone.
-- **No West zone map.** There is no gravitational gradient and no vertical distribution of blood flow, so zones are a fraction and an index rather than regions. The model cannot show zone I at all.
+- **No West zone map.** There is no gravitational gradient and no vertical distribution of blood flow, so the fractional waterfall weight and zone index are coefficients rather than an anatomical count of regions. The model cannot show zone I at all.
 - **The knee width is a numerical choice** as much as a physiological one.
 - **Some unvalved connections remain forward-only.** The reservoir-to-IVC segment and pulmonary arterial inflow still exclude reversal. The symmetric caval extension is not a fitted human pressure-flow relation and adds no vessel-wall dynamics.
 - The zone III index qualifies a readout; it does not change the perfusion distribution, because there is no distribution to change.
@@ -153,6 +144,8 @@ The executable checks do not compare separate superior and inferior caval closin
 ---
 
 ## References
+
+[West et al.](https://journals.physiology.org/doi/abs/10.1152/jappl.1964.19.4.713) varied vascular and alveolar pressures in an isolated, perfused dog lung and measured regional flow. The study supports pressure-dependent zone behaviour, not Arthur's fixed 0.45 waterfall weight or its non-regional zone index.
 
 - Permutt S, Riley RL. [Hemodynamics of collapsible vessels with tone: the vascular waterfall](https://doi.org/10.1152/jappl.1963.18.5.924). *J Appl Physiol* 1963;18:924–32.
 - West JB, Dollery CT, Naimark A. [Distribution of blood flow in isolated lung; relation to vascular and alveolar pressures](https://doi.org/10.1152/jappl.1964.19.4.713). *J Appl Physiol* 1964;19:713–24.

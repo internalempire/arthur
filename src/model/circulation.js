@@ -1,19 +1,13 @@
-// A closed-loop lumped-parameter circulation. Eight pressure-bearing compliant
-// compartments plus one pressureless pulmonary transport pathway, all volumes
-// conserved. Each pressure-bearing compartment is referenced to the pressure
-// that actually surrounds it:
-//
-//   systemic arteries  -> atmosphere
-//   systemic veins     -> abdominal pressure
-//   RA, RV, LA, LV     -> pleural pressure + pericardial pressure
-//   PA, PV             -> pleural pressure
-//
-// Nothing about heart-lung interaction is added on top of this; it all falls out
-// of that table. Raising intrathoracic pressure lifts right atrial pressure but
-// not the systemic venous reservoir, so venous return falls. It lifts left
-// ventricular cavity pressure and aortic pressure is unchanged, so the LV
-// unloads. It lifts the RV and the pulmonary artery equally, so RV afterload is
-// untouched — only lung volume can move that.
+// Closed-loop lumped circulation: nine pressure-bearing compartments and one
+// pressureless pulmonary transport pathway, all included in conserved blood.
+// Systemic arteries reference atmosphere; the systemic venous reservoir and
+// IVC use the aggregate abdominal relation; atria and ventricles reference
+// pleural plus additional pericardial pressure; PA/PV reference pleural pressure.
+// Pressure transmission, storage, valve gradients, caval closing pressure and
+// pulmonary vascular loading interact. Abdominal transmission can raise the
+// upstream venous pressure alongside right atrial pressure; aortic pressure is
+// free to respond to flow. RV load includes the pulmonary law and waterfall,
+// not lung volume alone. See manual/the-four-effects-of-a-breath.md.
 
 import { cmH2OtoMmHg, clamp } from './units.js';
 import { pvrAt } from './lung.js';
@@ -32,11 +26,9 @@ const ALVEOLAR_WATERFALL_FRACTION = 0.45;
 // Unstressed volumes (mL) and compliances (mL/mmHg) that are not user-facing.
 export const VASC = {
   vuSa: 700, cSa: 1.35,
-  // The inferior vena cava (IVC) is now a separate compliant conduit between the
-  // splanchnic reservoir and the right atrium. Its unstressed volume (50 mL) was
-  // reallocated from the former vuSv (2800 → 2750), keeping total venous
-  // unstressed volume unchanged. The IVC compliance (~15–40 mL/mmHg) is anchored
-  // to literature on caval distensibility; 20 mL/mmHg is a compact teaching value.
+  // Separate IVC conduit between the aggregate systemic venous reservoir and RA.
+  // Its 50 mL zero-pressure capacity is included in total blood. The selected
+  // 20 mL/mmHg compliance is a didactic coefficient, not a validated human range.
   vuSv: 2750,
   // Part of the former PA/PV zero-pressure volume now lives in the transport
   // pathway below. Their stressed volumes — and therefore resting pressures —

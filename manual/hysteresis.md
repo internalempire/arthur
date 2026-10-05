@@ -20,8 +20,8 @@ A classical respiratory pressure–volume loop contains more than recruitment an
 
 Memory is off in the default prescription. The Opening with memory profile enables it; Advanced opening settings also permit custom values. The reopenable share specifies how much of the compromised component can participate, while two transpulmonary midpoints locate its pressure ranges:
 
-- `pOpen` locates the **opening range**. Opening is gradual: at this transpulmonary pressure half of the units that can be recruited have opened during rising pressure.
-- `pClose` locates the lower **closing range**. During falling pressure, half of those recruitable units remain open at this pressure.
+- `pOpen` locates the **opening range**. On the opening branch, this midpoint corresponds to half of the potentially reopenable units being open. A lung retaining more opening from a previous inflation need not return to that fraction.
+- `pClose` locates the lower **closing range**. On the closing boundary, this midpoint corresponds to half of the potentially reopenable units remaining open. If fewer units were opened beforehand, reaching this pressure does not create the missing opening.
 
 The closing midpoint cannot exceed the opening midpoint; equality removes the memory gap. Both are transpulmonary pressures. They are not airway pressures, PEEP values or sharply defined thresholds at which every unit changes state.
 
@@ -53,7 +53,7 @@ The resulting total open fraction is used by lung mechanics, strain and [pulmona
 
 ### A reproducible experiment
 
-The executable example below uses one recruitable ARDS phenotype for both the manoeuvre and the incremental/decremental paths.
+The executable example below uses one recruitable ARDS phenotype for both the manoeuvre and the incremental/decremental paths. Its high-pressure step is performed by the documentation generator and exceeds the ordinary PEEP control range; it is a mechanistic experiment, not an instruction available through that slider or a clinical manoeuvre recommendation.
 
 <!-- BEGIN GENERATED: hysteresis-example -->
 *Executable setup: volume control, VT 250 mL, 20/min, aerated-lung compliance 45 mL/cmH₂O, 45% compromised with 72.8% of that component reopenable, opening midpoint 25 cmH₂O and closing midpoint 6 cmH₂O (both transpulmonary). After settling at PEEP 10, PEEP is raised to 35 for 30 s and returned to 10.*
@@ -92,7 +92,7 @@ The benefit can be small or absent if ordinary breaths already open the availabl
 
 ### When the manoeuvre leaves little or nothing
 
-Three examples are useful at the bedside:
+Three comparisons help interpret the simulated response:
 
 **Pressure afterwards is too low.** If transpulmonary pressure falls through the closing range, recently opened units close again. Raising `pClose` only removes the retained gain if the subsequent pressure trajectory reaches enough of that range. Follow transpulmonary pressure and open fraction together: comparing closing pressure with the numerical PEEP setting alone does not establish whether units will close.
 
@@ -106,11 +106,11 @@ Three examples are useful at the bedside:
 
 **A physiological memory rather than a manoeuvre button.** A button could impose a prewritten improvement after high pressure. Carrying the recruited fraction as a state allows the result to depend on the pressure reached, the tidal excursion and what happens afterwards.
 
-**Memory only in the recruitable compartment.** The controls describe injured units that can open and close. Applying the same history to already-aerated lung would be mathematically convenient but physiologically incoherent.
+**Memory only in the recruitable compartment.** These controls describe opening and closure of the compromised component. Already-aerated tissue uses the shared pressure–volume curve without this opening memory; that is a deliberate simplification, not a claim that normal tissue or surfactant has no hysteresis.
 
 **Off by default.** With path dependence, identical current settings can produce different states depending on what happened earlier. That behaviour is useful but can confuse a first reading, so it remains optional.
 
-**No time constant.** Recruitment in vivo depends on both pressure and duration. A time-dependent implementation would require one or more poorly anchored rates and would add complexity beyond the present teaching aim. The model therefore changes recruitment as soon as the relevant pressure range is crossed.
+**No recruitment time constant.** In lavaged rats, Albert and colleagues observed recruitment evolving with both pressure magnitude and the duration of its application. Arthur represents the pressure dependence and retained opening, but has no corresponding biological recruitment rate. Once gas volume, transpulmonary pressure and memory are consistent, waiting alone does not recruit more units. This is a deliberate omission, not evidence that duration is unimportant in patients.
 
 ---
 
@@ -119,7 +119,7 @@ Three examples are useful at the bedside:
 ### Of the construction
 
 - **Only recruitment and derecruitment memory are represented.** The tissue pressure–volume relation itself is single-valued. Surfactant dynamics, viscoelasticity, stress relaxation and the area of a measured respiratory pressure–volume loop are absent.
-- **No time dependence.** Holding the same pressure for one second or one minute produces no additional recruitment or derecruitment.
+- **No intrinsic recruitment clock.** Once transpulmonary pressure and mechanics are unchanged, holding them longer produces no additional opening or closing. A constant airway-pressure hold can still change volume and transpulmonary pressure while gas equilibrates; that is respiratory filling, not a biological recruitment time constant.
 - **Shared opening and closing distributions.** All recruitable units belong to two smooth pressure ranges with fixed widths; there is no patient-specific distribution of regional thresholds.
 - **One global recruitment state.** Dependent and non-dependent regions cannot open or close differently.
 - **Numerical verification has a defined scope.** Fixed-volume consistency, gas conservation and timestep refinement are checked in demanding recruitable-lung states. These checks establish internal consistency in the tested conditions; they do not validate every control combination or the numerical values against patients.

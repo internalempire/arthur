@@ -51,7 +51,7 @@
 <text class="label" x="300.5" y="424" text-anchor="middle">Right atrial pressure (mmHg)</text>
 <line class="total" style="stroke-dasharray:none" x1="551" y1="48" x2="579" y2="48"/><text class="label" x="585" y="52">current model relation</text>
 <line class="alv" style="stroke-dasharray:5 4" x1="551" y1="70" x2="579" y2="70"/><text class="label" x="585" y="74">line through hold points</text>
-<text class="tick" x="551" y="110">internal Pmsf 9.8 mmHg</text>
+<text class="tick" x="551" y="110">smoothed Pmsf 9.8 mmHg</text>
 <text class="tick" x="551" y="126">extrapolated intercept 27.2</text>
 <text class="tick" x="551" y="142">the difference is not calibrated</text>
 </svg>

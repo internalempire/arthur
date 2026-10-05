@@ -6,7 +6,7 @@
 
 ## Three kinds of statement
 
-Each concept page begins with the physiology, then explains the model only when the implementation changes what a reader should infer. The section *Why this and not something else* records important alternatives or reversals. *Limits* separates what the construction cannot represent from what must not be concluded clinically.
+Each concept page begins with the physiology, then explains the model only when the implementation changes what a reader should infer. The section *Why this and not something else* explains the rationale and boundaries of the current assumptions; the handover records development history. *Limits* separates what the construction cannot represent from what must not be concluded clinically.
 
 A statement can therefore be true at one of three levels:
 
@@ -24,7 +24,7 @@ The model labels three numerical categories:
 - **derived index** — calculated from model measurements and meaningful only when its assumptions hold, such as PPV or stress index;
 - **internal model coefficient** — a parameter used by the equations, such as the pulmonary resistance coefficient from the J-curve.
 
-Some latent quantities, including true open fraction and stressed volume, are exactly known because this is a simulation. They are not directly measurable with the same certainty in a patient. [Interpretability](interpretability.md) gives the complete distinction.
+Some latent quantities, including the represented open fraction and systemic venous stressed volume, are exactly known because this is a simulation. They are not directly measurable with the same certainty in a patient. [Interpretability](interpretability.md) gives the complete distinction.
 
 ## Quality messages
 
@@ -40,15 +40,15 @@ The model-wide invalid banner is different. It suppresses readouts when the nume
 
 Airway, alveolar, pleural and abdominal pressure are displayed in cmH₂O. Vascular and chamber pressures are displayed in mmHg. When the same physical pressure crosses between respiratory and circulatory equations, the model converts units explicitly.
 
-Measured vascular pressure is referenced to atmosphere. Transmural pressure is inside minus surrounding pressure. A rise in CVP during positive-pressure inspiration can therefore coexist with a fall in right atrial distension.
+Measured vascular pressure is referenced to atmosphere. Transmural pressure is inside minus surrounding pressure. For the atria, the displayed transmural value subtracts pleural pressure and the additional pericardial pressure, after unit conversion. A rise in CVP during positive-pressure inspiration can therefore coexist with a fall in right atrial distension.
 
-Flow is positive in the forward physiological direction. Lung volume in the waveforms is volume above the calculated resting reference, while the PVR panel uses absolute lung volume in litres.
+Flow is positive in the forward physiological direction. Negative caval flow means blood returning from the right atrium into the IVC, not a negative cardiac output. Lung volume in the waveforms is volume above the calculated resting reference, while the PVR panel uses absolute lung volume in litres.
 
 ## Time conventions
 
-Waveforms show the most recent <!-- CONSISTENCY: trace-window-seconds -->12<!-- /CONSISTENCY --> seconds. Numerical haemodynamic values are generally beat or cycle measurements smoothed for readability; the instantaneous drawing may therefore lead or lag a tile slightly. On the Guyton panel, the faint trail uses one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. The filled point averages those variables over one complete breath so it can be compared with the hollow analytic crossing. Neither venous-inflow display is a direct cardiac-output measurement.
+Waveforms show the most recent <!-- CONSISTENCY: trace-window-seconds -->12<!-- /CONSISTENCY --> seconds. Cardiac output is measured over completed beats. Mean vascular-pressure tiles use exponential smoothing with a 3 s time constant: recent samples count more than older ones; this is not a three-second box average. The instantaneous drawing may therefore lead or lag a tile slightly. On the Guyton panel, the faint trail uses one-heartbeat means of right atrial pressure and IVC-to-right-atrial venous inflow. The filled point applies a sliding one-breath-duration average to those heartbeat means so it can be compared with the hollow analytic crossing. It updates continuously, rather than waiting for the end of a breath. Neither venous-inflow display is a direct cardiac-output measurement.
 
-Simulation speed changes wall-clock playback only. Pause freezes state; it is not an occlusion. Respiratory holds are model manoeuvres and continue according to simulated time.
+Simulation speed changes wall-clock playback only. Pause freezes simulated time; it is not an occlusion and does not prevent a control edit or blood application from changing the patient. Respiratory holds are model manoeuvres and continue according to simulated time.
 
 ## Mathematical notation
 

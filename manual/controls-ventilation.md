@@ -26,6 +26,12 @@ Changing from any scenario to volume control or pressure control sets inspirator
 
 The sign of pleural-pressure change is central, but it is not fixed by the mode label alone. In assisted breathing, respiratory effort, chest-wall mechanics and applied pressure combine; inspect the waveform rather than assuming transmission.
 
+### A useful controlled comparison
+
+To explore CPAP mechanically, Pin a settled spontaneous-breathing state and change PEEP while keeping prescribed effort, rate and inspiratory time unchanged. Follow delivered tidal volume, pleural pressure, RV output and LV filling together. Any output change is the combined circulatory response under that fixed activation pattern. It cannot be attributed to relief of respiratory fatigue, automatic reduction in drive, or improvement in oxygenation, because none of those responses is simulated.
+
+For a passive PEEP comparison at fixed tidal volume, use volume control with effort at zero. These are different experiments: matching the PEEP change does not make their pressure and volume trajectories equivalent.
+
 ### What starts and ends a pressure-support breath
 
 The sequence is deliberately pneumatic, as in a conventional ventilator:
@@ -34,7 +40,7 @@ The sequence is deliberately pneumatic, as in a conventional ventilator:
 2. the ventilator continues to provide PEEP only;
 3. support begins when the patient produces 1 L/min of inspiratory trigger flow;
 4. airway pressure rises from PEEP to the selected support over 100 ms;
-5. support ends when inspiratory flow falls below 25% of that breath's peak flow.
+5. after at least 0.2 s of support, it ends when inspiratory flow falls below 25% of that breath's peak flow.
 
 Intrinsic PEEP is therefore a real threshold load. The patient must first lower Palv below applied PEEP; an insufficient effort remains ineffective. External PEEP can reduce this pre-trigger load in a flow-limited obstructed state. The 1 L/min threshold and 100 ms rise are fixed teaching settings, not patient-specific ventilator prescriptions.
 
@@ -43,6 +49,8 @@ The patient's neural inspiratory time remains independent of ventilator cycling.
 ### Rate and inspiratory time
 
 In volume and pressure control, inspiratory time is the duration imposed by the ventilator. In spontaneous breathing and pressure support, it is the duration of the patient's neural inspiratory command; PSV itself remains flow-cycled. This distinction is why a 1.2 s neural inspiration can continue after a shorter mechanical PSV breath.
+
+The model limits neural inspiratory time to half the respiratory cycle even if the selected time is longer. This prevents its regular activation pattern from extending into the next breath; it does not represent neural adaptation.
 
 Together with respiratory rate, inspiratory time also determines the time available for expiration. Shortening expiration in a high-resistance or flow-limited lung prevents complete emptying, raises end-expiratory volume and generates intrinsic PEEP. Rate changes how many cardiac beats occur within one breath, affecting the interpretability of dynamic indices.
 
@@ -60,7 +68,7 @@ The slider sets the pressure scale of one aggregate inspiratory-muscle activatio
 
 The decay time is derived from the available expiratory time, so rate and inspiratory time change its absolute duration. There is no additional braking control: the residual pressure, its effect on alveolar pressure and the resulting expiratory flow all emerge from the same respiratory equation of motion.
 
-Non-zero effort during positive-pressure ventilation makes PPV unavailable because the passive controlled-breath assumptions are absent. In PSV, continued inspiratory drive after ventilator cycling is distinguished from the slower post-inspiratory decay that begins after neural switch-off. The model does not calculate clinical work of breathing.
+PPV is withheld during spontaneous mode and when prescribed effort exceeds the model's small 0.5 cmH₂O detection threshold; the ordinary effort-control steps therefore make any non-zero user selection unavailable. This threshold is an implementation rule, not evidence that a small clinical effort is harmless to PPV interpretation. In PSV, continued inspiratory drive after ventilator cycling is distinguished from the slower post-inspiratory decay that begins after neural switch-off. The model does not calculate clinical work of breathing.
 
 If an [end-inspiratory hold](manoeuvres.md#what-an-inspiratory-hold-shows-during-pressure-support) is applied during PSV, flow stops at the end-inspiratory volume while this same muscle state continues to evolve. Relaxation makes Ppl less negative and can raise Paw toward a passive plateau. The model displays that pressure trajectory but does not convert it into a separate pressure muscle index.
 
@@ -79,6 +87,8 @@ The set exposes the minimum respiratory inputs needed to distinguish negative- f
 - Control ranges are model operating ranges, not recommended ventilator settings.
 
 ## References
+
+Shee and colleagues measured post-inspiratory braking in eight conscious spontaneously breathing adults; this supports persistence of muscle pressure into expiration, not Arthur's exact activation coefficients. MacIntyre and colleagues studied obstructed patients on pressure support, supporting the intrinsic-PEEP threshold mechanism. Neither establishes automatic effort adaptation in the model.
 
 - Pinsky MR. Cardiovascular issues in respiratory care. *Chest*. 2005;128:592S–597S. [doi:10.1378/chest.128.5_suppl_2.592S](https://doi.org/10.1378/chest.128.5_suppl_2.592S)
 - Tobin MJ. *Principles and Practice of Mechanical Ventilation*. 3rd ed. McGraw-Hill; 2013.

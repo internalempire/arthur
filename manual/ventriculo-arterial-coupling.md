@@ -39,7 +39,7 @@ This is not a physical stiffness of the aorta. On the pressure–volume plane it
 
 The ratio $E_{es}/E_a$ describes the match within this lumped framework. Values around 1.5–2 are often reported for the resting normal left ventricle, but the energetic optimum and clinical interpretation depend on ventricular function, loading and method. A lower ratio generally indicates that arterial load is high relative to contractility; it is not a universal treatment threshold.
 
-This framing is what makes vasodilatation a *positive inotropic-like* intervention in a failing ventricle without touching contractility: it lowers $E_a$, which raises the ratio, which raises stroke volume.
+Reducing arterial load can let a failing ventricle eject more without increasing intrinsic contractility. A higher coupling ratio is a description of that altered pressure–volume relation, not a separate cause of higher output; the response still depends on preload and the arterial pressure that results.
 
 ### Why it belongs in a heart–lung model
 
@@ -49,12 +49,15 @@ Because ventilation can move both terms. Raised intrathoracic pressure can reduc
 
 ## In the model
 
-Both ventricles use a time-varying elastance driven by a double-hill activation waveform normalised to a peak of one. Systolic and diastolic behaviour come from separate terms:
+Both ventricles use a time-varying elastance driven by an activation waveform with an approximately unit peak. Systolic and diastolic behaviour come from separate terms:
 
 - an end-systolic straight line with slope `eesLv` or `eesRv` and its own unstressed volume;
 - an end-diastolic exponential, with the left ventricle's stiffness on the `lvStiff` control and the right ventricle's fixed.
 
 The atria are simpler: a linear elastance swinging between a minimum and a maximum on an atrial activation waveform.
+
+<details>
+<summary>Mathematical details: contraction timing and the valid pressure domain</summary>
 
 For the ventricles, the duration of activation is not kept at a fixed fraction of every beat. If $T=60/HR$ is the cardiac-cycle duration, the model first defines
 
@@ -76,24 +79,19 @@ The intrinsic ventricular pressure is the passive exponential plus activation ti
 
 Valves are represented as one-way resistances driven by their pressure gradients. Isovolumic phases arise from those relations. There is no forced mutual exclusion of the inflow and outflow valves. A completed beat with more than 0.01% of forward volume (and at least 0.001 mL) occurring during paired-valve throughflow or ventricular activation below 0.001 is outside the intended phase domain. The check applies to both ventricles and suspends clinical readouts.
 
+</details>
+
 The right ventricle carries two extra terms from [ventricular interdependence](ventricular-interdependence.md): a diastolic septal shift and a systolic contribution from the left ventricle. Consequently, the selected intrinsic RV elastance is not always the slope from the fixed zero-pressure volume to the total end-systolic RV pressure. The PV-loop panel draws a local effective line through the actual end-systolic point and explains the distinction; the control itself still represents the intrinsic ventricular term.
 
-**The model does not compute $E_a$ or the coupling ratio as an output.** They can be derived from what it reports — mean pressure and stroke volume — but they are not tiles, because an effective arterial elastance computed from a cycle mean rather than from end-systolic pressure is a different quantity wearing the same name. See [interpretability](interpretability.md).
+**There is no numerical $E_a$ or coupling-ratio tile.** The PV panel does draw an $E_a$ line through the completed beat's end-diastolic zero-pressure point and transmural end-ejection point; this is a graphical single-beat summary. Mean arterial pressure and stroke volume alone do not provide conventional effective arterial elastance. It requires an explicitly defined end-systolic pressure, pressure reference and matched stroke volume. A ratio formed from a cycle mean answers a different question. See [interpretability](interpretability.md).
 
-### A directional load surrogate
+### Explore unloading without equating it with stronger contraction
 
-A passive patient at 500 mL and PEEP 5, using mean arterial pressure divided by stroke volume as a **load surrogate**. The failing states use $E_{es}=0.55$ mmHg/mL and the vasoplegic states use a systemic resistance of 0.75 mmHg·s/mL. The result is labelled $MAP/SV$ rather than $E_a$ because effective arterial elastance is conventionally $P_{es}/SV$:
+Select **LV failure**, allow it to settle and create a Pin. Reduce **Systemic vascular resistance** while leaving LV contractility unchanged. Compare stroke volume and output with MAP and the PV loop: easier ejection can increase stroke volume even while arterial pressure falls. The final response also includes changed filling and, if enabled, autonomic compensation.
 
-| | ejection fraction | stroke volume | MAP | $MAP/SV$ | $E_{es}/(MAP/SV)$ |
-|---|---|---|---|---|---|
-| normal | 56.2% | 70 mL | 102 mmHg | 1.47 | 2.05 |
-| failing left ventricle | 22.4% | 37 mL | 52 | 1.41 | 0.39 |
-| vasoplegia | 61.2% | 73 mL | 80 | 1.09 | 2.76 |
-| both | 26.8% | 43 mL | 46 | 1.05 | 0.52 |
+Then return to the same starting phenotype and change PEEP alone. This changes filling and pulmonary loading as well as the pressure around the LV. The generated [wedge examples](pulmonary-artery-wedge-pressure.md#worked-examples) show why a lower transmural ejection-pressure burden need not increase output. The useful question is which change offsets which, not whether an afterload surrogate crossed a numerical target.
 
-The normal row yields 2.05 for this surrogate ratio. It must not be interpreted as a validated normal coupling measurement: replacing end-systolic pressure with MAP changes the quantity, and the model does not reproduce the measurement assumptions used to estimate clinical $E_a$.
-
-The interesting row is the last. Adding vasoplegia to a failing ventricle *raises* stroke volume from 37 to 43 mL while mean pressure falls from 52 to 46 mmHg. Contractility is unchanged; the model ventricle ejects against a lower load, and the $E_{es}/(MAP/SV)$ surrogate rises from 0.39 to 0.52.
+If calculating a ratio outside the application, $MAP/SV$ is only a named pressure-to-volume surrogate. It is not $E_a=P_{es}/SV$: a cycle mean and end-systolic pressure are different measurements, and a pressure from one clock should not be paired casually with a stroke volume from another.
 
 ---
 
@@ -103,7 +101,7 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 
 **Resistive valves rather than cardiac-cycle state switches.** The one-way condition avoids explicit event-driven valve states and produces the intended loop phases. Flow is continuous at zero gradient, but its derivative has a corner there; the formulation reduces state-machine complexity rather than removing every derivative discontinuity.
 
-**Not publishing a coupling ratio.** It would be easy to divide two numbers and print $E_{es}/E_a$ as a tile. It is not printed because a defensible computation needs end-systolic pressure and because the ratio's clinical meaning is anchored in measurements — pressure–volume catheterisation or single-beat estimation — whose assumptions the model does not reproduce. The table above demonstrates afterload sensitivity with an explicitly named surrogate; it does not validate ventriculo-arterial coupling numerically.
+**Not publishing a coupling ratio.** The plotted $E_a$ line has a model end-ejection pressure available, but that does not validate a clinical ratio. Its pressure reference, the effective line through a single beat and the selected intrinsic contractility are distinct constructions. Clinical pressure–volume catheterisation and single-beat estimation have measurement assumptions that Arthur does not reproduce. The proposed comparison demonstrates load sensitivity without presenting a numerically validated coupling ratio.
 
 ---
 
@@ -113,7 +111,7 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 
 - **No wave transmission.** The arterial system is a resistance and a compliance. There is no characteristic impedance, no pulse wave velocity, no reflected wave, and therefore no augmentation index and no distinction between central and peripheral pressure.
 - **$E_{es}$ is a straight line** with a fixed unstressed volume. Real end-systolic relations are mildly curvilinear and their intercept moves.
-- **No length-dependent activation beyond the elastance formulation**, no force–frequency relationship, and no contractile reserve: heart rate and contractility are independent controls.
+- **No length-dependent activation beyond the elastance formulation** and no intrinsic force–frequency or metabolic contractile-reserve law. Heart rate and contractility are independently selected; the aggregate baroreflex can change both together through its prescribed gains.
 - **No coronary circulation**, so no ischaemia, no supply–demand relationship, and no myocardial energetics. Pressure–volume area cannot be interpreted as oxygen consumption here.
 - The atria contract but do not have their own pathology; there is no atrial fibrillation and no loss of atrial kick as a switchable state.
 - Valves do not regurgitate, stenose or prolapse.
@@ -121,7 +119,7 @@ The interesting row is the last. Adding vasoplegia to a failing ventricle *raise
 ### Of clinical application
 
 - The normal reference produces an ejection fraction in the expected resting range because the activation waveform reaches the selected elastance. Individual values remain properties of the model's elastances and loading; they are not calibrated against echocardiographic measurement and should not be compared directly with a patient's number.
-- The ratios in the table use $MAP/SV$, not effective arterial elastance. They show a direction — vasodilatation raising stroke volume in a failing ventricle — and must not be quoted as coupling measurements.
+- A ratio using $MAP/SV$ must not be quoted as an effective arterial elastance or compared with a clinical coupling threshold.
 - Nothing here supports a decision about inotropes versus vasodilators in a particular patient. The model has no myocardial oxygen balance, which is the constraint that decision usually turns on.
 
 ---

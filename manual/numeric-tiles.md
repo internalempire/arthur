@@ -6,7 +6,7 @@
 
 ## How a model state becomes a number
 
-The circulation is integrated at every time step, but most bedside quantities are not instantaneous. Systolic and diastolic pressures come from the latest completed cardiac cycle. Cardiac output divides integrated aortic volume by the measured duration of the latest completed beat. Mean vascular pressures are exponential three-second averages. Most respiratory summaries come from the latest completed breath, but the alveolar, pleural and transpulmonary tiles show the current model pressure. A tile can therefore lag an animated chamber or instantaneous waveform without either being wrong.
+The circulation is integrated at every time step, but most bedside quantities are not instantaneous. Systolic and diastolic pressures come from the latest completed cardiac cycle. Cardiac output divides integrated aortic volume by the measured duration of the latest completed beat. Mean vascular pressures use exponential smoothing with a three-second time constant: recent samples carry more weight, and older samples fade rather than being discarded at a sharp three-second boundary. Most respiratory summaries come from the latest completed breath, but the alveolar, pleural and transpulmonary tiles show the current model pressure. A tile can therefore lag an animated chamber or instantaneous waveform without either being wrong.
 
 After measurement, the interface may apply a calculation such as $(mPAP-wedge)/CO$, $VT/\Delta P$ or respiratory variation. It then asks whether the assumptions needed to give that calculation its clinical name are present. Finally, a colour may draw attention to a teaching state. These four stages are separate:
 
@@ -24,6 +24,12 @@ The category shown on each tile is part of the result:
 - **internal model coefficient** — used by the equations but not measured the same way at the bedside.
 
 An exactly known latent model state can still be clinically unmeasurable. Conversely, a bedside-derived index can remain useful despite measurement uncertainty. [Interpretability](interpretability.md) explains the badge rules.
+
+## Start with a clinical question
+
+For a PEEP intervention, first read Ppl and $P_L$: how much pressure surrounds the heart and how much distends the lung? Then compare transmural filling, ventricular volumes and forward output. Finally inspect pulmonary load and the interpretability badges. This sequence prevents a rise in CVP from becoming “better preload”, or a lower LV end-ejection pressure from becoming “better cardiac output”, without checking the intervening mechanism.
+
+Use the same logic with a blood dose: verify the blood-total change in the sidebar, then ask whether the extra pressure-generating volume increased filling and useful forward flow. A transient output difference between ventricles can represent storage and redistribution. It does not imply that blood has disappeared.
 
 ## Pin values for a comparison
 
@@ -52,7 +58,7 @@ Read each card's measurement label and time window:
 - Pleural pressure is instantaneous, in cmH₂O relative to atmosphere. Lung gas volume, open fraction, the internal PVR coefficient and pulmonary blood volume are instantaneous model states.
 - The venous forward-driving gradient uses three-second exponential mean determinants: systemic filling pressure minus effective downstream pressure, which uses a smooth transition between right atrial and caval critical pressure. This is a gradient calculated from mean determinants, not a time average of the instantaneous gradient. It is not a measurement of net flow; resistance, collapse and backflow also matter.
 - RV and LV end-diastolic volumes and forward outputs refer to the latest completed beat. RV output divides integrated forward pulmonary-valve volume by that beat's measured duration; systemic output uses forward aortic volume. These outputs can differ during redistribution.
-- Mean arterial and pulmonary arterial pressures are three-second exponential means referenced to atmosphere. The internal PVR coefficient is not catheter-derived PVR and does not describe the whole RV afterload.
+- Mean arterial and pulmonary arterial pressures are referenced to atmosphere and use exponential smoothing with a three-second time constant. The internal PVR coefficient is not catheter-derived PVR and does not describe the whole RV afterload.
 - LV end-ejection transmural pressure is the pressure at the last forward-ejection sample in the completed beat, after subtracting pleural and additional pericardial pressure. It is a measured outcome of loading and contraction, not an independently prescribed afterload or proof of improved ejection. Read it alongside filling, stroke volume and output.
 - Pulmonary blood volume includes arteries, the transport buffer and veins. The displayed transport-buffer mean time is an internal timescale, not a fixed delay or a clinical transit measurement.
 
@@ -108,7 +114,7 @@ Related pages: [Transmural pressure](transmural-pressure.md) · [Pleural pressur
 
 Pmsf is the elastic pressure generated by stressed systemic venous volume, modified by abdominal transmission where the reservoir remains distended. The subtitle reports the effective gradient between Pmsf and the back-pressure seen by venous return; near caval collapse that back-pressure is not simply right atrial pressure.
 
-Pmsf is an exactly known model state. A patient value requires an occlusion or extrapolation and carries much greater uncertainty.
+This Pmsf is known exactly as a calculation from the aggregate venous reservoir. Arthur does not stop the whole systemic circulation and measure its equilibrated pressure; the label denotes the reservoir approximation that drives its venous-return construction. A patient estimate from occlusion or extrapolation has different assumptions and much greater uncertainty.
 
 Related pages: [Stressed volume](stressed-volume.md) · [Venous tone](venous-tone.md) · [Venous return](venous-return.md) · [Pmsf and occlusions](pmsf-and-occlusions.md)
 
@@ -124,7 +130,7 @@ Related page: [Preload reserve](preload-reserve.md)
 
 ### Pulmonary artery
 
-Systolic and diastolic values come from the latest pulmonary arterial beat; mPAP is a three-second mean. The subtitle includes the left-atrial-pressure wedge surrogate so the upstream and downstream pressures remain visible together. mPAP depends on flow, downstream pressure and the complete pulmonary vascular load, and a failing RV may be unable to generate a striking pressure despite severe afterload.
+Systolic and diastolic values come from the latest pulmonary arterial beat; mPAP is an exponential mean with a three-second time constant. The subtitle includes the left-atrial-pressure wedge surrogate so the upstream and downstream pressures remain visible together. mPAP depends on flow, downstream pressure and the complete pulmonary vascular load, and a failing RV may be unable to generate a striking pressure despite severe afterload.
 
 The pulmonary-hypertension status uses the model's mPAP, wedge surrogate and derived PVR. It is descriptive, not diagnostic, and its pre-/post-capillary wording is uncertain whenever the wedge surrogate is cautioned.
 
@@ -132,7 +138,7 @@ Related pages: [The right ventricle](the-right-ventricle.md) · [Pulmonary arter
 
 ### Wedge surrogate
 
-The tile is a three-second mean of atmospheric left atrial pressure. It is not produced by a catheter occlusion and is not sampled specifically at end-expiration. Pleural and pericardial pressure are included in the displayed value, so it must not be equated automatically with transmural left-heart filling pressure.
+The tile is an exponential mean of atmospheric left atrial pressure with a three-second time constant. It is not produced by a catheter occlusion and is not sampled specifically at end-expiration. Pleural and pericardial pressure are included in the displayed value, so it must not be equated automatically with transmural left-heart filling pressure.
 
 The subtitle reports a **zone 3 index**, a normalised pulmonary-venous-to-alveolar pressure margin. It is not an anatomical percentage of lung. The tile is cautioned when this index does not support an uninterrupted downstream pressure column.
 
@@ -140,7 +146,7 @@ Related page: [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.
 
 ### LA transmural pressure
 
-This tile asks a different question from the wedge surrogate: how much pressure is actually distending the model left atrium? It subtracts pleural and pericardial pressure from atmospheric left atrial pressure. All three terms use the same three-second averaging interval, so the comparison is not distorted by mixing a smoothed wedge value with an instantaneous respiratory pressure.
+This tile asks a different question from the wedge surrogate: how much pressure is actually distending the model left atrium? It subtracts pleural and pericardial pressure from atmospheric left atrial pressure. All three terms use the same exponential three-second time constant, so the comparison is not distorted by mixing a smoothed wedge value with an instantaneous respiratory pressure.
 
 Because this is an exactly known internal chamber state, it does not inherit the zone 3 caution. That does not make it a directly measured bedside quantity: estimating an equivalent patient value still requires a valid PAWP and a defensible estimate of the pressure surrounding the heart.
 
@@ -154,7 +160,7 @@ $$
 PVR_{derived}=\frac{mPAP-P_{w,surr}}{CO}
 $$
 
-Because cardiac output is in the denominator, derived PVR can rise when flow falls even if the internal resistance coefficient barely changes. It is unavailable near zero forward flow and inherits any zone-3 caution from the wedge surrogate.
+Because cardiac output is in the denominator, derived PVR can rise when flow falls even if the internal resistance coefficient barely changes. The numerator uses exponentially smoothed pressures, whereas the denominator uses the latest completed beat. During a transient this mixes response windows; interpret the ratio after the pressures and output have stabilised, not as an instantaneous measurement of vascular tone. It is unavailable near zero forward flow and inherits any zone-3 caution from the wedge surrogate.
 
 Related pages: [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Vascular waterfalls](vascular-waterfalls.md)
 
@@ -186,6 +192,8 @@ The tile reports the ventilator-like breathwise ratio $VT/\Delta P$, using total
 
 Related pages: [Equation of motion](equation-of-motion.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Two-population lung](two-population-lung.md)
 
+The compliance tile can remain visible during spontaneous effort even when the plateau tile is unavailable. In that situation it uses the model’s calculated passive recoil, not an actually measured assisted-breath plateau. It should not be treated as bedside passive compliance. After a setting change, the breathwise values can also retain the preceding breath until updated; allow stable complete cycles before comparing mechanics.
+
 ### Airway pressure
 
 The main tile number is instantaneous Paw; its subtitle retains the peak reached during the latest completed breath. The waveform rail follows the same hierarchy and therefore continues to update through VCV, PCV, PSV and spontaneous breathing.
@@ -202,7 +210,7 @@ Related pages: [Equation of motion](equation-of-motion.md) · [Stress index](str
 
 ### End-expiratory pressure and total PEEP
 
-The main number is the end-expiratory alveolar pressure from the last breath. Its name and subtitle change with the conditions under which it was produced.
+The number is applied PEEP plus the non-negative alveolar-pressure excess sampled late in expiration. It updates during the final part of expiration and then remains until the next such sample. It cannot report a value below applied PEEP, so it is not an unrestricted sample of the instantaneous Palv waveform. Its name and subtitle change with the conditions under which it was produced.
 
 In a **passive patient**, the tile is labelled **Total PEEP**. It separates applied from intrinsic PEEP and calls volume above the passive equilibrium at the same applied PEEP **dynamically trapped volume**. Loss-of-recoil hyperinflation is therefore not automatically labelled dynamic trapping. The EFL label reports whether the expiratory choke constrained flow during that breath.
 
@@ -212,9 +220,9 @@ Related page: [Expiratory flow limitation](expiratory-flow-limitation.md)
 
 ### Pleural pressure
 
-The main number is the current absolute pleural pressure: the pressure surrounding the lung, heart and intrathoracic vessels at that instant. The subtitle retains the swing measured over the latest completed breath. This order matters clinically: the absolute pressure helps interpret transmural filling and ejection load now, whereas the swing describes how strongly breathing has varied that surrounding pressure over one breath.
+The main number is the current pleural pressure relative to atmosphere: the pressure surrounding the lung, heart and intrathoracic vessels at that instant. The subtitle retains the swing measured over the latest completed breath. This order matters clinically: the pressure level helps interpret transmural filling and ejection load now, whereas the swing describes how strongly breathing has varied that surrounding pressure over one breath.
 
-Chest-wall compliance mainly changes the swing; chest-wall load can shift the resting level. The same swing can therefore begin from different absolute pressures and have different circulatory consequences.
+Chest-wall compliance mainly changes the swing; chest-wall load can shift the resting level. The same swing can therefore begin from different pressure levels relative to atmosphere and have different circulatory consequences.
 
 Related pages: [Pleural pressure](pleural-pressure.md) · [Transmural pressure](transmural-pressure.md) · [The four effects of a breath](the-four-effects-of-a-breath.md)
 
@@ -247,7 +255,7 @@ $$
 - $P_{alv}$ — alveolar pressure, in cmH₂O;
 - $P_{pl}$ — pleural pressure, in cmH₂O.
 
-The subtitle prints the two pressures used in the subtraction. Keeping $P_L$ separate from Ppl distinguishes the pressure that distends the lung from the pressure surrounding the circulation. It is an exact global model state, not an oesophageal-pressure measurement and not a regional estimate of lung stress. During flow it can differ from the bedside dynamic estimate $P_{aw}-P_{es}$ because that estimate includes the resistive Paw-to-Palv pressure drop. The [waveform page](panel-waveforms.md#why-the-model-trace-can-differ-from-bedside-dynamic-pl) explains when the two constructions converge.
+The subtitle prints the two pressures used in the subtraction. Keeping $P_L$ separate from Ppl distinguishes the pressure that distends the lung from the pressure surrounding the circulation. It is an exact global model state, not an oesophageal-pressure measurement and not a regional estimate of lung stress. During flow it can differ from the bedside dynamic estimate $P_{aw}-P_{es}$ because that estimate includes the resistive Paw-to-Palv pressure drop. The [waveform page](panel-waveforms.md#why-model-and-bedside-transpulmonary-pressure-traces-can-differ) explains when the two constructions converge.
 
 Related pages: [Pleural pressure](pleural-pressure.md) · [The Campbell diagram](panel-campbell.md) · [The waveform panel](panel-waveforms.md)
 
@@ -271,7 +279,7 @@ Related page: [Stress index](stress-index.md)
 
 ### Pulse pressure variation
 
-PPV and SVV compare extrema over recent complete respiratory cycles. The tile explicitly labels them as descriptive rather than a verdict on filling state, and the model deliberately does not colour them with a fluid-responsiveness cutoff. In particular, a low PPV can coexist with substantial [preload reserve](preload-reserve.md) when severe underfilling weakens transmission through the pulmonary circulation. Spontaneous effort makes the tile unavailable; low tidal volume, too few beats per breath, RV dilatation or high abdominal pressure add caution because they weaken or confound the usual mechanism.
+PPV and SVV compare completed cardiac beats in a trailing window of about one respiratory period (1.05 times the period set by respiratory rate). If that contains fewer than two beats, the calculation falls back to up to four recent beats. This is not a phase-synchronised average over several complete breaths. The tile explicitly labels them as descriptive rather than a verdict on filling state, and the model deliberately does not colour them with a fluid-responsiveness cutoff. In particular, a low PPV can coexist with substantial [preload reserve](preload-reserve.md) when severe underfilling weakens transmission through the pulmonary circulation. Spontaneous effort makes the tile unavailable; low tidal volume, too few beats per breath, RV dilatation or high abdominal pressure add caution because they weaken or confound the usual mechanism.
 
 Related page: [Pulse pressure variation](pulse-pressure-variation.md)
 

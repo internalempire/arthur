@@ -13,9 +13,12 @@ agreeing — because a stale document is the failure mode this file exists to
 prevent. Changing a status is therefore a deliberate act, reviewed like any
 other change.
 
-A failing row means one of two things: the model is wrong, or the reading of
-the source is wrong. Both are worth knowing. The `not yet` rows below are open
-work, not excuses.
+A failing row calls for checking the implementation, the source reading and
+whether the measurement and model conditions are actually comparable. An
+intentional omission or a mismatch of population/protocol can also explain a
+discrepancy. Passing a calibrated row is not independent external validation;
+all active rows currently agree, while the historical notes below document
+superseded investigations.
 
 ## Rows
 
@@ -25,10 +28,10 @@ work, not excuses.
 | `peep-euvolaemic-pig` | Experimental anchor, not a human clinical range: in nine anaesthetised pigs at 7.7 mL/kg, PEEP 5 → 10 raised balloon-occlusion MSFP 12.9 → 14.0 mmHg (+1.1) and changed pulmonary arterial flow 2.75 → 2.56 L/min (−6.9%, `p=0.094`). At the equivalent reference-weight tidal volume, the model allows ΔPmsf +0.5 to +1.8 mmHg and ΔCO −15% to +5%; these are model tolerances around the reported means, not study confidence intervals. | agrees | Berger et al., *Am J Physiol Heart Circ Physiol* 2016;311:H794–H806 |
 | `peep-volume-status` | The haemodynamic cost of PEEP depends on central filling: raising PEEP from 5 to 15 reduces output more in the underfilled model than in the euvolaemic model. This is a directional teaching constraint. Fougères et al. measured a 13±9% cardiac-index fall with higher PEEP and a 14±10% restoration with passive leg raising at high PEEP; they did **not** report the former model target of a ≥1.5× between-state ratio. | agrees | Fougères et al., *Crit Care Med* 2010;38:802–7 |
 | `pvr-recruitability-low` | At an explicit reopenable share of 0.06188009182612101 in the human ARDS calibration phenotype, PEEP 4 → 14 keeps derived PVR inside the low-recruiter trial IQRs (1.50–3.71 → 2.08–4.75 WU) and raises it by 20–80%. The ratio of cohort medians was +52%, but is not a median within-patient change. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
-| `pvr-recruitability-high` | At an explicit reopenable share of 0.7497452596823374, the same manoeuvre stays inside the high-recruiter IQRs (2.31–3.61 → 2.10–3.75 WU) and changes PVR by −10% to +20%; the current model gives +6%, while the ratio of cohort medians is +5% (P = 0.55). This is broad compatibility with reported dispersion, not a patient-level fit. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
+| `pvr-recruitability-high` | At an explicit reopenable share of 0.7497452596823374, the same manoeuvre stays inside the high-recruiter IQRs (2.31–3.61 → 2.10–3.75 WU) and changes PVR by −10% to +20%; the ratio of cohort medians is +5% (P = 0.55). This is broad compatibility with reported dispersion, not a patient-level fit. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `pvr-recruitability-dissociation` | Sweeping fixed explicit shares [0, 0.26362718641757965, 0.5760336369276047, 0.9422854383786519, 1] progressively attenuates the PEEP-related PVR rise by at least 15 percentage points. No sign change is required: the measured high-recruiter median was still +5%. | agrees | Cappio Borlino et al., *Am J Respir Crit Care Med* 2024;210(7) |
 | `transmission-chest-wall` | For the same PEEP, a stiff chest wall transmits more pressure to the pleural space than a compliant one. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
-| `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it recruits less volume per cmH₂O. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
+| `transmission-lung` | For the same PEEP, a stiff lung transmits less pressure to the pleural space than a compliant one, because it accepts less volume per cmH₂O in the tested passive comparison; this does not necessarily mean less alveolar recruitment. | agrees | Jardin et al., *Chest* 1985;88:653–8 |
 | `pvr-human-frc-nadir` | The fully open mechanical J-curve has its minimum within 0.15 L of the model's 2.2 L human FRC. | agrees | Cecconi, Collino & Pinsky, *Intensive Care Med* 2026, Fig. 1C (clinical synthesis: minimum near FRC) |
 | `pvr-human-j-direction` | Total PVR is higher at RV and TLC than near FRC; extra-alveolar resistance predominates at RV and alveolar resistance at TLC. This is the qualitative topology of the human teaching curve, not a numerical fit to the unscaled schematic or to maximal animal inflation. | agrees | Cecconi, Collino & Pinsky 2026, Fig. 1C; Thomas et al. 1961 and Hakim et al. 1982 for qualitative mechanism |
 | `ppv-suspended-spontaneous` | During spontaneous breathing, pulse pressure variation is withheld rather than presented as an interpretable dynamic index. | agrees | Teboul et al., *Am J Respir Crit Care Med* 2019;199:22–31 |
@@ -72,7 +75,7 @@ Agostoni E, Hyatt RE, *Handbook of Physiology* 1986:113–130,
 et al., *J Appl Physiol* 2003;95:2064–2071,
 [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003).
 
-## Current phase-8 EFL semantics
+## Current EFL semantics
 
 `raw` remains a linear resistance; `clung` is the local compliance of aerated
 tissue away from the capacity ceiling; and `lungCapacity` independently sets
@@ -109,17 +112,24 @@ active model, tests or manual generators. Earlier decisions and source history
 preserve the reason the fixed 0.75 cmH₂O opening width was chosen; that width is
 retained without asserting fresh external validation.
 
-## Current phase-3 volume semantics
+## Current volume semantics
 
 The three user-visible mechanisms are intentionally independent:
 
-1. `stressedVolume` adds or removes actual blood from the systemic venous
-   reservoir one-for-one, as a deliberately instantaneous fluid or diuresis
-   control.
-2. Baroreflex venous tone shifts the zero-pressure volume: positive outflow
-   moves blood from unstressed to stressed volume without changing total blood.
-3. `csv` changes the volume–pressure slope without reclassifying any volume as
-   stressed or unstressed.
+1. **Blood volume change** prepares a signed dose. Apply/Remove changes actual
+   blood in the systemic venous reservoir one-for-one and resets the pending
+   selector. Total blood and cumulative applied balance persist; the internal
+   `stressedVolume` prescription stores the applied amount in absolute model
+   coordinates. This is an instantaneous intravascular intervention, not
+   crystalloid kinetics, bleeding physiology or diuresis.
+2. **Venous capacity reduction** and baroreflex venous tone additively shift
+   zero-pressure volume without adding blood or changing compliance. A positive
+   reduction initially increases stressed volume; redistribution then changes
+   the observed reservoir fraction.
+3. **Venous compliance** (`csv`) changes the volume–pressure slope. At the
+   instant of the edit it neither changes total blood nor reclassifies stressed
+   versus unstressed volume; subsequent pressure-driven redistribution can
+   change the amount held in the reservoir.
 
 This follows the experimental teaching geometry: increased tone shifts the
 volume–pressure relation left with little change in slope, and human septic-shock
@@ -128,7 +138,7 @@ systemic pressure. The model's 200 mL recruitment per unit of reflex outflow is
 a transparent didactic coefficient, not a norepinephrine dose–response
 calibration.
 
-## Current phase-2 calibration
+## Current pulmonary calibration and its limits
 
 The active calibration is deliberately hierarchical:
 
@@ -141,12 +151,18 @@ The active calibration is deliberately hierarchical:
    volume-dependent mechanism. Their exact nadir, maximal-inflation ratios and
    vascular partitions are no longer executable human targets.
 
-The model now gives 2.68 → 3.28 WU (+22%) in the low-recruitability calibration
-phenotype and 2.45 → 2.62 WU (+7%) in the high-recruitability phenotype after 45
-s of equilibration. All four values fall within the published IQRs. The first
-response is smaller than the +52% ratio of cohort medians; it is retained rather
-than overfitted because the paper does not report the median paired percentage
-change and this remains a teaching model.
+The executable comparison in `tests/literature.mjs` retains the published
+cohort IQRs and the declared model tolerance bands in the table above. Current
+run-specific numbers belong in generated results rather than in a second
+hand-maintained calibration table. The ratio of cohort medians is not a
+median paired response and should not be treated as such.
+
+At the higher PEEP, the aggregate model can leave its zone-3 condition. Its
+left-atrial pressure is still known internally, so a pressure–flow ratio can be
+calculated, but its equivalence to a valid catheter wedge-based PVR is then
+cautioned. Agreement with the cohort ranges does not resolve that mismatch,
+validate the internal resistance coefficient, or make the explicitly selected
+opening shares measured human recruitability.
 
 The calibration phenotype is not the shipped “ARDS with right ventricular
 failure” preset. It uses normal RV contractility and `pvrBase=0.09`, because the
@@ -160,7 +176,7 @@ The sections below preserve how earlier formulations were investigated. Their
 numerical outputs and passing-row claims are historical; the table above and
 [MODEL_DECISIONS.md](MODEL_DECISIONS.md) are the current specification.
 
-## How the recruitability rows were closed
+### How the recruitability rows were closed
 
 These two rows were open for a while, and the reason they closed is worth
 recording, because the argument for why they *could not* close was wrong in an
@@ -213,7 +229,7 @@ was still open at that point and was unrelated to that work. It is now addressed
 separately by the pressureless flow pathway recorded in
 [MODEL_DECISIONS.md](MODEL_DECISIONS.md).
 
-## What making recruitment mechanical changed
+### What making recruitment mechanical changed
 
 Recruitment used to alter resistance and gas exchange but not mechanics, so a
 recruited lung gained no compliance and no resting volume. Closing that gap moved
@@ -250,7 +266,7 @@ range. It does not below about PEEP 4, because even a consolidated lung is still
 reopening its *normal* units down there, and it therefore has a shallow
 resistance optimum of its own near PEEP 8. The row now measures from 4.
 
-## Two rows that giving the tissue a ceiling pushed just outside
+### Two rows that giving the tissue a ceiling pushed just outside
 
 The lung's pressure–volume relation used to be a straight line above the
 recruitment sigmoid, so airway pressure rose linearly however hard a lung was
@@ -284,7 +300,7 @@ recorded here is that a defensible change to the mechanics cost two percent on
 one row and two points on another, and that neither was paid for by moving a
 number to avoid saying so.
 
-## What the published numbers turned out to be
+### What the published numbers turned out to be
 
 The two recruitability rows were written from a description of Cappio Borlino et
 al. rather than from its figures, so they asked for a *direction* and a band I
@@ -324,7 +340,7 @@ agreeing. But the trial measured +5%, and −14% is not the same as +5% — it i
 the opposite direction by nineteen points. The band is centred on the
 measurement instead, which is where a band belongs.
 
-## What the two papers actually say
+### What the two papers actually say
 
 Nicola supplied Thomas et al. 1961 and Hakim et al. 1982. Both were read, and
 both contradict the model in ways the old rows could not see, because the old
@@ -424,7 +440,7 @@ Neither is attempted here. Four rows now state what was measured, three of them
 fail, and that is a better position than one row stating a bound I made up and
 passing.
 
-## What changed when the limbs were rebuilt
+### What changed when the limbs were rebuilt
 
 Both limbs now follow volume. The alveolar component rises exponentially with
 strain; the extra-alveolar component falls as vessels unfurl and receives a
@@ -459,7 +475,7 @@ That was a category error of exactly the kind this project spends most of its
 interpretability machinery avoiding everywhere else, and it had been sitting in
 the rows since they were written.
 
-## Checked against Cecconi, Collino & Pinsky 2026
+### Checked against Cecconi, Collino & Pinsky 2026
 
 A short review of heart–lung interaction in ARDS, read in full. Every mechanism
 it names is already in the model, and one of its statements is now a row.
@@ -535,7 +551,7 @@ measurement into a 15% PPV warning threshold: the cutoff depended on the retired
 Michard calibration. Right ventricular dilatation remains a caution, with the
 explicit limitation that it is a late proxy for cyclic afterload.
 
-## A note on how these rows were written
+### A note on how these rows were written
 
 Two of the rows were narrowed after drafting, and it is worth saying why.
 
@@ -562,7 +578,7 @@ Historically, the `pvr-recruitability-high` row passed on a phenotype this file
 chose — 55% of the collapsed lung openable at an opening pressure of 20 cmH₂O —
 rather than on the R/I ratio the trial measured. The subsequent static R/I mapping was itself retired on 2026-09-17. The active rows now retain explicit fixture shares and the PVR bounds; they make no R/I measurement claim.
 
-## What this file is not
+### What this file is not
 
 These are directional and order-of-magnitude checks against published group
 means. Passing them is evidence that the model reproduces a documented

@@ -1,5 +1,7 @@
 # Model decisions
 
+> This is a dated decision history. Earlier entries preserve the assumptions and conclusions at that time; later corrections can supersede them. For current behavior use the [manual](../manual/home.md), [physiology overview](PHYSIOLOGY.md) and [scenario evidence](SCENARIO_VALIDATION.md).
+
 ## 2026-09-29 — Separate volume intervention, actual total and observed venous fraction
 
 Expose the actual blood intervention as a signed difference from an explicit

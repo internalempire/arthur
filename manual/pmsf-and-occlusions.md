@@ -33,9 +33,11 @@ Calling that value Pmsf assumes every hold samples the same venous-return relati
 
 ## In the model
 
-The inspiratory hold starts at end inspiration, stops gas flow and sets airway pressure equal to alveolar pressure. The circulation continues to run for the selected duration. Only the final 40% of the hold is averaged, allowing the initial transient to settle before one right-atrial-pressure/flow pair is stored.
+The **Insp hold** button arms an occlusion at the next end inspiration, stops gas flow and sets airway pressure equal to alveolar pressure. The circulation continues during the interface's fixed 12-second hold. The generated example below uses a separately specified 10-second scripted protocol; those durations must not be conflated. Only the final 40% of the hold is averaged, allowing the initial transient to settle before one right-atrial-pressure/flow pair is stored.
 
 ![Measured hold points, their extrapolated line and the current model venous-return relation](figure/pmsf-occlusions.svg)
+
+The background curve uses the final heartbeat-window construction; the annotated reservoir-based Pmsf uses the separate 3 s exponential smoothing. The hold points average the last 40% of each hold. Their clocks differ deliberately: they must not be read as simultaneous measurements of one invariant relation.
 
 <!-- BEGIN GENERATED: pmsf-occlusions -->
 *Executable setup: inspiratory holds lasting 10 s follow delivered tidal volumes of 300, 500, 700, 900 mL. Only the final 40% of each hold is averaged.*
@@ -72,12 +74,12 @@ The result is not tuned to the published magnitude. Berger and colleagues found 
 - The venous system is one reservoir, so regional time constants and separate SVC/IVC responses are absent.
 - The same abdominal coupling that creates the bias is an aggregate coefficient, not a calibrated human splanchnic model.
 - Holds are perfectly timed and noise-free; fitting uncertainty and measurement artefact are absent.
-- The model knows its internal Pmsf exactly, a privilege unavailable in an intact patient.
+- The model knows its internal reservoir-pressure surrogate labelled Pmsf exactly. It does not establish a reference pressure by arresting flow and equilibrating all systemic compartments.
 
 ### Of clinical application
 
 - The model cannot establish the accuracy or interchangeability of bedside Pmsf methods.
-- Its approximately 15 mmHg overestimate must not be expected in a patient or used to correct a measured value.
+- The large intercept–internal-pressure gap in the example must not be expected in a patient or used to correct a measured value.
 - A linear set of hold points does not prove that their zero-flow intercept equals the pressure that would be measured after true circulatory arrest.
 - The manoeuvre is an explanatory tool, not a recommendation to perform prolonged holds in a particular patient.
 
@@ -90,6 +92,8 @@ Executable checks require a hold to stop gas flow, make airway and alveolar pres
 ---
 
 ## References
+
+[Maas et al.](https://pubmed.ncbi.nlm.nih.gov/19237896/) studied 12 mechanically ventilated postoperative cardiac-surgery patients using 12-second holds and pulse-contour flow during the last three seconds, with posture and colloid loading as volume perturbations. Arthur instead averages signed caval flow over the final 40%; the protocols and measured signals are not identical.
 
 - Maas JJ, Geerts BF, van den Berg PCM, Pinsky MR, Jansen JRC. Assessment of venous return curve and mean systemic filling pressure in postoperative cardiac surgery patients. *Crit Care Med*. 2009;37:912–918. [doi:10.1097/CCM.0b013e3181961481](https://doi.org/10.1097/CCM.0b013e3181961481)
 - Berger D, Moller PW, Weber A, et al. Effect of PEEP, blood volume, and inspiratory hold maneuvers on venous return. *Am J Physiol Heart Circ Physiol*. 2016;311:H794–H806. [doi:10.1152/ajpheart.00931.2015](https://doi.org/10.1152/ajpheart.00931.2015)

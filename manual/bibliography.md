@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 145 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 148 unique entries.
 
 ---
 
@@ -24,14 +24,14 @@ A citation documents the physiological or methodological claim made on its sourc
 - Berger D, Moller PW, Weber A, et al. Effect of PEEP, blood volume, and inspiratory hold maneuvers on venous return. *Am J Physiol Heart Circ Physiol*. 2016;311:H794–H806. [doi:10.1152/ajpheart.00931.2015](https://doi.org/10.1152/ajpheart.00931.2015)
 - Bianchi I, Grassi A, Pham T, et al. Reliability of plateau pressure during patient-triggered assisted ventilation: analysis of a multicentre database. *J Crit Care*. 2022;68:96–103. [doi:10.1016/j.jcrc.2021.12.002](https://doi.org/10.1016/j.jcrc.2021.12.002)
 - Brower R, Wise RA, Hassapoyannes C, et al. Effect of lung inflation on lung blood volume and pulmonary venous flow. *J Appl Physiol*. 1985;58:954–963. [doi:10.1152/jappl.1985.58.3.954](https://doi.org/10.1152/jappl.1985.58.3.954)
-- Buda AJ, Pinsky MR, Ingels NB Jr, et al. Effect of intrathoracic pressure on left ventricular performance. *N Engl J Med*. 1979;301:453–459. <https://doi.org/10.1056/NEJM197908303010901>
+- Buda AJ, Pinsky MR, Ingels NB Jr, et al. Effect of intrathoracic pressure on left ventricular performance. *N Engl J Med*. 1979;301:453–459. [doi:10.1056/NEJM197908303010901](https://doi.org/10.1056/NEJM197908303010901)
 - Burkhoff D, Mirsky I, Suga H. Assessment of systolic and diastolic ventricular properties via pressure–volume analysis. *Am J Physiol Heart Circ Physiol*. 2005;289:H501–H512. [doi:10.1152/ajpheart.00138.2005](https://doi.org/10.1152/ajpheart.00138.2005)
 - Burkhoff D, Sagawa K. Ventricular efficiency predicted by an analytical model. *Am J Physiol* 1986;250:R1021–7. [doi:10.1152/ajpregu.1986.250.6.R1021](https://doi.org/10.1152/ajpregu.1986.250.6.R1021)
 ## C
 
 - Campbell EJM. *The Respiratory Muscles and the Mechanics of Breathing*. Lloyd-Luke; 1958.
-- Cappio Borlino S, et al. The effect of PEEP on pulmonary vascular resistance depends on lung recruitability in patients with ARDS. *Am J Respir Crit Care Med* 2024;210:900–907. [doi:10.1164/rccm.202402-0383OC](https://doi.org/10.1164/rccm.202402-0383OC) — human PEEP comparison used for phenotype calibration, subject to the model's downstream-pressure limitations.
-- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3) — Fig. 1C is the clinical two-limb synthesis this page follows.
+- Cappio Borlino S, et al. [The effect of positive end-expiratory pressure on pulmonary vascular resistance depends on lung recruitability in patients with acute respiratory distress syndrome](https://doi.org/10.1164/rccm.202402-0383OC). *Am J Respir Crit Care Med* 2024;210:900–7. Human pressure–flow comparison used to constrain an illustrative model phenotype, not independent validation of its internal coefficient or of a whole human J-curve.
+- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical bedside implications. *Intensive Care Med* 2026;52:2031–2034. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3) — Fig. 1C is the clinical two-limb synthesis this page follows.
 - Chantler PD, Lakatta EG, Najjar SS. Arterial–ventricular coupling: mechanistic insights into cardiovascular performance at rest and during exercise. *J Appl Physiol* 2008;105:1342–51. [doi:10.1152/japplphysiol.90600.2008](https://doi.org/10.1152/japplphysiol.90600.2008)
 - Chapleau MW, Abboud FM. Determinants of sensitization of carotid baroreceptors by pulsatile pressure in dogs. *Circ Res*. 1989;65:566–577. [doi:10.1161/01.RES.65.3.566](https://doi.org/10.1161/01.RES.65.3.566)
 - Chase SC, Taylor BJ, Cross TJ, et al. Influence of thoracic fluid compartments on pulmonary congestion in chronic heart failure. *J Card Fail*. 2017;23:690–696. [doi:10.1016/j.cardfail.2017.07.394](https://doi.org/10.1016/j.cardfail.2017.07.394)
@@ -46,6 +46,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Damiano RJ Jr, La Follette P Jr, Cox JL, Lowe JE, Santamore WP. Significant left ventricular contribution to right ventricular systolic function. *Am J Physiol*. 1991;261:H1514–H1524. [doi:10.1152/ajpheart.1991.261.5.H1514](https://doi.org/10.1152/ajpheart.1991.261.5.H1514)
 - Dampney RAL. Central neural control of the cardiovascular system: current perspectives. *Adv Physiol Educ*. 2016;40:283–296. [doi:10.1152/advan.00027.2016](https://doi.org/10.1152/advan.00027.2016)
 - De Backer D, Heenen S, Piagnerelli M, Koch M, Vincent JL. Pulse pressure variations to predict fluid responsiveness: influence of tidal volume. *Intensive Care Med*. 2005;31:517–523. [doi:10.1007/s00134-005-2586-4](https://doi.org/10.1007/s00134-005-2586-4)
+- De Hoyos A, Liu PP, Benard DC, Bradley TD. Haemodynamic effects of continuous positive airway pressure in humans with normal and impaired left ventricular function. *Clin Sci*. 1995;88:173–178. [doi:10.1042/cs0880173](https://doi.org/10.1042/cs0880173) — 16 patients with heart failure and 5 controls; CPAP 5 and 10 cmH₂O, measured after 10 minutes at each pressure.
 - Dunham-Snary KJ, Wu D, Sykes EA, et al. Hypoxic pulmonary vasoconstriction: from molecular mechanisms to medicine. *Chest*. 2017;151:181–192. [doi:10.1016/j.chest.2016.09.001](https://doi.org/10.1016/j.chest.2016.09.001)
 ## E
 
@@ -116,9 +117,11 @@ A citation documents the physiological or methodological claim made on its sourc
 - Mojoli F, Pozzi M, Orlando A, et al. Timing of inspiratory muscle activity detected from airway pressure and flow during pressure support ventilation: the waveform method. *Crit Care*. 2022;26:32. [doi:10.1186/s13054-022-03895-4](https://doi.org/10.1186/s13054-022-03895-4)
 - Monnet X, Marik PE, Teboul JL. Prediction of fluid responsiveness: an update. *Ann Intensive Care*. 2016;6:111. [doi:10.1186/s13613-016-0216-7](https://doi.org/10.1186/s13613-016-0216-7)
 - Moreno AH, Katz AI, Gold LD, Reddy RV. Mechanics of distension of dog veins and other very thin-walled tubular structures. *Circ Res*. 1970;27:1069–1080. [doi:10.1161/01.RES.27.6.1069](https://doi.org/10.1161/01.RES.27.6.1069)
+- Morrell NW, Nijran KS, Biggs T, Seed WA. Magnitude and time course of acute hypoxic pulmonary vasoconstriction in man. *Respir Physiol*. 1995;100:271–281. [doi:10.1016/0034-5687(95)00002-U](https://doi.org/10.1016/0034-5687(95)00002-U) — eight normal subjects, induced lobar hypoxia and serial scintigraphic perfusion measurements; supports direction and time dependence, not the model gain.
 ## N
 
-- Nuñez Silveira JM, Gallardo A, Alcala G, et al. Work of breathing by the Campbell diagram: physiology and practice. *Respir Care*. 2026. [doi:10.1177/19433654261453096](https://doi.org/10.1177/19433654261453096)
+- Naughton MT, Rahman MA, Hara K, et al. Effect of continuous positive airway pressure on intrathoracic and left ventricular transmural pressures in patients with congestive heart failure. *Circulation*. 1995;91:1725–1731. [doi:10.1161/01.CIR.91.6.1725](https://doi.org/10.1161/01.CIR.91.6.1725) — 15 patients with heart failure and 9 healthy subjects; graduated CPAP up to 10 cmH₂O, with oesophageal pressure as the intrathoracic-pressure estimate.
+- Nuñez Silveira JM, Gallardo A, Alcala G, et al. Work of breathing by the Campbell diagram: physiology and practice. *Respir Care*. 2026;71:1047–1054. [doi:10.1177/19433654261453096](https://doi.org/10.1177/19433654261453096)
 ## O
 
 - Oberkampf WL, Roy CJ. *Verification and Validation in Scientific Computing*. Cambridge University Press; 2010. [doi:10.1017/CBO9780511760396](https://doi.org/10.1017/CBO9780511760396)
@@ -170,7 +173,7 @@ A citation documents the physiological or methodological claim made on its sourc
 ## T
 
 - Takata M, Wise RA, Robotham JL. Effects of abdominal pressure on venous return: abdominal vascular zone conditions. *J Appl Physiol*. 1990;69:1961–1972. [doi:10.1152/jappl.1990.69.6.1961](https://doi.org/10.1152/jappl.1990.69.6.1961)
-- Talmor D, Sarge T, O'Donnell CR, et al. Esophageal and transpulmonary pressures in acute respiratory failure. *Crit Care Med*. 2006;34:1389–1394. <https://doi.org/10.1097/01.CCM.0000215515.49001.A2>
+- Talmor D, Sarge T, O'Donnell CR, et al. Esophageal and transpulmonary pressures in acute respiratory failure. *Crit Care Med*. 2006;34:1389–1394. [Article DOI](https://doi.org/10.1097/01.CCM.0000215515.49001.A2)
 - Taylor RR, Covell JW, Sonnenblick EH, Ross J. Dependence of ventricular distensibility on filling of the opposite ventricle. *Am J Physiol* 1967;213:711–8. [doi:10.1152/ajplegacy.1967.213.3.711](https://doi.org/10.1152/ajplegacy.1967.213.3.711)
 - Teboul JL, Monnet X, Chemla D, Michard F. Arterial pulse pressure variation with mechanical ventilation. *Am J Respir Crit Care Med*. 2019;199:22–31. [doi:10.1164/rccm.201801-0088CI](https://doi.org/10.1164/rccm.201801-0088CI)
 - Teboul JL, Monnet X, Richard C. Weaning failure of cardiac origin: recent advances. *Crit Care*. 2010;14:211. [doi:10.1186/cc8852](https://doi.org/10.1186/cc8852)
@@ -185,7 +188,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - van Loon LM, van der Hoeven JG, Veltink PH, Lemson J. The inspiration hold maneuver is a reliable method to assess mean systemic filling pressure but its clinical value remains unclear. *Ann Transl Med*. 2020;8:1390. [doi:10.21037/atm-20-3540](https://doi.org/10.21037/atm-20-3540)
 - Venegas JG, Harris RS, Simon BA. A comprehensive equation for the pulmonary pressure–volume curve. *J Appl Physiol*. 1998;84:389–395. [doi:10.1152/jappl.1998.84.1.389](https://doi.org/10.1152/jappl.1998.84.1.389)
 - Ventetuolo CE, Klinger JR. Management of acute right ventricular failure in the intensive care unit. *Ann Am Thorac Soc*. 2014;11:811–822. [doi:10.1513/AnnalsATS.201312-446FR](https://doi.org/10.1513/AnnalsATS.201312-446FR)
-- Vieillard-Baron A, Charron C, Caille V, et al. Prone positioning unloads the right ventricle in severe ARDS. *Chest*. 2007;132:1440–1446. <https://doi.org/10.1378/chest.07-1013>
+- Vieillard-Baron A, Charron C, Caille V, et al. Prone positioning unloads the right ventricle in severe ARDS. *Chest*. 2007;132:1440–1446. [doi:10.1378/chest.07-1013](https://doi.org/10.1378/chest.07-1013)
 - Vieillard-Baron A, Chergui K, Augarde R, et al. Cyclic changes in arterial pulse during respiratory support revisited by Doppler echocardiography. *Am J Respir Crit Care Med*. 2003;168:671–676. [doi:10.1164/rccm.200301-135OC](https://doi.org/10.1164/rccm.200301-135OC)
 - Vieillard-Baron A, Price LC, Matthay MA. Acute cor pulmonale in ARDS. *Intensive Care Med*. 2013;39:1836–1838. [doi:10.1007/s00134-013-3045-2](https://doi.org/10.1007/s00134-013-3045-2)
 - von Euler US, Liljestrand G. Observations on the pulmonary arterial blood pressure in the cat. *Acta Physiol Scand* 1946;12:301–20. [doi:10.1111/j.1748-1716.1946.tb00389.x](https://doi.org/10.1111/j.1748-1716.1946.tb00389.x)

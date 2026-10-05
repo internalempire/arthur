@@ -31,6 +31,8 @@ Pressure enters other parts of the circulation explicitly:
 - Alveolar pressure raises effective downstream pressure in a fixed share of the bed when it exceeds pulmonary venous pressure.
 - Fixed arterial and venous compliances relate stored blood volume to vascular pressure; respiratory pressure and the represented lung-inflation displacement effect also contribute.
 
+**For the user:** matching airway pressure is not sufficient for comparing two states. Record how pressure is generated, pleural pressure, lung volume and open fraction, and upstream/downstream vascular pressures. The same apparent PEEP or transpulmonary pressure can coexist with a different RV ejection load.
+
 The resistance law itself contains no pressure-induced vascular widening or recruitment. Compliant blood storage and pressure-dependent resistance are separate mechanisms; representing the first does not imply that the second is present.
 
 ## Limits

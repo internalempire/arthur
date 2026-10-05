@@ -48,7 +48,7 @@
 <text class="label" x="313" y="424" text-anchor="middle">End-expiratory transpulmonary pressure (cmH₂O)</text>
 <line class="total" style="stroke-dasharray:none" x1="576" y1="48" x2="604" y2="48"/><text class="label" x="610" y="52">incremental</text>
 <line class="alv" style="stroke-dasharray:none" x1="576" y1="70" x2="604" y2="70"/><text class="label" x="610" y="74">decremental</text>
-<text class="tick" x="576" y="110">only the collapsed but recruitable</text>
+<text class="tick" x="576" y="110">only the reopenable component</text>
 <text class="tick" x="576" y="126">part of the lung retains memory</text>
 <text class="tick" x="576" y="142">on the way down</text>
 </svg>

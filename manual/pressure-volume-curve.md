@@ -6,7 +6,7 @@
 
 ## Physiology
 
-The relation between transpulmonary pressure and lung volume is sigmoid. Its lower limb is dominated by units opening, its middle region is approximately linear, and its upper limb flattens as further distending pressure produces progressively less volume.
+A global static inflation curve can have a sigmoid shape: opening contributes to the lower limb, the middle region can be approximately linear, and the upper limb flattens as additional distending pressure produces less volume. Its shape depends on pressure history, airway closure, regional mechanics and the measurement protocol; it is not a unique anatomical curve belonging to every patient.
 
 These regions answer different clinical questions:
 
@@ -57,7 +57,7 @@ The live compliance displayed by the model is not required to equal this setting
 - upper-limb stiffening near maximum capacity;
 - chest-wall mechanics when respiratory-system compliance is reported.
 
-Thus `clung` is a constitutive tissue input, while live respiratory-system compliance is the current bedside-like output. The distinction is necessary rather than optional: one parameter cannot simultaneously be an instantaneous readout and the anatomical volume ceiling.
+Thus the aerated-lung compliance control is an input describing tissue properties, while the respiratory-system compliance tile is a breathwise output: delivered tidal volume divided by plateau minus total PEEP. The internal local slope used for some calculations is a different quantity. Plateau is calculated from passive recoil at the represented end-inspiratory volume, and total PEEP uses the model's late-expiratory pressure sample. During patient effort, the displayed ratio remains a model-derived mechanical descriptor, not a compliance measured from an assisted breath at the bedside. The distinction is necessary rather than optional: one parameter cannot simultaneously be an instantaneous readout and the anatomical volume ceiling.
 
 ### What maximum lung capacity means
 
@@ -77,7 +77,7 @@ This is how the model separates three lesions:
 |---|---|---|
 | `clung` | local stiffness of aerated tissue | a smaller maximum lung |
 | `lungCapacity` | size of the completely open lung | low compliance or collapse |
-| `collapsed` | fraction unavailable at low pressure | intrinsically stiff aerated tissue |
+| Compromised lung (`collapsed`) | diseased share whose opening potential is selected separately | fraction currently closed or intrinsically stiff aerated tissue |
 
 ![Pressure–volume curves with independent compliance and capacity](figure/pv-curve.svg)
 

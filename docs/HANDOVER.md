@@ -1,6 +1,24 @@
 # Project handover
 
-Updated: 2026-09-29
+Updated: 2026-10-05
+
+## Clinician-first documentation audit — October 5
+
+The clinician requested a full review of the documentation after September's changes, including mechanism, literature support, current controls, deprecated features, limitations and didactic scenarios. Three domain reviewers and an adversarial cross-review covered all 53 manual pages, README and the current technical/evidence documents. The manual describes current behavior; dated decisions remain explicitly historical.
+
+Corrected clinically material mismatches: blood redistributes within the circulation; CVP/LA transmural pressure subtract pleural and pericardial pressure; Pmsf is a reservoir-based calculation rather than measured whole-system zero-flow equilibration; pulmonary storage and tracer transit do not impose one universal mechanical delay; opened units also distend; PSV includes an intrinsic-PEEP threshold and pneumatic triggering; the septal control does not scale systolic LV-to-RV assistance. Nine pressure-bearing compartments plus the pressureless transport pathway are represented. Mean-pressure exponential smoothing, moving Guyton windows and PPV beat selection are distinguished from phase-latched measurements.
+
+User instructions now match the opening preset, blood Apply/Remove, Custom Reset, live Pins, saved prescriptions and optional combined Mechanisms. Guided scenarios specify starting conditions, one controlled intervention, early/settled observations and the permitted conclusion. The two healthy presets are not a matched ventilation-mode experiment. ARDS relative benefit at equal high PEEP is distinct from improvement over its own baseline. Passive PE comparisons explicitly remove effort. COPD requires more available expiratory time, not slower flow. The LV/CPAP investigation remains paused pending a new agreed teaching question.
+
+Four obsolete, ungenerated cardiovascular tables and duplicated baseline outputs were replaced by reproducible experiments and generated examples. The 18 generated numerical tables are unchanged; captions were regenerated from source. Figure labels now match current blood controls and state their averaging protocols. The pericardial figure pairs instantaneous pressure with instantaneous volume; its previous mean/instantaneous mismatch was a documentation plotting defect. Labels extending beyond several SVG boundaries and four obsolete internal anchors were corrected. Long reference text on the scenario page was shortened for narrow screens.
+
+Primary sources were checked with population, manoeuvre and measurement context. Ranieri 1993 and Georgopoulos 1993 had been conflated; Behazin 2010 was misattributed. The asserted human IVC-compliance range lacked adequate support and is now a labelled didactic coefficient. Authentic 2026 editorial/tutorial references are distinguished from primary quantitative validation. The bibliography is generated from the page references, not evidence that every paper was read in full. Source accessibility and verification limits are retained in the private reports.
+
+No physiological equation, coefficient, scenario prescription, numerical target or application layout changed. Runtime source edits are five scenario-note strings and descriptive comments only. Two documentary test expectations were updated because they enforced the incorrect fixed-interval/complete-breath descriptions; no numerical assertion was weakened. The figure generator changes only documentation output. No new runtime dependency or ongoing computation was added.
+
+Verification evidence and the final publication result are recorded in the private report and outputs directory. The initial full local suite returned 498 passes and two obsolete textual-contract failures; after correcting those expectations, the entire affected contract suite returned 80 passes. The UI suite returned 54 passes; manual examples, build and lint passed. The real-browser check passed all 53 pages, internal anchors, search, six narrow-screen pages and the five changed on-screen notes, with no JavaScript errors. Publication remains gated by the complete verification workflow on the committed revision; the private report records its final result and the published-byte comparison.
+
+Private evidence: `codex-notes/Arthur-revisione-documentazione-2026-10-05.md`, the three `Arthur-audit-docs-*-2026-10-05.md` reports, and `outputs/Arthur-documentation-audit-2026-10-05/`. The existing untracked physiological-review file is not part of this change. VPS is the working copy; Mac synchronization is not claimed.
 
 ## Explicit blood applications and Pin totals — September 29
 

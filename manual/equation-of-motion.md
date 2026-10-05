@@ -31,7 +31,7 @@ $$
 
 This partition is clinically important. The lung component determines lung stress; the chest-wall component is transmitted around the heart and intrathoracic vessels. The same airway pressure can therefore have different pulmonary and haemodynamic meanings in two patients.
 
-When flow stops during a hold, the resistive term disappears. This is why peak airway pressure contains resistance whereas plateau pressure represents the combined elastic load.
+When flow stops during a hold, the airway resistive term disappears. With relaxed respiratory muscles, plateau pressure then represents the combined lung and chest-wall elastic load. If effort persists, the zero-flow airway pressure still contains its effect and is not automatically a passive plateau.
 
 ---
 
@@ -55,11 +55,13 @@ $$
 P_l(V_{relax})+P_{cw}(V_{relax})=0
 $$
 
-At a static PEEP:
+At a static PEEP, with relaxed muscles, an open airway and enough time for gas to equilibrate:
 
 $$
 P_l(V_{EE})+P_{cw}(V_{EE})=PEEP
 $$
+
+During actual cycling, incomplete expiration, effort and recruitment history can leave end-expiratory volume away from this equilibrium.
 
 A collapsed, stiff lung meets the independent chest-wall relation at a lower volume and a higher transpulmonary recoil. A lung with lost recoil meets the same wall at a higher volume. Lung properties and the chest-wall reference are controlled independently.
 
@@ -67,7 +69,7 @@ A collapsed, stiff lung meets the independent chest-wall relation at a lower vol
 
 Volume control imposes inspiratory flow and lets pressure emerge. Pressure control applies airway pressure and lets flow decay as alveolar pressure approaches it. Spontaneous and assisted breaths subtract effective inspiratory-muscle pressure from the relaxed wall pressure.
 
-The neural command and effective muscle pressure are not treated as the same instantaneous signal. One internal activation state rises rapidly during neural inspiration and decays more slowly after neural switch-off. The residual pressure lowers pleural and alveolar pressure during early expiration, reducing outward flow. Volume then changes more slowly, which feeds back through both nonlinear recoil relations. This is the model's aggregate representation of post-inspiratory expiratory braking; the [Campbell diagram](panel-campbell.md#what-happens-during-active-expiration) shows its pressure–volume consequence.
+The neural command and effective muscle pressure are not treated as the same instantaneous signal. One internal activation state rises rapidly during neural inspiration and decays more slowly after neural switch-off. The residual pressure lowers pleural and alveolar pressure during early expiration, reducing outward flow. Volume then changes more slowly, which feeds back through both nonlinear recoil relations. This is the model's aggregate representation of post-inspiratory expiratory braking; the [Campbell diagram](panel-campbell.md#what-happens-after-spontaneous-inspiration) shows its pressure–volume consequence.
 
 In pressure support, the ventilator acts only after patient effort produces 1 L/min of inspiratory flow at the airway. Before that point Paw remains at PEEP, so intrinsic PEEP must be overcome by muscle pressure rather than bypassed by a neural trigger. Support rises over 100 ms and ends when flow falls below 25% of its peak. Neural inspiration and ventilator inflation remain separate clocks: a restrictive, rapidly emptying system can therefore cycle early while muscle pressure is still increasing.
 

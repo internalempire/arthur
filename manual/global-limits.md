@@ -1,14 +1,12 @@
 # Global limits
 
-The [independent audit](validation.md#independent-audit-and-unresolved-findings) separates unresolved findings from passing contracts. Cardiac output uses integrated valve flow; incompatible ventricular pressure envelopes or filling/ejection throughflow suspend clinical interpretation. The LV-failure preset demonstrates pressure unloading with a modest fall in forward output. Open-caval reversal is represented and checked. Hysteresis convergence and preservation of the potential reopenable share during chest-wall interventions are enforced regression checks. The seven active audit criteria are enforced regression checks; quantitative external validation of the model remains incomplete.
-
 > The model is a compact mechanical argument about heart–lung interaction; it is not a complete cardiopulmonary patient, and every scenario inherits the omissions below.
 
 ---
 
 ## What the model can legitimately show
 
-The strongest claims are causal and comparative: how the sign of pleural pressure changes venous return; how lung volume and recruitment alter pulmonary vascular load; how a pressure change around the heart differs from transmural filling; how RV output reaches the LV after transit; and how ventricular interaction changes the response to a load.
+The strongest claims are causal and comparative: how the sign of pleural pressure changes venous return; how lung volume and recruitment alter pulmonary vascular load; how a pressure change around the heart differs from transmural filling; how pulmonary storage buffers the serial response from RV to LV; and how ventricular interaction changes the response to a load.
 
 Absolute outputs are useful for orientation and internal consistency, especially where constrained by human in-vivo data. They are not individual predictions, normal ranges or treatment targets.
 
@@ -19,7 +17,7 @@ Absolute outputs are useful for orientation and internal consistency, especially
 - One aggregate lung without lobes, gravitational gradients, pendelluft, regional stress, regional time constants or spatial ventilation–perfusion matching.
 - One pleural pressure and one aggregate sigmoid chest wall, without regional gradients, separate rib-cage/diaphragm mechanics or oesophageal-pressure artefact.
 - Chest-wall load is an independently selected pressure offset, not a prediction from anthropometry, posture or abdominal pressure.
-- No airway leak, gas compression, secretions, airway closure or bronchodilator response. Pressure support has a fixed pneumatic trigger, 100 ms rise and 25% flow-cycling rule; it can show intrinsic-PEEP trigger delay, ineffective effort and early cycling, but not the full range of patient–ventilator dyssynchrony.
+- No airway leak, gas compression, secretions, separately resolved regional airway opening/closure or bronchodilator response. Pressure support has a fixed pneumatic trigger, 100 ms rise and 25% flow-cycling rule; it can show intrinsic-PEEP trigger delay, ineffective effort and early cycling, but not the full range of patient–ventilator dyssynchrony.
 - EFL is one collapsible-airway choke, not a regional COPD model.
 - Recruitment uses two unit populations and one distributed opening range; tissue and surfactant hysteresis are absent.
 - No capillary filtration, lymphatic drainage or time-dependent pulmonary oedema.
@@ -31,7 +29,7 @@ Consequently, the model cannot predict oxygenation, ventilatory efficiency, mech
 - Open and derecruited beds are aggregate parallel pathways, not regional vessels.
 - HPV is selected tone in the derecruited pathway, not a response calculated from alveolar oxygen.
 - Thrombotic obstruction, blood viscosity, haematocrit, vascular remodelling and non-alveolar critical closing pressure are not separately resolved.
-- Pressure/flow-dependent vascular recruitment and distension are simplified into effective coefficients.
+- There is no explicit pressure- or flow-dependent recruitment or distension of pulmonary vessels. The resistance coefficient responds to lung inflation, open/closed pathway mixture and selected hypoxic tone. Vascular storage remains pressure-dependent through fixed compliant compartments; storage compliance is not a law that lowers vascular resistance as pressure rises.
 - No characteristic impedance, wave reflection, pulmonary arterial wave velocity or frequency-dependent RV afterload.
 - West-zone behaviour is aggregate; the [wedge tile](pulmonary-artery-wedge-pressure.md) uses smoothed left atrial pressure as a surrogate, not a catheter occlusion, and derived PVR inherits its zone-3 caution.
 - Pulmonary transit uses eight pressureless mixing stages and is not a contrast-bolus or regional capillary model.
@@ -54,28 +52,30 @@ The pulmonary-embolism scenario therefore raises one aggregate vascular load. It
 
 One bounded 15-second sympathetic signal senses filtered systemic MAP and changes heart rate, SVR, venous tone and contractility together. There is no separate vagal limb, chemoreflex, cardiopulmonary receptor, afferent response to mPAP/PVR/RV stretch, or effector-specific kinetics.
 
-Controls do not represent drug dose. Fluid is placed instantaneously in the venous reservoir; vasopressor effects are not receptor-specific; inotropes have no oxygen cost; pulmonary vasodilators have no systemic spill-over or gas-exchange effect. The model cannot compare therapies on risk, outcome or dose.
+Controls do not represent drug dose. Applied blood doses enter or leave the venous reservoir instantaneously and remain entirely intravascular; no crystalloid-specific distribution is represented; vasopressor effects are not receptor-specific; inotropes have no oxygen cost; pulmonary vasodilators have no systemic spill-over or gas-exchange effect. The model cannot compare therapies on risk, outcome or dose.
 
 ## Numerical and measurement limits
 
 - Forward Euler uses a fixed 0.25 ms step and a protective 1 mL volume floor.
 - Reset settles for 15 seconds; extreme states may require longer to reach a slow equilibrium.
 - Traces are noise-free and lack transducer, catheter and ventilator measurement artefacts.
-- Several quantities—true Pmsf, stressed volume, open fraction—are latent states known exactly in simulation but not directly in vivo.
-- Plateau pressure is calculated rather than measured during a zero-flow pause.
+- Several quantities—systemic venous stressed volume and lung open fraction—are internal states known exactly in simulation but not directly in vivo. The displayed Pmsf is an exact calculation from the systemic venous reservoir law and abdominal transmission; it is not a measured whole-system pressure after actual zero-flow equilibration.
+- The routine plateau tile is calculated from end-inspiratory recoil rather than measured during a zero-flow pause. Explicit inspiratory holds produce a separate pressure waveform; they do not populate that tile. Respiratory-system compliance can remain displayed during effort using this internal recoil calculation, without becoming a clinically measured assisted-breath compliance.
 - The model-wide validity flag catches encoded numerical failures, not every physiologically impossible combination.
 - Different parameter combinations can produce similar outputs; controls are not identifiable patient estimates.
-- A saved patient stores the complete control vector, not dynamic integrator state. Loading it reproduces the selected inputs from a newly settled simulation; it does not resume the same beat, breath, waveform history or occlusion measurement.
+- A saved patient stores the complete control prescription and starting blood-volume reference, not dynamic integrator state or a pending blood dose. Loading it reproduces the selected inputs from a newly settled simulation; it does not resume the same beat, breath, waveform history or occlusion measurement.
 
 ## Limits of indices and scenarios
 
 PPV and SVV are descriptive and deliberately not tied to a diagnostic fluid-responsiveness threshold. There is no tidal-volume challenge because the model is not quantitatively calibrated to its proposed PPV increment. The specified reopenable share and the reported closed fraction/opening excursion are internal model quantities, not anatomical measurements. Arthur does not calculate or accept R/I as a physiological quantity. Preload reserve is the slope of an analytic model curve, not a validated bedside index.
 
-Every scenario is a phenotype designed around one question. None contains the full disease named in its title. ARDS lacks gas exchange, inflammatory and thrombotic biology; COPD lacks regional obstruction; sepsis lacks endothelial and organ physiology; LV failure does not generate hydrostatic pulmonary oedema from filling pressure and lacks fluid kinetics and mitral regurgitation; pulmonary embolism lacks explicit clot; tamponade lacks pericardial fluid dynamics and diagnostic imaging. Prone position is a coarse immediate transformation. There is no weaning scenario: the model does not represent enough of the syndrome’s causal physiology.
+Every scenario is a phenotype designed around one question. None contains the full disease named in its title. ARDS lacks gas exchange, inflammatory and thrombotic biology; COPD lacks regional obstruction; sepsis lacks endothelial and organ physiology; LV failure does not generate hydrostatic pulmonary oedema from filling pressure and lacks fluid kinetics and mitral regurgitation; pulmonary embolism lacks explicit clot; tamponade lacks pericardial fluid dynamics and diagnostic imaging. Prone position is a coarse immediate transformation. The model does not reproduce the combined effort, sympathetic, ischaemic, regurgitant and oedema mechanisms needed to predict weaning failure.
 
 ## Validation boundary
 
-The model has numerical verification, executable literature constraints and scenario-level mechanism audits. It does not have comprehensive quantitative human validation, global sensitivity analysis, uncertainty propagation, parameter identifiability or prospective clinical evaluation. A passing test establishes only the contract named by that test.
+The [independent audit](validation.md#independent-audit-and-unresolved-findings) separates unresolved findings from passing contracts. Cardiac output uses integrated valve flow; incompatible ventricular pressure envelopes or filling/ejection throughflow suspend clinical interpretation. The LV-failure preset demonstrates pressure unloading with a modest fall in forward output. Open-caval reversal is represented and checked. Hysteresis convergence and preservation of the potential reopenable share during chest-wall interventions are enforced regression checks. The seven active audit criteria are enforced regression checks; quantitative external validation of the model remains incomplete.
+
+The model has numerical verification, executable literature constraints and scenario-level mechanism audits. It does not have comprehensive quantitative human validation, global sensitivity analysis, uncertainty propagation, parameter identifiability or prospective clinical evaluation. A passing test establishes only the contract named by that test. An unqualified tile means that its encoded interpretability conditions are present, not that its magnitude is externally validated. Absence of a red banner cannot certify clinical plausibility for every combination of controls.
 
 ## Safe interpretation
 

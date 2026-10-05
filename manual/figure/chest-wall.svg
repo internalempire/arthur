@@ -54,7 +54,7 @@
 <line class="total" style="stroke-dasharray:none" x1="516" y1="48" x2="544" y2="48"/><text class="label" x="550" y="52">reference wall: Ccw 200</text>
 <line class="alv" style="stroke-dasharray:none" x1="516" y1="70" x2="544" y2="70"/><text class="label" x="550" y="74">stiff wall: Ccw 75</text>
 <line class="extra" style="stroke-dasharray:none" x1="516" y1="92" x2="544" y2="92"/><text class="label" x="550" y="96">reference wall + 6 cmH₂O load</text>
-<text class="tick" x="516" y="132">the curve is near-linear around tidal breathing</text>
+<text class="tick" x="516" y="132">near-linear during tidal breathing</text>
 <text class="tick" x="516" y="148">it stiffens progressively at high volume</text>
 <text class="tick" x="516" y="164">the lung has its own separate curve</text>
 </svg>

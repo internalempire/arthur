@@ -10,7 +10,7 @@
 |---|---:|---|
 | open-lung PVR at FRC | 0.03–0.60 mmHg·s/mL | reference resistance coefficient of the fully open pathway at its vascular minimum |
 | hypoxic vasoconstriction | 0–3 × | selective resistance gain in the derecruited pathway |
-| pulmonary capacitance coupling | 0–200 mL/L | blood displaced toward the left atrium per litre of lung inflation |
+| pulmonary capacitance coupling | 0–200 mL/L | scale of inflation-related pulmonary venous capacity reduction, gated by the zone-3 index |
 
 ### Open-lung PVR at FRC
 
@@ -22,7 +22,11 @@ The control raises resistance only in the pathway associated with derecruited un
 
 ### Pulmonary capacitance coupling
 
-Inflation can displace blood from the compliant pulmonary reservoir toward the left atrium, producing an immediate left-sided filling effect. The coefficient sets the strength of this “venous piston”. It does not change mean blood volume and is independent of the delayed change in RV output crossing the lung.
+Inflation can raise pulmonary venous pressure and drive blood toward the left atrium before the delayed change in RV output arrives. The coefficient sets the strength of this “venous piston”: inflation above the model's passive reference reduces the zero-pressure capacity of the pulmonary venous reservoir, weighted by its aggregate zone-3 index. Below that reference the extra displacement term is zero. When the zone-3 condition deteriorates, the piston contribution is attenuated.
+
+This conserves **total circulating blood**, but can change the amount stored in the pulmonary reservoir and its distribution elsewhere. It neither prescribes a fixed delivered bolus nor sets pulmonary venous compliance; actual flow follows the resulting pressures. It is separate from the delayed transmission of changing RV output through the lung.
+
+Brower and colleagues found opposite pulmonary venous-flow responses during inflation of isolated canine lungs depending on whether zone 2 or zone 3 predominated. Arthur represents a zone-3-weighted forward piston and other pressure-gradient effects; attenuating this piston is not a complete reproduction of the experimental zone-2 storage mechanism.
 
 The piston is one contributor to respiratory stroke-volume variation, not its universal driver. During positive-pressure ventilation, reduced RV preload and cyclic RV afterload can reduce RV output; that change reaches the left heart later because blood must cross the pulmonary circulation. Which component dominates depends on filling, lung mechanics, RV function and pulmonary vascular conditions. Vieillard-Baron and colleagues demonstrated both the immediate inspiratory increase in pulmonary venous flow and the opposite-phase variation of right- and left-ventricular output; the observation supports the mechanism, but not a claim that it dominates every phenotype.
 
@@ -35,7 +39,7 @@ The separation prevents three different mechanisms from being reduced to a gener
 - The baseline resistance is an aggregate coefficient; no explicit clot burden, viscosity, vessel recruitment, vasodilator pharmacology or regional obstruction.
 - No pulmonary arterial impedance, wave reflection or frequency-dependent afterload.
 - HPV is not driven by alveolar oxygen and cannot predict oxygenation.
-- The piston is a linear, instantaneous displacement coefficient and not a measured pulmonary venous flow model.
+- The piston is an instantaneous capacity shift proportional to positive inflation above the reference and modulated by the zone-3 index. It is not a measured pulmonary venous flow model or an oxygenation response.
 - Pulmonary capillary fluid exchange and oedema formation are absent.
 
 ## References

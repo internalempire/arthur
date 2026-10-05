@@ -57,6 +57,6 @@
 <line class="extra" style="stroke-dasharray:none" x1="516" y1="92" x2="544" y2="92"/><text class="label" x="550" y="96">C 45, capacity 6 L</text>
 <line class="total" style="stroke-dasharray:none" x1="516" y1="114" x2="544" y2="114"/><text class="label" x="550" y="118">C 100, capacity 4 L</text>
 <line class="alv" style="stroke-dasharray:none" x1="516" y1="136" x2="544" y2="136"/><text class="label" x="550" y="140">C 100, capacity 8 L</text>
-<text class="tick" x="516" y="176">model curves over the clinical pressure range</text>
-<text class="tick" x="516" y="192">collapse scales the accessible share separately</text>
+<text class="tick" x="516" y="176">illustrative model tissue curves</text>
+<text class="tick" x="516" y="192">collapse sets the accessible share</text>
 </svg>

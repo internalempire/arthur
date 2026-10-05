@@ -48,17 +48,21 @@ The model does **not** calculate or display PMI as a separate index. It closes t
 
 The routine plateau-pressure tile is not measured from this hold. During PSV it remains unavailable because an ordinary assisted breath has no passive plateau. The hold must instead be read directly on the Paw waveform: a stable level after zero flow is the relevant observation.
 
-The model's 12-second hold is deliberately longer than the 2–3-second respiratory manoeuvre commonly used clinically because the same control also lets the circulation settle for the Guyton measurement. The airway-pressure transition occurs in the early part; only the final 40% is used for the haemodynamic average.
+The model's 12-second hold is deliberately longer than the 2–3-second holds used in the original study of nine nonobstructed acute-lung-injury patients receiving several pressure-support levels. That study supports the pressure-muscle-index concept under its measured conditions, not quantitative validation of every simulated effort or obstructive state. [Foti and colleagues](https://pubmed.ncbi.nlm.nih.gov/9351624/)
+
+Arthur uses the longer hold because the same control also lets the circulation adapt for the Guyton measurement. The airway-pressure transition occurs in the early part; only the final 40% is used for the haemodynamic average.
 
 ## Play, Pause and speed
 
-Pause freezes numerical integration and the drawings. It does not close the airway or represent an apnoeic patient. A pending hold cannot finish while simulated time is paused, so its button remains active and can be cancelled.
+Pause freezes simulated time for the current patient and every live Pin. Readouts can still change when you edit a control, apply blood or inspect retained waveform history. It does not close the airway or represent an apnoeic patient. A pending hold cannot finish while simulated time is paused, so its button remains active and can be cancelled.
 
 Speed changes how many simulated seconds are advanced per wall-clock second. It does not change heart rate, respiratory rate, the integration step or physiological time constants. Running faster is useful for settling a new state; return to normal speed when judging visual timing.
 
 ## Reset
 
-Reset clears hold measurements, cancels an active manoeuvre, restores model state and settles the circulation. If a named scenario is selected, its parameters are reapplied. Reset does not preserve the custom state or the previous Guyton trail.
+Reset cancels holds, clears their measurements, the Guyton trail, waveform history and all live Pins, and reconstructs the patient before 15 simulated seconds of silent settlement. If a named scenario is selected, its prescription is reapplied. With **Custom**, the current parameter prescription, applied blood balance and starting-volume reference are retained; only the evolving state is restarted. A pending blood dose is discarded. Reset therefore does not undo blood already applied to a Custom patient.
+
+Reset is not a rewind to a saved physiological instant: blood redistribution, opening memory and reflex activation are rebuilt. To return to a preset’s original patient, select that preset. To preserve an evolving physiological state for immediate comparison, use Pin. A saved patient file preserves the prescription and blood-volume reference, not the full evolving state or Pins.
 
 ## A reproducible occlusion sequence
 

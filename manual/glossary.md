@@ -14,15 +14,19 @@
 
 **Auto-PEEP / intrinsic PEEP.** In a passive breath, alveolar pressure remaining above applied PEEP at end expiration because expiration did not reach the static equilibrium. During active breathing the same numerical state may also reflect post-inspiratory muscle activity, so the interface reports end-expiratory alveolar pressure without assigning the intrinsic-PEEP label. See [expiratory flow limitation](expiratory-flow-limitation.md) and [numerical tiles](numeric-tiles.md#end-expiratory-pressure-and-total-peep).
 
+**Blood volume change.** A prepared amount to add or remove in mL. Only pressing **Apply** or **Remove** changes the circulation. Current total blood volume is the sum across all blood compartments, displayed in litres; it is not the stressed-volume amount. See [volume controls](controls-volume.md).
+
 **Capacitance.** The capacity of a vascular compartment to contain volume at a given pressure. The model keeps capacity shifts caused by [venous tone](venous-tone.md) separate from compliance.
 
 **Cardiac output (CO).** Forward systemic arterial flow averaged over time, reported in L/min.
 
-**Central venous pressure (CVP).** Right atrial pressure referenced to atmosphere. The model also reports transmural CVP, which subtracts surrounding pleural pressure.
+**Central venous pressure (CVP).** Right atrial pressure referenced to atmosphere. The model also reports transmural CVP, which subtracts surrounding pleural pressure and additional pericardial pressure.
 
-**Chest-wall compliance (`ccw`).** Local slope of the independent relaxed chest-wall pressure–volume curve near the normal reference volume. It controls pressure change per volume change and is separate from chest-wall load.
+**Chest-wall compliance (`ccw`).** Local slope of the independent relaxed chest-wall pressure–volume curve near the normal reference volume. It expresses volume change per pressure change and is separate from chest-wall load.
 
 **Chest-wall load (`cwLoad`).** Pressure offset applied to the whole relaxed chest-wall curve. A positive load can represent aggregate mass or diaphragmatic loading; it changes resting pressure without being defined as stiffness. See [pleural pressure](pleural-pressure.md).
+
+**Compromised lung.** The model population assigned to diseased units, including a specified potentially reopenable share and a permanently closed remainder. It is distinct from the closed fraction actually reached at end expiration and is not a CT tissue measurement.
 
 **Compliance.** Change in volume divided by change in pressure. Lung and chest-wall compliance are reported in mL/cmH₂O; vascular compliance in mL/mmHg. Compliance is the reciprocal of elastance only for a locally linear relation.
 
@@ -32,7 +36,7 @@
 
 **Effective arterial elastance ($E_a$).** A lumped ventricular load commonly estimated as end-systolic pressure divided by stroke volume, in mmHg/mL. The model draws an $E_a$ surrogate on PV loops but does not publish a coupling ratio. See [ventriculo-arterial coupling](ventriculo-arterial-coupling.md).
 
-**End-systolic elastance ($E_{es}$).** Slope of the end-systolic pressure–volume relation, in mmHg/mL; used as the contractility control for each ventricle.
+**End-systolic elastance ($E_{es}$).** Slope of the end-systolic pressure–volume relation, in mmHg/mL; used as the intrinsic contractility control for each ventricle. The displayed coupled single-beat ESPVR can also contain ventricular-interaction effects and is not identical to that control.
 
 **Expiratory flow limitation (EFL).** A condition in which more expiratory driving pressure no longer increases flow because a collapsible airway has reached a choke point.
 
@@ -42,15 +46,17 @@
 
 ## I–P
 
-**Inferior vena cava (IVC).** [Inferior vena cava](inferior-vena-cava.md). The compliant conduit between the splanchnic reservoir and the right atrium. The model represents it as a separate compartment whose own blood volume drives its displayed diameter, so it stays full in tamponade and collapses during strong inspiratory draw.
+**Inferior vena cava (IVC).** [Inferior vena cava](inferior-vena-cava.md). The compliant conduit between the aggregate systemic venous reservoir and the right atrium. The model represents it as a separate compartment whose own blood volume drives its displayed diameter, as a qualitative schematic. It is not a calibrated ultrasound diameter or a fluid-responsiveness test.
 
 **Maximum lung capacity (`lungCapacity`).** Asymptotic volume ceiling of a completely open lung, entered directly in litres. Collapse determines what fraction is currently accessible. It is not an anthropometric predicted TLC. See [the pressure–volume curve](pressure-volume-curve.md).
 
 **Mean pulmonary artery pressure (mPAP).** Time-averaged pulmonary arterial pressure, in mmHg.
 
-**Mean systemic filling pressure (Pmsf).** The equilibrated systemic vascular pressure that would exist at zero flow, used as the upstream pressure in the Guyton construction. See [venous return](venous-return.md).
+**Mean systemic filling pressure (Pmsf).** Clinically, an estimate of the systemic vascular equilibrium pressure at zero flow. The model uses a reservoir-based upstream pressure calculated from systemic venous stressed volume, compliance and abdominal transmission; it does not stop and equilibrate all systemic compartments. See [venous return](venous-return.md).
 
 **Open fraction.** Fraction of the represented lung currently aerated. It is an internal state, not a bedside measurement.
+
+**Opening excursion.** Maximum minus minimum open fraction over one complete breath, expressed in percentage points of the whole model lung.
 
 **PEEP.** Positive end-expiratory pressure set at the airway opening, in cmH₂O. Total PEEP is external plus intrinsic PEEP.
 
@@ -66,21 +72,17 @@
 
 ## R–Z
 
-**Compromised lung.** The model population assigned to diseased units, including a specified potentially reopenable share and a permanently closed remainder. It is distinct from the closed fraction actually reached at end expiration and is not a CT tissue measurement.
+**Reopenable share.** The specified fraction of the compromised population capable of opening. Its value is fixed during chest-wall interventions; actual opening depends on transpulmonary pressure and, if enabled, memory. It is a model coefficient, not a measured R/I. See [lung opening profiles](recruitment-and-ri.md).
 
-**Reopenable share.** The specified fraction of the compromised population capable of opening. Its value is fixed during chest-wall interventions; actual opening depends on transpulmonary pressure and, if enabled, memory.
-
-**Opening excursion.** Maximum minus minimum open fraction over one complete breath, expressed in percentage points of the whole model lung.
-
-**Reopenable share.** The specified proportion of the compromised component that is capable of opening. It is a model coefficient, distinct from the proportion actually open at a given pressure. See [lung opening profiles](recruitment-and-ri.md).
-
-**Resistance to venous return.** The denominator relating the pressure available for venous return to flow, in mmHg·s/mL. In the model it is split between the splanchnic reservoir and the [inferior vena cava](inferior-vena-cava.md) conduit (33% upstream, 67% downstream), with the downstream segment carrying the caval waterfall.
+**Resistance to venous return.** The denominator relating the pressure available for venous return to flow, in mmHg·s/mL. In the model it is split between the aggregate systemic venous reservoir and the [inferior vena cava](inferior-vena-cava.md) conduit (33% upstream, 67% downstream), with the downstream segment carrying the caval waterfall.
 
 **Stress index.** Exponent describing curvature of airway pressure during constant-flow inflation. Values below, near or above one suggest continuing recruitment, near-linear mechanics or increasing elastance respectively, under its measurement assumptions.
 
 **Stressed volume.** Vascular volume above zero-pressure capacity that generates elastic recoil. See [stressed volume](stressed-volume.md).
 
-**Stroke volume (SV).** Forward volume ejected by a ventricle in one beat, in mL.
+**Stressed fraction.** In the sidebar, stressed blood in the systemic venous reservoir divided by all blood in that same reservoir. It excludes the IVC, heart and pulmonary circulation; it is not a percentage of whole-body blood.
+
+**Stroke volume (SV).** Volume ejected per beat, in mL. Forward output is measured by integrating arterial-valve flow. The PV-loop width is end-diastolic minus end-systolic chamber volume; the two constructions should not be silently substituted outside normal valve timing.
 
 **Systemic vascular resistance (SVR).** Aggregate systemic outflow resistance, in mmHg·s/mL in the control and converted internally where necessary.
 

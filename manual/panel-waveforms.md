@@ -12,7 +12,7 @@ The strip immediately below shows transpulmonary pressure ($P_L=P_{alv}-P_{pl}$)
 
 The separate $P_L$ strip is a graphical choice, not a different equation. On one shared numerical axis, positive $P_L$ would correctly appear above a near-zero Paw and a negative Ppl. Giving it a time-aligned strip below Paw and Ppl preserves the true value while keeping the visual and numerical reading order consistent.
 
-### Why the model trace can differ from bedside dynamic $P_L$
+### Why model and bedside transpulmonary pressure traces can differ
 
 The model knows the pressure inside its alveolar compartment and therefore displays the pressure actually acting across the lung:
 
@@ -40,9 +40,13 @@ Each strip fits its vertical range again when a control or scenario changes. The
 
 Respiratory and vascular pressures deliberately do not share an axis. Their units and magnitudes differ, and a dual axis would make visual crossings physiologically meaningless.
 
+## Follow one intervention across the strips
+
+After a PEEP increase, read the airway-pressure change first, then the accompanying Ppl and $P_L$, then the vascular response. Ppl explains changed pressure around the heart; $P_L$ and lung volume describe the inflation imposed on the lung. The arterial response can develop over subsequent beats as pulmonary blood storage and LV filling change. The strips show timing together, but temporal association alone does not separate these simultaneous mechanisms. Use a [live Pin](numeric-tiles.md#pin-values-for-a-comparison) to retain the untreated state while observing the new trajectory.
+
 ## Pause and inspect one instant
 
-Press **Pause**, then drag the time cursor above the strips or drag directly across any waveform. The vertical cursor crosses all four strips on one clock. Numerical tiles and the live point in each diagram move to the model state nearest that instant, allowing Paw, Ppl, CVP, ventricular position and lung position to be read together rather than estimated by eye.
+Press **Pause**, then drag the time cursor above the strips or drag directly across any waveform. The vertical cursor crosses all four strips on one clock. Numerical tiles and each diagram’s current-state representation move to the retained model state nearest that instant, allowing Paw, Ppl, CVP, ventricular position and lung position to be read together rather than estimated by eye.
 
 The waveform itself remains sampled at <!-- CONSISTENCY: trace-sample-rate -->250 Hz<!-- /CONSISTENCY -->. The complete state needed by the other panels is retained every 50 ms, so their selected point can differ from the cursor by at most about 25 ms. This lighter presentation history does not rewind the simulator and is cleared when a scenario, patient file or reset creates a fresh simulation.
 
@@ -78,7 +82,6 @@ The panel shows no airflow trace. Expiratory flow limitation must be inferred fr
 - The 12-second window can conceal slower adaptation, including the 15-second aggregate baroreflex.
 - Automatic rescaling means screen height cannot be compared between widely separated states without reading the axes.
 - The cursor selects the nearest retained 50 ms presentation sample; it is not intended for millisecond timing measurements.
-- Absence of an airflow trace limits direct evaluation of expiratory flow contour and zero-flow holds.
 
 ## References
 

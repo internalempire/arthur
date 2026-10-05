@@ -6,7 +6,7 @@
 
 ## Physiology
 
-The systemic circulation holds most of its blood on the venous side, at low pressure. If the heart were stopped, pressures would equalise at a value set by the blood volume and the compliance of the vessels holding it: the **mean systemic filling pressure**, around 7–10 mmHg. That pressure is the upstream head for the return of blood to the chest.
+The systemic circulation holds most of its blood on the venous side, at low pressure. The **mean systemic filling pressure** is the pressure approached when flow in the systemic circulation stops and systemic pressures equilibrate under specified conditions. It depends on blood volume, vascular capacity, compliance and surrounding pressures. It is not identical to the mean circulatory filling pressure obtained after equilibration of both systemic and pulmonary circuits. No single normal value applies across measurement methods and ventilatory states. In the Guyton construction it represents the upstream pressure available for return to the chest.
 
 Flow back to the right atrium is then:
 
@@ -21,7 +21,7 @@ $$
 
 Two features of this expression carry most of the clinical content.
 
-**The driving gradient is small.** A few millimetres of mercury separate the reservoir from the right atrium. A change in right atrial pressure that would be trivial on the arterial side — 3 mmHg — is a large fraction of this gradient. Anything that raises right atrial pressure, including [pleural pressure](pleural-pressure.md) transmitted from a ventilator, therefore cuts venous return substantially.
+**The driving gradient is small.** A few millimetres of mercury separate the reservoir from the right atrium. A change in right atrial pressure that would be trivial on the arterial side — 3 mmHg — is a large fraction of this gradient. If upstream pressure and resistance remain fixed, raising right atrial pressure narrows this gradient and reduces return. Ventilation can change all three, so the rise in atrial pressure alone does not determine the net effect.
 
 **Raising right atrial pressure reduces flow.** This is the sense in which "the heart limits its own filling". A ventricle that fails and backs up raises the pressure it must fill against.
 
@@ -55,11 +55,11 @@ The analytic venous-return curve reduces the two resistances to their sum and us
 
 The fast **Live** view uses one-heartbeat averages for both RV and venous-return determinants, preserving respiratory movement. **Mean** uses respiratory averages for both. In optional deep mode, VR mean uses the separately settled reference conditions and VR live uses instantaneous return determinants. The predicted crossing is withheld in live views because storage during a breath prevents interpreting it as instantaneous whole-circuit equilibrium.
 
-Mean systemic filling pressure comes from the [stressed volume](stressed-volume.md) of the venous reservoir divided by its compliance, plus the [abdominal](abdominal-pressure.md) contribution where the reservoir is distended enough to have one.
+The internal quantity labelled Pmsf comes from the [stressed volume](stressed-volume.md) of the venous reservoir divided by its compliance, plus the [abdominal](abdominal-pressure.md) contribution where the reservoir is distended enough to have one. It is a reservoir-pressure approximation to the upstream head. Arthur does not arrest systemic flow and wait for every systemic compartment to equilibrate before calculating it.
 
 ### The marks on the diagram
 
-The faint inflow path uses one-heartbeat mean RAP and net IVC-to-right-atrial inflow. The dark mean venous-inflow marker uses a complete respiratory cycle in both Live and Mean. The hollow predicted-equilibrium point is the crossing of the two analytic curves, displayed only in Mean. Optional Deep CO adds a red mean LV-output marker and replaces the ascending relation with a separately settled whole-heart response. See [the Guyton panel](panel-guyton.md) for its loading protocol and calculation status.
+The faint inflow path uses one-heartbeat mean RAP and net IVC-to-right-atrial inflow. The dark mean venous-inflow marker uses a sliding respiratory-period average of the heartbeat-smoothed measurements in both Live and Mean. It updates continuously rather than waiting for an end-expiratory boundary. The hollow predicted-equilibrium point is the crossing of the two analytic curves, displayed only in Mean. Optional Deep CO adds a red mean LV-output marker and replaces the ascending relation with a separately settled whole-heart response. See [the Guyton panel](panel-guyton.md) for its loading protocol and calculation status.
 
 The respiratory markers remove much of the within-breath variation but a beat or a breath need not return every compartment to exactly the same volume when the cardiac and respiratory clocks are not commensurate. The optional deep response uses complete minute windows and explicitly checks flow agreement and storage. During an intervention, differences between venous inflow and aortic output can be caused by redistribution.
 
@@ -82,7 +82,7 @@ This distinction is especially important in pulmonary embolism. A spontaneous in
 A passive patient at 500 mL, 14 breaths per minute:
 
 <!-- BEGIN GENERATED: venous-return-peep -->
-*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure is averaged over the most recent complete respiratory cycle, as in the filled simulated-mean point on the Guyton panel.*
+*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure uses a sliding one-breath-duration average of heartbeat-duration means, as in the filled simulated-mean point on the Guyton panel.*
 
 | PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |
 |---:|---:|---:|---:|
@@ -93,7 +93,7 @@ A passive patient at 500 mL, 14 breaths per minute:
 | 20 | 11.9 | 6.0 | 4.60 |
 <!-- END GENERATED: venous-return-peep -->
 
-Mean systemic filling pressure *rises* with PEEP — the abdominal contribution and the compression of the reservoir see to that — and output falls anyway, because right atrial pressure rises faster than the head does. The gradient is what matters, not either end of it.
+In this sweep, internal Pmsf rises with PEEP as abdominal transmission and blood redistribution change the reservoir pressure, yet output falls. The relevant downstream term includes both right atrial pressure and the caval closing pressure: compare the effective venous gradient, not Pmsf or CVP in isolation. The two tabulated pressure columns also use different averaging windows, so their subtraction is not a separately measured gradient.
 
 ---
 
@@ -114,7 +114,7 @@ The resistance to venous return is a single control. One systemic reservoir keep
 ### Of the construction
 
 - **One venous reservoir.** No splanchnic, cutaneous or muscular capacitance beds, and therefore no redistribution between fast and slow compartments. A fluid bolus arrives instantaneously in one place.
-- **No stress relaxation, no transcapillary escape, no distribution kinetics.** Volume added stays where it is put.
+- **No stress relaxation, transcapillary escape or renal removal.** Added blood redistributes among the represented vascular and cardiac compartments but remains entirely intravascular until the user removes it.
 - **The resistance to venous return is constant in a normally filled circulation.** An additional abdominal contribution is confined to the upstream segment when both the systemic reservoir and IVC are poorly distended. It does not otherwise vary with flow, tone or vessel calibre.
 - **The Guyton curves are local approximations placed under a dynamic trail.** Live uses heartbeat determinants and Mean uses respiratory determinants. The measured respiratory-mean inflow and the Mean-only predicted crossing have different definitions and need not coincide.
 - **The ascending analytic curve represents a local RV relation, not an independent biventricular or LV function curve.** Its RV-volume anchor follows the selected clock and does not reproduce a new closed-loop beat at every pressure on the curve.
@@ -124,8 +124,8 @@ The resistance to venous return is a single control. One systemic reservoir keep
 
 ### Of clinical application
 
-- **No number on this diagram is a target.** The construction shows the shape of a patient's reserve, not a value to resuscitate towards.
-- The model's mean systemic filling pressure is exact and always available. At the bedside it is not measurable without a manoeuvre whose own assumptions are questionable, and the model deliberately shows how far that manoeuvre's estimate can sit from the truth.
+- **No number on this diagram is a target.** The construction describes the simulated circulation, not the reserve of an individual patient.
+- The model's internal reservoir pressure labelled Pmsf is exactly calculable from its own state. It is not established by actually arresting flow and equilibrating all systemic compartments. At the bedside it is not measurable without a manoeuvre whose own assumptions are questionable, and the model deliberately shows how far that manoeuvre's estimate can sit from the truth.
 - Preload responsiveness in this model is a movement along its own curves in response to its own blood-volume application. That is not the same as a patient's response to 500 mL of crystalloid, which redistributes.
 
 ---

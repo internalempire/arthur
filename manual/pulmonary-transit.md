@@ -1,16 +1,16 @@
 # Pulmonary transit
 
-> A change in right ventricular output does not reach the left heart immediately, and the delay becomes longer when more blood crosses the lung at a lower flow.
+> The pulmonary circulation stores blood between the ventricles. A change in RV output can therefore affect LV filling over subsequent beats, while pressure transmission and pulmonary venous emptying also have immediate effects.
 
 ---
 
 ## Physiology
 
-The ventricles are coupled in series. A fall in right ventricular stroke volume reduces left ventricular filling only after the affected blood volume has crossed the pulmonary circulation. Pinsky's useful bedside description is temporal rather than anatomical: after a sustained change in right-sided output, the left-sided consequence becomes evident over the following two to three beats.
+The ventricles are coupled in series, with a compliant blood reservoir between them. When RV output falls, this reservoir can temporarily continue supplying the left heart. Its changing storage and outflow spread the left-sided filling response over time. The familiar two-to-three-beat description is a useful account of a delayed respiratory response, not a period during which the left heart is mechanically isolated from the right.
 
 That beat count is not a universal transit time. The same number of seconds contains more beats during tachycardia, and the pulmonary circulation can hold different volumes of blood. Congestion, pulmonary vascular disease, cardiac output and the landmarks used to start and stop a contrast measurement all change the reported interval.
 
-The governing relation is the central-volume principle:
+For steady through-flow, the central-volume principle relates mean blood residence time to contained blood volume:
 
 $$
 T_{pul} = \frac{V_{pul}}{Q_{RV}}
@@ -19,6 +19,8 @@ $$
 - $T_{pul}$ is mean pulmonary transit time, in seconds.
 - $V_{pul}$ is the blood volume between the selected pulmonary arterial and left-sided landmarks, in millilitres.
 - $Q_{RV}$ is mean forward right ventricular output, in millilitres per second.
+
+**Mean residence time is not the same as the delay of a pressure wave or the time to the first LV response.** A tracer mean transit time, an arterial-waveform phase shift and the time until output reaches its nadir are different observations. Arthur uses the volume/flow relationship to scale its aggregate flow-delivery delay; that is a teaching construction, not a derivation of every pulsatile response from tracer kinetics.
 
 The implication is more important than any single normal value. At the same pulmonary blood volume, halving flow doubles mean transit time. At the same flow, pulmonary vascular engorgement lengthens it. This is why a congested low-output circulation can retain an important right-to-left delay even when heart rate is high.
 
@@ -70,7 +72,7 @@ With passive ventilation, HR 75/min, RR 18/min, VT 450 mL and PEEP 5 cmH2O held 
 | congested low-output LV failure | 765 | 15.2 | 6.0 |
 <!-- END GENERATED: pulmonary-transit -->
 
-The ordering is the lesson. The embolism and LV-failure numbers are outputs of selected model phenotypes, not expected clinical values or diagnostic thresholds. In particular, an estimate near 20 seconds in the severe low-output LV phenotype should be read as “very slow transport in this model state”, not as a normal clinical range or a patient-level prediction. The LV phenotype reaches the staged numerical ceiling, while the unbounded whole-circuit estimate remains visible.
+The ordering is the lesson. The embolism and LV-failure numbers are outputs of selected model phenotypes, not expected clinical values or diagnostic thresholds. The longer estimate in the low-output LV phenotype means slow transport in that model state; it is neither a normal clinical range nor a patient-level prediction. The LV phenotype reaches the staged numerical ceiling, while the longer whole-circuit estimate remains visible. Near arrest, the reporting calculation uses a minimum denominator of 1 mL/s to avoid an infinite displayed estimate; the true zero-flow residence time is not finite.
 
 Pressure is not delayed with blood. Pulmonary venous pressure still enters the pulmonary pressure gradient immediately, and [ventricular interdependence](ventricular-interdependence.md), pericardial interaction and the pulmonary venous piston remain immediate mechanical routes. The stages delay delivery of changing blood flow only.
 
@@ -92,7 +94,7 @@ The transport pathway is not a contrast-kinetic model. It has no injection or sa
 
 - One aggregate pulmonary pathway: no regional perfusion distribution, shunt, dead-space pathway, bronchial circulation or gravity-dependent transit.
 - Pulmonary vascular blood volume is the sum of lumped compartments, not a directly simulated indicator-dilution volume.
-- RV output comes from the most recent complete beat. Arrhythmia and beat-to-beat variation in transit velocity are not represented.
+- RV output comes from the most recent complete beat; beat-related changes enter the staged pathway through its smoothed target. Arrhythmia and a separately resolved intrabeat blood-velocity profile are not represented.
 - The staged pathway is pressureless. PA and PV carry pressure and compliance; the buffer carries timing.
 - The 2-second adaptation is a numerical stabiliser, not vascular recruitment kinetics.
 
@@ -114,6 +116,8 @@ The full constraints are recorded in [literature ranges](../docs/LITERATURE_RANG
 ---
 
 ## References
+
+Levinson and colleagues measured human pulmonary vascular volume using dilution curves. Seraphim and colleagues derived first-pass contrast timing between RV and LV blood pools in 985 patients referred for perfusion CMR. These observations concern blood volume and tracer timing; they do not independently validate the eight stages, their adaptation rule, or the phase of Arthur's LV stroke-volume response.
 
 - Levinson GE, Frank MJ, Hellems HK. The pulmonary vascular volume in man: measurement from atrial dilution curves. *Am Heart J*. 1964;67:734–741. [doi:10.1016/0002-8703(64)90174-7](https://doi.org/10.1016/0002-8703(64)90174-7)
 - Pinsky MR. The effects of mechanical ventilation on the cardiovascular system. *Crit Care Clin*. 1990;6:663–678. [doi:10.1016/S0749-0704(18)30360-9](https://doi.org/10.1016/S0749-0704(18)30360-9)

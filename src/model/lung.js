@@ -13,25 +13,18 @@
 // identical transpulmonary pressure — nothing is left to tell them apart, and no
 // formulation of the resistance curve can separate them.
 //
-// So the units are split into two populations by how hard they are to open:
-// normal units, which close on deflation and reopen at low pressure, and
-// diseased units, which are shut at rest and reopen only if they are
-// recruitable at all. Consolidated lung is collapsed and stays collapsed however
-// hard it is pushed. The reopenable share is an explicit phenotype property.
-// Opening/closing pressures determine how much of that potential is realised;
-// the chest wall never recalibrates the share to preserve a requested index.
+// Two populations distinguish readily aerated tissue from a compromised
+// component with an explicitly prescribed potentially reopenable share.
+// The non-reopenable remainder is closed within this model's domain; it is not
+// a universal statement about the recruitability of clinical consolidation.
+// Opening/closing pressures determine actual opening. Chest-wall changes do
+// not recalibrate intrinsic potential to preserve a requested index.
 //
-// Units are treated as either open at full size or shut — the sponge
-// idealisation. It is why the arithmetic below works, and it is also the reason
-// the model says a deflated lung stretches its remaining open units: with half
-// the units shut, the gas that is left has nowhere else to go.
-//
-// Recruitment changes the mechanics too, and that is where most of its clinical
-// weight sits. Units that open accept gas, so the lung's compliance follows how
-// many of them are open, and the resting volume rises when pressure opens more.
-// The pressure–volume relationship is therefore sigmoid rather than linear, and
-// it is sigmoid because of the unit population rather than because a sigmoid was
-// fitted to it.
+// Open units also distend according to the shared tissue pressure-volume law.
+// Both opening additional units and distending units already open add gas.
+// At fixed total gas volume, fewer open units require more inflation per open
+// unit. The distributed opening transition contributes to apparent compliance
+// without changing the independently selected aerated-tissue compliance.
 //
 // `clung` and lung size are deliberately independent. `clung` is the local
 // compliance of aerated tissue while it is away from its upper-volume limit;

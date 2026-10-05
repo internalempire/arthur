@@ -14,21 +14,31 @@ In the optional deep mode, the ascending relation is labelled **Cardiac output (
 
 Reduced venous inflow can relieve excessive distension. That may be useful even without a rise in flow, but does not itself prove that a cardiac-function curve has improved. A better response means more flow at comparable filling pressure, or lower filling pressure for comparable flow, under specified loading conditions. Right atrial pressure here is relative to atmosphere: it can rise when external cardiac pressure rises even while transmural filling pressure falls.
 
+## Choose the view for the question
+
+| question | view | what it can answer |
+|---|---|---|
+| How does breathing move the conditions for venous return and RV filling? | **Live** | shows respiratory movement of two local relations |
+| Where do these conditions sit on average after redistribution? | **Mean** | compares respiratory-smoothed relations and measured inflow |
+| How much whole-heart flow can this separately conditioned circulation sustain at several imposed inflows? | **Deep CO** | runs a separate loading experiment, with a substantial computational cost |
+
+For ordinary teaching, begin with Live and Mean. Read the x-axis as **right atrial pressure relative to atmosphere**, not transmural preload. A rise in this pressure can mean a higher pressure around the heart rather than greater chamber filling. Read the measured flow marker separately from the analytic crossing; the crossing is a prediction from the displayed relations.
+
 ## The default dynamic view
 
 - **RV function** is the rapidly updated ascending relation. Its highlighted steep segment corresponds to the local RV preload-reserve construction.
 - **Venous return** is the descending relation determined by systemic filling pressure, caval closing pressure and resistance to return.
-- **mean venous inflow**, the dark marker, uses net IVC-to-right-atrial venous inflow over a complete breath: forward volume minus backward volume, divided by elapsed time. It is not RV output, LV output or cardiac output.
+- **mean venous inflow**, the dark marker, uses net IVC-to-right-atrial venous inflow: forward volume minus backward volume per unit time, smoothed over a moving respiratory-duration window after heartbeat smoothing. It is not RV output, LV output or cardiac output.
 - **predicted equilibrium**, the hollow marker shown in Mean, is the crossing of the local RV and venous-return relations on the same respiratory-mean clock.
 - **inflow path**, the faint trail, retains one-heartbeat means of venous inflow and right atrial pressure. It displays temporary storage and respiratory timing.
 
-**Live** is the default. Both curves follow respiratory excursions using determinants smoothed over one heartbeat. This removes cardiac pressure ripple while preserving breathing movement. **Mean** switches both curves to determinants averaged over a full breath, making their average position easier to compare across settings. Click again to return to Live. The selection changes only the display; it does not change the simulated patient or launch a loading experiment.
+**Live** is the default. Both curves follow respiratory excursions using determinants smoothed over one heartbeat. This removes cardiac pressure ripple while preserving breathing movement. **Mean** switches both curves to determinants averaged over a moving window with the duration of one breath, making their average position easier to compare across settings. Click again to return to Live. The selection changes only the display; it does not change the simulated patient or launch a loading experiment.
 
 The RV construction uses right atrial pressure, RV end-diastolic/end-systolic volumes, heart rate and RV contractility on the selected clock. The chamber endpoints are latched at completed beats; this is a rapidly updated local approximation, not a direct instantaneous output measurement. The mean mode constructs a curve from mean determinants, rather than averaging the drawn curves point by point.
 
-The mean venous-inflow marker retains its respiratory clock in both views; the faint trail retains the within-breath inflow path. Live withholds the predicted-equilibrium marker: even curves on the same heartbeat clock do not establish instantaneous whole-circuit equilibrium while blood is being stored or released between compartments.
+These are continuously moving windows whose durations follow the current effective heart rate and selected respiratory rate, not measurements latched only at a completed beat or breath. Just after a control change, they can still contain samples from the preceding state. The mean venous-inflow marker retains its respiratory clock in both views; the faint trail retains the within-breath inflow path. Live withholds the predicted-equilibrium marker: even curves on the same heartbeat clock do not establish instantaneous whole-circuit equilibrium while blood is being stored or released between compartments.
 
-At steady state mean venous inflow and the predicted crossing should be close. During redistribution, venous return and LV output can differ because blood is being stored or released between them. In pulmonary embolism or severe RV pressure loading, the trail can be broad while the respiratory-mean points remain close once the whole circulation settles. Drawing a trail from successive predicted crossings would hide that dynamic information.
+In a settled state the mean venous inflow and predicted crossing can be compared as a consistency check, but their agreement is approximate because the local RV construction is not the integrated closed circulation. During redistribution, venous return and LV output can differ because blood is being stored or released between them. In pulmonary embolism or severe RV pressure loading, the trail can be broad while the respiratory-mean points remain close once the whole circulation settles. Drawing a trail from successive predicted crossings would hide that dynamic information.
 
 The descending curve retains the forward-return formula, whereas measured inflow includes brief caval reversal. Nonlinear collapse also means that flow calculated from mean pressures need not equal the mean of instantaneous flows. Consequently, even in a settled pulsatile circulation, the curve at measured mean RAP need not pass through the dark marker. This gap is distinct from the distance between the dark marker and the hollow crossing. Neither marker is moved to force agreement. See [venous return](venous-return.md) for the flow definition and [vascular waterfalls](vascular-waterfalls.md) for the conservative reverse-flow law and its limits.
 
@@ -44,7 +54,7 @@ The venous-return curve shifts because its determinants change. Abdominal pressu
 
 The opposing changes are unequal: higher Pmsf only partly preserves the effective return gradient, and settled output falls. The pulmonary resistance coefficient also rises modestly; the protocol does not isolate its contribution to the output change. The pericardial excess-pressure term remains zero in this preset. No autonomic venoconstriction is being invoked with the reflex off.
 
-`node tools/experiments/healthy-peep.mjs output.json` reproduces the sequential intervention in one closed circulation: 135 s initial settlement, two 60 s measurement windows, only PEEP changed, then 120 s settlement and two further 60 s windows. Each measurement window contains 75 heartbeats and 14 breaths. The report contains directly integrated aortic/pulmonic/venous flows, pressure and volume means, the elastic and abdominal Pmsf components, respiratory curve excursions, parameter-difference checks, volume balance and cardiac-domain checks. Values are model outputs, not patient-specific predictions.
+For an exact numerical reproduction, the repository experiment `tools/experiments/healthy-peep.mjs` uses one closed circulation: 135 s initial settlement, two 60 s measurement windows, only PEEP changed, then 120 s settlement and two further 60 s windows. Each measurement window contains 75 heartbeats and 14 breaths. The report contains directly integrated aortic/pulmonic/venous flows, pressure and volume means, the elastic and abdominal Pmsf components, respiratory curve excursions, parameter-difference checks, volume balance and cardiac-domain checks. Values are model outputs, not patient-specific predictions.
 
 ## Optional Deep CO analysis
 
@@ -53,7 +63,7 @@ Select **Deep CO** to request one computationally intensive whole-heart loading 
 The button becomes **Live RV**: selecting it cancels the experiment immediately and restores the fast view. Changing a parameter, selecting a scenario or resetting also cancels the experiment and returns to the fast view. Deep computation requires a fresh opt-in. The choice is not saved in patient files or carried across reloads. To refresh an autonomically compensated reference, return to Live RV and select Deep CO again.
 
 - **Cardiac output (LV)** is the red response curve from separate loading experiments. Only settled, physiologically admissible segments are drawn. An ending line means the tested range has ended; it is not an extrapolated plateau or a prediction of arrest.
-- **mean LV output**, the additional red marker, is integrated aortic flow averaged over the most recent complete respiratory cycle after heartbeat smoothing. Its horizontal coordinate is the matching mean right atrial pressure. The marker and its numerical description are withheld when the displayed patient is outside the model domain.
+- **mean LV output**, the additional red marker, is integrated aortic flow averaged over a moving respiratory-duration window after heartbeat smoothing. Its horizontal coordinate is the matching mean right atrial pressure. The marker and its numerical description are withheld when the displayed patient is outside the model domain.
 - The dark mean venous-inflow marker and faint inflow path retain their measured meaning. The hollow crossing uses the separately settled reference relations.
 
 In deep mode, **VR mean** uses the settled reference pressure and resistance determinants paired with the cardiac-response experiment. **VR live** uses all three current determinants together and withholds the predicted crossing. Live markers and the trail continue to describe the displayed patient. The deep relation is a settled loading analysis, not a breath-by-breath replacement for the dynamic view.
@@ -78,7 +88,7 @@ The plotted line interpolates a finite set of loading experiments. It is conditi
 
 The **RV preload reserve** tile uses the local analytic RV construction on the respiratory-mean clock. The highlighted segment follows the selected fast-curve clock, so a breathing-phase highlight need not match the tile's mean value. Neither independently tests LV reserve or gives the derivative of the optional whole-heart curve. The [preload-reserve page](preload-reserve.md) explains this boundary. No RV-only slope is highlighted on the deep whole-heart curve.
 
-Occlusion marks retain their measured pressure/venous-inflow meaning. Their extrapolated intercept is not automatically the model's true Pmsf: a hold can change the pressure conditions being sampled. See [Pmsf and occlusions](pmsf-and-occlusions.md).
+Occlusion marks retain their measured pressure/venous-inflow meaning. Their extrapolated intercept is not automatically the model's internal reservoir-based Pmsf: a hold can change the pressure conditions being sampled. See [Pmsf and occlusions](pmsf-and-occlusions.md).
 
 ## Limits
 

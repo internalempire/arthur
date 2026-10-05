@@ -12,13 +12,24 @@ It is not a patient-specific digital twin, a ventilator, a monitor or a treatmen
 
 If this is your first visit, start with the [ten-minute guided exploration](quick-start.md). The [conventions](conventions.md) explain what the badges and numerical categories mean, and the [glossary](glossary.md) collects terms, symbols and units.
 
+## Learn one question at a time
+
+| question | read first | then look at |
+|---|---|---|
+| Why can CVP rise while filling falls? | [Transmural pressure](transmural-pressure.md), then [venous return](venous-return.md) | pressure waveforms, transmural CVP and the Guyton inflow point during a PEEP change |
+| Did pressure open lung or distend tissue already open? | [Two-population lung](two-population-lung.md), then [opening profiles](recruitment-and-ri.md) | end-expiratory closed fraction, opening excursion, plateau and the mechanical PVR curve |
+| Why do the two ventricles respond at different times? | [Four effects of a breath](the-four-effects-of-a-breath.md), then [pulmonary transit](pulmonary-transit.md) | early and later RV/LV loop changes after the same intervention |
+| Did we add blood or change its pressure-generating share? | [Stressed volume](stressed-volume.md), then [venous tone](venous-tone.md) | current total blood, systemic venous stressed fraction, Pmsf and output |
+
+For each question, predict a direction, Pin the starting state, change one control and compare the first response with the settled pattern. If the result differs from your prediction, check the pressure reference, measurement timing and competing pathways before changing another control. The [scenario guide](scenarios.md) supplies starting conditions and explicit limits for these experiments.
+
 ## Everything on the application screen
 
 ### Patient and time controls
 
-The scenario selector loads a teaching phenotype. The current presets and the question each is meant to expose are collected on [Clinical scenarios](scenarios.md). Selecting a preset replaces the current parameters; changing any control afterwards makes the state *Custom*.
+The scenario selector loads a teaching phenotype. The current presets and the question each is meant to expose are collected on [Clinical scenarios](scenarios.md). Selecting a preset replaces the current parameters; applying a physiological setting afterwards makes the state *Custom*. Preparing a blood dose does nothing until **Apply** or **Remove** is pressed.
 
-Play/Pause stops or resumes simulated time. The speed selector changes how quickly simulated time passes, not any physiological parameter. Reset returns the current preset to its initial state and clears measured occlusion points. End-expiratory and end-inspiratory holds are explained under [Manoeuvres](manoeuvres.md).
+Play/Pause stops or resumes simulated time. The speed selector changes how quickly simulated time passes, not any physiological parameter. Reset restarts the current prescription and clears dynamic history and measured occlusion points. In *Custom*, it retains your settings and applied blood; reselect a named preset to recover that preset's starting patient. End-expiratory and end-inspiratory holds are explained under [Manoeuvres](manoeuvres.md).
 
 ### The five control groups
 
@@ -30,7 +41,7 @@ Play/Pause stops or resumes simulated time. The speed selector changes how quick
 | cardiac function | rate, biventricular contractility, LV diastolic stiffness, baroreflex and ventricular interaction | [Heart controls](controls-heart.md) |
 | pulmonary circulation | open-lung vascular resistance, hypoxic vasoconstriction and pulmonary capacitance coupling | [Pulmonary controls](controls-pulmonary.md) |
 
-Controls are generated from the model's parameter registry. A grey control is not applicable in the current state—for example, tidal volume in pressure control, closing pressure while recruitment hysteresis is off, or baroreflex sensitivity while the reflex is disabled. The baroreflex is <!-- CONSISTENCY: baroreflex-default -->off<!-- /CONSISTENCY --> by default so the first view exposes uncompensated mechanical interaction; enabling it adds the model's aggregate pressure defence.
+A grey control is not applicable in the current state—for example, tidal volume in pressure control, closing pressure while recruitment hysteresis is off, or baroreflex sensitivity while the reflex is disabled. The baroreflex is <!-- CONSISTENCY: baroreflex-default -->off<!-- /CONSISTENCY --> by default so the first view exposes uncompensated mechanical interaction; enabling it adds the model's aggregate pressure defence.
 
 Manual search covers the full text of every written page, not only its title and summary. Results include a nearby excerpt so a body-text match can be judged before opening the page.
 
@@ -73,7 +84,7 @@ This provenance does not make the result independently validated. The developmen
 
 ## Why a linked manual
 
-The manual follows the persistent-wiki approach described in [Karpathy's LLM-Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): physiological explanations, implementation choices, reversals and limitations are kept as interconnected Markdown pages rather than rediscovered from chat history. The source pages remain readable without the web viewer, and Git records how each claim changes.
+The manual follows the persistent-wiki approach described in [Karpathy's LLM-Wiki](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f): physiological explanations, current assumptions and limitations are kept as interconnected Markdown pages rather than rediscovered from chat history. The source pages remain readable without the web viewer, and Git records how each claim changes.
 
 ## Limits
 

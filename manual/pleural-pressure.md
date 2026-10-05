@@ -6,18 +6,18 @@
 
 ## Physiology
 
-At passive end-expiration, lung recoil pulls inward while the chest wall usually tends outward. Functional residual capacity is the volume at which those opposing forces balance, so alveolar pressure equals atmospheric pressure even though pleural pressure is subatmospheric.
+At passive equilibrium with an open airway, no applied PEEP and complete expiration, lung recoil pulls inward while the chest wall usually tends outward. Functional residual capacity is the volume at which those opposing forces balance, so alveolar pressure equals atmospheric pressure even though pleural pressure is subatmospheric.
 
-During inspiration, the sign depends on who expands the thorax:
+For the two isolated mechanisms, the direction is:
 
 - A **ventilator** raises alveolar pressure and displaces the wall outward. Pleural pressure rises.
 - The **inspiratory muscles** pull the wall outward. Pleural pressure falls.
 
-This sign reversal explains much of heart–lung interaction. Positive-pressure inspiration raises measured right atrial pressure while opposing venous return; spontaneous inspiration can lower measured CVP while increasing the transmural filling pressure and the gradient for venous return.
+When effort and ventilator pressure act together, their contributions combine; the mode label alone does not fix the sign. This sign reversal between the passive and unassisted mechanisms explains much of heart–lung interaction. Positive-pressure inspiration raises measured right atrial pressure while opposing venous return; spontaneous inspiration can lower measured CVP while increasing the transmural filling pressure and the gradient for venous return.
 
 ### Swing, resting pressure and load are not the same thing
 
-Chest-wall compliance mainly determines how much pleural pressure changes for a given tidal displacement. Near the usual operating range:
+Chest-wall compliance mainly determines how much pleural pressure changes for a given tidal displacement **during passive inflation**, when muscle pressure does not change. Near the usual operating range:
 
 $$
 \Delta P_{pl}\approx\frac{V_T}{C_{cw}}
@@ -43,7 +43,7 @@ $$
 P_{pl}=P_{cw}-P_{mus}
 $$
 
-$P_{mus}$ is an effective pressure-generating state, not an on/off copy of neural inspiration. It rises during the inspiratory command and decays through early expiration. While this post-inspiratory activity persists, pleural pressure remains more negative than the relaxed chest-wall pressure and expiratory flow is braked. The [Campbell diagram](panel-campbell.md#what-happens-during-active-expiration) shows why the active expiratory trajectory therefore approaches $C_{cw}$ gradually instead of falling onto it as soon as inspiration ends.
+$P_{mus}$ is an effective pressure-generating state, not an on/off copy of neural inspiration. It rises during the inspiratory command and decays through early expiration. While this post-inspiratory activity persists, pleural pressure remains more negative than the relaxed chest-wall pressure and expiratory flow is braked. The [Campbell diagram](panel-campbell.md#what-happens-after-spontaneous-inspiration) shows why the active expiratory trajectory therefore approaches $C_{cw}$ gradually instead of falling onto it as soon as inspiration ends.
 
 The pressure that distends the lung is then:
 
@@ -57,7 +57,7 @@ $$
 
 The interface therefore gives these pressures different visual roles. The pleural-pressure tile and waveform rail put the current Ppl in the foreground and retain the latest breath's swing as secondary context. A Palv tile and curve expose the pressure inside the alveolar compartment and its gradient from Paw. A separate $P_L$ tile and trace show the pressure across the lung. This keeps “pressure at the airway”, “pressure inside the alveoli”, “pressure around the circulation” and “pressure distending the lung” distinct.
 
-Because the model uses Palv and Ppl directly, its dynamic $P_L$ trace is not the same construction as the clinical surrogate $P_{aw}-P_{es}$ while gas is flowing. Paw still contains the pressure lost across airway resistance, and Pes is a regional estimate rather than the global Ppl known by the model. The two approach one another during a valid zero-flow pause. See [the waveform panel](panel-waveforms.md#why-the-model-trace-can-differ-from-bedside-dynamic-pl).
+Because the model uses Palv and Ppl directly, its dynamic $P_L$ trace is not the same construction as the clinical surrogate $P_{aw}-P_{es}$ while gas is flowing. Paw still contains the pressure lost across airway resistance, and Pes is a regional estimate rather than the global Ppl known by the model. The two approach one another during a valid zero-flow pause. See [the waveform panel](panel-waveforms.md#why-model-and-bedside-transpulmonary-pressure-traces-can-differ).
 
 The default curve is calibrated so that at the normal 2.2 L reference, $P_{cw}=-5$ cmH₂O and the local slope corresponds to 200 mL/cmH₂O. Its relaxed zero-recoil volume is higher, near 3.2 L: below that volume the wall tends outward; above it the wall tends inward. These are model reference values, not universal patient normals.
 
@@ -97,7 +97,7 @@ A collapsed, stiff lung therefore finds equilibrium at a lower volume, where the
 
 ### Body position and the abdomen
 
-Prone position reduces the selected chest-wall compliance to 65% of its supine value, raises abdominal pressure by 2 cmH₂O and lowers the opening-pressure distribution of recruitable lung. These are coarse, simultaneous transformations. Recruitment may offset the expected change in mean pleural pressure, so the model validates chest-wall stiffening from the **larger within-breath pleural swing**, not by requiring mean pleural pressure to rise in every phenotype.
+Prone position reduces the selected chest-wall compliance to 65% of its supine value, raises abdominal pressure by 2 cmH₂O and lowers the opening midpoint of recruitable lung by 6 cmH₂O, with a minimum of 5 cmH₂O. The closing setting and reopenable potential are not independently recalibrated by position; if the effective opening midpoint falls to or below the closing setting, the effective memory gap is zero. These are coarse, simultaneous transformations. Recruitment may offset the expected change in mean pleural pressure, so the model validates chest-wall stiffening from the **larger within-breath pleural swing**, not by requiring mean pleural pressure to rise in every phenotype.
 
 The obesity and intra-abdominal-hypertension scenarios also use a positive wall load. This pressure is selected independently from abdominal pressure because the model has no geometry from which to calculate transmission. It must not be read as a measured abdominal-to-pleural transmission fraction.
 
@@ -129,12 +129,14 @@ Pressure transmission is an outcome of lung recoil, wall recoil, volume and load
 
 ## References
 
+Rahn and colleagues establish the separate lung and thorax relaxation curves. Behazin and colleagues studied anaesthetized, paralysed subjects with severe obesity: elevated resting pressure and reduced lung compliance were prominent, while chest-wall compliance was not uniformly reduced. This supports keeping load, lung stiffness and wall stiffness distinct rather than treating the obesity scenario as a universal patient pattern.
+
 - Rahn H, Otis AB, Chadwick LE, Fenn WO. The pressure-volume diagram of the thorax and lung. *Am J Physiol*. 1946;146:161–178. [doi:10.1152/ajplegacy.1946.146.2.161](https://doi.org/10.1152/ajplegacy.1946.146.2.161)
 - Agostoni E, Hyatt RE. Static behavior of the respiratory system. In: *Handbook of Physiology, The Respiratory System*. 1986:113–130. [doi:10.1002/cphy.cp030309](https://doi.org/10.1002/cphy.cp030309)
 - Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Behazin N, Jones SB, Cohen RI, Loring SH. Respiratory restriction and elevated pleural and esophageal pressures in morbid obesity. *J Appl Physiol*. 2010;108:212–218. [doi:10.1152/japplphysiol.91356.2008](https://doi.org/10.1152/japplphysiol.91356.2008)
 - Akoumianaki E, Maggiore SM, Valenza F, et al. The application of esophageal pressure measurement in patients with respiratory failure. *Am J Respir Crit Care Med*. 2014;189:520–531. [doi:10.1164/rccm.201312-2193CI](https://doi.org/10.1164/rccm.201312-2193CI)
-- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med*. 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
+- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical bedside implications. *Intensive Care Med*. 2026;52:2031–2034. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
 - Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
 - Jonkman AH, Telias I, Spinelli E, et al. The oesophageal balloon for respiratory monitoring in ventilated patients: updated clinical review and practical aspects. *Eur Respir Rev*. 2023;32:220186. [doi:10.1183/16000617.0186-2022](https://doi.org/10.1183/16000617.0186-2022)
 - Mojoli F, Pozzi M, Orlando A, et al. Timing of inspiratory muscle activity detected from airway pressure and flow during pressure support ventilation: the waveform method. *Crit Care*. 2022;26:32. [doi:10.1186/s13054-022-03895-4](https://doi.org/10.1186/s13054-022-03895-4)

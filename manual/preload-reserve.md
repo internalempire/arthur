@@ -14,13 +14,15 @@ The default Guyton panel uses a rapidly updated RV-function relation. The RV pre
 
 ![Equilibrium output as mean systemic filling pressure is increased](figure/preload-reserve.svg)
 
+The figure sweeps upstream pressure while retaining one local RV-function construction. Its coloured slope is estimated from nearby 0.1 mmHg sampling steps; the tile uses a ±0.5 mmHg perturbation. The figure illustrates the steep and flat regions rather than reproducing the tile classifier at every boundary.
+
 The clinically familiar fluid challenge is a finite volume intervention. The model's reserve is instead a local slope: it asks what an additional millimetre of filling pressure would buy at the current point. That keeps the question independent of how much of a real bolus remains intravascular or reaches a particular capacitance bed.
 
 ---
 
 ## In the model
 
-The simulator first averages the right-sided state over one complete respiratory cycle. It then raises and lowers model Pmsf by 0.5 mmHg, recomputes the intersection of an analytic venous-return relation and local RV-function approximation, and estimates the central slope:
+The simulator first smooths the right-sided state over a sliding window of one current heartbeat, then averages those smoothed values over a sliding window of one current respiratory period. This respiratory mean updates continuously; it is not a sample latched at the end of the last breath. It then raises and lowers model Pmsf by 0.5 mmHg, recomputes the intersection of an analytic venous-return relation and local RV-function approximation, and estimates the central slope:
 
 $$
 R_{preload} = \frac{1}{Q}\frac{\Delta Q}{\Delta P_{msf}}
@@ -31,24 +33,19 @@ $$
 - $\Delta Q$ — change in equilibrium flow across the small Pmsf perturbation, L/min
 - $\Delta P_{msf}$ — change in mean systemic filling pressure, mmHg
 
-The value is displayed as percent of current output per mmHg. A value of 0.10 therefore reads “about 10% more output for one additional mmHg of filling pressure” within the local construction.
+The value is displayed as percent of the analytically predicted flow at the current intersection per mmHg; the denominator is not measured aortic output. A value of 0.10 therefore reads “about 10% more output for one additional mmHg of filling pressure” within the local construction.
 
 Here, “output” means the common steady flow predicted at the intersection. The ascending curve itself calculates RV output; it does not run a separate LV filling or LV-function calculation at each perturbed point.
 
 The RV reserve tile uses 8%/mmHg to distinguish a steep local response from a flatter one. This is a model classifier, not a clinical threshold. The fast RV view highlights the steep segment on its selected clock: heartbeat summaries in Live, respiratory summaries in Mean. The tile always uses the respiratory mean, so the moving highlight need not match that mean classification at each breathing phase. It is not highlighted on the optional, independently sampled whole-heart curve. A finite bolus can cross a knee and venous compliance changes how much pressure a volume increment produces, so the local coefficient and a finite volume response need not agree.
 
-### A reproducible comparison
+### Compare a predicted slope with an actual intervention
 
-With passive volume control, VT 560 mL, RR 14/min, PEEP 5 and baroreflex disabled:
+Select a passive phenotype, leave baroreflex off and create a Pin after settling. Note the RV reserve coefficient, prepare +200 mL under **Blood volume change**, then press **Apply**. Wait for redistribution and compare the actual change in aortic output and ventricular filling with the reference. This tests the intact model response to a finite dose; it is not the small analytical pressure perturbation used by the tile.
 
-| model state | local reserve | output before | output after +500 mL selected stressed volume | gain |
-|---|---:|---:|---:|---:|
-| lower filling — 300 mL selected stressed volume | 15.9%/mmHg | 3.79 L/min | 5.65 L/min | +49% |
-| higher filling — 900 mL selected stressed volume | 6.8%/mmHg | 5.91 L/min | 6.76 L/min | +14% |
+Repeat from a different starting filling state, or with impaired LV function. A high RV coefficient can coexist with a smaller whole-heart benefit because the LV and pulmonary circulation are not independently re-tested by the coefficient. A substantial rise in filling pressure with little additional flow is also an informative result.
 
-The exact gains are properties of these model states. The point is the separation: the same added volume raises output much more on the steep limb.
-
-Unlike PPV, preload reserve remains available during spontaneous breathing and low tidal volume because it is not read from respiratory amplitude. Using a complete-breath mean prevents one arbitrarily phased heartbeat from changing the classification. It can still become unavailable if the two analytical curves have no finite crossing.
+Unlike PPV, this coefficient remains available during spontaneous breathing and low tidal volume because it is not read from respiratory amplitude. Its smoothed reference spans a moving breath-duration window; it can still become unavailable if the two analytical curves have no finite crossing or the circulation is outside the model domain.
 
 ### What changes it — and what it changes
 
@@ -60,7 +57,7 @@ The reserve is largest when the heart can convert a small rise in filling pressu
 - **the route back to the heart:** resistance to venous return, venous collapse and the pressures surrounding the great veins determine how readily extra upstream pressure becomes extra flow;
 - **the modeled RV response:** the RV diastolic pressure–volume relation, RV contractility, pleural and pericardial pressure, and the effective pulmonary arterial load determine the ascending curve;
 - **right-ventricular afterload:** pulmonary vascular load and lung inflation can flatten the useful response to additional right-sided filling;
-- **the current output:** the displayed percentage is normalised to present flow, so the same absolute gain represents a larger percentage when starting output is low.
+- **the current output:** the displayed percentage is normalised to the predicted intersection flow, so the same absolute gain represents a larger percentage when starting output is low.
 
 The actual closed-loop simulation still contains the LV, ventricular interaction and pulmonary transit. They can influence the current state from which the analytic curve is built. However, the preload-reserve calculation does not independently ask whether the LV could accept and eject the extra flow after the pulmonary circulation has transmitted it. A low LV reserve can therefore be underrepresented by this particular readout.
 
@@ -82,12 +79,12 @@ The calculation is expressed per mmHg rather than per millilitre. Converting pre
 
 ### Of the construction
 
-- The reserve is derived from a steady-state analytical construction anchored to the most recent complete respiratory cycle of a breathing closed-loop simulation.
+- The reserve is derived from a steady-state analytical construction anchored to a moving respiratory-period mean of heartbeat-smoothed states in the breathing closed-loop simulation.
 - The 8%/mmHg split is a didactic classifier with broad, not exact, agreement with the model's 500 mL experiment.
 - The slope is local; a finite intervention can leave the steep limb and yield less benefit than the derivative suggests.
 - The ascending relation is an RV-function approximation. It uses current RV afterload and external pressures and does not simulate a full new biventricular steady state at every perturbed point.
 - LV filling reserve and LV systolic limitation are not independently tested by the analytic slope.
-- Added volume is placed immediately in one venous reservoir with no distribution or loss.
+- Added blood is placed immediately in one venous reservoir and redistributes through the represented circulation. There is no interstitial escape, renal removal or drug-specific volume kinetics.
 
 ### Of clinical application
 
@@ -100,7 +97,7 @@ The calculation is expressed per mmHg rather than per millilitre. Converting pre
 
 ## Validation
 
-Executable tests require this RV coefficient to fall as selected stressed volume rises, remain available when spontaneous breathing or low tidal volume withholds PPV, and agree broadly with the model's own finite-volume response. These checks qualify the analytic RV coefficient; the whole-heart curve has separate loading, LV-sensitivity, conservation, phase and convergence tests.
+Executable tests require this RV coefficient to fall as the prescribed intravascular blood volume rises in the tested filling sweep, remain available when spontaneous breathing or low tidal volume withholds PPV, and agree broadly with the model's own finite-volume response. These checks qualify the analytic RV coefficient; the whole-heart curve has separate loading, LV-sensitivity, conservation, phase and convergence tests.
 
 ---
 

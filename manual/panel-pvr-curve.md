@@ -18,11 +18,17 @@ Volume is used on the horizontal axis deliberately. Inflation and deflation expe
 
 The FRC marker is also a design choice, not an inferred measurement. The opposing slopes are constructed to cancel at zero strain, which places the fully open reference minimum near the tissue's resting volume. The panel can therefore demonstrate movement to either limb, but it cannot determine where the human nadir ought to be. The animal experiments place their minimum nearer half maximal volume; the model instead follows the human clinical teaching geometry and human in-vivo magnitude constraints. See [why the minimum is placed at FRC](pulmonary-vascular-resistance.md#the-minimum-is-placed-at-frc-and-this-is-a-genuine-choice).
 
-The grey vertical band is the lung-volume excursion already traversed during the current breath. The white *Patient* point uses the current open fraction and HPV state, so it may sit above the fully open mechanical curve when derecruited lung adds load.
+The grey vertical band is the lung-volume excursion already traversed during the current breath. The contrasting *Patient* point uses the current open fraction and HPV state, so it may sit above the fully open mechanical curve when derecruited lung adds load.
 
 The `+`, `−` and percentage/Fit buttons change only the vertical view. Zoom is centred on the patient point when possible and never changes model state. The full RV-to-TLC horizontal range is retained so neither limb disappears.
 
 The panel can also display **Derived PVR: use with caution**. This warning is propagated from the wedge surrogate when the zone 3 pressure margin is inadequate. It qualifies the catheter-style calculation $(mPAP-wedge)/CO$; it does not invalidate the mechanical component curves or their model patient point.
+
+## Follow the point, then check the circulation
+
+Raise PEEP while keeping the other settings fixed and follow three observations: lung volume, the Patient resistance point, and RV output/filling. More inflation may move the open pathway up its high-volume limb; opening additional lung can also change the parallel vascular mixture. These effects can oppose each other. The net result must be read from the Patient point and the running circulation, not from the slope of a reference limb alone.
+
+The lowest point of the purple curve is therefore not an “optimal PEEP” target. This panel does not balance oxygenation, regional injury, systemic venous return or total cardiac output. If a substantially closed lung lies below the displayed fully open RV landmark, the Patient point is outside the horizontal domain and is omitted; that is a plotting limit, not evidence that the simulation has stopped.
 
 ## In the model
 

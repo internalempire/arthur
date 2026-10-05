@@ -10,6 +10,8 @@ Systemic arteries dilate in local hypoxia; small pulmonary arteries do the oppos
 
 The same mechanism has a cost. If hypoxia is widespread, vasoconstriction acts across much of the pulmonary circulation and raises right ventricular afterload. Its net effect therefore depends on how much lung is involved, the remaining recruitable vascular bed, pulmonary arterial and venous pressure, cardiac output, mixed venous oxygen tension, carbon dioxide, pH and time.
 
+In a human experiment by Morrell and colleagues, lobar hypoxia during bronchoscopic occlusion reduced regional perfusion over minutes; hyperoxic occlusion did not produce the same response. This supports an oxygen-dependent, time-dependent redistribution mechanism, not an instantaneous rule tied only to lung closure.
+
 HPV is neither an on/off switch nor a direct function of macroscopic lung collapse. Aerated units can be hypoxic, derecruited units can receive little flow, and vascular obstruction can raise PVR without hypoxia. Recruitment may improve oxygenation and restore vascular area, but overdistension can simultaneously compress alveolar vessels.
 
 ## In the model
@@ -60,6 +62,8 @@ There is no mechanistic oxygen-sensing response. Regional ventilation, perfusion
 Executable checks require stronger HPV to reduce relative flow through the derecruited pathway, stronger collapse to reduce available pulmonary conductance, and total PVR to remain the parallel combination of open and closed beds. These are internal mechanism checks, not validation against measured regional human perfusion.
 
 ## References
+
+- Morrell NW, Nijran KS, Biggs T, Seed WA. Magnitude and time course of acute hypoxic pulmonary vasoconstriction in man. *Respir Physiol*. 1995;100:271–281. [doi:10.1016/0034-5687(95)00002-U](https://doi.org/10.1016/0034-5687(95)00002-U) — eight normal subjects, induced lobar hypoxia and serial scintigraphic perfusion measurements; supports direction and time dependence, not the model gain.
 
 - Sylvester JT, Shimoda LA, Aaronson PI, Ward JPT. Hypoxic pulmonary vasoconstriction. *Physiol Rev*. 2012;92:367–520. [doi:10.1152/physrev.00041.2010](https://doi.org/10.1152/physrev.00041.2010)
 - Dunham-Snary KJ, Wu D, Sykes EA, et al. Hypoxic pulmonary vasoconstriction: from molecular mechanisms to medicine. *Chest*. 2017;151:181–192. [doi:10.1016/j.chest.2016.09.001](https://doi.org/10.1016/j.chest.2016.09.001)

@@ -15,13 +15,42 @@
 
 The first three levels are valuable, but they cannot be promoted into the fourth by increasing the number of tests.
 
+## How to use this confidence in a teaching session
+
+For a proposed experiment, first state the observation you expect and the mechanism that could explain it. Then check that the required mechanism exists in Arthur and that the displayed quantities use the intended pressure reference and time window. Finally distinguish three possible conclusions:
+
+- **A direction supported by the mechanism:** for example, increased pressure around the heart can raise atmospheric CVP without improving transmural filling.
+- **A size conditional on the model:** the number of mmHg or the percentage change in output also depends on the chosen coefficients, blood distribution and starting phenotype.
+- **A clinical effect outside scope:** oedema resolution, gas exchange, fatigue, drug dose and patient outcome cannot be validated through outputs the model does not calculate.
+
+A useful comparison can therefore teach physiology even when its numerical magnitude is not a prediction for a patient. Read the [scenario instructions](scenarios.md) for the experiment and its [scenario assessment](../docs/SCENARIO_VALIDATION.md) for the strength of the claim. Green badges and passing numerical checks do not substitute for these distinctions.
+
 ## Development review and validation
 
 The model, code, tests, interface and manual were generated primarily with GPT-5.6-Sol using the high reasoning setting, under human-in-the-loop direction and revision. Other LLMs cross-reviewed internal consistency, physiological claims against the available literature and agreement between implementation and documentation. Human clinical review selected the scope and literature, challenged results, tested the interface and approved substantive changes.
 
 These layers can expose contradictions, stale documentation and implausible directions, but they are not independent scientific validation. LLM reviewers may share assumptions and failure modes, while human review of a teaching model is not a blinded comparison with external patient data. The evidence level therefore depends on the executable and experimental anchors described below, not on the number or identity of reviewers.
 
-## The executable suite
+## Calibration hierarchy
+
+Human in-vivo measurements take priority when an appropriate matched quantity exists. Contemporary clinical syntheses constrain teaching geometry and direction. Animal, isolated-lung and ex-vivo studies support mechanism when human decomposition is unavailable, but their numerical extrema are not imported as human targets.
+
+Not every coefficient has a source. A coefficient chosen to make an established but unquantified relationship visible is labelled a didactic shape coefficient. Attaching a paper to it would imply a calibration that did not occur.
+
+## What green does not mean
+
+- It does not establish diagnostic accuracy, patient-specific prediction or treatment benefit.
+- It does not prove that a passing directional relationship has the correct magnitude.
+- It does not validate physiology omitted from the state equations.
+- It does not make two similarly named quantities interchangeable—for example, pulmonary resistance coefficient and catheter-derived PVR.
+- It does not establish parameter identifiability: different control combinations can produce similar visible states.
+- It does not replace prospective comparison against independent human data.
+
+## Limits
+
+There is no systematic global sensitivity or uncertainty analysis, no parameter-identifiability study, no external patient dataset, no formal calibration likelihood and no blinded prospective evaluation. Several anchors are small studies or animal experiments. Extreme combinations are safety-tested more broadly than they are physiologically validated.
+
+## The executable suite — technical detail
 
 `npm test` runs dependency-free checks across the model's numerical, physiological and documentary domains. The exact count is intentionally not embedded here because every new contract would otherwise make the validation page stale.
 
@@ -61,26 +90,7 @@ The manual has two narrower implementation guards as well. A generated search in
 
 ### Scenario contracts
 
-Every preset is tested for safety and a settled snapshot. The parameter-difference tables in the [scenario page](scenarios.md#preset-parameter-changes) are generated directly from `defaultParams()` and `SCENARIOS`; manual validation fails if the documented tables no longer match the code. [`SCENARIO_VALIDATION.md`](../docs/SCENARIO_VALIDATION.md) asks the more important question: does the proposed intervention actually demonstrate the claim written beside it? Presets are labelled supported, qualified or needing correction. The former weaning preset was removed because the model lacked enough of its mechanism to reproduce the intended lesson.
-
-## Calibration hierarchy
-
-Human in-vivo measurements take priority when an appropriate matched quantity exists. Contemporary clinical syntheses constrain teaching geometry and direction. Animal, isolated-lung and ex-vivo studies support mechanism when human decomposition is unavailable, but their numerical extrema are not imported as human targets.
-
-Not every coefficient has a source. A coefficient chosen to make an established but unquantified relationship visible is labelled a didactic shape coefficient. Attaching a paper to it would imply a calibration that did not occur.
-
-## What green does not mean
-
-- It does not establish diagnostic accuracy, patient-specific prediction or treatment benefit.
-- It does not prove that a passing directional relationship has the correct magnitude.
-- It does not validate physiology omitted from the state equations.
-- It does not make two similarly named quantities interchangeable—for example, pulmonary resistance coefficient and catheter-derived PVR.
-- It does not establish parameter identifiability: different control combinations can produce similar visible states.
-- It does not replace prospective comparison against independent human data.
-
-## Limits
-
-There is no systematic global sensitivity or uncertainty analysis, no parameter-identifiability study, no external patient dataset, no formal calibration likelihood and no blinded prospective evaluation. Several anchors are small studies or animal experiments. Extreme combinations are safety-tested more broadly than they are physiologically validated.
+Every preset is tested for safety and a settled snapshot. The parameter-difference tables in the [scenario page](scenarios.md#preset-parameter-changes) are generated directly from `defaultParams()` and `SCENARIOS`; manual validation fails if the documented tables no longer match the code. [`SCENARIO_VALIDATION.md`](../docs/SCENARIO_VALIDATION.md) asks the more important question: does the proposed intervention actually demonstrate the claim written beside it? The audit distinguishes a supported directional lesson from a qualified one and states which omitted mechanisms prevent a broader clinical interpretation.
 
 ## How to run the checks
 
@@ -98,7 +108,7 @@ Snapshot regeneration is intentionally separate: `npm run snapshots`. A changed 
 
 `npm run test:audit` measures flows and pressure responses independently of the quantities whose correctness it assesses. Its explicit registry distinguishes `PASS`, `KNOWN_FAILURE`, `REGRESSION` and `UNEXPECTED_PASS`. A known failure is an unresolved defect, never evidence of physiological validity. Unexpected passes require review and promotion to a permanent regression check. Missing probes, malformed results, non-finite measurements and flow-volume imbalance fail verification regardless of the registry.
 
-`npm run test:audit:strict` fails while any finding remains unresolved. The normal verification command accepts only the specifically registered known failures; CI preserves their numerical measurements as an artifact. This separates a reproducible development checkpoint from physiological acceptance.
+All seven current findings have resolved status in the registry and must pass. `npm run test:audit:strict` additionally prohibits unresolved findings; there is no accepted known failure in the current registry. CI retains numerical measurements so a pass can be inspected rather than treated as an unexplained label.
 
 The audit tracks seven criteria: agreement of displayed cardiac output with integrated aortic flow; diastolic mitral-to-aortic throughflow; ventricular pressure increasing with activation at fixed volume; activation continuity at high heart rates; hysteresis time-step convergence; preservation of intrinsic opening potential during a chest-wall intervention; and reverse flow through an open caval segment. All seven are enforced regression checks. Their executable status is recorded in [`audit-expectations.json`](https://github.com/internalempire/arthur/blob/main/tests/audit-expectations.json). The model makes no R/I prediction or validation claim. Passing these checks does not establish quantitative external validity of the opening profiles; that requires joint assessment of pressures, volumes, compliance and circulatory response under a specified protocol.
 

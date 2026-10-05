@@ -10,7 +10,7 @@ The manual is deliberately not the only place knowledge lives.
 
 | layer | where | what it is |
 |---|---|---|
-| sources | `docs/` | Immutable record: `MODEL_DECISIONS.md`, `LITERATURE_RANGES.md`, `PHYSIOLOGY.md`, the audits and postmortems. Written when a decision was taken. |
+| current technical references and history | `docs/` | `PHYSIOLOGY.md`, `LITERATURE_RANGES.md` and `SCENARIO_VALIDATION.md` describe current interpretation and evidence. `MODEL_DECISIONS.md`, dated audits and the handover preserve the history of decisions and corrections. |
 | the wiki | `manual/*.md` | These pages. Written for a reader, cross-linked, rewritten freely. |
 | schema | this file | The conventions. |
 
@@ -35,7 +35,7 @@ A page never restates a source at length. It explains, then links. Files under `
 ## See also              three to six lateral links
 ```
 
-`In the model` is not a code tour. Compliance does not need explaining; the distinction between potential and actual opening and the pulmonary transit stages do. The test is whether a reader could be misled about what the number means without it.
+`In the model` is not a code tour. Define the physiological quantity before the calculation: compliance means volume change per pressure change; potential opening differs from actual opening; pulmonary blood residence differs from the delay in a mechanical response. The test is whether a reader could be misled about what the number means without it.
 
 `Limits` is the section that must never be thin. Both halves are required: what the construction cannot represent, and what a clinician must not conclude from it.
 

@@ -16,23 +16,23 @@ $$
 - $P_{\text{inside}}$ — pressure in the lumen or cavity, mmHg; this is what a catheter reads
 - $P_{\text{surrounding}}$ — pressure in the space the structure sits in, mmHg
 
-That difference is what distends it, and therefore what determines the volume it holds. Everything else in heart–lung interaction follows from the fact that mechanical ventilation changes the *surrounding* term while a catheter measures the *inside* one.
+That difference is the distending pressure. The resulting volume also depends on wall stiffness, geometry and, in a cardiac chamber, the phase and strength of contraction. Everything else in heart–lung interaction follows from the fact that mechanical ventilation changes the *surrounding* term while a catheter measures the *inside* one.
 
-The thorax contains structures with four different surroundings. The great vessels outside the chest see atmospheric pressure. The intrathoracic vessels and the lung see [pleural pressure](pleural-pressure.md). The cardiac chambers see pleural pressure plus whatever the pericardium adds. The splanchnic venous reservoir sees [abdominal pressure](abdominal-pressure.md). A single number quoted "in mmHg" therefore means something different depending on which of these it was measured in.
+The thorax contains structures with four different surroundings. The great vessels outside the chest see atmospheric pressure. Extra-alveolar intrathoracic vessels are influenced by [pleural pressure](pleural-pressure.md), whereas alveolar microvessels also experience alveolar pressure. Lung distension depends on alveolar minus pleural pressure. The cardiac chambers see pleural pressure plus whatever the pericardium adds. The splanchnic venous reservoir sees [abdominal pressure](abdominal-pressure.md). A single number quoted "in mmHg" therefore means something different depending on which of these it was measured in.
 
 ### Why this makes filling pressures untrustworthy
 
-A central venous catheter reports pressure referenced to atmosphere. Right ventricular filling depends on right atrial pressure referenced to the pericardial space. Applying PEEP raises pleural pressure, which raises measured central venous pressure — while the transmural pressure that actually fills the ventricle falls, because venous return has been impeded.
+A central venous catheter reports pressure referenced to atmosphere. Right ventricular filling depends on right atrial pressure referenced to the pericardial space. Applying PEEP can raise pleural pressure and measured central venous pressure while reducing venous return and transmural filling pressure. Transmural atrial pressure is more informative about distension than atmospheric CVP alone, but ventricular filling still depends on chamber compliance, atrioventricular flow and pericardial constraint.
 
 The measured number and the transmural estimate can therefore move in **opposite directions**. The magnitude and even the net change depend on volume status, chest-wall mechanics, pericardial constraint and the timing of measurement, so the example should be used as a mechanism rather than a universal rule.
 
-The same reasoning explains why raised intrathoracic pressure unloads the left ventricle. Left ventricular afterload is the transmural systolic pressure it must generate — aortic pressure minus pleural pressure. Raising pleural pressure lowers that difference at constant arterial pressure, which is why positive pressure can help a failing left ventricle and why removing it at extubation can precipitate failure. The [LV-failure preset](scenarios.md#lv-failure) demonstrates reduced transmural ejection pressure, while forward output falls modestly because filling also falls. There is no weaning preset because the model cannot reproduce enough of that syndrome faithfully.
+The same reasoning explains why raised intrathoracic pressure unloads the left ventricle. One component of LV afterload is the systolic pressure generated relative to its surroundings. During ejection, aortic pressure minus pressure around the heart approximates this pressure burden; ventricular geometry, arterial impedance and the time course of pressure also matter. Raising pleural pressure lowers that difference at constant arterial pressure, which is why positive pressure can help a failing left ventricle and why removing it at extubation can precipitate failure. The [LV-failure preset](scenarios.md#lv-failure) demonstrates reduced transmural ejection pressure, while forward output falls modestly because filling also falls. Arthur does not reproduce the oedema, ischaemia, changing effort and other mechanisms required to simulate weaning-induced cardiac failure as a complete syndrome.
 
 ---
 
 ## In the model
 
-Every compartment is built the same way: an elastic relation gives a transmural pressure from the volume it holds, and the pressure that surrounds it is then added to obtain the pressure a catheter would read.
+For the represented vascular reservoirs and cardiac chambers, an elastic relation gives pressure relative to the surroundings; external pressure is then added to obtain atmospheric pressure. The simplest linear form is shown below. Ventricular passive stiffness is nonlinear and contraction changes throughout the beat; the staged pulmonary transport store has no separate pressure measurement.
 
 ```
 transmural = elastance × (volume − unstressed volume)
@@ -44,7 +44,8 @@ The surrounding pressure differs by compartment:
 | compartment | surrounded by |
 |---|---|
 | systemic arteries | atmosphere (zero) |
-| systemic venous reservoir | elastic pressure, with a fractional abdominal contribution described under [abdominal pressure](abdominal-pressure.md) |
+| systemic venous reservoir | an effective fractional abdominal contribution described under [abdominal pressure](abdominal-pressure.md); elastic recoil is the pressure generated within the reservoir, not its surroundings |
+| aggregate IVC conduit | abdominal pressure, with a model lower bound on atmospheric conduit pressure |
 | pulmonary artery, pulmonary vein | pleural pressure |
 | all four cardiac chambers | pleural pressure **+** pericardial pressure |
 | alveoli | pleural pressure |
@@ -71,9 +72,9 @@ Raising PEEP in a passive patient at 500 mL and 14 breaths per minute:
 Across this sweep, measured CVP rises by 6.4 mmHg while transmural CVP falls by 0.7 mmHg.
 <!-- END GENERATED: transmural-peep -->
 
-A clinician reading only measured CVP would conclude that the patient was becoming better filled while the transmural filling pressure and output were moving in the opposite direction.
+Reading the rise in measured CVP as improved filling would give the wrong conclusion in this experiment: transmural filling pressure and output move in the opposite direction. Pin the settled starting state, change PEEP, and compare CVP with transmural CVP and ventricular end-diastolic volume. Allow the new state to settle before comparing the magnitude; the readouts use different averaging windows.
 
-The app reports measured and transmural CVP together. It also places the three-second **Wedge surrogate** beside a separately synchronised **LA transmural pressure** tile, so left-sided external pressure transmission can be inspected without subtracting an instantaneous respiratory value from a smoothed vascular value. See [numeric tiles](numeric-tiles.md) and [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md).
+The app reports measured and transmural CVP together. It also places the **Wedge surrogate**, smoothed with a three-second time constant, beside a separately synchronised **LA transmural pressure** tile, so left-sided external pressure transmission can be inspected without subtracting an instantaneous respiratory value from a smoothed vascular value. See [numeric tiles](numeric-tiles.md) and [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md).
 
 ---
 
@@ -106,10 +107,14 @@ The cost is that every compartment must have a defensible answer to "what surrou
 
 ## References
 
+The distinction between arterial pressure and transmural ejection pressure has direct human experimental support: [Buda et al.](https://pubmed.ncbi.nlm.nih.gov/460363/) studied eight patients during Müller and Valsalva manoeuvres. That protocol supports the mechanism, not a universal cardiac-output response to PEEP.
+
+- Buda AJ, Pinsky MR, Ingels NB Jr, et al. Effect of intrathoracic pressure on left ventricular performance. *N Engl J Med*. 1979;301:453–459. [doi:10.1056/NEJM197908303010901](https://doi.org/10.1056/NEJM197908303010901)
+
 - Pinsky MR. Cardiopulmonary interactions: physiologic basis and clinical applications. *Ann Am Thorac Soc* 2018;15(Suppl 1):S45–S48. [doi:10.1513/AnnalsATS.201704-339FR](https://doi.org/10.1513/AnnalsATS.201704-339FR)
 - Magder S. Central venous pressure: a useful but not so simple measurement. *Crit Care Med* 2006;34:2224–7. [doi:10.1097/01.CCM.0000227646.98423.98](https://doi.org/10.1097/01.CCM.0000227646.98423.98)
 - Mahmood SS, Pinsky MR. Heart–lung interactions during mechanical ventilation: the basics. *Ann Transl Med* 2018;6:349. [doi:10.21037/atm.2018.04.29](https://doi.org/10.21037/atm.2018.04.29)
-- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
+- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical bedside implications. *Intensive Care Med* 2026;52:2031–2034. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
 - Jardin F, Farcot JC, Boisante L, et al. Influence of positive end-expiratory pressure on left ventricular performance. *N Engl J Med* 1981;304:387–92. [doi:10.1056/NEJM198102123040703](https://doi.org/10.1056/NEJM198102123040703)
 
 ---

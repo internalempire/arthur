@@ -42,7 +42,7 @@ At the same stressed volume, lower compliance generates higher elastic filling p
 
 ### Resistance to venous return
 
-This control changes how much flow a given Pmsf–right-atrial-pressure gradient can sustain. It aggregates venous, hepatic and caval resistance, split between the splanchnic reservoir and the [inferior vena cava](inferior-vena-cava.md) conduit (33% upstream, 67% downstream); abdominal pressure can add a dynamic contribution and create a waterfall plateau on the downstream segment.
+This control changes how much flow a given Pmsf–right-atrial-pressure gradient can sustain. It aggregates venous, hepatic and caval resistance, split between the aggregate systemic venous reservoir, with its partial abdominal-pressure transmission, and the [inferior vena cava](inferior-vena-cava.md) conduit (33% upstream, 67% downstream); abdominal pressure can add a dynamic contribution and create a waterfall plateau on the downstream segment.
 
 ### Systemic vascular resistance
 
@@ -52,11 +52,19 @@ SVR changes LV arterial load and systemic pressure. The active [baroreflex](baro
 
 Fluid, venoconstriction and reduced venous compliance can all raise Pmsf, but they do so by changing different properties. Combining them into one “preload” control would make it impossible to teach why pressure can rise without an equivalent increase in usable flow.
 
+## Compare pressure-generating volume with container properties
+
+Keep the baroreflex off and Pin a settled reference. Apply a small blood dose, then read total blood, the stressed reservoir fraction, Pmsf, transmural filling pressures and output together. A higher Pmsf without a useful rise in output demonstrates that upstream pressure and pump performance are different questions.
+
+For a separate capacity experiment, restore the same starting prescription before pinning again; a Custom Reset alone retains applied blood. Reduce venous capacity while keeping total blood and compliance fixed. More of the existing reservoir blood now generates elastic pressure. A compliance experiment changes a third property: how much pressure a given stressed volume generates.
+
+In this aggregate linear reservoir, equal blood addition and capacity reduction can produce the same pressure and flow trajectories even though the blood totals differ. The comparison illustrates two ways of producing the same initial stressed-volume increase; it does not establish that clinical transfusion, fluids and venoconstriction have interchangeable effects.
+
 ## Limits
 
 - One systemic venous reservoir replaces separate splanchnic, renal, muscular and cutaneous beds.
 - No infusion time, transcapillary exchange, interstitial compartment, renal handling or blood viscosity.
-- SVR has resistance and compliance but no distributed arterial waves or regional organ flow.
+- The systemic arterial compartment has fixed compliance; the SVR control changes its outflow resistance. Distributed arterial waves and regional organ flow are absent.
 - The controls do not represent vasoactive drug doses or receptor pharmacology.
 - Extreme combinations can create internally valid but clinically implausible states; use the global validity banner and compare directions rather than targets.
 

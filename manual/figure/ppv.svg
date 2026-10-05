@@ -42,7 +42,7 @@
 <text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Systemic arterial pressure (mmHg)</text>
 <text class="label" x="338" y="424" text-anchor="middle">Time from onset of inspiration (s)</text>
 <line class="total" style="stroke-dasharray:none" x1="626" y1="48" x2="654" y2="48"/><text class="label" x="660" y="52">arterial pressure</text>
-<text class="tick" x="626" y="88">model example: PPV 4.1%</text>
+<text class="tick" x="626" y="88">model PPV 4.1%</text>
 <text class="tick" x="626" y="104">inspiration lasts 1.2 s</text>
 <text class="tick" x="626" y="120">the value is descriptive</text>
 </svg>

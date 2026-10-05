@@ -10,48 +10,48 @@ The application opens on the settled *Healthy, breathing spontaneously* referenc
 
 ## Minute 1–3: reverse the sign of inspiration
 
-1. Leave the *Healthy passive volume control* preset selected and watch pleural pressure, CVP and the Guyton operating point during inspiration.
-2. Select *Healthy spontaneous breathing*.
+1. In *Healthy, breathing spontaneously*, watch pleural pressure, CVP and the Guyton operating point during inspiration.
+2. Select *Healthy, passive volume control*.
 3. Compare the direction of the pleural-pressure and measured-CVP swings.
 
-During positive-pressure inflation, pleural pressure rises; during spontaneous inspiration, it falls. Measured CVP follows surrounding thoracic pressure, whereas transmural CVP more closely reflects chamber distending pressure. This is the quickest way to see why an atmospheric pressure reading is not the same as preload. See [transmural pressure](transmural-pressure.md).
+During positive-pressure inflation, pleural pressure rises; during spontaneous inspiration, it falls. Measured CVP follows surrounding thoracic pressure, whereas transmural CVP more closely reflects chamber distending pressure. This shows why an atmospheric pressure reading is not the same as preload. Compare the direction within each breath here: the two presets also differ in blood volume, systemic resistance and RV contractility, so their settled outputs do not isolate the effect of ventilation. See [transmural pressure](transmural-pressure.md).
 
 ## Minute 3–6: raise PEEP
 
-1. Return to *Healthy passive volume control*.
-2. Increase PEEP from 5 to 12 cmH₂O.
-3. Allow at least five breaths for the circulation and pulmonary transport to approach a new state.
+1. Return to *Healthy, passive volume control*.
+2. Press **Pin** to retain an independently evolving reference, then increase PEEP from 5 to 12 cmH₂O.
+3. Watch the first response, then wait until successive breaths repeat a similar pattern. Several breaths are a starting observation period, not a guarantee of equilibrium.
 4. Follow pleural pressure, measured and transmural CVP, Pmsf, the venous-return gradient, PVR and output.
 
-PEEP does several things at once. It raises the pressure around the right atrium, changes abdominal pressure and resistance to venous return, moves the lung along the PVR–volume relation and changes LV transmural afterload. [The four effects of a breath](the-four-effects-of-a-breath.md) separates these pathways.
+PEEP does several things at once. It raises the pressure around the right atrium, changes abdominal pressure and, depending on the abdominal load, can alter resistance to venous return, moves the lung along the PVR–volume relation and changes LV transmural afterload. [The four effects of a breath](the-four-effects-of-a-breath.md) separates these pathways.
 
 Do not expect one universal direction for cardiac output. The point of the experiment is to identify which mechanism dominates in this selected circulation.
 
 ## Minute 6–8: compare recruitment with distension
 
 1. Select *ARDS with right ventricular failure*.
-2. Note compromised fraction, opening profile, closed fraction at end expiration, opening excursion, plateau pressure, derived PVR and RV:LV volume ratio.
+2. Note compromised fraction, opening profile, closed fraction at end expiration, opening excursion, plateau pressure, both the internal PVR coefficient and derived PVR with its quality badge, and RV:LV volume ratio.
 3. Raise PEEP gradually.
 4. Return to the preset, select the Non-reopenable opening profile, and repeat the same PEEP change.
 
-With recruitable lung, some added pressure opens units and distributes inflation across a larger aerated volume. Without recruitment, more of the pressure distends the already open lung. The comparison is qualitative: it demonstrates why equal PEEP is not equal lung stress or equal RV load. See [lung opening profiles](recruitment-and-ri.md) and [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
+With recruitable lung, some added pressure opens units and distributes inflation across a larger aerated volume. Without recruitment, more of the pressure distends the already open lung. Compare both lungs at the same PEEP as well as each lung before and after the step. A recruitable lung can have a lower RV cost than a non-reopenable lung at high PEEP while its own output still falls after the increase. This distinction prevents “less harmful” from becoming “improved output”. The comparison demonstrates why equal PEEP is not equal lung stress or equal RV load. See [lung opening profiles](recruitment-and-ri.md) and [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 
 ## Minute 8–10: inspect a ventricular response
 
 1. Select *Acute pulmonary embolism*.
 2. Inspect mPAP, the [wedge surrogate](pulmonary-artery-wedge-pressure.md), derived PVR and its quality badge, RV:LV volume ratio, the thoracic septum and the RV pressure–volume loop.
-3. Raise PEEP by a small amount and wait several breaths.
+3. For a passive positive-pressure comparison, select **Volume control** and set **Inspiratory effort** to zero. Let that state settle, press **Pin**, then raise PEEP by a small amount and follow the response.
 
 This preset combines high aggregate pulmonary vascular load with a vulnerable right ventricle. The displayed change is not an intubation-risk prediction; it is a way to see how increased RV load can enlarge the RV, reduce left-sided filling through serial coupling and shift the septum. See [the right ventricle](the-right-ventricle.md).
 
 ## Reading rules that prevent common mistakes
 
 - Compare a state with itself after one controlled change; do not compare unrelated presets as though they were cohorts.
-- Read trends over several breaths. The left heart receives changing RV output only after [pulmonary transit](pulmonary-transit.md).
+- Read trends over several breaths. Pulmonary storage buffers and spreads the response to changing RV output; [pulmonary transit](pulmonary-transit.md) is not a strict delay before every LV response.
 - A tile marked *caution* remains visible but has a known confounder. A value marked *unavailable* is intentionally withheld.
 - A small warning on a diagram qualifies the named derived interpretation, not every construction in that panel. For example, **Derived PVR: use with caution** does not invalidate the mechanical PVR–volume curve.
 - Controls with a coloured dot differ from the model's neutral reference parameter set. The mark explains how the present phenotype was constructed; it does not label that setting abnormal or unsafe.
-- Reset before beginning a new comparison. Reset also clears occlusion points from the Guyton panel.
+- Reselect the named preset before starting a new baseline. **Reset** restarts the current prescription; in *Custom* it keeps your settings and applied blood. It also clears occlusion points from the Guyton panel.
 - Use Play/Pause and the waveform time cursor to inspect a frame; pausing does not create a physiological hold.
 - Use **Pin** to create up to four independently evolving references. Select a row below the tiles to show that state beneath the current values; each row has **Unpin**, and **Unpin all** clears the comparison. [Live comparisons](numeric-tiles.md#pin-values-for-a-comparison) explains timing and parameter differences.
 - Absolute numbers are model outputs, not patient targets.
@@ -62,15 +62,9 @@ Use **Save patient** after creating a useful phenotype. The application download
 
 **Load patient** validates that file, labels the result *Custom*, starts a fresh simulation and allows it to settle. The same parameter set is therefore reproduced without carrying across the arbitrary cardiac phase, respiratory phase, pressures or compartment volumes present when Save was clicked. This distinction is intentional: the feature reproduces a patient definition and experiment, not one frozen animation frame.
 
-Version 2 files retain the exact reopenable share and custom opening settings, including precision not shown in percentage labels. The loader accepts version 2 only. A version-1 file requires separate conversion before loading; rejection leaves the current patient unchanged. The offline recovery tool uses a self-contained archived implementation and writes a new version-2 file without overwriting the original:
+The file preserves applied blood, its starting-volume reference and the resulting balance. A prepared but unsubmitted dose is not saved. Opening settings retain their full precision even when a displayed percentage is rounded. Loading a file discards any pending dose.
 
-```bash
-node tools/archive/ri/convert-patient.mjs input-v1.json output-v2.json
-```
-
-Load the resulting version-2 file normally. The converter requires Node.js and a local project checkout; it does not run in the browser. See the [recovery tool instructions](../tools/archive/ri/README.md).
-
-Unknown settings in a version-2 file are reported and ignored; an R/I field is rejected to avoid silently changing the prescribed phenotype. A known setting outside its available range is rejected rather than silently clipped, because clipping would make a debugging case appear reproduced when it was not.
+The application accepts version-2 files. If a file is rejected, the current patient is unchanged. Unknown settings are reported and ignored; a known setting outside its allowed range is rejected. Recovery of older files is an optional technical task, described in the [offline recovery instructions](https://github.com/internalempire/arthur/blob/main/tools/archive/ri/README.md); it is not needed to use Save and Load with current files.
 
 ## Limits
 

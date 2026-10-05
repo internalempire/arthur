@@ -37,7 +37,13 @@ Pulmonary load includes the volume-dependent [PVR J-curve](pulmonary-vascular-re
 
 RV dilatation affects the LV through two explicit routes. Diastolic septal coupling raises the LV filling penalty as the RV becomes larger, and pericardial pressure rises when total cardiac volume exceeds the selected capacity. The same shared pressure can also restrict the RV preferentially because its normal filling pressure is lower. A separate systolic term permits LV contraction to assist RV pressure generation. These coefficients are teaching representations, not echocardiographic measurements. The [cardiac tamponade](cardiac-tamponade.md) page isolates the pericardial route.
 
-Changing RV output reaches LV preload after [pulmonary transit](pulmonary-transit.md), whereas pleural pressure, the pulmonary venous piston and ventricular interaction act immediately. This distinction explains why the right and left ventricular effects of one breath can appear in different respiratory phases.
+The pulmonary blood stores buffer and spread the effect of changing RV output on LV filling. Their [transport timescale](pulmonary-transit.md) does not impose a strict delay before any left-sided response; pleural pressure, the pulmonary venous piston and ventricular interaction provide immediate mechanical routes. This distinction explains why the right and left ventricular effects of one breath can appear in different respiratory phases.
+
+### Follow one intervention across both ventricles
+
+Start with a settled passive state, create a Pin and raise PEEP. Read the result in order: pleural pressure and venous gradient; RV end-diastolic volume; pulmonary load and RV forward output; then LV filling and systemic output. The optional **Mechanisms** view places these readings together, but its arrows do not isolate the contribution of each pathway. If output falls, ask whether filling fell, pulmonary load rose, or both. An enlarged RV and underfilled LV suggest that direct ventricular interaction may also matter; a pressure rise alone cannot establish this.
+
+Repeat in the ARDS/RV phenotype to see why opening and inflation can change the balance. Keep the actual delivered breath in view: identical ventilator settings do not ensure identical lung volume or pleural-pressure transmission.
 
 ## Why this and not something else
 

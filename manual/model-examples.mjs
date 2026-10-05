@@ -179,7 +179,7 @@ function transmuralBlock(rows) {
 
 function venousReturnBlock(rows) {
   return [
-    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure is averaged over the most recent complete respiratory cycle, as in the filled simulated-mean point on the Guyton panel.*',
+    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure uses a sliding one-breath-duration average of heartbeat-duration means, as in the filled simulated-mean point on the Guyton panel.*',
     '',
     '| PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |',
     '|---:|---:|---:|---:|',
@@ -249,7 +249,7 @@ function wedgePeepExamplesBlock() {
     '',
     wedgeExampleDetails(
       'Example 4 — severe underfilling: the number remains visible after its catheter meaning weakens',
-      'The normal passive setup with stressed volume reduced to 300 mL.',
+      'The normal passive setup after removing 400 mL with Blood volume change.',
       { ...passive, stressedVolume: 300 },
       [0, 15],
       ([zero, high]) => `The wedge surrogate rises by ${fixed(high.metrics.paop - zero.metrics.paop, 1)} mmHg while LA transmural pressure, LVEDV and output all fall. The zone 3 index is already ${Math.round(zero.metrics.zone3 * 100)}% at zero PEEP and falls further with PEEP, so both wedge and derived PVR must be read with caution throughout this comparison.`,
@@ -412,7 +412,7 @@ function cardiacTamponadeBlock() {
     metrics: settled({ ...scenario.params, pericardialCapacity }),
   }));
   return [
-    '*Executable setup: spontaneous breathing, inspiratory effort 10 cmH₂O, 20 breaths/min, selected heart rate 105/min, stressed volume 1,050 mL and pericardial gain 4×; each state is settled for 45 s. The second row changes pericardial capacity only.*',
+    '*Executable setup: spontaneous breathing, inspiratory effort 10 cmH₂O, 20 breaths/min, selected heart rate 105/min, the preset starting blood volume and pericardial gain 4×; each state is settled for 45 s. The second row changes pericardial capacity only.*',
     '',
     '| state | capacity (mL) | P<sub>peri</sub> (mmHg) | CVP (mmHg) | RV end-diastolic pressure (mmHg) | PA diastolic (mmHg) | wedge surrogate (mmHg) |',
     '|---|---:|---:|---:|---:|---:|---:|',
@@ -522,7 +522,7 @@ function scenarioOverridesBlock() {
   });
 
   return [
-    '*Generated directly from `defaultParams()` and `SCENARIOS`. The reference is the model\'s passive volume-control default, not the healthy spontaneous preset shown when the application opens.*',
+    '*Generated from the current scenario definitions. The comparison reference is the neutral passive volume-control parameter set; it is not the healthy spontaneous preset shown when the application opens.*',
     '',
     'Only values that actually differ from the reference are listed. A preset may repeat an unchanged value in the source code to make its intended ventilation explicit; such repetitions are omitted here because they do not alter the simulated patient.',
     '',

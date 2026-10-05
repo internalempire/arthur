@@ -6,7 +6,7 @@
 
 ## Physiology
 
-Forcing air out of a normal lung faster requires only a larger pressure difference. In emphysema it does not. As expiration proceeds, the pressure inside the airway falls below the pressure surrounding it, and airways that have lost their parenchymal tethering are compressed. Beyond that point flow is set by the alveolar-to-compression-point gradient alone: lowering mouth pressure further widens the gradient downstream of a choke and changes nothing upstream of it.
+Before expiratory flow limitation develops, a larger pressure difference increases outward flow. Once a collapsible airway becomes flow-limiting, further increases in effort or reductions in mouth pressure need not increase flow. This can occur in healthy forced expiration as well as in obstructive disease; emphysema makes it particularly relevant during ordinary breathing. As expiration proceeds, the pressure inside the airway falls below the pressure surrounding it, and airways that have lost their parenchymal tethering are compressed. Beyond that point flow is set by the alveolar-to-compression-point gradient alone: lowering mouth pressure further widens the gradient downstream of a choke and changes nothing upstream of it.
 
 Two clinical consequences follow, and they are the reason this belongs in a heart–lung model rather than a ventilator manual.
 
@@ -14,13 +14,13 @@ Two clinical consequences follow, and they are the reason this belongs in a hear
 
 **Applied PEEP below the choke may substitute rather than add.** In a flow-limited patient, raising downstream pressure below the critical level may leave expiratory flow and end-expiratory volume nearly unchanged. Above that level, applied PEEP adds to the load and can increase hyperinflation. The transition is patient-specific; it is not a universal fraction of intrinsic PEEP.
 
-The therapeutic lever that does work is **time**. Slowing the respiratory rate lengthens expiration and lets the lung reach a lower volume.
+A useful model experiment is to change **expiratory time**. With tidal volume and inspiratory time fixed, slowing respiratory rate permits more emptying before the next breath. Whether that is clinically acceptable also depends on gas exchange, which Arthur does not calculate.
 
 ---
 
 ## In the model
 
-Loss of recoil (`clung`), linear airway resistance (`raw`) and available expiratory time already existed and remain separate. Flow limitation adds one binary control, `efl`.
+Aerated-lung compliance, airway resistance and available expiratory time are separate controls. High compliance represents reduced elastic recoil; high airway resistance slows flow while preserving its dependence on the pressure gradient. **Expiratory flow limitation** adds a separate on/off limit to how rapidly the lung can empty.
 
 With it on, passive expiratory flow may not exceed a volume-dependent maximal-flow envelope, expressed as a minimum emptying time constant of **4.5 s**. Ordinary resistive flow still applies whenever it is the slower of the two: the cap only ever removes flow, never adds it.
 
@@ -83,12 +83,12 @@ Time still works. At the shipped PEEP, slowing the rate from 26 to 12 breaths pe
 
 ### Of the construction
 
-- **One envelope for the whole lung.** No volume-dependent airway compression, no heterogeneous regional time constants, no airway closure, no collateral ventilation.
+- **One envelope for the whole lung.** The flow limit depends on gas volume, but airway-wall deformation is not calculated explicitly. There are no heterogeneous regional time constants, separate airway opening/closure states or collateral ventilation.
 - **Binary.** There is no partial flow limitation and no patient-specific choke point.
 - **No CO₂, no dead space, no V/Q** — so nothing about the gas-exchange consequences of trapping, which is half the clinical problem.
 - **No bronchodilator, no secretions, no dynamic airway collapse during forced effort.**
 - Dynamic trapped volume is a model-derived separation from the model's own static equilibrium, not a measurement of occult regional trapping.
-- No inspiratory threshold load, so the model cannot show the work a spontaneously breathing patient does to overcome intrinsic PEEP before flow begins — one of the main reasons flow limitation matters in an awake patient.
+- Intrinsic PEEP creates a represented inspiratory threshold: effort must lower alveolar pressure below applied airway pressure before inward flow begins. In pressure support, sufficient inward flow must then reach the pneumatic trigger. Arthur can show delayed or ineffective triggering, but does not calculate clinical work of breathing or adapt effort to fatigue. See [ventilation controls](controls-ventilation.md#what-starts-and-ends-a-pressure-support-breath).
 
 ### Of clinical application
 
@@ -100,6 +100,10 @@ Time still works. At the shipped PEEP, slowing the rate from 26 to 12 breaths pe
 ---
 
 ## References
+
+The passive PEEP comparison is supported by studies of mechanically ventilated obstructed patients, including Ranieri and colleagues. The separate pressure-support threshold mechanism is supported by MacIntyre and colleagues' study of 13 patients with obstructive airway disease. Neither study validates Arthur's fixed emptying envelope or prescribes a PEEP level for its users.
+
+- MacIntyre NR, Cheng KC, McConnell R. Applied PEEP during pressure support reduces the inspiratory threshold load of intrinsic PEEP. *Chest*. 1997;111:188–193. [doi:10.1378/chest.111.1.188](https://doi.org/10.1378/chest.111.1.188)
 
 - Pepe PE, Marini JJ. Occult positive end-expiratory pressure in mechanically ventilated patients with airflow obstruction: the auto-PEEP effect. *Am Rev Respir Dis* 1982;126:166–70. [doi:10.1164/arrd.1982.126.1.166](https://doi.org/10.1164/arrd.1982.126.1.166)
 - Tuxen DV, Lane S. The effects of ventilatory pattern on hyperinflation, airway pressures, and circulation in mechanical ventilation of patients with severe air-flow obstruction. *Am Rev Respir Dis* 1987;136:872–9. [doi:10.1164/ajrccm/136.4.872](https://doi.org/10.1164/ajrccm/136.4.872)

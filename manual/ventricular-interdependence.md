@@ -8,9 +8,9 @@
 
 The right and left ventricles are not two pumps in series with independent filling. They share the interventricular septum, and they are enclosed together in a stiff sac. Two distinct mechanisms follow.
 
-**Series interdependence** is the trivial one: what the right ventricle ejects is what the left ventricle will receive, after a delay — see [pulmonary transit](pulmonary-transit.md).
+**Series interdependence** concerns delivery: what the right ventricle ejects is what the left ventricle will receive, after a delay — see [pulmonary transit](pulmonary-transit.md).
 
-**Direct (parallel) interdependence** is the interesting one, and it has two anatomical routes.
+**Direct (parallel) interdependence** concerns shared mechanics, with two anatomical routes.
 
 *The septum.* A distended right ventricle pushes the septum leftward. The left ventricle's cavity is deformed from a circle toward a D, and for the same filling pressure it holds less blood. Its compliance has effectively fallen — not because the myocardium changed, but because one of its walls moved. This is why acute right ventricular dilatation reduces left ventricular output while left ventricular contractility is untouched, and it is the mechanism behind the septal flattening seen on echo in acute cor pulmonale.
 
@@ -22,9 +22,12 @@ The septum also works in the other direction during systole. A large share of ri
 
 ## In the model
 
-Three separate couplings, two of them on user controls.
+There are three couplings. The **Septal coupling** control changes the filling penalty associated with enlargement of the opposite ventricle. **Pericardial constraint** and **Pericardial capacity** control the shared external restraint. A fixed LV-to-RV systolic assistance term remains active even when the septal control is zero. These distinctions matter when asking what a switch-off experiment actually removes.
 
-**Diastolic septal shift** is a pressure added to one ventricle in proportion to how far the other is distended beyond a reference volume:
+<details>
+<summary>Model equations: septal penalty, systolic assistance and pericardial pressure</summary>
+
+**The coupling used to represent diastolic septal interaction** adds pressure to one ventricle when the other exceeds a reference volume. The term is evaluated throughout the beat, not switched on only in diastole; its principal teaching interpretation is a penalty to filling:
 
 $$
 \Delta P_{lv} = k_{septal} \cdot g_{rv \to lv} \cdot \max(0,\ V_{rv} - 145\ \text{mL})
@@ -39,7 +42,7 @@ $$
 - $g_{rv \to lv} = 0.085$, $g_{lv \to rv} = 0.014$ — gains, mmHg/mL
 - $V_{rv}$, $V_{lv}$ — instantaneous ventricular volumes, mL; 145 and 135 mL are the volumes beyond which each begins to deform the other
 
-The asymmetry is deliberate and large — the right-to-left gain is six times the left-to-right one. A thin-walled right ventricle deforms the septum far more readily than a thick-walled left ventricle does.
+The asymmetry is deliberate and large — the right-to-left gain is six times the left-to-right one. This selected asymmetry emphasises impaired LV filling during RV enlargement. It is not a measured sixfold anatomical difference: real septal displacement depends on transseptal pressure, timing, geometry and pericardial constraint.
 
 **Systolic assistance** is *not* on the septal control:
 
@@ -66,6 +69,8 @@ $$
 - 62 mL is the scale over which pressure steepens
 
 Its output is added to pleural pressure to form the pressure surrounding every chamber. It therefore does not act on one ventricle: it lifts all four together. Reducing capacity moves the knee leftward and represents lost space inside the sac; it is not a literal effusion volume. See [cardiac tamponade](cardiac-tamponade.md) for the full construction.
+
+</details>
 
 ### What the model shows
 
@@ -98,18 +103,22 @@ The gains, reference volumes and pericardial constants are **didactic shape coef
 - **No geometry.** No septal curvature, no D-shaped left ventricle, no eccentricity index — so the model cannot produce the echocardiographic sign that the mechanism is named after.
 - **The pericardium remains one aggregate pressure.** There is no fluid compartment, accumulation rate, loculation, regional contact pressure, chamber-wall collapse or constrictive physiology. The tamponade scenario is directional rather than diagnostically calibrated.
 - **The thresholds are hard corners.** Below the reference volume the coupling is exactly zero, which is not how a septum behaves.
-- No atrial contribution to interdependence, and no interatrial septum.
+- No separate interatrial septal coupling. Atrial volumes do contribute to the shared pericardial constraint.
 - The systolic assistance coefficient is fixed. In reality the degree to which the left ventricle supports the right varies with loading and with disease.
 
 ### Of clinical application
 
-- **This is not a model of acute cor pulmonale as a syndrome.** It produces right ventricular dilatation and its consequence for left ventricular filling; it has no coronary circulation, so the ischaemic limb of the right ventricular spiral — falling systemic pressure reducing right ventricular perfusion — does not exist here. Defending arterial pressure in this model does not help the right ventricle.
+- **This is not a model of acute cor pulmonale as a syndrome.** It produces right ventricular dilatation and its consequence for left ventricular filling; it has no coronary circulation, so the ischaemic limb of the right ventricular spiral — falling systemic pressure reducing right ventricular perfusion — does not exist here. Defending arterial pressure therefore cannot rescue the RV through coronary perfusion here. It can still alter RV mechanics indirectly through LV contraction, shared filling and the aggregate baroreflex.
 - The magnitudes are illustrative. Do not read "the septum costs 2.5% of output" as a clinical quantity; it is what these coefficients produce in this phenotype.
 - Pericardial capacity is an internal model volume, not an effusion measurement. Do not infer how many millilitres of fluid would cause or relieve tamponade in a patient.
 
 ---
 
 ## References
+
+[Damiano et al.](https://pubmed.ncbi.nlm.nih.gov/1951739/) demonstrated an LV/septal contribution to RV pressure and pulmonary flow in a canine preparation with separately controlled RV free-wall activation. This supports the existence of systolic assistance, not Arthur's fixed gain or its exact fraction in a human RV.
+
+- Damiano RJ Jr, La Follette P Jr, Cox JL, Lowe JE, Santamore WP. Significant left ventricular contribution to right ventricular systolic function. *Am J Physiol*. 1991;261:H1514–H1524. [doi:10.1152/ajpheart.1991.261.5.H1514](https://doi.org/10.1152/ajpheart.1991.261.5.H1514)
 
 - Taylor RR, Covell JW, Sonnenblick EH, Ross J. Dependence of ventricular distensibility on filling of the opposite ventricle. *Am J Physiol* 1967;213:711–8. [doi:10.1152/ajplegacy.1967.213.3.711](https://doi.org/10.1152/ajplegacy.1967.213.3.711)
 - Santamore WP, Dell'Italia LJ. Ventricular interdependence: significant left ventricular contributions to right ventricular systolic function. *Prog Cardiovasc Dis* 1998;40:289–308. [doi:10.1016/S0033-0620(98)80049-2](https://doi.org/10.1016/S0033-0620(98)80049-2)

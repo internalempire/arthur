@@ -19,7 +19,7 @@ export const SCENARIOS = [
   {
     id: 'healthy-vcv',
     name: 'Healthy, passive volume control',
-    note: 'The same lungs, the opposite pressure sign. Right atrial pressure now rises with each breath and cardiac output falls, because pleural pressure lifts the heart but not the venous reservoir.',
+    note: 'Positive-pressure inspiration raises measured right atrial pressure. Abdominal transmission can also raise upstream venous pressure: follow their gradient, the resistance to return and the delayed left-heart response. Compare phases of the breath; the healthy spontaneous preset also differs in filling, systemic resistance and RV contractility.',
     params: { mode: 'vcv', pmus: 0, vt: 450, peep: 5, rr: 14 },
   },
   {
@@ -31,7 +31,7 @@ export const SCENARIOS = [
   {
     id: 'septic-responder',
     name: 'Septic shock, fluid responsive',
-    note: 'Low stressed volume, vasodilated, and compensating hard — the aggregate baroreflex raises the rate from its selected 105 to about 122 and holds mean pressure near 82, which is the trap. The pressure looks survivable while the operating point remains on the steep part of the model RV-function curve and fluid still raises output. Increase stressed volume and watch that reserve fall as output climbs. Then turn the baroreflex off and see the same circulation without compensation.',
+    note: 'Low effective filling and systemic vasodilation coexist with baroreflex compensation. Arterial pressure alone does not describe preload reserve. Select a positive Blood volume change and press Apply; watch Pmsf, output and the Guyton operating point. Reselect the preset before switching the baroreflex off to examine compensation separately. The addition is an idealized intravascular load, not a clinical fluid dose.',
     params: {
       mode: 'vcv', pmus: 0, vt: 560, peep: 8, rr: 18, ccw: 150,
       stressedVolume: 330, svr: 0.85, hr: 105, baroreflexEnabled: true,
@@ -59,7 +59,7 @@ export const SCENARIOS = [
   {
     id: 'ards-rv',
     name: 'ARDS with right ventricular failure',
-    note: 'A collapsed, stiff lung and a failing right ventricle, with a reopenable diseased component. The RV dilates, the septum bows left and the left ventricle cannot fill. At the starting PEEP, end-expiratory transpulmonary pressure is about 13 cmH₂O. Compare PEEP levels, then select the non-reopenable profile while leaving collapse, tissue stiffness and the thoracic load unchanged: the consolidated phenotype carries the greater pulmonary vascular and RV cost.',
+    note: 'A collapsed, stiff lung and a failing right ventricle, with a reopenable diseased component. The RV dilates, the septum bows left and left-ventricular filling is restricted. At the starting PEEP, end-expiratory transpulmonary pressure is about 13 cmH₂O. Compare PEEP levels, then select the non-reopenable profile while leaving collapse, tissue stiffness and the thoracic load unchanged: the consolidated phenotype carries the greater pulmonary vascular and RV cost.',
     params: {
       mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
       collapsed: 0.42, clung: 25,
@@ -78,7 +78,7 @@ export const SCENARIOS = [
   {
     id: 'pulmonary-embolism',
     name: 'Acute pulmonary embolism',
-    note: 'Normal lungs, high aggregate pulmonary vascular load — the mirror image of the ARDS case. The raised PVR coefficient represents the effective bedside load without separating clot obstruction, critical closing pressure, calibre or viscosity. The atmospheric CVP is only about 3 mmHg during spontaneous breathing, while transmural right-atrial pressure is higher; the wedge remains low, the right ventricle is almost twice the size of the left, and the septum impedes left-sided filling. The selected tachycardia, systemic resistance and filling describe an already compensated phenotype: the model baroreflex senses only systemic MAP, not PVR or mPAP directly. Switch to volume control, then raise PEEP, and watch what intubating this patient costs.',
+    note: 'Normal lungs, high aggregate pulmonary vascular load — the mirror image of the ARDS case. The raised PVR coefficient represents the effective bedside load without separating clot obstruction, critical closing pressure, calibre or viscosity. The atmospheric CVP is only about 3 mmHg during spontaneous breathing, while transmural right-atrial pressure is higher; the wedge remains low, the right ventricle is almost twice the size of the left, and the septum impedes left-sided filling. The selected tachycardia, systemic resistance and filling describe an already compensated phenotype: the model baroreflex senses only systemic MAP, not PVR or mPAP directly. To isolate positive-pressure loading, select volume control, set inspiratory effort to zero, settle and Pin, then raise PEEP. This demonstrates mechanical vulnerability, not the full consequences or individual risk of intubation.',
     params: {
       mode: 'spont', pmus: 6, peep: 0, rr: 24,
       pvrBase: 0.44, eesRv: 0.32, stressedVolume: 1050, svr: 1.25, hr: 118,
@@ -87,7 +87,7 @@ export const SCENARIOS = [
   {
     id: 'cardiac-tamponade',
     name: 'Cardiac tamponade',
-    note: 'A pressurised pericardial space makes all four chambers compete for a nearly fixed total volume, limiting the lower-pressure right heart most. Increase pericardial capacity to simulate decompression: pericardial pressure and CVP fall while ventricular filling, output and arterial pressure recover. Capacity is a model surrogate for available space, not a measured effusion volume. The respiratory arterial variation is directional; the preset is not a calibrated pulsus-paradoxus test.',
+    note: 'A shared pericardial pressure increasingly opposes filling as chamber volumes rise, limiting the lower-pressure right heart most. Increase pericardial capacity to simulate decompression: pericardial pressure and CVP fall while ventricular filling, output and arterial pressure recover. Capacity is a model surrogate for available space, not a measured effusion volume. The respiratory arterial variation is directional; the preset is not a calibrated pulsus-paradoxus test.',
     params: {
       mode: 'spont', pmus: 10, peep: 0, rr: 20,
       pericardium: 4, pericardialCapacity: 100,

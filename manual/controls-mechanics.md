@@ -16,7 +16,7 @@
 | airway resistance | 1–40 cmH₂O/L/s | linear resistance applied during flow |
 | expiratory flow limitation | off/on | activates a collapsible-airway choke during expiration |
 
-`Aerated-lung compliance` is not the compliance a ventilator would report when part of the lung is closed. It is the local tissue slope used at the current operating point, before recruitment and chest-wall effects are added. Measured respiratory-system compliance also depends on open fraction, proximity to maximum capacity and chest-wall mechanics.
+`Aerated-lung compliance` is not the compliance a ventilator would report when part of the lung is closed. It sets the approximately linear slope of the fully open tissue relation away from its upper-volume ceiling; the actual slope decreases near that ceiling, even without changing the control. Measured respiratory-system compliance also depends on open fraction, proximity to maximum capacity and chest-wall mechanics.
 
 `Maximum lung capacity` is independent of that slope. It is a direct teaching-scale input in litres, not an anthropometric predicted TLC. Collapse reduces the fraction of this ceiling currently accessible; recruitment can restore part of it. This separation prevents low compliance and collapse from shrinking the same baby lung twice.
 
@@ -72,9 +72,9 @@ Prone position is deliberately coarse. It combines directional changes intended 
 - Maximum capacity is entered directly in litres; height-, sex- and age-based prediction is not implemented.
 - The chest wall has one aggregate sigmoid curve; rib cage, diaphragm and abdominal wall are not separate compartments.
 - Chest-wall load is selected directly rather than predicted from anthropometry, posture or abdominal pressure.
-- The reopenable share is an internal teaching coefficient, not a measured R/I or an anatomical percentage.
+- The compromised fraction and reopenable share are internal teaching quantities, not CT tissue fractions. The reopenable share is not a measured R/I or a prescribed amount of opening during one PEEP step.
 - Recruitment has one diseased population; opening pressures are distributed but not spatially assigned.
-- EFL has one choke and no small-airway heterogeneity, airway closure or gas compression.
+- EFL has one aggregate choke, without regional small-airway heterogeneity, a separate airway opening/closure process or gas compression.
 - Prone effects are directional and not patient-specific.
 
 ## References

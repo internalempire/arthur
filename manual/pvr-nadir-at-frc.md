@@ -12,7 +12,7 @@ Clinical teaching diagrams commonly place that minimum near functional residual 
 
 ## In the model
 
-The minimum belongs to the **fully open reference pathway**. Its horizontal coordinate is strain: volume per open unit relative to the volume that aerated tissue holds at resting recoil. For the default lung, zero strain corresponds to 2.25 L, close to the nominal whole-lung FRC of 2.2 L. The reference follows the selected aerated-tissue compliance and maximum capacity; it is not fixed to a healthy absolute volume for every lung.
+The minimum belongs to the **fully open reference pathway**. Its horizontal coordinate is strain: volume per open unit relative to the volume that aerated tissue holds at resting recoil. For the default lung, zero strain corresponds to 2.25 L, close to the nominal whole-lung FRC of 2.2 L. The reference follows the selected aerated-tissue compliance and maximum capacity; it is not fixed to a healthy absolute volume for every lung. More precisely, it is the volume the fully open tissue holds at **5 cmH₂O transpulmonary pressure**. In a diseased or loaded thorax, this need not equal that patient's passive zero-PEEP equilibrium, which is found by balancing lung and chest-wall recoil. The label “at FRC” therefore names the normal calibration, not an identity imposed on every phenotype.
 
 The extra-alveolar decay coefficient is derived so that the opposing slopes cancel at zero strain:
 
@@ -47,7 +47,7 @@ The `pvr-human-frc-nadir` and `pvr-human-j-direction` rows check the constructed
 
 ## References
 
-- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3) — clinical teaching geometry.
+- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical bedside implications. *Intensive Care Med* 2026;52:2031–2034. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3) — clinical teaching geometry.
 - Thomas LJ, Griffo ZJ, Roos A. Effect of negative pressure inflation of the lung on pulmonary vascular resistance. *J Appl Physiol* 1961;16:451–6. [doi:10.1152/jappl.1961.16.3.451](https://doi.org/10.1152/jappl.1961.16.3.451) — excised dog lungs during negative-pressure inflation with vascular pressures held constant.
 - Cappio Borlino S, et al. The effect of PEEP on pulmonary vascular resistance depends on lung recruitability in patients with ARDS. *Am J Respir Crit Care Med* 2024;210:900–907. [doi:10.1164/rccm.202402-0383OC](https://doi.org/10.1164/rccm.202402-0383OC) — human PEEP comparison used for phenotype calibration, subject to the model's downstream-pressure limitations.
 

@@ -9,11 +9,11 @@
 | control | range | model meaning |
 |---|---:|---|
 | baseline heart rate | 40–170/min | selected cycle frequency before any baroreflex contribution |
-| LV contractility ($E_{es}$) | 0.3–6.0 mmHg/mL | LV end-systolic elastance |
-| RV contractility ($E_{es}$) | 0.08–1.60 mmHg/mL | RV end-systolic elastance |
+| LV contractility ($E_{es}$) | 0.3–6.0 mmHg/mL | intrinsic LV peak active elastance |
+| RV contractility ($E_{es}$) | 0.08–1.60 mmHg/mL | intrinsic RV peak active elastance |
 | LV diastolic stiffness | 0.010–0.080 /mL | exponent of the LV end-diastolic pressure–volume relation |
 
-Contractility changes the slope of the end-systolic relation, not arterial resistance. The ventricular activation waveform is normalised to a peak of one, so the selected $E_{es}$ is the peak active slope actually reached by the chamber. Diastolic stiffness changes how rapidly LV filling pressure rises with volume. The passive pressure relation must remain below the selected systolic envelope at the observed volumes; incompatible combinations suspend interpretation. At high heart rates activation remains continuous and finishes before atrial contraction, using a didactic timing boundary rather than a calibrated relaxation model. Ejection fraction remains load-dependent, so it should not be used as a direct readout of the selected $E_{es}$.
+Contractility changes the slope of the end-systolic relation, not arterial resistance. The ventricular activation waveform has an approximately unit peak and approaches the selected intrinsic active elastance; total chamber pressure also includes the represented ventricular-interaction terms. The displayed single-beat ESPVR is therefore not simply a readout of this control. Diastolic stiffness changes how rapidly LV filling pressure rises with volume. The passive pressure relation must remain below the selected systolic envelope at the observed volumes; incompatible combinations suspend interpretation. At high heart rates activation remains continuous and finishes before atrial contraction, using a didactic timing boundary rather than a calibrated relaxation model. Ejection fraction remains load-dependent, so it should not be used as a direct readout of the selected $E_{es}$.
 
 The model has no force–frequency relation: changing baseline heart rate does not automatically change contractility. Very high rate shortens filling time but does not reproduce ischaemia or rate-dependent relaxation. When the baroreflex is on, the Heart rate tile shows the effective rate used by the circulation; the control itself continues to show the selected baseline.
 
@@ -33,9 +33,15 @@ The signal adapts over one 15-second time constant and changes effective heart r
 |---|---:|---|
 | pericardial constraint | 0–4 × | gain on pressure generated when total cardiac volume exceeds represented pericardial reserve |
 | pericardial capacity | 100–600 mL | aggregate four-chamber volume accommodated before pericardial pressure rises |
-| septal coupling | 0–4 × | gain on diastolic septal competition and systolic LV-to-RV assistance |
+| septal coupling | 0–4 × | gain on the volume-dependent septal contribution to filling pressure |
 
 Pericardial constraint changes the gain of the shared pressure, while pericardial capacity moves the knee of its pressure–volume relation. Capacity is an internal aggregate volume, not effusion volume or an echocardiographic measurement. Reducing it represents loss of space available to the chambers without adding or removing circulating blood. Zero constraint removes the pressure route; one is the reference normal gain. Values above one are sensitivity experiments and should not be mapped directly to disease severity. See [cardiac tamponade](cardiac-tamponade.md).
+
+## Read the response, not just the selected setting
+
+With the reflex off, reduce LV contractility and compare LV end-systolic volume, forward stroke volume, LA transmural pressure and pulmonary artery pressure. The question is how a weaker pump changes ejection and upstream storage, not whether EF alone reaches a disease label. For increased diastolic stiffness, ask how much pressure is required to accommodate the observed end-diastolic volume.
+
+The **Septal coupling** control changes the volume-dependent interaction that raises one ventricle’s pressure when the other is distended. The additional systolic assistance from LV contraction to RV pressure remains present even when this control is zero. This separates two model mechanisms; zero septal coupling does not isolate the RV from all LV influence. Experimental support for systolic interdependence comes from an electrically isolated RV free-wall preparation in dogs, not a human calibration of the control. [Damiano and colleagues](https://pubmed.ncbi.nlm.nih.gov/1951739/)
 
 ## Limits
 

@@ -53,6 +53,12 @@ The panel marks this distance with an orange dashed segment. Clinically, this is
 
 During passive mechanical ventilation, inspiratory muscle pressure is absent. In this ideal elastic wall, the pleural-pressure trajectory therefore overlaps $C_{cw}$. Ventilator pressure is represented by airway and alveolar pressure in the [waveforms](panel-waveforms.md), rather than as an additional Campbell curve.
 
+## What to learn from a comparison
+
+With passive ventilation, compare the same delivered tidal volume at different chest-wall compliance. A stiffer wall requires a larger change in Ppl to move through the same volume: more of the respiratory pressure change is experienced around the heart. With effort, compare the distance from the relaxed-wall curve: a leftward movement at the same volume indicates greater inspiratory muscle pressure.
+
+The diagram separates lung recoil, chest-wall recoil and muscle pressure. It does not calculate metabolic effort, fatigue or the clinical benefit of unloading respiratory muscles. A visible loop or a larger muscle-pressure segment should not be converted into an oxygen cost of breathing.
+
 ## Zooming the diagram
 
 The diagram opens at **300%** around the current pleural-pressure–volume point, making the tidal trajectory and the muscle-pressure separation visible without an initial adjustment. The `+` and `−` controls enlarge or reduce this view. Both axes are magnified, and the centre remains fixed: the axes do not chase the moving point during the breath.
@@ -81,7 +87,7 @@ $$
 P_{mus}=P_{mus,max}a
 $$
 
-The expiratory time constant is 30% of the available expiratory time. This gives an approximate half-decay during the first quarter of expiration and leaves little activity late in the breath, consistent with the broad timing reported in conscious adults. It is a population-scale teaching calibration, not a patient-specific neural or diaphragmatic model. Respiratory rate and inspiratory time therefore alter the absolute duration of the decay without adding another control.
+The expiratory time constant is 30% of the available expiratory time. This gives an approximate half-decay during the first quarter of expiration and leaves little activity late in the breath, consistent with the broad timing reported in conscious adults. The timing is inspired by measurements in eight conscious spontaneously breathing adults, not a fit to ventilated ARDS or a patient-specific neural or diaphragmatic model. [Shee and colleagues](https://pubmed.ncbi.nlm.nih.gov/4008406/) reported marked early-expiratory braking; the model’s single decay law simplifies that observation. Respiratory rate and inspiratory time therefore alter the absolute duration of the decay without adding another control.
 
 When the patient is completely passive, activation is exactly zero and pleural pressure follows the relaxed chest wall:
 
@@ -127,7 +133,7 @@ The fitted axes cover the static pressure–volume domain of the selected patien
 - Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Mauri T, Yoshida T, Bellani G, et al. Esophageal and transpulmonary pressure in the clinical setting. *Ann Intensive Care*. 2016;6:77. [doi:10.1186/s13613-016-0186-0](https://doi.org/10.1186/s13613-016-0186-0)
 - Shee CD, Ploy-Song-Sang Y, Milic-Emili J. Decay of inspiratory muscle pressure during expiration in conscious humans. *J Appl Physiol*. 1985;58:1859–1865. [doi:10.1152/jappl.1985.58.6.1859](https://doi.org/10.1152/jappl.1985.58.6.1859)
-- Nuñez Silveira JM, Gallardo A, Alcala G, et al. Work of breathing by the Campbell diagram: physiology and practice. *Respir Care*. 2026. [doi:10.1177/19433654261453096](https://doi.org/10.1177/19433654261453096)
+- Nuñez Silveira JM, Gallardo A, Alcala G, et al. Work of breathing by the Campbell diagram: physiology and practice. *Respir Care*. 2026;71:1047–1054. [doi:10.1177/19433654261453096](https://doi.org/10.1177/19433654261453096)
 
 ---
 

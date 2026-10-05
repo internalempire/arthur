@@ -27,11 +27,12 @@
 <rect class="bg" width="760" height="430"/>
 <text class="title" x="66" y="16">Preload reserve is the local gain in output when filling pressure rises</text>
 <line class="grid" x1="66" y1="378.0" x2="540" y2="378.0"/><text class="tick" x="57" y="382.0" text-anchor="end">2</text>
-<line class="grid" x1="66" y1="315.1" x2="540" y2="315.1"/><text class="tick" x="57" y="319.1" text-anchor="end">3</text>
-<line class="grid" x1="66" y1="252.3" x2="540" y2="252.3"/><text class="tick" x="57" y="256.3" text-anchor="end">4</text>
-<line class="grid" x1="66" y1="189.4" x2="540" y2="189.4"/><text class="tick" x="57" y="193.4" text-anchor="end">5</text>
-<line class="grid" x1="66" y1="126.6" x2="540" y2="126.6"/><text class="tick" x="57" y="130.6" text-anchor="end">6</text>
-<line class="grid" x1="66" y1="63.7" x2="540" y2="63.7"/><text class="tick" x="57" y="67.7" text-anchor="end">7</text>
+<line class="grid" x1="66" y1="327.7" x2="540" y2="327.7"/><text class="tick" x="57" y="331.7" text-anchor="end">3</text>
+<line class="grid" x1="66" y1="277.4" x2="540" y2="277.4"/><text class="tick" x="57" y="281.4" text-anchor="end">4</text>
+<line class="grid" x1="66" y1="227.1" x2="540" y2="227.1"/><text class="tick" x="57" y="231.1" text-anchor="end">5</text>
+<line class="grid" x1="66" y1="176.9" x2="540" y2="176.9"/><text class="tick" x="57" y="180.9" text-anchor="end">6</text>
+<line class="grid" x1="66" y1="126.6" x2="540" y2="126.6"/><text class="tick" x="57" y="130.6" text-anchor="end">7</text>
+<line class="grid" x1="66" y1="76.3" x2="540" y2="76.3"/><text class="tick" x="57" y="80.3" text-anchor="end">8</text>
 <text class="tick" x="66.0" y="396" text-anchor="middle">4</text>
 <text class="tick" x="145.0" y="396" text-anchor="middle">6</text>
 <text class="tick" x="224.0" y="396" text-anchor="middle">8</text>
@@ -41,15 +42,15 @@
 <text class="tick" x="540.0" y="396" text-anchor="middle">16</text>
 <line class="axis" x1="66" y1="26" x2="66" y2="378"/>
 <line class="axis" x1="66" y1="378.0" x2="540" y2="378.0"/>
-<path class="total" style="stroke-dasharray:none" d="M66.0 366.2 L69.9 361.1 L73.9 356.1 L77.8 351.1 L81.8 346.1 L85.7 341.1 L89.7 336.1 L93.6 331.1 L97.6 326.1 L101.5 321.2 L105.5 316.2 L109.4 311.3 L113.4 306.4 L117.3 301.5 L121.3 296.7 L125.2 291.8 L129.2 287.0 L133.1 282.1 L137.1 277.3 L141.0 272.6 L145.0 267.9 L148.9 263.2 L152.9 258.5 L156.8 253.8 L160.8 249.2 L164.7 244.6 L168.7 240.0 L172.6 235.5 L176.6 231.0 L180.5 226.5 L184.5 222.1 L188.4 217.8 L192.4 213.4 L196.3 209.1 L200.3 204.8 L204.2 200.7 L208.2 196.5 L212.1 192.4 L216.1 188.3 L220.0 184.3 L224.0 180.4 L227.9 176.5 L231.9 172.6 L235.8 168.8 L239.8 165.1 L243.7 161.4 L247.7 157.7 L251.6 154.1 L255.6 150.6 L259.5 147.1 L263.5 143.7 L267.4 140.3 L271.4 137.0 L275.3 133.8 L279.3 130.6 L283.2 127.4 L287.2 124.3"/>
-<path class="alv" style="stroke-dasharray:none" d="M291.1 121.2 L295.1 118.2 L299.0 115.2 L303.0 112.3 L306.9 109.4 L310.9 106.6 L314.8 103.8 L318.8 101.0 L322.7 98.3 L326.7 95.6 L330.6 93.0 L334.6 90.4 L338.5 87.9 L342.5 85.3 L346.4 82.8 L350.4 80.4 L354.3 78.0 L358.3 75.6 L362.2 73.2 L366.2 70.9 L370.1 68.6 L374.1 66.3 L378.0 64.1 L382.0 61.9 L385.9 59.7 L389.9 57.5 L393.8 55.4 L397.8 53.3 L401.7 51.2 L405.7 49.1 L409.6 47.1 L413.6 45.1 L417.5 43.0 L421.5 41.0 L425.4 39.1 L429.4 37.1 L433.3 35.2 L437.3 33.3 L441.2 31.4 L445.2 29.6 L449.1 27.7 L453.1 25.9 L457.0 24.0 L461.0 22.2 L464.9 20.4 L468.9 18.7 L472.8 16.9 L476.8 15.2 L480.7 13.4 L484.7 11.7 L488.6 10.0 L492.6 8.3 L496.5 6.7 L500.5 5.0 L504.4 3.3 L508.4 1.7 L512.3 0.1 L516.3 -1.5 L520.2 -3.1 L524.2 -4.7 L528.1 -6.3 L532.1 -7.9 L536.0 -9.4 L540.0 -10.9"/>
-<circle class="dot" cx="164.7" cy="244.6" r="4"/><text class="label" x="171.7" y="236.6">lower filling</text>
-<circle class="dot" cx="401.7" cy="51.2" r="4"/><text class="label" x="311.7" y="43.2">higher filling</text>
-<text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Equilibrium flow (L/min)</text>
+<path class="total" style="stroke-dasharray:none" d="M66.0 368.5 L69.9 364.5 L73.9 360.5 L77.8 356.5 L81.8 352.4 L85.7 348.5 L89.7 344.5 L93.6 340.5 L97.6 336.5 L101.5 332.5 L105.5 328.6 L109.4 324.6 L113.4 320.7 L117.3 316.8 L121.3 312.9 L125.2 309.1 L129.2 305.2 L133.1 301.3 L137.1 297.5 L141.0 293.7 L145.0 289.9 L148.9 286.1 L152.9 282.4 L156.8 278.6 L160.8 274.9 L164.7 271.3 L168.7 267.6 L172.6 264.0 L176.6 260.4 L180.5 256.8 L184.5 253.3 L188.4 249.8 L192.4 246.3 L196.3 242.9 L200.3 239.5 L204.2 236.1 L208.2 232.8 L212.1 229.5 L216.1 226.3 L220.0 223.1 L224.0 219.9 L227.9 216.8 L231.9 213.7 L235.8 210.6 L239.8 207.7 L243.7 204.7 L247.7 201.8 L251.6 198.9 L255.6 196.1 L259.5 193.3 L263.5 190.6 L267.4 187.9 L271.4 185.2 L275.3 182.6 L279.3 180.0 L283.2 177.5 L287.2 175.0"/>
+<path class="alv" style="stroke-dasharray:none" d="M291.1 172.6 L295.1 170.1 L299.0 167.7 L303.0 165.4 L306.9 163.1 L310.9 160.9 L314.8 158.6 L318.8 156.4 L322.7 154.3 L326.7 152.1 L330.6 150.0 L334.6 147.9 L338.5 145.9 L342.5 143.9 L346.4 141.9 L350.4 139.9 L354.3 138.0 L358.3 136.1 L362.2 134.2 L366.2 132.3 L370.1 130.5 L374.1 128.7 L378.0 126.9 L382.0 125.1 L385.9 123.4 L389.9 121.6 L393.8 119.9 L397.8 118.2 L401.7 116.6 L405.7 114.9 L409.6 113.3 L413.6 111.6 L417.5 110.0 L421.5 108.4 L425.4 106.9 L429.4 105.3 L433.3 103.8 L437.3 102.2 L441.2 100.7 L445.2 99.2 L449.1 97.7 L453.1 96.3 L457.0 94.8 L461.0 93.4 L464.9 92.0 L468.9 90.5 L472.8 89.1 L476.8 87.7 L480.7 86.3 L484.7 85.0 L488.6 83.6 L492.6 82.3 L496.5 80.9 L500.5 79.6 L504.4 78.3 L508.4 77.0 L512.3 75.7 L516.3 74.4 L520.2 73.1 L524.2 71.8 L528.1 70.6 L532.1 69.3 L536.0 68.1 L540.0 66.9"/>
+<circle class="dot" cx="164.7" cy="271.3" r="4"/><text class="label" x="171.7" y="263.3">lower filling</text>
+<circle class="dot" cx="401.7" cy="116.6" r="4"/><text class="label" x="311.7" y="108.6">higher filling</text>
+<text class="label" transform="translate(18 202) rotate(-90)" text-anchor="middle">Predicted RV flow (L/min)</text>
 <text class="label" x="303" y="424" text-anchor="middle">Mean systemic filling pressure (mmHg)</text>
 <line class="total" style="stroke-dasharray:none" x1="556" y1="48" x2="584" y2="48"/><text class="label" x="590" y="52">steep limb</text>
 <line class="alv" style="stroke-dasharray:none" x1="556" y1="70" x2="584" y2="70"/><text class="label" x="590" y="74">plateau limb</text>
-<text class="tick" x="556" y="110">8% of current flow per mmHg</text>
+<text class="tick" x="556" y="110">8%/mmHg of predicted flow</text>
 <text class="tick" x="556" y="126">is a model classifier,</text>
 <text class="tick" x="556" y="142">not a bedside cutoff</text>
 </svg>

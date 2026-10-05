@@ -1,6 +1,6 @@
 # The stress index
 
-> The shape of the airway pressure curve during a passive constant-flow breath. Upward or downward curvature can suggest falling or improving compliance during inspiration; under the model's restricted conditions, these correspond to distension and recruitment.
+> The shape of the airway pressure curve during a passive constant-flow breath indicates whether global compliance changes through inspiration. Opening and upper-limb stiffening are possible explanations; chest-wall mechanics also contribute.
 
 ---
 
@@ -17,9 +17,9 @@ $$
 - $b$ — the **stress index**, dimensionless
 - $a$, $c$ — scale and offset, fitted with it
 
-$b > 1$ — pressure rises faster than linearly. Compliance is falling as the breath proceeds: the lung is being pushed onto the flat upper part of its [pressure–volume curve](pressure-volume-curve.md). This is tidal overdistension.
+$b > 1$ — pressure rises faster than linearly. Respiratory-system compliance is falling as the breath proceeds. Approaching the upper limb of the lung [pressure–volume curve](pressure-volume-curve.md) is one explanation; the index alone does not establish regional overdistension or tissue injury.
 
-$b \approx 1$ — compliance is constant through the breath. Conventionally the target.
+$b \approx 1$ — the global pressure rise is nearly linear over the fitted interval. This does not prove that all regions behave uniformly or that ventilation is safe.
 
 $b < 1$ — pressure rises more slowly than linearly. Compliance is *improving* as the breath proceeds; intratidal recruitment is one important cause. At the bedside this does not, by itself, prescribe a higher PEEP.
 
@@ -37,7 +37,7 @@ The fit is a grid search over the exponent with a linear least-squares solve ins
 
 The first tenth of the samples is dropped as a fixed implementation choice to reduce the influence of the onset transient and resistive pressure step. Bedside protocols may define the fitted interval differently.
 
-The cost is about a hundred small regressions over roughly forty samples, once per breath — a few tens of microseconds against a breath containing thousands of integration steps. It is not measurable in the model's running time.
+The fit runs once per breath using the pressure samples already collected by the simulation. It does not start another patient simulation or require Deep CO; its exact runtime depends on the browser and device.
 
 **The index is withheld rather than shown when it would not mean anything** — during pressure control, during spontaneous effort, or when there are too few samples. This is the [interpretability](interpretability.md) machinery: a number whose validity conditions are not met is not displayed with a caveat, it is not displayed.
 
@@ -75,7 +75,7 @@ The panels are scaled independently because their pressure excursions differ. A 
 
 The normal lung is close to linear. With the same aerated-tissue compliance but a smaller 4 L maximum capacity, a 900 mL breath moves farther up the upper limb and raises the index; reducing tidal volume to 350 mL returns the same lung close to linear. This comparison deliberately changes **capacity**, not compliance, so overdistension is not manufactured by using one control for both properties.
 
-The final pair illustrates a change in the dominant mechanism. The same recruitable lung gives an index below 1 while substantial opening occurs within the breath. At higher PEEP, less compliance is gained from intratidal recruitment and the falling compliance of the already-aerated tissue dominates, taking the index above 1.
+The final pair illustrates why curvature and the overall pressure cost of a breath must be read separately. At low PEEP, substantial within-breath opening contributes gas volume and produces a strongly concave pressure rise. At higher PEEP the pressure rise is nearly linear, but plateau and driving pressure are higher. This example does not establish that the higher PEEP is safer, or that switching recruitment rules is equivalent to a successful recruitment manoeuvre. Follow [end-expiratory closure and opening excursion](recruitment-and-ri.md#what-to-read) as well.
 
 ---
 
@@ -96,23 +96,25 @@ The final pair illustrates a change in the dominant mechanism. The same recruita
 ### Of the construction
 
 - **No time dependence in the tissue**, so the model has no stress relaxation and no viscoelastic contribution to the curve's shape. A real trace contains both, and they bend it in ways the model attributes entirely to elastance.
-- **Constant airway resistance.** Flow-dependent resistance would curve the trace on its own; here it cannot.
+- **Constant airway resistance.** At constant flow it adds a fixed pressure offset. Resistance that changes with volume or time could alter the pressure ramp in a patient; a purely flow-dependent resistance would remain constant if flow were truly constant.
 - **One compartment**, so no contribution from regions filling with different time constants.
 - The chest wall is nonlinear. Its contribution to curvature is usually small in the model's tidal range but is not mathematically excluded, just as chest-wall mechanics can confound a bedside respiratory-system stress index.
-- The fit range is 0.4 to 2.2, so an extreme value is clipped rather than reported.
-- **There is no inspiratory pause.** Volume control delivers constant flow for the whole of the set inspiratory time, so the trace has no plateau phase; the plateau pressure the model reports is computed as alveolar pressure with the resistive term removed, not measured during a hold. The stress index itself is read from the ramp, but the figure is not the shape a ventilator with a pause would draw.
+- The fit searches only from 0.4 to 2.2. A result at a search boundary cannot tell you how far the unconstrained best fit might lie beyond it.
+- **Routine volume-controlled breaths have no inspiratory pause.** They deliver constant flow throughout inspiration; the displayed passive plateau is calculated from recoil, not acquired during that ramp. Separate user-requested holds are available in [Manoeuvres](manoeuvres.md). The stress index itself is fitted to the flowing inspiratory segment, not to an occlusion plateau.
 - The first-tenth exclusion is a fixed fraction, not an automatic detection of when flow has stabilised.
 
 ### Of clinical application
 
 - **The model's index is computed from a clean pressure trace.** A bedside trace contains cardiac oscillation, circuit compliance, trigger artefacts and noise; whether two nearby values are distinguishable in a given patient is a question about the measurement, not about the physiology.
 - **The index is not a PEEP or tidal volume setting.** It reports the direction of a problem, and the model deliberately does not convert it into an instruction.
-- A value below 1 does not always mean "raise PEEP": in this model it can only arise from intratidal recruitment, whereas at the bedside it can also arise from a leak or from flow that is not truly constant.
+- A value below 1 does not mean "raise PEEP". Within-breath opening is an important model cause, but the nonlinear chest wall can also affect curvature. At the bedside, nonconstant flow, leaks and patient activity introduce further confounders.
 - The validity conditions are enforced here and are not enforced at the bedside. The commonest way to be misled by a stress index is to read one during spontaneous effort, and the model shows nothing in that case.
 
 ---
 
 ## References
+
+Ranieri's isolated-rat experiment and Grasso's experimental lung-injury study support the relationship between pressure curvature and changing mechanics under constant flow. Terragni and colleagues compared indices with CT patterns in patients with ARDS. These contexts support careful interpretation of the sign; they do not make Arthur's fitted value a validated injury detector.
 
 - Ranieri VM, Zhang H, Mascia L, et al. Pressure–time curve predicts minimally injurious ventilatory strategy in an isolated rat lung model. *Anesthesiology* 2000;93:1320–8. [doi:10.1097/00000542-200011000-00027](https://doi.org/10.1097/00000542-200011000-00027)
 - Grasso S, Terragni P, Mascia L, et al. Airway pressure–time curve profile (stress index) detects tidal recruitment/hyperinflation in experimental acute lung injury. *Crit Care Med* 2004;32:1018–27. [doi:10.1097/01.CCM.0000120059.94009.AD](https://doi.org/10.1097/01.CCM.0000120059.94009.AD)

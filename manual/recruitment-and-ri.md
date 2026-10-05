@@ -65,6 +65,8 @@ Opening changes accessible volume and the effective pressure–volume relation. 
 
 Arthur specifies opening potential directly and measures the resulting model state. It does not calculate or accept a recruitment-to-inflation ratio (R/I), nor use one to calibrate opening or assess model validity. The compromised fraction, reopenable share and actual closed fraction describe different parts of the model; none is a measured anatomical percentage.
 
+The clinical R/I described by Chen and colleagues compares the estimated compliance of recruited lung with compliance at low PEEP during a defined pressure-release manoeuvre, accounting for airway opening pressure. It is not a percentage of collapsed lung. Similarly, CT-based recruitable tissue between specified pressure holds is not the model's potentially reopenable share. The references support those distinctions, not a conversion between their measurements and Arthur's controls.
+
 ## Limits
 
 - Compromised, reopenable and actually closed fractions are different model quantities. None is calibrated as a CT tissue fraction.

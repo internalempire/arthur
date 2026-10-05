@@ -168,7 +168,7 @@ section('Pulmonary vascular claims exposed to the user stay qualified');
   check('wedge teaching examples remain executable and use a synchronised transmural readout',
     wedgePage.includes('BEGIN GENERATED: wedge-peep-examples')
       && wedgePage.includes('LA transmural pressure')
-      && wedgePage.includes('same three-second interval'));
+      && wedgePage.includes('same exponential smoothing with a three-second time constant'));
   check('the corrected ventricular activation retired the old systematic EF warning',
     !limitsPage.includes('5–10 percentage points lower'));
 }
@@ -352,7 +352,7 @@ section('The Guyton points remain explicitly distinguished');
       && panel.toLowerCase().includes('drawing a trail from successive predicted crossings would hide'));
   check('the panel separates heartbeat dynamics, respiratory markers and settled loading windows',
     panel.includes('one-heartbeat means')
-      && panel.includes('most recent complete respiratory cycle')
+      && panel.includes('moving respiratory-duration window after heartbeat smoothing')
       && panel.includes('complete minute windows')
       && guytonUi.includes("deepClock === 'mean' ? (reference?.ppl ?? op.ppl) : c.p.ppl")
       && guytonUi.includes(': fast.state.ppl')

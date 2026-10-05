@@ -1,8 +1,8 @@
 // Figures for the manual, drawn from the model rather than by hand.
 //
-// Every curve here is the same function the running simulator calls, so a
-// figure cannot drift away from the behaviour it illustrates. Re-run this
-// script after any change to the physiology:
+// Figures use current model functions. Sampling and averaging protocols still
+// need explicit interpretation; shared code does not establish physiological
+// validity. Re-run this script after relevant model or label changes:
 //
 //   node manual/figure/generate.mjs
 //
@@ -215,7 +215,7 @@ ${curves}
 <text class="label" x="${PAD.l + plotW / 2}" y="${H - 6}" text-anchor="middle">Right atrial pressure (mmHg)</text>
 ${key}
 <text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 112}">solid: venous return</text>
-<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: predicted RV output</text>
+<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: RV flow</text>
 </svg>
 `;
 }
@@ -281,7 +281,7 @@ ${curves}
 <text class="label" x="${PAD.l + plotW / 2}" y="${H - 6}" text-anchor="middle">Right atrial pressure (mmHg)</text>
 ${key}
 <text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 112}">solid: venous return</text>
-<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: cardiac output (LV)</text>
+<text class="tick" x="${PAD.l + plotW + 16}" y="${PAD.t + 128}">dashed: LV output</text>
 </svg>
 `;
 }
@@ -386,14 +386,14 @@ function pericardialFigure() {
     xTick: 100, yTick: 5, xDomain: [80, 600], yDomain: [0, 25], padRight: 230,
     markers: [{
       x: sim.circ.p.vHeart,
-      y: sim.metrics.pPeri,
-      label: 'settled preset',
+      y: sim.circ.p.pPeri,
+      label: 'one settled instant',
       color: 'alv',
     }],
     notes: [
       'same nonlinear relation and 4× gain',
       'capacity changes available space',
-      'curves continue steeply above 25 mmHg',
+      'curves continue above 25 mmHg',
     ],
   });
 }
@@ -535,17 +535,17 @@ function preloadReserveFigure() {
   return chart({
     title: 'Preload reserve is the local gain in output when filling pressure rises',
     xLabel: 'Mean systemic filling pressure (mmHg)',
-    yLabel: 'Equilibrium flow (L/min)',
+    yLabel: 'Predicted RV flow (L/min)',
     series: [
       { label: 'steep limb', points: steep },
       { label: 'plateau limb', points: plateau },
     ],
-    xTick: 2, yTick: 1, xDomain: [4, 16], yDomain: [2, 7.6], padRight: 220,
+    xTick: 2, yTick: 1, xDomain: [4, 16], yDomain: [2, 9], padRight: 220,
     markers: [
       { x: low[0], y: low[1], label: 'lower filling' },
       { x: high[0], y: high[1], label: 'higher filling', dx: -90 },
     ],
-    notes: ['8% of current flow per mmHg', 'is a model classifier,', 'not a bedside cutoff'],
+    notes: ['8%/mmHg of predicted flow', 'is a model classifier,', 'not a bedside cutoff'],
   });
 }
 
@@ -573,7 +573,7 @@ function ppvFigure() {
     yLabel: 'Systemic arterial pressure (mmHg)',
     series: [{ label: 'arterial pressure', points }],
     xTick: 1, yTick: 10, xDomain: [0, period], yDomain: [60, 110],
-    notes: [`model example: PPV ${sim.metrics.ppv.toFixed(1)}%`, 'inspiration lasts 1.2 s', 'the value is descriptive'],
+    notes: [`model PPV ${sim.metrics.ppv.toFixed(1)}%`, 'inspiration lasts 1.2 s', 'the value is descriptive'],
   });
 }
 
@@ -632,7 +632,7 @@ function ppvFillingFigure() {
       + `<text class="tick" x="${left - 9}" y="${(yReserve(v) + 4).toFixed(1)}" text-anchor="end">${v}</text>`);
   }
   for (let v = 300; v <= 1400; v += 200) {
-    grid.push(`<text class="tick" x="${x(v).toFixed(1)}" y="${lowerTop + panelH + 19}" text-anchor="middle">${v}</text>`);
+    grid.push(`<text class="tick" x="${x(v).toFixed(1)}" y="${lowerTop + panelH + 19}" text-anchor="middle">${v - defaultParams().stressedVolume}</text>`);
   }
 
   const dry = samples.find((s) => s.stressedVolume === 300);
@@ -641,7 +641,7 @@ function ppvFillingFigure() {
     `<circle cx="${x(sample.stressedVolume).toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" style="fill:${colour};stroke:none"/>`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${FW} ${FH}" class="${ROOT}" role="img"
-  aria-label="Two aligned model plots against selected stressed volume. Pulse pressure variation is low at severe underfilling, rises and falls through intermediate filling, and rises again at high filling. Preload reserve falls steadily as filling increases, showing that low pulse pressure variation does not identify a full circulation.">
+  aria-label="Two aligned model plots against blood added or removed relative to the neutral starting volume. Pulse pressure variation is low at severe underfilling, rises and falls through intermediate filling, and rises again at high filling. Preload reserve falls steadily as filling increases, showing that low pulse pressure variation does not identify a full circulation.">
 <style>${STYLE}</style>
 <rect class="bg" width="${FW}" height="${FH}"/>
 <text class="title" x="${left}" y="18">PPV does not identify filling state in the model</text>
@@ -658,15 +658,15 @@ ${marker(full, yPpv(full.ppv), 'var(--fig-total, #1f6feb)')}
 ${marker(full, yReserve(full.reserve), 'var(--fig-extra, #2a9d8f)')}
 <text class="label" x="${left}" y="${top - 9}">PPV (%) — respiratory waveform variation</text>
 <text class="label" x="${left}" y="${lowerTop - 9}">Preload reserve (% of output per mmHg)</text>
-<text class="label" x="${left + width / 2}" y="${FH - 7}" text-anchor="middle">Selected stressed volume (mL)</text>
+<text class="label" x="${left + width / 2}" y="${FH - 7}" text-anchor="middle">Blood added/removed from neutral reference (mL)</text>
 <line class="total" x1="${left + width + 18}" y1="${top + 18}" x2="${left + width + 48}" y2="${top + 18}"/>
 <text class="label" x="${left + width + 55}" y="${top + 22}">PPV</text>
 <line class="extra" style="stroke-dasharray:none;stroke-width:2.5" x1="${left + width + 18}" y1="${top + 42}" x2="${left + width + 48}" y2="${top + 42}"/>
 <text class="label" x="${left + width + 55}" y="${top + 46}">preload reserve</text>
-<text class="tick" x="${left + width + 18}" y="${top + 79}">At 300 mL:</text>
+<text class="tick" x="${left + width + 18}" y="${top + 79}">After −400 mL:</text>
 <text class="tick" x="${left + width + 18}" y="${top + 95}">${dry.ppv.toFixed(1)}% PPV,</text>
 <text class="tick" x="${left + width + 18}" y="${top + 111}">${dry.reserve.toFixed(1)}%/mmHg reserve</text>
-<text class="tick" x="${left + width + 18}" y="${top + 139}">At 1400 mL:</text>
+<text class="tick" x="${left + width + 18}" y="${top + 139}">After +700 mL:</text>
 <text class="tick" x="${left + width + 18}" y="${top + 155}">${full.ppv.toFixed(1)}% PPV,</text>
 <text class="tick" x="${left + width + 18}" y="${top + 171}">${full.reserve.toFixed(1)}%/mmHg reserve</text>
 <text class="tick" x="${left + width + 18}" y="${lowerTop + 28}">Same passive breath</text>
@@ -698,7 +698,7 @@ function pmsfOcclusionFigure() {
     dashed: [1], xTick: 5, yTick: 1, xDomain: [0, 28], yDomain: [0, 6.2], padRight: 225,
     markers: points.map((point) => ({ x: point.pra, y: point.flow })),
     notes: [
-      `internal Pmsf ${sim.metrics.pmsf.toFixed(1)} mmHg`,
+      `smoothed Pmsf ${sim.metrics.pmsf.toFixed(1)} mmHg`,
       `extrapolated intercept ${estimatedPmsf.toFixed(1)}`,
       'the difference is not calibrated',
     ],
@@ -726,7 +726,7 @@ function pvCurveFigure() {
     xLabel: 'Transpulmonary pressure (cmH\u2082O)',
     yLabel: 'Lung volume (L)',
     series, xTick: 5, yTick: 1, padRight: 260,
-    notes: ['model curves over the clinical pressure range', 'collapse scales the accessible share separately'],
+    notes: ['illustrative model tissue curves', 'collapse sets the accessible share'],
   });
 }
 
@@ -761,7 +761,7 @@ function chestWallFigure() {
       { x: chestWallNeutralVolume(base), y: 0, label: 'zero wall recoil', dx: 7, dy: 16 },
     ],
     notes: [
-      'the curve is near-linear around tidal breathing',
+      'near-linear during tidal breathing',
       'it stiffens progressively at high volume',
       'the lung has its own separate curve',
     ],
@@ -1011,7 +1011,7 @@ function hysteresisFigure() {
     ],
     xTick: 5, yTick: 5, padRight: 200, xDomain, yDomain,
     notes: [
-      'only the collapsed but recruitable',
+      'only the reopenable component',
       'part of the lung retains memory',
       'on the way down',
     ],

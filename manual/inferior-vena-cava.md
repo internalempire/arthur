@@ -1,6 +1,6 @@
 # Inferior vena cava
 
-> The inferior vena cava is the compliant conduit that delivers blood from the splanchnic reservoir to the right atrium. Its displayed calibre follows its own blood volume rather than instantaneous right-atrial pressure, so it remains dilated but can retain a small respiratory excursion in tamponade.
+> The inferior vena cava is the compliant conduit that delivers blood from the systemic venous reservoir to the right atrium. Its displayed calibre follows its own blood volume rather than instantaneous right-atrial pressure, so it remains dilated but can retain a small respiratory excursion in tamponade.
 
 ---
 
@@ -10,9 +10,9 @@ The inferior vena cava is a thin-walled, highly compliant vessel that spans the 
 
 Two mechanical properties matter for heart–lung interaction, and both follow from the fact that the IVC is a collapsible tube in series with the rest of the venous system.
 
-**The IVC is a volume buffer.** Its compliance — roughly 15–40 mL/mmHg in humans — means it can accept or release tens of millilitres of blood without a large pressure change. This smooths the respiratory oscillations in venous return before they reach the right atrium.
+**The IVC is a volume buffer.** Its capacity to change volume with distending pressure lets it accept or release blood during the breath. That behaviour depends on shape, surrounding pressure and the length of vessel considered; a local ultrasound diameter change is not a measurement of whole-caval volume compliance. This smooths the respiratory oscillations in venous return before they reach the right atrium.
 
-**The IVC is the site of the caval waterfall.** The [vascular waterfall](vascular-waterfalls.md) that produces the plateau of the venous return curve occurs where the IVC enters the thorax. There the vessel is surrounded by a pressure that is part abdominal and part pleural; when the internal pressure falls below that external pressure (minus a few cmH₂O that the vessel wall can withstand), the IVC flutters shut and flow stops rising even as right atrial pressure falls further.
+**The inferior caval pathway can develop a vascular waterfall.** The [vascular waterfall](vascular-waterfalls.md) that produces the plateau of the venous return curve can arise where surrounding pressure narrows the returning venous pathway. Thoracic and abdominal surroundings differ along that pathway. Once flow limitation occurs, further lowering atrial pressure can fail to increase return. A fixed closing allowance or obligatory wall flutter should not be inferred from the schematic.
 
 Two clinical consequences follow.
 
@@ -20,7 +20,7 @@ Two clinical consequences follow.
 
 **In cardiac tamponade**, the right heart cannot readily accept the increased venous return because the [pericardium](ventricular-interdependence.md) leaves little room. The IVC therefore remains distended and plethoric. Clinically this means a dilated IVC with **blunted** inspiratory collapse; it does not require the diameter to be completely motionless.
 
-The IVC therefore sits at the junction of three teaching concepts: stressed volume, venous return, and the caval waterfall. Its behaviour is a readout of all three, not a mechanism of its own.
+The IVC therefore links storage, venous return and collapse-limited flow. Its behaviour is influenced by upstream filling and downstream cardiac pressure; neither a large diameter nor a small respiratory excursion alone proves a need for fluid.
 
 ---
 
@@ -28,22 +28,24 @@ The IVC therefore sits at the junction of three teaching concepts: stressed volu
 
 ### A separate compliant compartment
 
-The IVC is a distinct compliant compartment between the splanchnic reservoir and the right atrium. Its volume changes with the balance of inflow and outflow, and its pressure is determined by its own compliance:
+The IVC is a distinct compliant compartment between the systemic venous reservoir and the right atrium. Its volume changes with the balance of inflow and outflow, and its pressure is determined by its own compliance:
 
 $$
 P_{IVC,tm} = \frac{V_{IVC} - V_{u,IVC}}{C_{IVC}}
 $$
 
 $$
-P_{IVC,atm} = P_{IVC,tm} + P_{ab}
+P_{IVC,atm} = \max\left(0.01\ \mathrm{mmHg},\ P_{IVC,tm} + P_{ab}\right)
 $$
 
 - $V_{IVC}$ — blood volume held in the IVC, mL
 - $V_{u,IVC} = 50$ mL — unstressed volume assigned to the IVC
-- $C_{IVC} = 20$ mL/mmHg — IVC compliance, within the published range of 15–40 mL/mmHg
-- $P_{ab}$ — abdominal pressure, mmHg; the IVC is intra-abdominal
+- $C_{IVC} = 20$ mL/mmHg — selected aggregate IVC compliance, not a validated human whole-caval measurement
+- $P_{ab}$ — abdominal pressure, mmHg; the represented conduit uses this surrounding pressure throughout
 
-With both manual and reflex capacity shifts at zero, combined systemic venous unstressed volume is 2,800 mL: 2,750 mL in the splanchnic reservoir and 50 mL in the IVC. Manual and reflex capacity reductions change the reservoir intercept; the IVC zero-pressure volume stays at 50 mL. Applying **Blood volume change** adds or removes blood in the splanchnic reservoir; IVC volume follows the balance of inflow and outflow and is not a second user input.
+The 0.01 mmHg minimum is an explicit numerical floor on atmospheric conduit pressure. Where it is active, atmospheric pressure minus abdominal pressure no longer equals the unconstrained elastic term above. Near this limit, the compartment must not be read as a complete physiological pressure–volume relation.
+
+With both manual and reflex capacity shifts at zero, combined systemic venous unstressed volume is 2,800 mL: 2,750 mL in the systemic venous reservoir and 50 mL in the IVC. Manual and reflex capacity reductions change the reservoir intercept; the IVC zero-pressure volume stays at 50 mL. Applying **Blood volume change** adds or removes blood in the systemic venous reservoir; IVC volume follows the balance of inflow and outflow and is not a second user input.
 
 ### Split resistance to venous return
 
@@ -51,14 +53,14 @@ The resistance to venous return (`rvr`) is divided into two series segments:
 
 | segment | fraction | from | to | Starling resistor? |
 |---|---:|---|---|---|
-| upstream | 33% | splanchnic reservoir | IVC | no — the abdominal reservoir does not collapse |
+| upstream | 33% | systemic venous reservoir | IVC | no — the abdominal reservoir does not collapse |
 | downstream | 67% | IVC | right atrium | yes — caval collapse at $P_{crit}$ |
 
-The same softplus collapse law described under [vascular waterfalls](vascular-waterfalls.md) applies only to the downstream segment. The upstream segment carries no collapse: the splanchnic bed is a capacious reservoir whose pressure is set by stressed volume and venous compliance, not by a surrounding pressure that can compress it shut.
+The same softplus collapse law described under [vascular waterfalls](vascular-waterfalls.md) applies only to the downstream segment. The upstream segment has no waterfall switch. Its resistance can nevertheless rise with abdominal pressure when both reservoir and IVC are poorly distended; [abdominal pressure](abdominal-pressure.md) describes that separate restriction. Omitting an upstream waterfall is a model choice, not a claim that real abdominal veins cannot collapse.
 
 The downstream segment permits brief reversal when atrial pressure exceeds IVC pressure: blood then leaves the atrium and returns to the IVC. Both directions use the same closing-pressure law, with upstream and downstream ends exchanged for reversal. The upstream segment remains forward-only. The volume balance uses signed downstream flow, so reversal fills the cava rather than creating blood.
 
-For steady forward flow the two resistances add. In a pulsatile circulation, a curve evaluated at mean pressures need not equal the mean signed flow through the two segments. The IVC adds an RC time constant of about 0.6 s (filling: $C_{IVC} \times rvr_{up}$), which buffers the respiratory oscillations in venous return. Signed flow in either direction uses these same compartment balances.
+For steady forward flow the two resistances add. In a pulsatile circulation, a curve evaluated at mean pressures need not equal the mean signed flow through the two segments. The product of compliance and upstream resistance has units of time and describes one filling scale. It is not the relaxation time of the whole conduit: outflow, collapse and both surrounding pressures also affect the response. Signed flow in either direction uses these same compartment balances.
 
 ### What the thorax panel shows
 
@@ -89,7 +91,7 @@ This is not an echocardiographic diameter equation. It is a visually compressed 
 
 The respiratory volume swing is not the same as ultrasound collapsibility. The displayed-calibre column reports only how much the schematic width changes after the square-root transformation. In the tamponade preset, the underlying IVC volume varies through the breath and the drawing displays that small excursion. A distended cava can therefore remain visibly distended while still changing calibre.
 
-The magnitude is deliberately not calibrated to an ultrasound cutoff. In Himelman and colleagues' cohort, IVC plethora was defined as less than 50% reduction with deep inspiration, and the plethora group showed a mean reduction of 18%. The model uses ordinary regular breaths, has no ultrasound plane or longitudinal vessel deformation, and should therefore reproduce only the direction: **dilated and less collapsible**, not a particular diagnostic percentage.
+The magnitude is deliberately not calibrated to an ultrasound cutoff. [Himelman and colleagues](https://www.jacc.org/doi/10.1016/S0735-1097%2888%2980011-1) reviewed 115 patients with moderate or large pericardial effusions, including 33 with tamponade. Plethora was defined as less than 50% diameter reduction with deep inspiration; the 83 patients with plethora averaged an 18% reduction. That subgroup was not composed exclusively of tamponade patients. The model uses ordinary regular breaths, has no ultrasound plane or longitudinal vessel deformation, and should therefore reproduce only the direction: **dilated and less collapsible**, not a particular diagnostic percentage.
 
 ---
 
@@ -99,9 +101,9 @@ The magnitude is deliberately not calibrated to an ultrasound cutoff. In Himelma
 
 **Displayed calibre follows distending volume.** Relating diameter to the square root of distending volume is a geometric approximation that preserves small excursions while compressing the display of high volumes. The 150 mL reference is a display reference, not an upper limit on IVC volume. The width calculation does not enter the physiological flow equations.
 
-**Why the Starling resistor sits on the downstream segment only.** The splanchnic reservoir is a capacious bed whose surrounding pressure (abdominal) actually helps squeeze blood forward when the abdomen is distended (zone III). It does not flutter shut the way the IVC does at the thoracic inlet — the collapse is a property of the conduit, not of the reservoir. The downstream resistor expresses the conduit closing condition described under [abdominal pressure](abdominal-pressure.md); reservoir compression separately contributes to the upstream pressure head.
+**Why the Starling resistor sits on the downstream segment only.** Arthur separates an aggregate reservoir from a conduit to distinguish mobilising upstream pressure from limiting return. In the reservoir, abdominal pressure contributes to the driving head according to filling. In the downstream segment it raises the closing pressure; additional upstream resistance is permitted during depletion. Real abdominal zone behaviour is more distributed than this two-part representation.
 
-**Why 20 mL/mmHg for the IVC.** The published range of human caval distensibility spans 15–40 mL/mmHg. A middle value was chosen — large enough to produce a visible buffering effect, small enough that the IVC does not become a dominant capacitance. The value is a didactic choice and must not be read as a measured patient parameter.
+**Why 20 mL/mmHg for the IVC.** This is an aggregate teaching coefficient that gives the conduit a visible storage effect without making it the principal reservoir. The cited experiments on canine veins support pressure-dependent distension, not a human whole-caval compliance range or this exact value.
 
 ---
 
@@ -110,10 +112,10 @@ The magnitude is deliberately not calibrated to an ultrasound cutoff. In Himelma
 ### Of the construction
 
 - **One aggregate IVC.** There is no separate superior and inferior caval route and no azygos bypass. The model therefore cannot show selective SVC collapse or the differential response of the two routes to raised abdominal pressure.
-- **No hepatic waterfall or portal system.** The splanchnic reservoir is one compartment that drains directly into the IVC.
+- **No hepatic waterfall or portal system.** The systemic venous reservoir is one compartment that drains directly into the IVC.
 - **The IVC is surrounded by abdominal pressure throughout.** In reality the intra-thoracic IVC sees pleural pressure, creating a pressure gradient along the vessel that the lumped compartment does not resolve.
 - **No venous valves, no gravitational gradient, no orthostatic redistribution.**
-- The unstressed volume (50 mL) and compliance (20 mL/mmHg) are aggregate teaching coefficients anchored to the plausible physiological range, not to a specific patient measurement.
+- The unstressed volume (50 mL) and compliance (20 mL/mmHg) are aggregate teaching coefficients without a matched human measurement validating their magnitude.
 - The 33/67 resistance split is a didactic choice. No published measurement partitions the resistance to venous return at this exact boundary.
 
 ### Of clinical application

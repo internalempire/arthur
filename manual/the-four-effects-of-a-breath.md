@@ -6,19 +6,19 @@
 
 ## Physiology
 
-One positive-pressure inspiration does four things at once. Taken separately each is simple; the confusion at the bedside comes from the fact that they overlap in time and two of them oppose each other.
+A positive-pressure inspiration activates four interacting pathways. The directions below describe a common passive-breath pattern, not four inevitable outcomes: abdominal pressure, recruitment, filling and ventricular reserve can alter the balance.
 
-**1 · Right ventricular preload falls.** Pleural pressure rises, so right atrial pressure rises, so the gradient driving [venous return](venous-return.md) narrows. Less blood arrives at the right ventricle. Where the great veins are already near collapse, this is where the [waterfall](vascular-waterfalls.md) truncates flow entirely.
+**1 · Right ventricular preload falls.** Pleural pressure rises, so right atrial pressure rises, so the gradient driving [venous return](venous-return.md) narrows. Less blood arrives at the right ventricle. Near caval collapse, the [waterfall](vascular-waterfalls.md) limits the benefit of lowering atrial pressure further. A flow plateau is not cessation of venous return.
 
-**2 · Right ventricular afterload rises.** Lung inflation moves the lung along the [J-shaped resistance curve](pulmonary-vascular-resistance.md). Above functional residual capacity, alveolar vessels are compressed and resistance rises; where alveolar pressure exceeds pulmonary venous pressure, the alveolar segment sits behind a waterfall. The right ventricle ejects less for the same filling.
+**2 · Right ventricular afterload rises.** Lung inflation moves the lung along the [J-shaped resistance curve](pulmonary-vascular-resistance.md). On its high-volume limb, alveolar-vessel compression can increase resistance; where alveolar pressure exceeds pulmonary venous pressure, the alveolar segment sits behind a waterfall. The right ventricle ejects less for the same filling.
 
 **3 · Left ventricular preload can rise briefly before falling.** Inflation can squeeze blood out of the pulmonary vascular bed toward the left atrium — the *piston* effect — while the reduced right ventricular output arrives later. The observed sequence depends on pulmonary vascular volume, zone conditions, flow and transit time; the early rise is not obligatory in every patient.
 
-**4 · Left ventricular afterload falls.** The transmural systolic pressure the left ventricle must generate is aortic pressure minus pleural pressure — see [transmural pressure](transmural-pressure.md). Raising pleural pressure lowers it, so a given contraction can eject more at the same filling. The [LV-failure preset](scenarios.md#lv-failure) demonstrates pressure unloading together with reduced filling and a modest fall in forward output; the net response depends on both effects.
+**4 · Left ventricular afterload falls.** The pressure component of LV afterload depends on ejection pressure relative to pressure around the heart, approximately aortic pressure minus pleural and pericardial pressure during ejection — see [transmural pressure](transmural-pressure.md). Raising pleural pressure lowers it, so a given contraction can eject more at the same filling. The [LV-failure preset](scenarios.md#lv-failure) demonstrates pressure unloading together with reduced filling and a modest fall in forward output; the net response depends on both effects.
 
 ### Why the timing matters
 
-Effects (1) and (2) act on the right ventricle *during* inspiration. Effect (3), the fall, acts on the left ventricle **later** — because the blood whose ejection was reduced has to cross the lung first. The model's staged buffering component is close to two seconds in the reference circulation, while its whole PA-to-LA central-volume estimate is longer. Both change with pulmonary blood volume and forward flow.
+Effects (1) and (2) act on the right ventricle *during* inspiration. The reduced RV delivery in effect (3) can influence LV filling **later and more gradually** because the pulmonary circulation stores and releases blood. This is a storage-mediated mechanical response, not a strict waiting period for the same parcel of blood to reach the LA; pressure effects can be immediate. The model's staged buffering component is close to two seconds in the reference circulation, while its whole PA-to-LA central-volume estimate is longer. Both change with pulmonary blood volume and forward flow.
 
 At common heart and respiratory rates, the arterial pressure trough caused by inspiration often appears in **expiration**. A clinician who expects cause and effect to coincide may attribute the fall to the wrong phase of the breath. The exact phase depends on heart rate, respiratory rate and pulmonary transit.
 
@@ -35,10 +35,10 @@ The four effects are not added as corrections to the displayed waveforms, but ne
 | RV preload | pleural pressure enters the pressure surrounding the right atrium, narrowing the venous return gradient |
 | RV afterload | lung volume enters `pvrAt`, and alveolar pressure enters the effective downstream pressure of the pulmonary circuit |
 | LV preload, piston | lung volume above resting volume lowers the pulmonary venous unstressed volume, in proportion to the zone III index |
-| LV afterload | pleural pressure is added to the left ventricle's transmural pressure, so aortic ejection meets a lower transmural load |
-| the delay | the eight-stage [pulmonary transit](pulmonary-transit.md) pathway, with mean time derived from pulmonary blood volume and RV output |
+| LV afterload | pleural and pericardial pressures are added to intrinsic LV pressure to obtain cavity pressure; at a given aortic pressure, a rise in surrounding pressure reduces the transmural pressure required for ejection |
+| the delay | storage and release through the eight-stage [pulmonary transit](pulmonary-transit.md) pathway, with mean time derived from pulmonary blood volume and RV output; this does not impose a strict dead time |
 
-The piston is on its own control (`piston`) and is gated by the zone III index, because squeezing the pulmonary bed only works where the capillaries are open.
+The **Pulmonary capacitance coupling** control sets the piston coefficient. Arthur weights that effect with its zone III pressure-margin index. This is a chosen aggregate rule, not a measured fraction of open capillaries or proof that pulmonary blood displacement vanishes outside zone III.
 
 ### What the model shows
 
@@ -68,11 +68,11 @@ Here they arise from a shared set of pressure, volume and flow relations rather 
 - **Transit remains aggregate.** Its mean changes with represented pulmonary blood volume and RV output, but one staged path cannot reproduce regional capillary transit, shunt or contrast kinetics. The staged portion is bounded to 0.8–6 s for numerical stability.
 - **One pleural pressure**, so no regional differences in how the breath reaches different parts of the heart.
 - The piston is a single coefficient acting on pulmonary venous unstressed volume. It is a stand-in for a distributed squeezing of a compliant bed, not a representation of it.
-- Spontaneous effort is one aggregate activation with one amplitude control and a regular post-inspiratory decay. There is no inspiratory threshold load, separately recruited expiratory-muscle pressure or complete dyssynchrony model.
+- Spontaneous effort is one aggregate activation with one amplitude control and a regular post-inspiratory decay. Pressure support includes an inspiratory trigger threshold and can show delayed or ineffective triggering with trapped pressure. There is no separately recruited expiratory-muscle pressure, fatigue adaptation or complete dyssynchrony model.
 
 ### Of clinical application
 
-- The magnitudes above belong to one phenotype at one setting. They demonstrate an ordering and a ratio, not values to expect in a patient.
+- The timing examples belong to specified model phenotypes. They demonstrate a sequence, not a fixed delay or effect size to expect in a patient.
 - **The delay is the most transferable finding on this page and the least quantitative.** That the arterial consequence follows the right-sided cause is robust; its exact interval and respiratory phase depend on the selected model state.
 - Nothing here tells you which of the four dominates in a given patient. The model can be used to explore its own phenotypes, but it cannot identify the dominant mechanism in an individual patient from a table or waveform alone.
 
@@ -84,7 +84,7 @@ Here they arise from a shared set of pressure, volume and flow relations rather 
 - Mahmood SS, Pinsky MR. Heart–lung interactions during mechanical ventilation: the basics. *Ann Transl Med* 2018;6:349. [doi:10.21037/atm.2018.04.29](https://doi.org/10.21037/atm.2018.04.29)
 - Yuriditsky E, Mireles-Cabodevila E, Alviar CL. How I Teach: Heart–Lung Interactions during Mechanical Ventilation. Positive Pressure and the Right Ventricle. *ATS Scholar* 2025;6:94–108. [doi:10.34197/ats-scholar.2024-0059HT](https://doi.org/10.34197/ats-scholar.2024-0059HT)
 - Vieillard-Baron A, Chergui K, Augarde R, et al. Cyclic changes in arterial pulse during respiratory support revisited by Doppler echocardiography. *Am J Respir Crit Care Med*. 2003;168:671–676. [doi:10.1164/rccm.200301-135OC](https://doi.org/10.1164/rccm.200301-135OC)
-- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
+- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical bedside implications. *Intensive Care Med* 2026;52:2031–2034. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
 
 ---
 

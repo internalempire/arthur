@@ -16,7 +16,7 @@ This has two consequences that oppose each other, and the older teaching that "d
 
 The balance can therefore shift with vascular filling: compression of a distended abdominal reservoir may support the pressure head, whereas compression of an underfilled or collapsible bed may predominantly impede return. This helps explain why hypovolaemia worsens tolerance of raised intra-abdominal pressure and why abdominal compression is not equivalent to volume expansion.
 
-Abdominal pressure also reaches the thorax from the other side. A raised, splinted diaphragm stiffens the chest wall, and a stiffer chest wall transmits more of each breath to the [pleural space](pleural-pressure.md). Obesity, ascites, ileus and an abdomen closed under tension all do this.
+Abdominal pressure also reaches the thorax from the other side. A raised diaphragm and abdominal distension can increase resting thoracic load and alter chest-wall mechanics. The size of the transmitted [pleural pressure](pleural-pressure.md) and any stiffness change depend on anatomy and the clinical state; external load and compliance are distinct quantities.
 
 ---
 
@@ -37,13 +37,18 @@ $$
 
 The pressure load transmitted to the thorax is represented separately by `cwLoad`. It shifts the independent [chest-wall relaxation curve](pleural-pressure.md) and can raise resting pleural pressure without changing the selected wall compliance. `pab0` does **not** automatically determine `cwLoad`: abdominal-to-thoracic transmission depends on posture, diaphragm configuration and abdominal compliance, none of which is resolved. The intra-abdominal-hypertension preset selects both values to construct one teaching phenotype; it does not encode a universal transmission fraction.
 
+In practical terms, Arthur lets abdominal pressure support upstream pressure when blood is available to mobilise. When both the reservoir and caval conduit are poorly distended, it also permits extra resistance. The following coefficients specify that choice; they are not measurements to enter from a patient.
+
+<details>
+<summary>Model equations: filling-dependent abdominal pressure and resistance</summary>
+
 The opposing consequences first depend on how distended the venous reservoir is. The model reads that from the elastic pressure the reservoir already generates, and forms an index between 0 and 1:
 
 $$
 z = \operatorname{clamp}\left(\frac{P_{msf,\text{elastic}} - 2}{8},\ 0,\ 1\right)
 $$
 
-- $z$ — dimensionless distension index, 0 for an empty reservoir and 1 for a full one
+- $z$ — dimensionless distension index, 0 for the low-distension end of the chosen transition and 1 for its high-distension end; these do not mean anatomically empty or full
 - $P_{msf,\text{elastic}}$ — the pressure the venous reservoir generates from its own stressed volume alone, mmHg, before any abdominal contribution
 
 The respiratory calculation is converted to mmHg before it enters the circulation:
@@ -92,18 +97,13 @@ The coefficient 0.6 is the share of the systemic venous reservoir treated as int
 
 Abdominal pressure also sets the closing pressure of the great veins, which is why it appears again in [vascular waterfalls](vascular-waterfalls.md).
 
-### What the model shows
+</details>
 
-A passive patient at 500 mL, PEEP 5, with the baseline abdominal pressure raised:
+### Explore the competing effects
 
-| `pab0` | mean P<sub>ab</sub> | P<sub>msf</sub> | mean CVP | cardiac output |
-|---|---|---|---|---|
-| 0 | 2.5 cmH₂O | 7.5 mmHg | 1.1 mmHg | 5.37 L/min |
-| 5 | 7.5 | 9.0 | 1.2 | 5.53 |
-| 12 | 14.5 | 12.9 | 0.7 | 4.94 |
-| 20 | 22.5 | 17.8 | 0.2 | 4.11 |
+Pin a settled passive state and raise **Abdominal pressure** while keeping PEEP, tidal volume and thoracic wall load unchanged. Follow internal Pmsf, the effective venous-return gradient, the IVC and cardiac output together. A higher upstream pressure can coexist with less flow if the pressure limiting caval return rises more. Repeat from a lower blood volume using **Blood volume change** and **Remove**, then allow redistribution to settle: underfilling also permits the additional upstream resistance to appear.
 
-In this filled model run, a modest rise in abdominal pressure initially mobilises blood and slightly supports output. At higher pressure, Pmsf continues to rise but the caval closing pressure rises enough for output to fall. Linear resistance remains at its selected baseline because this is not an underfilled venous reservoir. The accompanying fall in central venous pressure is a model result, not a general diagnostic pattern of intra-abdominal hypertension.
+This comparison isolates Arthur's abdominal vascular pathway. To explore an added thoracic load, change that control as a separate intervention. Raising abdominal pressure alone does not automatically stiffen or load the chest wall in this model. The [intra-abdominal hypertension scenario](scenarios.md#intra-abdominal-hypertension) combines selected vascular and thoracic changes; it is a phenotype, not an abdominal pressure threshold test.
 
 ---
 
@@ -126,7 +126,7 @@ The `0.6` splanchnic fraction, the transition window and the resistance coeffici
 - **One venous reservoir with a fractional abdominal share.** There is no separate splanchnic compartment, no hepatic waterfall, no portal bed, and no distinction between superior and inferior caval return. A real abdomen redistributes blood between these; the model can only scale one pooled compartment.
 - **The reservoir and IVC depletion indices are inferred, not measured.** They are internal coefficients used to decide when an additional upstream resistance is allowed; they are not bedside diagnoses or thresholds.
 - **The diaphragm has no geometry.** Its descent is a coefficient on lung volume, so there is no zone of apposition, no rib cage expansion from diaphragmatic contraction, and no distinction between the abdominal pressure a passive descent produces and that of a vigorous contraction.
-- Abdominal compliance is not represented: the same volume displacement produces the same pressure rise regardless of whether the abdomen is lax or tense.
+- Abdominal compliance is represented only through the selected pressure–volume coupling: stronger coupling gives a greater pressure rise for the same displacement. There is no separate nonlinear abdominal pressure–volume curve or anatomical geometry; the selected coupling remains fixed during a run.
 - Thoracic wall load is selected independently from abdominal pressure. The model cannot predict how much of a measured Pab reaches pleural pressure in a particular patient.
 
 ### Of clinical application
@@ -140,10 +140,12 @@ The `0.6` splanchnic fraction, the transition window and the resistance coeffici
 
 ## References
 
+[Takata et al.](https://pubmed.ncbi.nlm.nih.gov/2076989/) tested the opposing effects of abdominal pressure in 12 canine experiments with an open-chest IVC bypass and phrenic stimulation. Return increased or decreased according to caval distending pressure. This supports the competing mechanisms; it does not validate Arthur's human-scale coefficients or crossover.
+
 - Takata M, Wise RA, Robotham JL. Effects of abdominal pressure on venous return: abdominal vascular zone conditions. *J Appl Physiol* 1990;69:1961–72. [doi:10.1152/jappl.1990.69.6.1961](https://doi.org/10.1152/jappl.1990.69.6.1961)
 - Malbrain MLNG, Cheatham ML, Kirkpatrick A, et al. Results from the International Conference of Experts on Intra-abdominal Hypertension and Abdominal Compartment Syndrome. I. Definitions. *Intensive Care Med* 2006;32:1722–32. [doi:10.1007/s00134-006-0349-5](https://doi.org/10.1007/s00134-006-0349-5)
 - Kirkpatrick AW, Roberts DJ, De Waele J, et al. Intra-abdominal hypertension and the abdominal compartment syndrome: updated consensus definitions and clinical practice guidelines. *Intensive Care Med* 2013;39:1190–206. [doi:10.1007/s00134-013-2906-z](https://doi.org/10.1007/s00134-013-2906-z)
-- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS. *Intensive Care Med* 2026. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
+- Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical bedside implications. *Intensive Care Med* 2026;52:2031–2034. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3)
 - Behazin N, Jones SB, Cohen RI, Loring SH. Respiratory restriction and elevated pleural and esophageal pressures in morbid obesity. *J Appl Physiol*. 2010;108:212–218. [doi:10.1152/japplphysiol.91356.2008](https://doi.org/10.1152/japplphysiol.91356.2008)
 
 ---
