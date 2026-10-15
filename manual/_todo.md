@@ -4,6 +4,12 @@
 
 ---
 
+## Agreed sequence — October 15
+
+After correcting the remaining ungenerated numerical examples, review the venous pressure–volume representation: distinguish zero-transmural-pressure volume, current stressed volume, compliance and the effect of tone, while retaining explicit one-off blood applications. Use the clinician's article as a discussion source, not automatic authorization for a new constitutive law. Separate controllable vessel properties from volumes that emerge as blood redistributes; do not invent independent controls for dependent quantities or force different pressure/flow trajectories without a mechanism.
+
+Then revisit pulmonary transit before implementing the blood-distribution view. Audit the current eight-stage, adaptive, pressureless transport pathway together with pressure-bearing PA/PV storage: track compartment and total blood, pressure and forward flow during matched changes in LV function, PEEP and volume. Distinguish transport delay from pressure transmission and anatomical capillary congestion. Determine whether any artefact materially changes the teaching result before proposing a physiological extension or additional computational work. Model and substantive interface changes still require clinician confirmation.
+
 ## Model
 
 ### Revisit LV/CPAP only after agreeing a new teaching question
@@ -20,7 +26,7 @@ Constrain the magnitude of within-breath opening and its plateau/compliance cons
 
 ## Teaching presentation — discuss before implementation
 
-Discuss blood-volume redistribution across existing compartments and pressure history across a manoeuvre before implementation. Quantifying the separate effects of simultaneous interventions would require specifically controlled experiments; the Mechanisms view reports their combined state differences and does not perform that attribution. The independent venous-capacity control is implemented; showing where the conserved blood redistributes is the next planned discussion. These views must show observed changes without implying that a causal contribution has been quantitatively isolated. Do not add quizzes, blood-gas calculations or automatic pressure selection. The private discussion is `codex-notes/Arthur-discussione-spunti-didattici-2026-09-24.md`; it does not authorize these remaining model or interface changes.
+Discuss blood-volume redistribution across existing compartments and pressure history across a manoeuvre before implementation. Quantifying the separate effects of simultaneous interventions would require specifically controlled experiments; the Mechanisms view reports their combined state differences and does not perform that attribution. The independent venous-capacity control is implemented; showing where the conserved blood redistributes follows the venous-state and pulmonary-transit reviews above. These views must show observed changes without implying that a causal contribution has been quantitatively isolated. Do not add quizzes, blood-gas calculations or automatic pressure selection. The private discussion is `codex-notes/Arthur-discussione-spunti-didattici-2026-09-24.md`; it does not authorize these remaining model or interface changes.
 
 
 ### Fit the waveform cursor status on very narrow screens

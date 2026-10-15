@@ -61,7 +61,18 @@ For this phenotype, total PEEP and end-expiratory volume are essentially unchang
 
 The model does not contain a single pressure parameter called the choke pressure. Its flow envelope and ordinary resistive emptying compete at every step, so the end of the flat region is the crossover between those mechanisms in this particular experiment. Baseline total PEEP must not be read as that crossover or as a bedside PEEP target.
 
-Without the flow cap the same phenotype behaves differently: PEEP 0 → 5 raises total PEEP from about 6.5 to 11.4 cmH₂O and end-expiratory volume from 3.41 to 3.95 L, with output falling. That is the model's response to resistive incomplete emptying without an explicit choke; it is not evidence that every non-flow-limited patient behaves that way.
+Without the explicit flow cap, the same phenotype has a different PEEP response:
+
+<!-- BEGIN GENERATED: efl-off-peep -->
+*Executable setup: the same passive obstructed phenotype as above, with EFL off. Each PEEP level is initialized independently and run for 45 s. Total PEEP and lung volume are latched at end expiration; output is forward aortic volume per duration of the last completed heartbeat.*
+
+| applied PEEP (cmH₂O) | total PEEP (cmH₂O) | end-expiratory volume (L) | cardiac output (L/min) |
+|---:|---:|---:|---:|
+| 0 | 6.6 | 3.18 | 5.22 |
+| 5 | 11.5 | 3.74 | 4.77 |
+<!-- END GENERATED: efl-off-peep -->
+
+Here, raising applied PEEP increases both total PEEP and absolute end-expiratory volume, while output falls. This is the model's response to resistive incomplete emptying without an explicit choke; it is not evidence that every non-flow-limited patient behaves that way.
 
 Time still works. At the shipped PEEP, slowing the rate from 26 to 12 breaths per minute markedly reduces intrinsic PEEP and dynamic trapping and restores output. These are phenotype-specific model effects, not quantitative COPD targets.
 

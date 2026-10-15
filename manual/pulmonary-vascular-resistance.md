@@ -162,11 +162,15 @@ A fall in the resistance coefficient therefore does not guarantee lower RV eject
 
 ### What the fully open normal lung does
 
-| | RV (1.31 L) | FRC (2.20 L) | TLC (6.00 L) |
-|---|---|---|---|
-| total | 2.03 WU | **1.17 WU** | 1.81 WU |
-| relative to the minimum | 1.74× | 1.00× | 1.55× |
-| extra-alveolar ÷ alveolar | 3.43 | 1.03 | 0.18 |
+<!-- BEGIN GENERATED: pvr-landmarks -->
+*Executable setup: fully open reference lung, no HPV; static evaluation of the internal mechanical resistance coefficient, without a ventilatory manoeuvre or a catheter measurement.*
+
+| | zero-transpulmonary-pressure reference (1.27 L) | FRC reference (2.20 L) | capacity limit (6.00 L) |
+|---|---:|---:|---:|
+| total coefficient (WU) | 2.10 | 1.17 | 1.81 |
+| relative to the FRC minimum | 1.80× | 1.00× | 1.55× |
+| extra-alveolar ÷ alveolar | 3.64 | 1.03 | 0.18 |
+<!-- END GENERATED: pvr-landmarks -->
 
 The crossover — the volume at which the dominant mechanism changes — sits at FRC, which is the teaching point the figure exists to make.
 
@@ -179,12 +183,18 @@ The model reports pulmonary resistance twice, and they are different kinds of qu
 - **Pulmonary resistance coefficient** — the model's own internal $R$, the thing the equations divide by. Not measurable in a patient, and not a Poiseuille resistance.
 - **PVR, derived** — $(\overline{P}_{pa} - P_{la})/\dot{Q}$, computed from mean pulmonary arterial pressure, model left atrial pressure and cardiac output. It has the form of catheter PVR only while left atrial pressure is a defensible [wedge surrogate](pulmonary-artery-wedge-pressure.md), and inherits that tile's caution automatically.
 
-They can move in opposite directions. The derived value includes the downstream-pressure effects, pulsatile storage and averaging choices as well as flow in its denominator; it is not obtained simply by reading the internal resistor. A fall in flow alone would not change the ratio in an ideal steady resistor if its pressure gradient fell proportionally. In the research calibration phenotype, PEEP 4 → 14 with fixed low and high reopenable shares of the same compromised component:
+They can move in opposite directions. The derived value includes the downstream-pressure effects, pulsatile storage and averaging choices as well as flow in its denominator; it is not obtained simply by reading the internal resistor. A fall in flow alone would not change the ratio in an ideal steady resistor if its pressure gradient fell proportionally. In the research calibration phenotype, compare PEEP 4 and 14 cmH₂O at fixed low and high reopenable shares of the same compromised component:
 
-| | coefficient | derived | open fraction |
-|---|---|---|---|
-| low reopenable share | 2.38 → 2.36 WU (−1%) | 2.64 → **3.16 WU (+20%)** | 58 → 59% |
-| high reopenable share | 2.38 → 2.22 WU (−7%) | 2.54 → 2.64 WU (+4%) | 58 → 64% |
+<!-- BEGIN GENERATED: pvr-opening-peep -->
+*Executable setup: the shared literature-check phenotype, distinct from the shipped ARDS/RV preset: passive volume control, VT 350 mL, 24/min, aerated-lung compliance 40 mL/cmH₂O, 42% compromised, transpulmonary opening midpoint 17.5 cmH₂O, opening memory off, baroreflex on, baseline pulmonary coefficient 0.09 mmHg·s/mL and HPV multiplier 1.6. Each PEEP level is initialized independently and run for 45 s, rather than reached by a sequential PEEP step.*
+
+| reopenable share | internal coefficient (WU), PEEP 4 → 14 | pressure–flow estimate (WU), PEEP 4 → 14 | open fraction at sampling, PEEP 4 → 14 |
+|---|---:|---:|---:|
+| low (6.2% of compromised lung) | 2.41 → 2.40 (−0.4%) | 2.71 → 3.52 (+29.8%) | 58 → 61% |
+| high (75.0% of compromised lung) | 2.38 → 1.72 (−28.0%) | 2.44 → 2.60 (+6.3%) | 59 → 89% |
+
+The internal coefficient and open fraction are instantaneous samples at 45 s, not respiratory means or dedicated end-expiratory measurements. The pressure–flow estimate combines pulmonary arterial and left atrial pressures smoothed with a 3 s exponential time constant (both relative to atmosphere) with forward aortic output from the last completed heartbeat. The displayed changes compare those specified samples; their size is not an independently validated clinical effect.
+<!-- END GENERATED: pvr-opening-peep -->
 
 Reading the coefficient as though it were the pressure–flow estimate would report the opposite direction. However, at PEEP 14 these model runs fall outside the zone III assumption and the wedge surrogate is flagged. The table therefore demonstrates an internal pressure–flow response and its dependence on recruitability; it does not independently reproduce a valid catheter measurement at both PEEP levels.
 

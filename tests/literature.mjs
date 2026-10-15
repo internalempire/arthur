@@ -10,6 +10,7 @@ import { defaultParams, REFERENCE_WEIGHT_KG } from '../src/model/parameters.js';
 import { pvrComponents, NORMAL_FRC } from '../src/model/lung.js';
 import { systemicVenousVolumeState, venousReturnFlow } from '../src/model/circulation.js';
 import { applyBaroreflex } from '../src/model/baroreflex.js';
+import { HUMAN_ARDS_PVR as HUMAN_ARDS, PVR_REOPENABLE_SHARES } from '../tools/fixtures/pulmonary-pvr.mjs';
 
 function settle(overrides, seconds = 30) {
   const s = new Simulator();
@@ -31,19 +32,14 @@ const change = (before, after) => (after / before - 1) * 100;
 // baseline resistance would make the model validate its own extreme scenario
 // rather than the measured human values. A PVR0 of 0.09 gives the whole-lung
 // catheter-derived values inside all four reported IQRs.
-const HUMAN_ARDS = {
-  clung: 40, vt: 350, rr: 24, pvrBase: 0.09, hpv: 1.6,
-  // The narrower cohort-constrained recruitment distribution moves the same
-  // mechanical transition over a shorter pressure interval. Keeping the old
-  // midpoint at 21 cmH2O would put both opening phenotypes on the inflation side of the
-  // PVR curve. A midpoint of 17.5 preserves the independently observed PVR
-  // separation without changing the shipped ARDS/RV-failure preset.
-  collapsed: 0.42, pOpen: 17.5,
-  // The in-vivo cohort retained autonomic compensation. Keep that choice
-  // explicit now that the teaching application's uncompensated default is off;
-  // this does not identify a human baroreflex gain from the study.
-  baroreflexEnabled: true,
-};
+// The narrower cohort-constrained recruitment distribution moves the same
+// mechanical transition over a shorter pressure interval. Keeping the old
+// midpoint at 21 cmH2O would put both opening phenotypes on the inflation side of the
+// PVR curve. A midpoint of 17.5 preserves the independently observed PVR
+// separation without changing the shipped ARDS/RV-failure preset.
+// The in-vivo cohort retained autonomic compensation. Keep that choice
+// explicit now that the teaching application's uncompensated default is off;
+// this does not identify a human baroreflex gain from the study.
 
 export const LITERATURE = {
   'copd-flow-limited-peep': () => {
@@ -111,8 +107,8 @@ export const LITERATURE = {
   // remains deliberately broader than a ratio of cohort medians, which is not
   // the median within-patient response.
   'pvr-recruitability-low': () => {
-    const a = settle({ ...HUMAN_ARDS, reopenable: 0.06188009182612101, peep: 4 }, 45);
-    const b = settle({ ...HUMAN_ARDS, reopenable: 0.06188009182612101, peep: 14 }, 45);
+    const a = settle({ ...HUMAN_ARDS, reopenable: PVR_REOPENABLE_SHARES.low, peep: 4 }, 45);
+    const b = settle({ ...HUMAN_ARDS, reopenable: PVR_REOPENABLE_SHARES.low, peep: 14 }, 45);
     const d = change(a.pvrDerivedWood, b.pvrDerivedWood);
     const absolute = a.pvrDerivedWood >= 1.50 && a.pvrDerivedWood <= 3.71
       && b.pvrDerivedWood >= 2.08 && b.pvrDerivedWood <= 4.75;
@@ -127,8 +123,8 @@ export const LITERATURE = {
   },
 
   'pvr-recruitability-high': () => {
-    const a = settle({ ...HUMAN_ARDS, reopenable: 0.7497452596823374, peep: 4 }, 45);
-    const b = settle({ ...HUMAN_ARDS, reopenable: 0.7497452596823374, peep: 14 }, 45);
+    const a = settle({ ...HUMAN_ARDS, reopenable: PVR_REOPENABLE_SHARES.high, peep: 4 }, 45);
+    const b = settle({ ...HUMAN_ARDS, reopenable: PVR_REOPENABLE_SHARES.high, peep: 14 }, 45);
     const d = change(a.pvrDerivedWood, b.pvrDerivedWood);
     const absolute = a.pvrDerivedWood >= 2.31 && a.pvrDerivedWood <= 3.61
       && b.pvrDerivedWood >= 2.10 && b.pvrDerivedWood <= 3.75;

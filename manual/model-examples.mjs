@@ -11,8 +11,10 @@ import { SCENARIOS } from '../src/model/scenarios.js';
 import { RECRUITMENT_PROFILES } from '../src/model/recruitment.js';
 import {
   lungVolumeAtPl, staticEndExpiratoryVolume, relaxationVolume,
-  chestWallPressure, transpulmonaryAt,
+  chestWallPressure, transpulmonaryAt, pvrComponents, NORMAL_FRC,
 } from '../src/model/lung.js';
+import { RESISTANCE_TO_WOOD } from '../src/model/units.js';
+import { HUMAN_ARDS_PVR, PVR_REOPENABLE_SHARES } from '../tools/fixtures/pulmonary-pvr.mjs';
 import { ivcDisplayWidth } from '../src/ui/panels/thorax.js';
 
 const SETTLING_SECONDS = 45;
@@ -98,7 +100,8 @@ export const STRESS_INDEX_CASES = [
 ];
 
 export const DOCUMENTED_EXAMPLE_TARGETS = [
-  { file: 'manual/expiratory-flow-limitation.md', ids: ['efl-peep'] },
+  { file: 'manual/expiratory-flow-limitation.md', ids: ['efl-peep', 'efl-off-peep'] },
+  { file: 'manual/pulmonary-vascular-resistance.md', ids: ['pvr-landmarks', 'pvr-opening-peep'] },
   { file: 'manual/stress-index.md', ids: ['stress-index'] },
   { file: 'manual/transmural-pressure.md', ids: ['transmural-peep'] },
   { file: 'manual/venous-return.md', ids: ['venous-return-peep'] },
@@ -127,6 +130,59 @@ function eflBlock() {
     '| applied PEEP (cmH\u2082O) | total PEEP (cmH\u2082O) | dynamic trapped volume (mL) | end-expiratory volume (L) | cardiac output (L/min) |',
     '|---:|---:|---:|---:|---:|',
     ...rows,
+  ].join('\n');
+}
+
+function eflOffBlock() {
+  const rows = [0, 5].map((peep) => {
+    const m = settled({ ...EFL_EXAMPLE.parameters, efl: 'off', peep });
+    return `| ${peep} | ${fixed(m.totalPeep, 1)} | ${fixed(m.endExpiratoryVolume, 2)} | ${fixed(m.co, 2)} |`;
+  });
+  return [
+    '*Executable setup: the same passive obstructed phenotype as above, with EFL off. Each PEEP level is initialized independently and run for 45 s. Total PEEP and lung volume are latched at end expiration; output is forward aortic volume per duration of the last completed heartbeat.*',
+    '',
+    '| applied PEEP (cmH₂O) | total PEEP (cmH₂O) | end-expiratory volume (L) | cardiac output (L/min) |',
+    '|---:|---:|---:|---:|',
+    ...rows,
+  ].join('\n');
+}
+
+function pvrLandmarksBlock() {
+  const p = { ...defaultParams(), hpv: 0 };
+  const volumes = [lungVolumeAtPl(p, 0, 1), NORMAL_FRC, p.lungCapacity];
+  const components = volumes.map((v) => pvrComponents(p, v, null, 1));
+  const values = (fn) => components.map(fn).join(' | ');
+  return [
+    '*Executable setup: fully open reference lung, no HPV; static evaluation of the internal mechanical resistance coefficient, without a ventilatory manoeuvre or a catheter measurement.*',
+    '',
+    `| | zero-transpulmonary-pressure reference (${fixed(volumes[0], 2)} L) | FRC reference (${fixed(volumes[1], 2)} L) | capacity limit (${fixed(volumes[2], 2)} L) |`,
+    '|---|---:|---:|---:|',
+    `| total coefficient (WU) | ${values((c) => fixed(c.total * RESISTANCE_TO_WOOD, 2))} |`,
+    `| relative to the FRC minimum | ${values((c) => fixed(c.total / components[1].total, 2) + '×')} |`,
+    `| extra-alveolar ÷ alveolar | ${values((c) => fixed(c.extraAlveolarPath / c.alveolarPath, 2))} |`,
+  ].join('\n');
+}
+
+function pvrOpeningBlock() {
+  const p = { ...defaultParams(), ...HUMAN_ARDS_PVR };
+  const percentChange = (a, b) => {
+    const value = (b / a - 1) * 100;
+    return `${value < 0 ? '−' : '+'}${fixed(Math.abs(value), 1)}%`;
+  };
+  const pair = (a, b) => `${fixed(a, 2)} → ${fixed(b, 2)} (${percentChange(a, b)})`;
+  const rows = Object.entries(PVR_REOPENABLE_SHARES).map(([label, reopenable]) => {
+    const a = settled({ ...HUMAN_ARDS_PVR, reopenable, peep: 4 });
+    const b = settled({ ...HUMAN_ARDS_PVR, reopenable, peep: 14 });
+    return `| ${label} (${fixed(reopenable * 100, 1)}% of compromised lung) | ${pair(a.pvrCoefficientWood, b.pvrCoefficientWood)} | ${pair(a.pvrDerivedWood, b.pvrDerivedWood)} | ${fixed(a.openFraction * 100, 0)} → ${fixed(b.openFraction * 100, 0)}% |`;
+  });
+  return [
+    `*Executable setup: the shared literature-check phenotype, distinct from the shipped ARDS/RV preset: ${p.mode === 'vcv' && p.pmus === 0 ? 'passive volume control' : p.mode + ', effort ' + p.pmus + ' cmH₂O'}, VT ${p.vt} mL, ${p.rr}/min, aerated-lung compliance ${p.clung} mL/cmH₂O, ${p.collapsed * 100}% compromised, transpulmonary opening midpoint ${p.pOpen} cmH₂O, opening memory ${p.hysteresis}, baroreflex ${p.baroreflexEnabled ? 'on' : 'off'}, baseline pulmonary coefficient ${p.pvrBase} mmHg·s/mL and HPV multiplier ${p.hpv}. Each PEEP level is initialized independently and run for ${SETTLING_SECONDS} s, rather than reached by a sequential PEEP step.*`,
+    '',
+    '| reopenable share | internal coefficient (WU), PEEP 4 → 14 | pressure–flow estimate (WU), PEEP 4 → 14 | open fraction at sampling, PEEP 4 → 14 |',
+    '|---|---:|---:|---:|',
+    ...rows,
+    '',
+    'The internal coefficient and open fraction are instantaneous samples at 45 s, not respiratory means or dedicated end-expiratory measurements. The pressure–flow estimate combines pulmonary arterial and left atrial pressures smoothed with a 3 s exponential time constant (both relative to atmosphere) with forward aortic output from the last completed heartbeat. The displayed changes compare those specified samples; their size is not an independently validated clinical effect.',
   ].join('\n');
 }
 
@@ -684,6 +740,9 @@ export function renderDocumentedExampleBlocks() {
   const peepRows = peepSweepRows();
   return new Map([
     ['efl-peep', eflBlock()],
+    ['efl-off-peep', eflOffBlock()],
+    ['pvr-landmarks', pvrLandmarksBlock()],
+    ['pvr-opening-peep', pvrOpeningBlock()],
     ['stress-index', stressIndexBlock(rows)],
     ['transmural-peep', transmuralBlock(peepRows)],
     ['venous-return-peep', venousReturnBlock(peepRows)],
