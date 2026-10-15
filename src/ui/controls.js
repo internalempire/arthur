@@ -33,7 +33,7 @@ function openingDisabledReason(spec, params) {
 export function createControls(container, sim, onChange) {
   const rows = new Map();
   let profileSummary = null;
-  let bloodTotal, bloodReference, bloodBalance, bloodLimits, bloodApply, venousFraction;
+  let bloodTotal, bloodReference, bloodBalance, bloodLimits, bloodApply, venousFraction, venousReservoir, venousUnstressed, venousStressed, venousTone;
   let pendingBloodDose = 0;
   const reference = Object.fromEntries(PARAMETERS.map((spec) => [spec.id, spec.default]));
   const changeSummary = document.createElement('p');
@@ -206,7 +206,42 @@ export function createControls(container, sim, onChange) {
         input.setAttribute('aria-describedby', 'blood-volume-limits blood-volume-reference blood-volume-total blood-volume-balance');
       } else {
         venousFraction = reading;
-        input.setAttribute('aria-describedby', 'venous-stressed-fraction');
+        const explanation = document.createElement('p');
+        explanation.id = 'venous-tone-meaning';
+        explanation.className = 'ctrl-reading';
+        explanation.textContent = 'Positive: reduce V₀. Negative: increase V₀. Total blood unchanged.';
+        row.insertBefore(explanation, reading);
+        const state = document.createElement('div');
+        state.className = 'venous-state';
+        const title = document.createElement('p');
+        title.className = 'venous-state-title';
+        title.textContent = 'Systemic venous reservoir · current';
+        state.appendChild(title);
+        const volumes = document.createElement('dl');
+        const addVolume = (label, id) => {
+          const term = document.createElement('dt');
+          term.textContent = label;
+          const amount = document.createElement('dd');
+          amount.id = id;
+          volumes.append(term, amount);
+          return amount;
+        };
+        venousReservoir = addVolume('Blood present', 'venous-reservoir-volume');
+        venousUnstressed = addVolume('V₀ · unstressed', 'venous-unstressed-volume');
+        venousStressed = addVolume('Stressed · blood − V₀', 'venous-stressed-volume');
+        state.appendChild(volumes);
+        const meaning = document.createElement('p');
+        meaning.id = 'venous-state-meaning';
+        meaning.className = 'ctrl-reading ctrl-reference';
+        meaning.textContent = 'V₀ is the volume at zero transmural pressure. These are volume components, not separate pools of blood.';
+        state.appendChild(meaning);
+        row.insertBefore(state, reading);
+        state.appendChild(reading);
+        venousTone = document.createElement('p');
+        venousTone.id = 'venous-tone-contributions';
+        venousTone.className = 'ctrl-reading ctrl-reference';
+        state.appendChild(venousTone);
+        input.setAttribute('aria-describedby', 'venous-tone-meaning venous-state-meaning venous-tone-contributions');
       }
     }
     rows.set(spec.id, { spec, row, input, value, info, help });
@@ -319,10 +354,16 @@ export function createControls(container, sim, onChange) {
     bloodReference.textContent = `Starting patient volume: ${litres(reading.initialTotal)}.`;
     const balance = `Net added/removed: ${signedVolume(sim.params.stressedVolume - sim.bloodVolumeReference)} mL.`;
     if (bloodBalance.textContent !== balance) bloodBalance.textContent = balance;
-    venousFraction.textContent = reading.fraction === null
+    const ml = value => Number.isFinite(value) ? `${value.toFixed(0)} mL` : '—';
+    // Current observations only: no extra integration, averaging or live region.
+    const setText = (element, text) => { if (element.textContent !== text) element.textContent = text; };
+    setText(venousReservoir, ml(reading.reservoir));
+    setText(venousUnstressed, ml(reading.unstressed));
+    setText(venousStressed, ml(reading.stressed));
+    setText(venousTone, `V₀ reduction: manual ${signedVolume(reading.manualTone)} mL; reflex ${signedVolume(Math.round(reading.reflexTone))} mL.`);
+    setText(venousFraction, reading.fraction === null
       ? 'Stressed fraction unavailable: venous partition outside its range.'
-      : `Stressed: ${(100 * reading.fraction).toFixed(1)}% of current systemic venous blood `
-        + `(${reading.stressed.toFixed(0)} / ${reading.reservoir.toFixed(0)} mL).`;
+      : `Stressed: ${(100 * reading.fraction).toFixed(1)}% of blood in this reservoir.`);
   }
 
   sync();

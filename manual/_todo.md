@@ -6,9 +6,7 @@
 
 ## Agreed sequence — October 15
 
-After correcting the remaining ungenerated numerical examples, review the venous pressure–volume representation: distinguish zero-transmural-pressure volume, current stressed volume, compliance and the effect of tone, while retaining explicit one-off blood applications. Use the clinician's article as a discussion source, not automatic authorization for a new constitutive law. Separate controllable vessel properties from volumes that emerge as blood redistributes; do not invent independent controls for dependent quantities or force different pressure/flow trajectories without a mechanism.
-
-Then revisit pulmonary transit before implementing the blood-distribution view. Audit the current eight-stage, adaptive, pressureless transport pathway together with pressure-bearing PA/PV storage: track compartment and total blood, pressure and forward flow during matched changes in LV function, PEEP and volume. Distinguish transport delay from pressure transmission and anatomical capillary congestion. Determine whether any artefact materially changes the teaching result before proposing a physiological extension or additional computational work. Model and substantive interface changes still require clinician confirmation.
+Next, revisit pulmonary transit before implementing the blood-distribution view. Audit the current eight-stage, adaptive, pressureless transport pathway together with pressure-bearing PA/PV storage: track compartment and total blood, pressure and forward flow during matched changes in LV function, PEEP and volume. Distinguish transport delay from pressure transmission and anatomical capillary congestion. Determine whether any artefact materially changes the teaching result before proposing a physiological extension or additional computational work. Model and substantive interface changes still require clinician confirmation.
 
 ## Model
 

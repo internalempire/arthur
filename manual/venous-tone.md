@@ -20,7 +20,7 @@ This is why norepinephrine can have a clinically useful “fluid-like” venous 
 
 ## In the model
 
-The **Venous capacity reduction** control independently changes the systemic venous zero-transmural-pressure volume. Positive values reduce capacity; negative values increase it. The range is −200 to +200 mL in 25 mL steps, with a neutral default of 0. This is a bounded teaching range, chosen on the same scale as the aggregate reflex contribution; it is neither a validated maximum human reserve nor a computational limit. It changes neither actual blood volume nor the venous compliance slope. It represents a mechanical intervention, not a drug dose. Its adjacent stressed-percentage reading describes the current venous partition; it can change as blood redistributes and is not held at a chosen target. Applying a dose with **Blood volume change** changes actual circulating blood; its separate cumulative balance is relative to the stated starting patient volume.
+The **Venous tone effect** control independently changes the systemic venous zero-transmural-pressure volume. Positive values reduce capacity; negative values increase it. The range is −200 to +200 mL in 25 mL steps, with a neutral default of 0. This is a bounded teaching range, chosen on the same scale as the aggregate reflex contribution; it is neither a validated maximum human reserve nor a computational limit. It changes neither actual blood volume nor the venous compliance slope. It represents a mechanical intervention, not a drug dose. The adjacent current-state box shows actual reservoir blood, V₀, stressed volume and the stressed percentage. Manual and reflex reductions in V₀ are listed separately. Stressed volume emerges from blood present minus V₀; it can change as blood redistributes and is not held at a chosen target. Applying a dose with **Blood volume change** changes actual circulating blood; its separate cumulative balance is relative to the stated starting patient volume.
 
 When enabled, the aggregate [baroreflex](baroreflex.md) adds its own capacity shift alongside its other three effectors. The total reduction is:
 
@@ -43,7 +43,7 @@ In the shipped septic phenotype, enabling the aggregate baroreflex raises output
 
 ## Why this and not something else
 
-Changing venous compliance to represent tone would make constriction both shift and steepen the pressure-volume relation. That can occur in real vascular beds, but it would erase the didactically important difference between capacitance and compliance and would make a pressure rise impossible to attribute.
+In real vascular beds, changing tone can change the zero-pressure volume, compliance and curvature of the pressure–volume relation; these effects need not occur together. Arthur isolates the shift in V₀ under **Venous tone effect** and leaves compliance under its own control. This is a teaching separation of mechanisms, not a claim that biological tone only changes V₀.
 
 The model therefore uses the smallest mechanism that expresses the central principle: change the zero-pressure volume while leaving slope and total volume alone. Regional venous responses, drug-specific dose-response curves and redistribution time constants are outside this representation.
 

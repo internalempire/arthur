@@ -13,6 +13,9 @@ export function bloodVolumeReadings(sim) {
   const reservoir = sim.circ.vSv;
   const fraction = venous.stressedVolume / reservoir;
   return { total, initialTotal: total - added, stressed: venous.stressedVolume,
-    reservoir, fraction: Number.isFinite(fraction) && reservoir > 0
+    reservoir, unstressed: venous.unstressedVolume,
+    manualTone: sim.params.venousCapacityReduction ?? 0,
+    reflexTone: effective.venousReflexVolume,
+    fraction: Number.isFinite(fraction) && reservoir > 0
       && fraction >= 0 && fraction <= 1 ? fraction : null };
 }

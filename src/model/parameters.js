@@ -150,14 +150,14 @@ export const PARAMETERS = [
     help: 'Choose how much blood to add or remove, then press Apply or Remove. Total circulating blood changes by that amount. Blood enters or leaves the systemic venous reservoir, initially changing its stressed volume, then redistributes. The selector returns to zero after each application; the applied blood change remains. This is an instantaneous intravascular change, without infusion time or fluid escape into tissues.',
   },
   {
-    id: 'venousCapacityReduction', group: 'volume', label: 'Venous capacity reduction', unit: 'mL',
+    id: 'venousCapacityReduction', group: 'volume', label: 'Venous tone effect', unit: 'mL',
     min: -200, max: 200, step: 25, default: 0,
-    help: 'Positive values reduce venous capacity: more of the blood already present generates filling pressure. Negative values increase capacity and have the opposite effect. No blood is added or removed; venous compliance stays unchanged. This manual shift adds to the baroreflex contribution. The stressed percentage below follows the blood currently in the systemic venous reservoir; it is not held fixed.',
+    help: 'This setting represents tone through its effect on V₀: the volume held at zero transmural pressure (inside minus outside pressure). Positive values reduce V₀; negative values increase it. At the same blood volume, a smaller V₀ leaves more stressed volume generating elastic pressure. No blood is added or removed, and compliance stays unchanged. The optional baroreflex adds its own V₀ reduction. Real venous tone can also change compliance; Arthur keeps these effects independent.',
   },
   {
     id: 'csv', group: 'volume', label: 'Venous compliance (slope)', unit: 'mL/mmHg',
     min: 30, max: 200, step: 5, default: 100,
-    help: 'The change in venous volume per mmHg. It converts stressed volume into elastic filling pressure, but is independent of the venous-tone shift between unstressed and stressed volume.',
+    help: 'How much venous volume changes per mmHg of elastic pressure. At the same stressed volume, lower compliance gives higher pressure. Changing this setting does not directly change V₀ or add blood; subsequent circulation can redistribute blood and change stressed volume. Arthur keeps compliance independent of the tone effect on V₀.',
   },
   {
     id: 'rvr', group: 'volume', label: 'Resistance to venous return', unit: 'mmHg·s/mL',

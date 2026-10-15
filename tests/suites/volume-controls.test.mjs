@@ -91,3 +91,53 @@ check('capacity alone creates no total-blood difference in Pin',
 check('actual blood differences are visible even with identical parameter vectors',
   pinSettingChanges(sim.params, sim.params, { referenceTotal: 5080, currentTotal: 5330 })
     .some(change => change.text === 'Total blood volume: 5.08 → 5.33 L (+250 mL)'));
+
+
+section('Explicit current venous pressure-volume components');
+const stateProbe = new Simulator();
+const pausedClock = stateProbe.time;
+const zero = volumeControlReadings(stateProbe);
+check('neutral V0 is local, and stressed plus unstressed reconstruct actual reservoir blood',
+  zero.unstressed === 2750 && zero.manualTone === 0 && zero.reflexTone === 0
+  && near(zero.unstressed + zero.stressed, zero.reservoir, 1e-9)
+  && zero.reservoir < zero.total);
+stateProbe.setParam('venousCapacityReduction', -200);
+const dilated = volumeControlReadings(stateProbe);
+check('negative manual tone raises V0 immediately at unchanged actual local and total blood',
+  dilated.unstressed === 2950 && dilated.manualTone === -200
+  && dilated.reservoir === zero.reservoir && dilated.total === zero.total
+  && near(dilated.stressed, zero.stressed - 200, 1e-9));
+stateProbe.setParam('csv', 80);
+const stiffer = volumeControlReadings(stateProbe);
+check('a paused compliance change does not reclassify blood or alter V0',
+  stiffer.unstressed === dilated.unstressed && stiffer.stressed === dilated.stressed
+  && stiffer.reservoir === dilated.reservoir && stiffer.total === dilated.total);
+stateProbe.setParam('baroreflexEnabled', true);
+stateProbe.setParam('baroreflex', 1);
+stateProbe.baro.outflow = 0.5;
+const reflex = volumeControlReadings(stateProbe);
+check('readings combine manual and current reflex tone without relying on the stale effective cache',
+  reflex.manualTone === -200 && reflex.reflexTone === 100 && reflex.unstressed === 2850
+  && reflex.total === zero.total && near(reflex.stressed, zero.stressed - 100, 1e-9));
+stateProbe.setParam('baroreflex', 0);
+check('zero reflex sensitivity removes its displayed contribution while retaining the manual shift',
+  volumeControlReadings(stateProbe).reflexTone === 0
+  && volumeControlReadings(stateProbe).unstressed === 2950);
+stateProbe.setParam('baroreflex', 1);
+stateProbe.baro.outflow = -0.25;
+check('reflex withdrawal increases V0 rather than silently clipping tone at zero',
+  volumeControlReadings(stateProbe).reflexTone === -50
+  && volumeControlReadings(stateProbe).unstressed === 3000);
+stateProbe.setParam('baroreflexEnabled', false);
+const switchedOff = volumeControlReadings(stateProbe);
+check('switching the reflex off immediately removes only its contribution',
+  switchedOff.reflexTone === 0 && switchedOff.manualTone === -200
+  && switchedOff.unstressed === 2950);
+applyBloodVolumeDose(stateProbe, 200);
+const filled = volumeControlReadings(stateProbe);
+check('a bolus increases actual and stressed blood equally without changing V0 or tone',
+  near(filled.total - switchedOff.total, 200, 1e-7)
+  && near(filled.reservoir - switchedOff.reservoir, 200, 1e-9)
+  && near(filled.stressed - switchedOff.stressed, 200, 1e-9)
+  && filled.unstressed === switchedOff.unstressed
+  && stateProbe.time === pausedClock);

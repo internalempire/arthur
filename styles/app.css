@@ -1279,3 +1279,11 @@ input[type="range"]:disabled { cursor: not-allowed; }
 
 .blood-apply { width: 100%; margin-top: 6px; }
 .blood-apply:disabled { opacity: 0.45; cursor: default; background: transparent; }
+
+/* Local venous state: readable without confusing it with whole-circuit blood. */
+.venous-state { margin-top: 8px; padding: 9px; border: 1px solid var(--border); border-radius: 6px; }
+.venous-state-title { margin: 0 0 7px; font-size: 11px; font-weight: 600; }
+.venous-state dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 5px 8px; margin: 0; font-size: 11.5px; }
+.venous-state dt { color: var(--ink-secondary); }
+.venous-state dd { margin: 0; font-variant-numeric: tabular-nums; text-align: right; }
+.venous-state .ctrl-reading { margin-bottom: 0; color: var(--ink-secondary); }

@@ -76,6 +76,8 @@ changing it cannot alter pressure, volume or flow. Scenario selection establishe
 its own zero, Custom reset and Pin retain it, and version-2 files save it as
 optional metadata; older files use their prescribed volume as zero.
 
+The sidebar shows actual systemic reservoir blood, current V₀ (unstressed volume), their difference (stressed volume), and separate manual/reflex reductions in V₀. The user-facing **Venous tone effect** remains the existing `venousCapacityReduction` parameter; IDs, range and saved files are unchanged. Observations include edits while paused without integrating or settling another circulation.
+
 The stressed percentage is current systemic venous stressed volume divided by
 current systemic venous blood volume, excluding IVC and all other compartments.
 It follows redistribution and is never used as feedback. An impossible fraction

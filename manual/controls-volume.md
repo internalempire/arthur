@@ -9,7 +9,7 @@
 | control | range | model meaning |
 |---|---:|---|
 | blood volume change | 25 mL increments, with exact endpoints; bounds depend on blood already applied | prepare an amount, then apply it explicitly to add or remove actual blood |
-| venous capacity reduction | −200 to +200 mL, in 25 mL steps; default 0 | positive reduces zero-transmural-pressure volume; negative increases it, at unchanged total blood volume |
+| venous tone effect | −200 to +200 mL, in 25 mL steps; default 0 | positive reduces zero-transmural-pressure volume; negative increases it, at unchanged total blood volume |
 | venous compliance | 30–200 mL/mmHg | converts stressed volume into elastic filling pressure |
 | resistance to venous return | 0.020–0.300 mmHg·s/mL | sets the falling slope of the aggregate venous-return relation |
 | systemic vascular resistance | 0.25–3.00 mmHg·s/mL | aggregate resistance opposing LV outflow |
@@ -26,15 +26,25 @@ Selecting a scenario establishes its own starting volume and zero cumulative bal
 
 Pin and the optional Mechanisms view compare **actual total blood volume**, reference → current, with the difference in mL. This persists after the selector returns to zero and accumulates across applications. Each reference retains its own blood and continues circulating independently; capacity-only changes do not create a blood-total difference. The comparison describes the resulting states, not the timing or count of earlier applications.
 
-### Venous capacity reduction
+### Venous tone effect
 
-This control changes the size of the systemic venous reservoir at zero transmural pressure. Positive values make it smaller and convert existing unstressed volume into stressed volume; negative values do the reverse. Zero means no manual shift. Blood is neither added nor removed, and the compliance slope stays fixed. The circulation then redistributes the existing blood according to the resulting pressures. A rise in filling pressure does not guarantee a rise in cardiac output.
+This control represents venous tone through its effect on **V₀**, the volume the systemic venous reservoir holds at zero transmural pressure (pressure inside minus pressure outside). It is a reduction in V₀ expressed in mL, not a measured level of sympathetic activity. Positive values make it smaller and convert existing unstressed volume into stressed volume; negative values do the reverse. Zero means no manual shift. Blood is neither added nor removed, and the compliance slope stays fixed. The circulation then redistributes the existing blood according to the resulting pressures. A rise in filling pressure does not guarantee a rise in cardiac output.
 
 The manual shift remains present with the baroreflex off. With it on, the manual and reflex shifts add; the Guyton panel’s **?** values-and-description view lists each contribution and their total. Turning the reflex off removes only its contribution. Pin preserves the selected capacity in each evolving reference; saved version-2 patient files preserve it too, and a file without this setting uses zero. Deep CO freezes the combined shift once.
 
 To isolate the mechanism, leave the baroreflex off, Pin the baseline and change capacity without adding or removing blood and with compliance fixed. The ±200 mL range is a teaching exploration range, not a drug-dose conversion or a validated human reserve. See [venous tone](venous-tone.md).
 
-The adjacent **Stressed** reading is the current stressed volume divided by the blood physically present in the systemic venous reservoir. It is shown as a percentage with numerator and denominator in mL. It excludes the separate IVC, cardiac chambers and other vascular compartments. Blood redistribution can change this percentage even with capacity held fixed. The reading is not a target or an automatic regulator; it updates with the current patient, including immediate capacity edits while paused. A partition outside 0–100% is shown as unavailable rather than clipped. During waveform history inspection these sidebar observations remain with the current controls, not the historical trace.
+The **Systemic venous reservoir · current** box separates three quantities, all in mL:
+
+| reading | how to interpret it |
+|---|---|
+| **Blood present** | blood physically held in this reservoir now; only part of total circulating blood |
+| **V₀ · unstressed** | volume at zero transmural pressure for the current tone; neutral 2,750 mL minus manual and active reflex reductions |
+| **Stressed · blood − V₀** | blood present minus V₀; the excess that generates elastic pressure in this linear reservoir |
+
+The manual and reflex contributions to V₀ reduction are listed separately. For example, a positive manual setting lowers V₀ even with the reflex off; an active reflex can lower or raise it further. **Stressed** also appears as a percentage of blood in this reservoir. The readings exclude the separate IVC, cardiac chambers and other vessels. They are not two anatomical pools or a distinction between stagnant and circulating blood.
+
+Blood redistribution can change blood present, stressed volume and its percentage while V₀ stays fixed. With the reflex active, V₀ can also evolve. These are observations, not independently adjustable targets. They update with the current patient, including edits while paused, and stay with the current controls during waveform history inspection. They do not substitute the selected Pin's state. A fraction outside 0–100% is shown as unavailable rather than clipped; the raw volume readings remain visible. Values are instantaneous, rounded to whole mL (percentage to one decimal), so displayed rounding can differ by 1 mL when subtracting. No extra simulated circulation or Deep CO calculation is needed.
 
 ### Venous compliance
 
@@ -54,7 +64,7 @@ Fluid, venoconstriction and reduced venous compliance can all raise Pmsf, but th
 
 ## Compare pressure-generating volume with container properties
 
-Keep the baroreflex off and Pin a settled reference. Apply a small blood dose, then read total blood, the stressed reservoir fraction, Pmsf, transmural filling pressures and output together. A higher Pmsf without a useful rise in output demonstrates that upstream pressure and pump performance are different questions.
+Keep the baroreflex off and Pin a settled reference. Pause, prepare a small blood dose and apply it: total blood, blood present and stressed volume rise by the applied amount, while V₀ stays fixed. Resume and read those volumes alongside Pmsf, transmural filling pressures and output as blood redistributes. A higher Pmsf without a useful rise in output demonstrates that upstream pressure and pump performance are different questions.
 
 For a separate capacity experiment, restore the same starting prescription before pinning again; a Custom Reset alone retains applied blood. Reduce venous capacity while keeping total blood and compliance fixed. More of the existing reservoir blood now generates elastic pressure. A compliance experiment changes a third property: how much pressure a given stressed volume generates.
 

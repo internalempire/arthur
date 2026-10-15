@@ -122,7 +122,7 @@ The three user-visible mechanisms are intentionally independent:
    `stressedVolume` prescription stores the applied amount in absolute model
    coordinates. This is an instantaneous intravascular intervention, not
    crystalloid kinetics, bleeding physiology or diuresis.
-2. **Venous capacity reduction** and baroreflex venous tone additively shift
+2. **Venous tone effect** and baroreflex venous tone additively shift
    zero-pressure volume without adding blood or changing compliance. A positive
    reduction initially increases stressed volume; redistribution then changes
    the observed reservoir fraction.
