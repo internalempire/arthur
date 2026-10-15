@@ -64,7 +64,7 @@ The model does not contain a single pressure parameter called the choke pressure
 Without the explicit flow cap, the same phenotype has a different PEEP response:
 
 <!-- BEGIN GENERATED: efl-off-peep -->
-*Executable setup: the same passive obstructed phenotype as above, with EFL off. Each PEEP level is initialized independently and run for 45 s. Total PEEP and lung volume are latched at end expiration; output is forward aortic volume per duration of the last completed heartbeat.*
+*Executable setup: the same passive obstructed phenotype as above, with EFL off. Each PEEP level is initialized independently and run for 45 additional s after automatic initialization. Total PEEP and lung volume are latched at end expiration; output is forward aortic volume per duration of the last completed heartbeat.*
 
 | applied PEEP (cmH₂O) | total PEEP (cmH₂O) | end-expiratory volume (L) | cardiac output (L/min) |
 |---:|---:|---:|---:|

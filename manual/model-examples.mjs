@@ -139,7 +139,7 @@ function eflOffBlock() {
     return `| ${peep} | ${fixed(m.totalPeep, 1)} | ${fixed(m.endExpiratoryVolume, 2)} | ${fixed(m.co, 2)} |`;
   });
   return [
-    '*Executable setup: the same passive obstructed phenotype as above, with EFL off. Each PEEP level is initialized independently and run for 45 s. Total PEEP and lung volume are latched at end expiration; output is forward aortic volume per duration of the last completed heartbeat.*',
+    '*Executable setup: the same passive obstructed phenotype as above, with EFL off. Each PEEP level is initialized independently and run for 45 additional s after automatic initialization. Total PEEP and lung volume are latched at end expiration; output is forward aortic volume per duration of the last completed heartbeat.*',
     '',
     '| applied PEEP (cmH₂O) | total PEEP (cmH₂O) | end-expiratory volume (L) | cardiac output (L/min) |',
     '|---:|---:|---:|---:|',
@@ -176,13 +176,13 @@ function pvrOpeningBlock() {
     return `| ${label} (${fixed(reopenable * 100, 1)}% of compromised lung) | ${pair(a.pvrCoefficientWood, b.pvrCoefficientWood)} | ${pair(a.pvrDerivedWood, b.pvrDerivedWood)} | ${fixed(a.openFraction * 100, 0)} → ${fixed(b.openFraction * 100, 0)}% |`;
   });
   return [
-    `*Executable setup: the shared literature-check phenotype, distinct from the shipped ARDS/RV preset: ${p.mode === 'vcv' && p.pmus === 0 ? 'passive volume control' : p.mode + ', effort ' + p.pmus + ' cmH₂O'}, VT ${p.vt} mL, ${p.rr}/min, aerated-lung compliance ${p.clung} mL/cmH₂O, ${p.collapsed * 100}% compromised, transpulmonary opening midpoint ${p.pOpen} cmH₂O, opening memory ${p.hysteresis}, baroreflex ${p.baroreflexEnabled ? 'on' : 'off'}, baseline pulmonary coefficient ${p.pvrBase} mmHg·s/mL and HPV multiplier ${p.hpv}. Each PEEP level is initialized independently and run for ${SETTLING_SECONDS} s, rather than reached by a sequential PEEP step.*`,
+    `*Executable setup: the shared literature-check phenotype, distinct from the shipped ARDS/RV preset: ${p.mode === 'vcv' && p.pmus === 0 ? 'passive volume control' : p.mode + ', effort ' + p.pmus + ' cmH₂O'}, VT ${p.vt} mL, ${p.rr}/min, aerated-lung compliance ${p.clung} mL/cmH₂O, ${p.collapsed * 100}% compromised, transpulmonary opening midpoint ${p.pOpen} cmH₂O, opening memory ${p.hysteresis}, baroreflex ${p.baroreflexEnabled ? 'on' : 'off'}, baseline pulmonary coefficient ${p.pvrBase} mmHg·s/mL and HPV multiplier ${p.hpv}. Each PEEP level is initialized independently and run for ${SETTLING_SECONDS} additional s after automatic initialization, rather than reached by a sequential PEEP step.*`,
     '',
     '| reopenable share | internal coefficient (WU), PEEP 4 → 14 | pressure–flow estimate (WU), PEEP 4 → 14 | open fraction at sampling, PEEP 4 → 14 |',
     '|---|---:|---:|---:|',
     ...rows,
     '',
-    'The internal coefficient and open fraction are instantaneous samples at 45 s, not respiratory means or dedicated end-expiratory measurements. The pressure–flow estimate combines pulmonary arterial and left atrial pressures smoothed with a 3 s exponential time constant (both relative to atmosphere) with forward aortic output from the last completed heartbeat. The displayed changes compare those specified samples; their size is not an independently validated clinical effect.',
+    'The internal coefficient and open fraction are instantaneous samples at the end of that run, not respiratory means or dedicated end-expiratory measurements. The pressure–flow estimate combines pulmonary arterial and left atrial pressures smoothed with a 3 s exponential time constant (both relative to atmosphere) with forward aortic output from the last completed heartbeat. The displayed changes compare those specified samples; their size is not an independently validated clinical effect.',
   ].join('\n');
 }
 
