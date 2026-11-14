@@ -36,7 +36,7 @@ The delay should therefore be used to understand sequence, not to assign every e
 
 The represented pulmonary blood volume is the blood physically contained in three serial compartments: pulmonary artery, the pressureless transport pathway and pulmonary vein. Mean RV flow is obtained by integrating pulmonic flow over the most recent complete beat and dividing by its measured duration. The displayed whole-circuit estimate is their ratio.
 
-Eight well-mixed stages sit between pulmonary arterial inflow and pulmonary venous delivery. They distribute the delayed response in time; one reservoir would attenuate respiratory variation too strongly, while a pure time shift would return an unrealistically rigid copy of the right-sided waveform.
+Eight well-mixed mathematical stages sit between pulmonary arterial inflow and pulmonary venous delivery. They contain conserved blood and distribute its delivery over time; they are not eight anatomical structures. This construction permits a spread of arrival times rather than requiring an identical waveform to reappear after one fixed interval.
 
 The stages do not use the whole PA-to-LA time because pulmonary artery and pulmonary vein already store blood as pressure-bearing compliant compartments. They use the fraction corresponding to the pathway's initial 160 mL allocation within the initial 375 mL pulmonary circuit:
 
@@ -48,7 +48,7 @@ $$
 - $T_{pul}$ is the whole-circuit estimate defined above.
 - $160/375$ is the explicit pathway's initial share of represented pulmonary blood volume.
 
-The active staged time adapts toward that target over 2 seconds and is limited to 0.8–6 seconds. Adaptation prevents respiratory alternation between individual RV beats from repeatedly changing transport velocity and moving the LV response by numerical aliasing. The bounds allow stored pulmonary blood to continue draining during profound low flow without creating an arbitrarily long numerical memory. The fraction, adaptation time and bounds are implementation choices, not measured human reference ranges.
+The active staged time adapts toward that target over 2 seconds and is limited to 0.8–6 seconds. The gradual adaptation smooths changes derived from successive RV beats. Each stage delivers blood according to its current volume and transit time, so changing the time changes the delivered flow as well as its timing. The adaptation is not a neutral clock adjustment and is not independently calibrated to human respiratory flow variation. The bounds allow stored pulmonary blood to continue draining during profound low flow without creating an arbitrarily long numerical memory. The fraction, adaptation time and bounds are implementation choices, not measured human reference ranges.
 
 Three readouts are deliberately kept separate:
 
@@ -57,6 +57,20 @@ Three readouts are deliberately kept separate:
 | pulmonary vascular blood volume | blood currently held in PA, staged pathway and PV |
 | estimated PA-to-LA mean transit | central-volume estimate, pulmonary blood volume divided by RV output |
 | explicit staged buffer time | the bounded portion actually used by the eight transport stages |
+
+### Why the LV variation can be smaller
+
+If more blood arrives from the right ventricle during part of a breath, the pulmonary circulation can retain some of that extra volume and release it later. Pulmonary venous and left-atrial storage can further reduce the variation in flow crossing the mitral valve. Thus the left ventricle can receive a more uniform supply even when right-sided output varies substantially. This concerns the **size of the variation**, not loss of blood: once net storage has settled, mean right- and left-sided outputs must agree over a sufficiently long observation.
+
+Immediate inflation-related displacement of blood already in the pulmonary veins also contributes to LV filling. Its timing relative to the delayed RV contribution matters: the two can reinforce or oppose one another. Shortening a transport delay therefore does not guarantee a larger LV stroke-volume variation or a higher PPV. Nor does a longer volume/flow estimate prove that low flow is the cause of a small PPV. The magnitudes and timing of these combined effects are model outputs, not validated human response sizes.
+
+The pulmonary venous compliance coefficient and passive left-atrial stiffness are fixed internally. Their contribution to storage is distinct from the **Pulmonary capacitance coupling** control, which shifts pulmonary venous zero-transmural-pressure volume during inflation. The systemic **Venous compliance (slope)** control does not adjust either left-sided compartment. See [which controls affect storage](controls-pulmonary.md#compliance-capacity-and-filling-are-different).
+
+### Blood transit and arterial pressure decay are different times
+
+Mean blood residence time answers how long blood spends between chosen landmarks, using volume divided by flow. The delay to an observed LV change depends additionally on storage, cardiac timing and immediate mechanical effects. Neither is the arterial pressure-decay time constant.
+
+In a simplified compliant arterial reservoir draining through a resistance, with no inflow and a constant downstream pressure, the time constant is resistance multiplied by compliance. It describes the decay of the arterial pressure **above that downstream pressure**, not travel of a blood cell. Resistance in mmHg·s/mL multiplied by compliance in mL/mmHg gives seconds. Arthur also includes pulsatile ejection, changing downstream pressure and a vascular waterfall; its arterial waveform is not one universal exponential decay. The pulmonary arterial compliance coefficient is fixed, with no law that links it to resistance. Agreement of volume/flow timing does not validate arterial pulse pressure or pulsatile RV loading.
 
 ### A matched model experiment
 
@@ -95,15 +109,15 @@ The transport pathway is not a contrast-kinetic model. It has no injection or sa
 - One aggregate pulmonary pathway: no regional perfusion distribution, shunt, dead-space pathway, bronchial circulation or gravity-dependent transit.
 - Pulmonary vascular blood volume is the sum of lumped compartments, not a directly simulated indicator-dilution volume.
 - RV output comes from the most recent complete beat; beat-related changes enter the staged pathway through its smoothed target. Arrhythmia and a separately resolved intrabeat blood-velocity profile are not represented.
-- The staged pathway is pressureless. PA and PV carry pressure and compliance; the buffer carries timing.
-- The 2-second adaptation is a numerical stabiliser, not vascular recruitment kinetics.
+- The staged pathway stores blood without a pressure–volume relation. PA and PV carry pressure and compliance; the stages affect both timing and the size of flow variation.
+- The 2-second adaptation smooths the target time; its influence on flow variation is not validated human vascular recruitment or transport kinetics.
 
 ### Of clinical application
 
 - The displayed estimate is PA-to-LA within the model. CMR studies often measure RV-to-LV or RV-to-LA contrast timing, so their absolute values are not interchangeable with this readout.
 - A long transit time does not diagnose pulmonary embolism or heart failure. It can result from low flow, increased pulmonary blood volume, different measurement landmarks or several simultaneous abnormalities.
 - The model does not reproduce contrast curves and cannot be used to infer a patient's pulmonary blood volume from an observed bolus time.
-- The robust teaching claim is directional: lower forward flow and a larger pulmonary blood reservoir delay transmission of right-sided output changes to the left heart.
+- At fixed pulmonary volume, lower forward flow lengthens the volume/flow residence-time estimate; at fixed flow, a larger volume lengthens it. Neither statement establishes a fixed delay to the first LV response or a predictable PPV amplitude.
 
 ---
 

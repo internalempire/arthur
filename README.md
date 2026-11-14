@@ -41,7 +41,7 @@ The model is intended for mechanistic questions such as:
 - How do PEEP, lung volume, recruitment and expiratory trapping alter right-ventricular load?
 - Why can positive intrathoracic pressure reduce left-ventricular transmural afterload?
 - How do stressed volume, venous tone and resistance to venous return affect the Guyton operating point?
-- Why does a change in RV output reach the LV only after pulmonary transit?
+- How do pulmonary blood storage and transit spread a change in RV output over subsequent LV beats, alongside immediate mechanical effects?
 - How do ventricular interdependence and pericardial constraint couple the two sides of the heart?
 - How does loss of pericardial reserve restrict the lower-pressure right heart, and why does decompression restore output?
 

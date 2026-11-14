@@ -141,6 +141,12 @@ includes chamber and sampling effects that this PA-to-LA volume relation does
 not. Regional capillary perfusion and patient-specific transit distributions
 remain absent.
 
+Storage and timing determine different aspects of the response. Pulmonary veins and the left atrium can temporarily retain an increase in delivered blood and release it later, reducing the variation in LV filling while conserving blood. The adaptive staged pathway changes the amplitude as well as the timing of delivered flow. Inflation-related venous displacement and other immediate heart–lung effects can reinforce or oppose the delayed RV contribution. A longer volume/flow estimate therefore does not, by itself, establish stronger attenuation of respiratory LV output variation.
+
+The pulmonary venous compliance coefficient and the passive atrial stiffness coefficient are fixed internally; the atrial relation also changes with prescribed contraction during each heartbeat. **Venous compliance (slope)** adjusts the systemic reservoir only. **Pulmonary capacitance coupling** changes pulmonary venous zero-transmural-pressure volume during inflation, not its compliance coefficient. Pericardial controls change the pressure outside the atrium; ventricular controls change its emptying conditions. See [pulmonary controls](../manual/controls-pulmonary.md) and [heart controls](../manual/controls-heart.md). These distinctions do not imply that the combined pressure–volume response is fixed: the pericardial constraint and pressure-dependent weighting of pulmonary displacement can change that response.
+
+Pulmonary arterial compliance is also fixed internally. The decay of arterial pressure within a heartbeat is a separate question from blood residence time or respiratory RV-to-LV flow variation. The size and timing of those responses are not jointly validated by the central-volume relation; no resistance-dependent arterial compliance law is implemented.
+
 ---
 
 ## 5. Explicit opening potential and breathwise state
@@ -306,14 +312,15 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 - **No gas exchange.** There is no oxygen, CO₂, pH or shunt. Hypoxic pulmonary
   vasoconstriction is a coefficient on derecruited lung, not a consequence of an
   alveolar oxygen tension.
-- **Pulse pressure variation is non-monotonic at both filling extremes.** The
-  model does not support a monotonic separation between a fluid responder and
-  non-responder. At severe underfilling, absent zone-III piston contribution and
-  stronger low-flow pulmonary filtering can produce a small arterial variation
-  despite marked preload reserve. This is documented as a quantitative model
-  limitation, not a human hypovolaemia rule. At high filling, the direct
-  pulmonary venous piston can raise variation again even when additional filling
-  buys little output.
+- **Pulse pressure variation need not vary monotonically with filling.** A small
+  PPV can coexist with marked preload reserve, particularly with a small pleural
+  pressure excursion. Its size depends on the respiratory stimulus, pulmonary
+  and atrial storage, immediate inflation-related displacement and the timing
+  of the RV contribution. Low flow can prolong the volume/flow transit estimate,
+  but this does not establish stronger attenuation as the cause of low PPV.
+  The response depends on the conditions; it is not a human hypovolaemia rule.
+  At high filling, direct pulmonary venous displacement can raise variation
+  again even when additional filling buys little output.
 
   The filled-end rise has a represented mechanism. Once the capillaries are open
   along their whole length, lung inflation can squeeze blood forward into the

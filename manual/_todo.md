@@ -4,9 +4,11 @@
 
 ---
 
-## Agreed sequence — October 15
+## Pulmonary review before blood-distribution presentation
 
-Next, revisit pulmonary transit before implementing the blood-distribution view. Audit the current eight-stage, adaptive, pressureless transport pathway together with pressure-bearing PA/PV storage: track compartment and total blood, pressure and forward flow during matched changes in LV function, PEEP and volume. Distinguish transport delay from pressure transmission and anatomical capillary congestion. Determine whether any artefact materially changes the teaching result before proposing a physiological extension or additional computational work. Model and substantive interface changes still require clinician confirmation.
+Continue the pulmonary review with two separate questions. First, assess pulmonary arterial pulse pressure and RV pulsatile loading: distinguish the fixed arterial compliance coefficient, resistance and pressure-decay time from blood transit. Test whether a proposed resistance–compliance relation has a supported teaching benefit under declared conditions, before adopting one. Second, seek matched external evidence for the size and timing of RV-to-LV respiratory flow variation, including pulmonary venous/atrial storage and the adaptive eight-stage pathway. A longer volume/flow estimate alone must not be used to explain a small PPV.
+
+The October 27 experiments establish a contribution from distal storage and from adaptive timing, with conserved blood and numerical consistency; they do not establish that the current compliance coefficients should be reduced. Retain the operative laws while these questions remain unresolved. Any further experiment should separate altered distensibility from altered mean pressure, blood distribution and filling. Do not repeat broad parameter searches to reach a desired PPV. The correction history is in the handover and manual log; private evidence remains outside Git. Model and substantive interface changes still require a clinician-facing proposal and confirmation. Blood-distribution presentation follows this review.
 
 ## Model
 

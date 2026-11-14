@@ -157,7 +157,7 @@ export const PARAMETERS = [
   {
     id: 'csv', group: 'volume', label: 'Venous compliance (slope)', unit: 'mL/mmHg',
     min: 30, max: 200, step: 5, default: 100,
-    help: 'How much venous volume changes per mmHg of elastic pressure. At the same stressed volume, lower compliance gives higher pressure. Changing this setting does not directly change V₀ or add blood; subsequent circulation can redistribute blood and change stressed volume. Arthur keeps compliance independent of the tone effect on V₀.',
+    help: 'Compliance of the systemic venous reservoir, not the pulmonary veins or left atrium. At the same stressed volume, lower compliance gives higher elastic pressure. This setting does not change V₀ or add blood; circulation can then redistribute blood. The tone effect on V₀ is a separate control.',
   },
   {
     id: 'rvr', group: 'volume', label: 'Resistance to venous return', unit: 'mmHg·s/mL',
@@ -213,7 +213,7 @@ export const PARAMETERS = [
   {
     id: 'pericardium', group: 'heart', label: 'Pericardial constraint', unit: '×',
     min: 0, max: 4, step: 0.1, default: 1.0,
-    help: 'Gain on the pressure generated when the four chambers outgrow the space available inside the pericardium. Set to zero to abolish this route of diastolic ventricular interdependence.',
+    help: 'Scales the additional pressure exerted by the pericardium on all four chambers, including the left atrium, when their total volume exceeds pericardial capacity. This limits filling without changing the intrinsic chamber stiffness. Set to zero to remove this shared external constraint.',
   },
   {
     id: 'pericardialCapacity', group: 'heart', label: 'Pericardial capacity', unit: 'mL',
@@ -261,7 +261,7 @@ export const PARAMETERS = [
   {
     id: 'piston', group: 'pulmonary', label: 'Pulmonary capacitance coupling', unit: 'mL/L',
     min: 0, max: 200, step: 5, default: 85,
-    help: 'Sets how strongly lung inflation transiently displaces blood from the pulmonary vascular reservoir toward the left atrium. This "piston" is one immediate contributor to LV filling and stroke-volume variation; changes in RV preload and afterload, reaching the left heart after pulmonary transit, may dominate in other phenotypes.',
+    help: 'Sets how strongly lung inflation can push existing pulmonary venous blood toward the left atrium. It reduces the volume held at zero transmural pressure, with strength weighted by the zone-3 pressure condition; it does not change venous compliance or add blood. Actual flow follows the resulting pressures.',
   },
 ];
 

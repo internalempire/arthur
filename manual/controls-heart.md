@@ -17,6 +17,12 @@ Contractility changes the slope of the end-systolic relation, not arterial resis
 
 The model has no force–frequency relation: changing baseline heart rate does not automatically change contractility. Very high rate shortens filling time but does not reproduce ischaemia or rate-dependent relaxation. When the baroreflex is on, the Heart rate tile shows the effective rate used by the circulation; the control itself continues to show the selected baseline.
 
+## Left atrial filling and distensibility
+
+The atrium contracts and relaxes automatically within each heartbeat; its relaxed and peak stiffness coefficients are fixed internally. There is no atrial-stiffness or atrial-contractility control. Changing heart rate changes the time available for relaxation and contraction, not those coefficient values. **LV diastolic stiffness** acts on the ventricle: it can raise the pressure needed to empty the atrium into the LV without directly stiffening the atrium.
+
+The pericardial controls affect all four chambers, including the left atrium. Above the selected pericardial capacity, further total cardiac filling raises the surrounding pressure. Atrial cavity pressure can therefore rise without an equal rise in atrial transmural pressure. This is a shared external restriction, distinct from the atrial wall's own stiffness. See [pulmonary and atrial storage](controls-pulmonary.md#compliance-capacity-and-filling-are-different).
+
 ## Autonomic control
 
 | control | range | model meaning |

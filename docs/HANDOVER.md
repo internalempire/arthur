@@ -1,6 +1,22 @@
 # Project handover
 
-Updated: 2026-10-15
+Updated: 2026-11-14
+
+## Pulmonary interpretation and control meanings — November 14
+
+The clinician authorized correcting the documentation and justified code changes after reviewing the October 27 pulmonary experiments. This update changes explanatory text and three existing control-help strings only. It does not adopt a new physiological law, coefficient, scenario, interpretability threshold, control, numerical example or runtime dependency. The VPS remains the working copy. The clinician will update the Mac manually from GitHub; direct Mac synchronization is not available or claimed.
+
+The October 27 work comprised 39 initial conditions and 34 follow-up conditions in private source copies. It established contributions from pulmonary venous/atrial storage and adaptive transport timing to RV-to-LV flow variation. Removing the explicit delay did not uniformly increase LV variation. Reduced compliance changed mean filling in the initial experiments; follow-up comparisons preserved the baseline cardiac cycle to investigate local sensitivity. Those mathematical controls were diagnostic devices, not candidate physiological laws. The results do not justify reducing the operative compliances to obtain a desired PPV, and do not establish stronger attenuation at low flow as a general explanation of small PPV. Conservation and numerical consistency do not validate the response magnitude in humans.
+
+Corrected the overconfident low-flow explanation in both `docs/PHYSIOLOGY.md` and the PPV manual page. The transit page distinguishes blood residence time, timing of the observed LV response and arterial pressure-decay time. It describes temporary storage without blood loss, the amplitude effect of adaptive transit, and reinforcement or opposition between delayed RV delivery and immediate mechanical effects. Fixed pulmonary arterial compliance and the unresolved resistance–compliance question are kept separate from the venous/atrial investigation. README no longer implies a universal interval before any LV effect.
+
+Control guidance now distinguishes the fixed pulmonary venous compliance coefficient, prescribed atrial activation, pulmonary zero-transmural-pressure volume displacement and external pericardial restraint. **Venous compliance (slope)** acts only on the systemic reservoir; **Pulmonary capacitance coupling** shifts pulmonary venous zero-pressure volume rather than its compliance coefficient; **Pericardial constraint** changes external pressure around all four chambers. These three help strings are the only runtime changes. Pressure-dependent displacement weighting and shared pericardial pressure can change the combined pressure–volume response even while intrinsic coefficients stay fixed. Heart and volume control pages cross-link the explanation. No new atrial or pulmonary-compliance control is introduced.
+
+The actionable work remains a separate assessment of pulmonary arterial pulse pressure and pulsatile RV load, and external validation of the magnitude/timing of right-to-left variation. The current laws are retained. Any substantive implementation still requires a clear clinician-facing proposal and confirmation; blood-distribution presentation remains subsequent work.
+
+Verification completed so far: all 54 UI contracts; all 21 generated documentation blocks unchanged and coherent; manual build and lint (53 pages, 57 files, no errors or warnings); browser checks of the three help disclosures at 1440/390/320 px and five manual pages at 1440/390 px, with internal anchors and no JavaScript errors. Opening help preserves simulation state. A source comparison confirms identical parameter metadata apart from those help strings and identical contents of 81 other runtime/test/tool/style files. The final full-suite and publication results are retained in the private completion record; publication is gated by the complete verification workflow on the committed revision. The installed npm cannot launch the project script successfully; the same programs run directly with Node 22.18.0.
+
+Private experiment evidence: `codex-notes/Arthur-trasmissione-polmonare-2026-10-27.md`, `codex-notes/Arthur-serbatoio-polmonare-2026-10-27.md` and their corresponding `outputs/` directories. Update and verification record: `codex-notes/Arthur-documentazione-polmonare-2026-11-14.md` and `outputs/Arthur-pulmonary-documentation-2026-11-14/`. Private files are not part of the commit.
 
 ## Current venous pressure–volume readings — October 15
 
