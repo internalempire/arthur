@@ -17,6 +17,7 @@ export {
 } from './patient-state.js';
 
 export { bloodVolumeReadings } from './blood-volume.js';
+export { pulmonaryResistancePartition } from './pulmonary-vessels.js';
 
 // Read-only analyses used to draw the model's physiological constructions.
 export {

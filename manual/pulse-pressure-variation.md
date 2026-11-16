@@ -40,17 +40,17 @@ PPV remains a descriptive number, accompanied by [interpretability](interpretabi
 - RV/LV end-diastolic volume ratio above 1.2 produces a **caution** because afterload may dominate;
 - selected baseline abdominal pressure above 12 cmH₂O produces a **caution**. This internal threshold is in cmH₂O, not the clinical intra-abdominal-hypertension criterion in mmHg.
 
-The model has no arrhythmia, so regular rhythm is always present and cannot be checked. Low respiratory-system compliance is not by itself a badge rule, although the simulator exposes the within-breath PVR swing and RV dilatation that can reveal the mechanism.
+The model has no arrhythmia, so regular rhythm is always present and cannot be checked. Low respiratory-system compliance is not by itself a badge rule. The reported resistance swing is the last-breath excursion of the current pressure-sensitive segmental resistance sum, including middle-outlet narrowing. It is `(maximum − minimum) / [(maximum + minimum) / 2]`, not variation of total RV afterload or a time-mean-normalised signal. RV dilatation is an additional observation, not a direct measurement of that load.
 
 There is no diagnostic PPV threshold or automatic tidal-volume-challenge interpretation. The ventilation and population of a published cohort do not justify transporting a single regression into every scenario. PPV amplitude is not quantitatively calibrated across the control space, so a model-specific change during a tidal-volume manoeuvre cannot establish clinical fluid responsiveness.
 
 The model's PPV need not decrease steadily as filling increases. The pattern depends on the respiratory stimulus and the circulatory state; the figure below shows one specified comparison, not a universal relation.
 
-At severe underfilling, a small PPV can coexist with marked [preload reserve](preload-reserve.md), particularly with a small pleural-pressure excursion. Low pulmonary venous pressure can reduce the aggregate zone-3 pressure-margin index and therefore the immediate inflation-related displacement toward the LA. This is a model assumption, not a regional measurement of capillary patency.
+The respiratory stimulus, vascular storage, RV ejection load, ventricular interaction and LV ejection conditions all contribute. Alveolar compression can release pulmonary blood while extra-alveolar expansion retains it. A smaller or larger instantaneous pulmonary store does not by itself establish how much respiratory variation will reach the LV.
 
-A longer pulmonary blood transit estimate does not, by itself, explain the small PPV. Pulmonary vessels and the left atrium temporarily store and release blood, while the adaptive transport pathway changes both the size and timing of the delivered flow variation. That delayed contribution combines with immediate inflation-related displacement and cardiac mechanical effects. Their peaks can occur together or at different times, producing a larger or smaller LV stroke-volume variation. A change in transit time therefore need not change PPV in one direction. The amount of attenuation is not quantitatively validated in humans. This is a quantitative limitation of the model, **not** a clinical rule about profound hypovolaemia. See [pulmonary storage and timing](pulmonary-transit.md#why-the-lv-variation-can-be-smaller).
+A longer pulmonary blood residence estimate does not, by itself, explain a small PPV. Vessels and the LA temporarily store and release blood; the response to RV output combines with immediate changes in surrounding pressure and cardiac mechanics. Their maxima can occur together or at different times. The amount of attenuation is not quantitatively validated in humans. This is a quantitative limitation of the model, not a clinical rule about hypovolaemia. See [pulmonary storage and timing](pulmonary-transit.md#why-lv-variation-can-be-smaller).
 
-At the filled end, the opposite problem appears. When the aggregate zone-3 pressure-margin index approaches one, inflation can squeeze blood toward the left atrium and raise PPV again even when additional filling buys little output. The figure places the model's PPV above its independent preload-reserve readout across the same filling sweep.
+The following figure compares descriptive PPV with the model's independent local RV preload-reserve construction under the same prescribed breath. Its pattern is a model output, not a target imposed by the pulmonary law.
 
 ![Model PPV and preload reserve across the filling range](figure/ppv-filling.svg)
 
@@ -89,7 +89,7 @@ The simulator does not normalise PPV for tidal volume, compliance or driving pre
 
 ## Validation
 
-Executable checks require PPV to be withheld during spontaneous breathing, qualified at low tidal volume and with RV dilatation, and prevented from masquerading as preload reserve when pulmonary venous piston effects raise variation at high filling. Separate tests require the timing of the LV response to remain consistent with pulmonary transit.
+Executable rules withhold PPV during spontaneous breathing and qualify it at low tidal volume or RV dilatation. Pulmonary checks assess conservation, pressure-driven transfer and numerical convergence separately. They do not require a particular PPV amplitude, filling-response curve or phase of the LV nadir.
 
 ---
 

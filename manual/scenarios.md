@@ -52,7 +52,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 | inspiratory effort (cmH₂O) | delivered VT (mL) | minute ventilation (L/min) | pleural swing (cmH₂O) | preload reserve (% output/mmHg) |
 |---:|---:|---:|---:|---:|
-| 22 | 452 | 10.8 | 17.9 | 6.4 |
+| 22 | 452 | 10.8 | 17.9 | 7.6 |
 <!-- END GENERATED: swing-scenario -->
 
 ### ARDS with right ventricular failure
@@ -61,7 +61,7 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Try.** Pin the settled starting state at PEEP 12. Increase PEEP in small steps and follow opening and output together. At the chosen higher PEEP, create a second pin before selecting **Non-reopenable**, keeping compromised fraction, tissue compliance, capacity and cardiac controls unchanged. This separates the effect of raising PEEP from the effect of opening potential at the same PEEP. Prone positioning is a separate comparison.
 
-**Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. The preset leaves maximum lung capacity at the 6 L default: collapse makes the accessible baby lung smaller, while reduced aerated-lung compliance independently makes its open tissue less compliant. A separate supine thoracic load shifts resting pleural pressure without changing chest-wall compliance. Follow end-expiratory Ppl and PL, plateau pressure, closed fraction at end expiration and opening excursion, derived PVR, its wedge-dependent quality badge, RV/LV ratio, septal interaction and output together. Extreme PEEP can still generate plateau pressures outside a useful quantitative range and can invalidate the catheter interpretation of the wedge surrogate; prone response is directional rather than patient-specific. See [lung opening profiles](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md), [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) and [ventricular interdependence](ventricular-interdependence.md).
+**Read.** In the recruiter, added pressure opens units and shares gas among more aerated lung; in the non-recruiter, the same pressure mainly distends the remaining open lung. The preset leaves maximum lung capacity at the 6 L default: collapse makes the accessible baby lung smaller, while reduced aerated-lung compliance independently makes its open tissue less compliant. A separate supine thoracic load shifts resting pleural pressure without changing chest-wall compliance. Follow end-expiratory Ppl and PL, plateau pressure, closed fraction at end expiration and opening excursion, derived PVR, its wedge-dependent quality badge, RV/LV ratio, septal interaction and output together. Extreme PEEP can still generate plateau pressures outside a useful quantitative range and can invalidate the catheter interpretation of the wedge surrogate; the prone comparison does not reproduce the intended RV unloading. In the audited phenotype, opening increases and the geometric resistance reference falls, but the combined chest-wall, abdominal and opening transformation raises plateau pressure and RV/LV volume ratio. The pressure response is a primary limitation of the position transformation, before its absent RV benefit is interpreted; PaCO₂ and regional gas-exchange effects are absent. See [lung opening profiles](recruitment-and-ri.md), [pulmonary vascular resistance](pulmonary-vascular-resistance.md), [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) and [ventricular interdependence](ventricular-interdependence.md).
 
 The preset uses pressure-dependent opening without memory. Its potential reopenable share and opening midpoint are listed in the generated settings below. Scenario tests constrain end-expiratory Ppl and PL, EELV, plateau pressure, model-computed respiratory-system compliance, filling pressures and the RV phenotype together. Preserving one opening parameter alone is insufficient for validation. At high PEEP the recruitable example has less RV loading than the non-reopenable example, but its output is still lower than its own baseline. Opening does not guarantee an increase in output. The high-PEEP row below is a mechanistic stress test, not a recommended ventilator setting.
 
@@ -70,9 +70,9 @@ The preset uses pressure-dependent opening without memory. Its potential reopena
 
 | state | EELV (L) | end-expiratory Ppl / PL (cmH₂O) | plateau (cmH₂O) | closed at end expiration | open lung (instantaneous) | derived PVR (WU) | RV/LV | CO (L/min) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| recruitable baseline | 0.94 | -1.4 / 13.4 | 19.6 | 41.1% | 59% | 5.3 | 1.72 | 4.00 |
-| recruitable, high PEEP | 1.30 | 0.4 / 19.6 | 41.0 | 25.7% | 74% | 5.8 | 1.77 | 3.78 |
-| non-reopenable, high PEEP | 1.03 | -0.9 / 20.9 | 46.6 | 42.0% | 58% | 7.2 | 1.97 | 3.50 |
+| recruitable baseline | 0.94 | -1.4 / 13.4 | 19.6 | 41.1% | 59% | 5.0 | 1.69 | 4.20 |
+| recruitable, high PEEP | 1.30 | 0.4 / 19.6 | 41.0 | 25.7% | 74% | 6.7 | 1.89 | 3.64 |
+| non-reopenable, high PEEP | 1.03 | -0.9 / 20.9 | 46.6 | 42.0% | 58% | 8.8 | 2.19 | 3.17 |
 <!-- END GENERATED: ards-scenario -->
 
 ### Acute pulmonary embolism
@@ -89,7 +89,7 @@ The preset uses pressure-dependent opening without memory. Its potential reopena
 
 **Try.** Inspect pericardial pressure, CVP, RV and LV end-diastolic volume, output and the dashed pericardial ring. Then increase pericardial capacity from 100 to 430 mL and allow the circulation to settle.
 
-**Read.** The constrained state raises a shared external pressure, brings the main diastolic pressures into a broad common range and restricts the lower-pressure RV proportionally more than the LV. Restoring capacity represents decompression: pericardial pressure and CVP fall while both ventricles refill and output rises. The capacity is not an effusion-volume estimate, and the scenario does not provide a calibrated pulsus-paradoxus threshold. See [cardiac tamponade](cardiac-tamponade.md) and [ventricular interdependence](ventricular-interdependence.md).
+**Read.** The constrained state raises a shared external pressure, brings the main diastolic pressures into a broad common range and restricts the lower-pressure RV proportionally more than the LV. Restoring capacity represents decompression: pericardial pressure and CVP fall while both ventricles refill and output rises. The capacity is not an effusion-volume estimate, and the scenario does not provide a calibrated pulsus-paradoxus threshold. Two separate criteria remain unmet: the diastolic pressures do not lie within the declared spread below 8 mmHg, and relative IVC-volume excursion is not smaller than after decompression. The core filling/decompression lesson remains qualified by these limits. See [cardiac tamponade](cardiac-tamponade.md) and [ventricular interdependence](ventricular-interdependence.md).
 
 ### LV failure
 
@@ -211,7 +211,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Respiratory mechanics | Reopenable share of compromised lung | 0.0% | 38.9% |
 | Volume & vascular tone | Starting total blood volume | 5.08 L | 5.28 L |
 | Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.26 mmHg/mL |
-| Pulmonary circulation | Open-lung PVR at FRC | 0.07 mmHg·s/mL | 0.19 mmHg·s/mL |
+| Pulmonary circulation | Reference open-lung resistance at FRC | 0.07 mmHg·s/mL | 0.19 mmHg·s/mL |
 | Respiratory mechanics | Opening midpoint (transpulmonary) | 20.0 cmH₂O | 15.5 cmH₂O |
 | Pulmonary circulation | Hypoxic vasoconstriction | 1.0 × | 1.6 × |
 
@@ -227,7 +227,7 @@ Only values that actually differ from the reference are listed. A preset may rep
 | Volume & vascular tone | Systemic vascular resistance | 1.05 mmHg·s/mL | 1.25 mmHg·s/mL |
 | Cardiac function | Baseline heart rate | 75 /min | 118 /min |
 | Cardiac function | RV contractility (Ees) | 0.58 mmHg/mL | 0.32 mmHg/mL |
-| Pulmonary circulation | Open-lung PVR at FRC | 0.07 mmHg·s/mL | 0.44 mmHg·s/mL |
+| Pulmonary circulation | Reference open-lung resistance at FRC | 0.07 mmHg·s/mL | 0.44 mmHg·s/mL |
 
 #### Cardiac tamponade
 
@@ -310,7 +310,7 @@ Dynamic indices retain their own validity conditions inside a preset. A displaye
 
 ## Validation
 
-Every active preset has a volume-conservation, compartment-positivity and snapshot check. [The scenario validation audit](../docs/SCENARIO_VALIDATION.md) adds a separate contract for the teaching manoeuvre and classifies each preset as supported, qualified or needing correction. A green test means that the current implementation still agrees with the documented claim; it does not make the claim a validated clinical prediction.
+Every active preset has a volume-conservation, compartment-positivity and snapshot check. Three additional scenario expectations remain open in the independent audit: prone RV unloading, the tamponade diastolic-pressure band and the relative IVC-volume excursion ordering. They remain measured with their original criteria and are not counted as successful physiological validation. [The scenario validation audit](../docs/SCENARIO_VALIDATION.md) adds a separate contract for the teaching manoeuvre and classifies each preset as supported, qualified or needing correction. A green test means that the current implementation still agrees with the documented claim; it does not make the claim a validated clinical prediction.
 
 Published manoeuvre constraints live in [the literature ranges](../docs/LITERATURE_RANGES.md). Dated development decisions are recorded separately in [the model decision log](../docs/MODEL_DECISIONS.md).
 

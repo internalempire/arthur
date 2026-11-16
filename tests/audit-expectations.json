@@ -5,5 +5,8 @@
   "activation-continuity": "resolved",
   "hysteresis-convergence": "resolved",
   "patient-wall-intervention": "resolved",
-  "venous-reversal": "resolved"
+  "venous-reversal": "resolved",
+  "prone-rv-unloading": "open",
+  "tamponade-diastolic-spread": "open",
+  "tamponade-ivc-volume-excursion": "open"
 }

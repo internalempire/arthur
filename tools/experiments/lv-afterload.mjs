@@ -26,7 +26,6 @@ function bench({edv=180,aorta=80,external=0,ees=.6,dt=.00025}) {
   let av=0,mv=0,dias=0,invalid=false;
   for(let i=0;i<Math.floor((60/p.hr)/dt);i++) {
     for(const k of volumes) if(k!=='vLv') c[k]=fixed[k];
-    c.pulmonaryTransit=null;
     stepCirculation(p,c,resp,dt);
     av+=c.q.av*dt; mv+=c.q.mv*dt;
     if(c.act.v<.001) dias+=c.q.av*dt;

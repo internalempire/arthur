@@ -32,7 +32,7 @@ The same reasoning explains why raised intrathoracic pressure unloads the left v
 
 ## In the model
 
-For the represented vascular reservoirs and cardiac chambers, an elastic relation gives pressure relative to the surroundings; external pressure is then added to obtain atmospheric pressure. The simplest linear form is shown below. Ventricular passive stiffness is nonlinear and contraction changes throughout the beat; the staged pulmonary transport store has no separate pressure measurement.
+For the represented vascular reservoirs and cardiac chambers, an elastic relation gives pressure relative to the surroundings; external pressure is then added to obtain atmospheric pressure. The simplest linear form is shown below. Ventricular passive stiffness is nonlinear and contraction changes throughout the beat. All three pulmonary stores carry pressure; their negative-transmural-pressure branches are exponential. Extra-alveolar surroundings include tissue traction as well as pleural pressure, whereas the middle store is exposed to alveolar pressure.
 
 ```
 transmural = elastance × (volume − unstressed volume)
@@ -63,13 +63,13 @@ Raising PEEP in a passive patient at 500 mL and 14 breaths per minute:
 
 | PEEP (cmH₂O) | measured CVP (mmHg) | transmural CVP (mmHg) | cardiac output (L/min) |
 |---:|---:|---:|---:|
-| 0 | -0.6 | 2.7 | 5.56 |
-| 5 | 1.1 | 2.6 | 5.55 |
-| 10 | 2.6 | 2.3 | 5.30 |
-| 15 | 4.2 | 2.1 | 4.89 |
-| 20 | 5.8 | 2.0 | 4.60 |
+| 0 | -0.7 | 2.7 | 5.79 |
+| 5 | 1.0 | 2.5 | 5.57 |
+| 10 | 2.6 | 2.3 | 5.36 |
+| 15 | 4.2 | 2.2 | 5.15 |
+| 20 | 5.9 | 2.1 | 4.89 |
 
-Across this sweep, measured CVP rises by 6.4 mmHg while transmural CVP falls by 0.7 mmHg.
+Across this sweep, measured CVP rises by 6.5 mmHg while transmural CVP falls by 0.6 mmHg.
 <!-- END GENERATED: transmural-peep -->
 
 Reading the rise in measured CVP as improved filling would give the wrong conclusion in this experiment: transmural filling pressure and output move in the opposite direction. Pin the settled starting state, change PEEP, and compare CVP with transmural CVP and ventricular end-diastolic volume. Allow the new state to settle before comparing the magnitude; the readouts use different averaging windows.

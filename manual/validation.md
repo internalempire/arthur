@@ -70,7 +70,7 @@ Pressure-support timing has separate executable contracts. Patient effort must l
 
 These tests demonstrate that the encoded mechanism has not reversed. They do not specify how large the response should be in a patient.
 
-Interpretability is also executable physiology. A zone-3 state must leave the [wedge surrogate](pulmonary-artery-wedge-pressure.md) and derived PVR unqualified; when the pressure-margin heuristic fails, both must carry the same caution. This prevents a valid division from concealing an uncertain downstream pressure. Likewise, the same end-expiratory volume and pressure fields must be described as active-breath EELV when inspiratory effort is present, while the intrinsic-PEEP and trapped-gas labels remain reserved for passive emptying.
+Interpretability is also executable physiology. After a complete uninterrupted breath with a non-negative downstream transmural-pressure minimum, the [wedge surrogate](pulmonary-artery-wedge-pressure.md) and derived PVR must carry no compression caution. A negative minimum qualifies both; after a parameter change or hold, both remain pending until a fresh complete breath is observed. This prevents a valid division from concealing an uncertain downstream pressure. Likewise, the same end-expiratory volume and pressure fields must be described as active-breath EELV when inspiratory effort is present, while the intrinsic-PEEP and trapped-gas labels remain reserved for passive emptying.
 
 ### Published literature rows
 
@@ -81,7 +81,7 @@ Interpretability is also executable physiology. A zone-3 state must leave the [w
 - chest-wall and lung effects on pressure transmission;
 - greater haemodynamic PEEP cost at lower filling;
 - COPD waterfall behaviour below and above the expiratory choke;
-- venous-return plateau, venous-tone volume shift and pulmonary-transit ordering;
+- venous-return plateau, venous-tone volume shift and pressure-driven pulmonary storage;
 - withholding PPV during spontaneous breathing and pulmonary-hypertension classification logic.
 
 The source table records whether each row currently agrees. Its status field is itself tested, so documentation cannot continue to say *agrees* after the executable predicate fails.
@@ -106,11 +106,17 @@ Snapshot regeneration is intentionally separate: `npm run snapshots`. A changed 
 
 ### Independent audit and unresolved findings
 
-`npm run test:audit` measures flows and pressure responses independently of the quantities whose correctness it assesses. Its explicit registry distinguishes `PASS`, `KNOWN_FAILURE`, `REGRESSION` and `UNEXPECTED_PASS`. A known failure is an unresolved defect, never evidence of physiological validity. Unexpected passes require review and promotion to a permanent regression check. Missing probes, malformed results, non-finite measurements and flow-volume imbalance fail verification regardless of the registry.
+`npm run test:audit` measures flows and pressure responses independently of the quantities whose correctness it assesses. Its explicit registry distinguishes `PASS`, `KNOWN_FAILURE`, `REGRESSION` and `UNEXPECTED_PASS`. A known failure is an unmet criterion, never evidence of physiological validity. Its cause may be a numerical defect, a simplification or an unvalidated physiological assumption; recording it does not by itself settle that diagnosis. Unexpected passes require review and promotion to a permanent regression check. Missing probes, malformed results, non-finite measurements and flow-volume imbalance fail verification regardless of the registry.
 
-All seven current findings have resolved status in the registry and must pass. `npm run test:audit:strict` additionally prohibits unresolved findings; there is no accepted known failure in the current registry. CI retains numerical measurements so a pass can be inspected rather than treated as an unexplained label.
+The registry contains seven resolved criteria that must pass and three open criteria listed below. The ordinary audit reports these open findings explicitly as `KNOWN_FAILURE`; it does not count them as physiological successes. `npm run test:audit:strict` prohibits unresolved findings and therefore cannot pass while they remain open. CI retains numerical measurements so the result can be inspected rather than treated as an unexplained label.
 
-The audit tracks seven criteria: agreement of displayed cardiac output with integrated aortic flow; diastolic mitral-to-aortic throughflow; ventricular pressure increasing with activation at fixed volume; activation continuity at high heart rates; hysteresis time-step convergence; preservation of intrinsic opening potential during a chest-wall intervention; and reverse flow through an open caval segment. All seven are enforced regression checks. Their executable status is recorded in [`audit-expectations.json`](https://github.com/internalempire/arthur/blob/main/tests/audit-expectations.json). The model makes no R/I prediction or validation claim. Passing these checks does not establish quantitative external validity of the opening profiles; that requires joint assessment of pressures, volumes, compliance and circulatory response under a specified protocol.
+| open criterion | unchanged requirement | current limitation |
+|---|---|---|
+| `prone-rv-unloading` | prone RV/LV volume ratio lower than supine in the declared ARDS comparison | improved opening and lower geometric resistance do not produce the intended RV unloading |
+| `tamponade-diastolic-spread` | spread of CVP, RVEDP, PA diastolic pressure and wedge surrogate below 8 mmHg | the constrained state narrows the range but remains outside that model band |
+| `tamponade-ivc-volume-excursion` | phase-averaged `(Vmax − Vmin) / Vmean` smaller with constraint than after decompression | that volume ordering is not reproduced; schematic width and ultrasound diameter are different quantities |
+
+The seven resolved criteria are: agreement of displayed cardiac output with integrated aortic flow; diastolic mitral-to-aortic throughflow; ventricular pressure increasing with activation at fixed volume; activation continuity at high heart rates; hysteresis time-step convergence; preservation of intrinsic opening potential during a chest-wall intervention; and reverse flow through an open caval segment. All seven are enforced regression checks. Their executable status is recorded in [`audit-expectations.json`](https://github.com/internalempire/arthur/blob/main/tests/audit-expectations.json). The model makes no R/I prediction or validation claim. Passing these checks does not establish quantitative external validity of the opening profiles; that requires joint assessment of pressures, volumes, compliance and circulatory response under a specified protocol.
 
 Caval regression checks require zero flow at equal pressures, flow in the pressure-gradient direction, preservation of the forward branch, and conserved volume during reversal, including when the atrial donor reaches its protective volume floor. Resolving this criterion does not validate human backflow amplitudes or remove the [remaining waterfall limitations](vascular-waterfalls.md#limits), including the near-equilibrium zero-flow interval and single caval closing pressure.
 

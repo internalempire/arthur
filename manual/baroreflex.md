@@ -52,8 +52,8 @@ The septic preset illustrates the difference. The model remains preload responsi
 
 | aggregate baroreflex | cardiac output (L/min) | MAP (mmHg) | effective heart rate (/min) | effective SVR (mmHg·s/mL) |
 |---|---:|---:|---:|---:|
-| off | 4.22 | 67.0 | 105 | 0.85 |
-| on | 4.60 | 82.9 | 119 | 0.98 |
+| off | 4.37 | 70.6 | 105 | 0.85 |
+| on | 4.67 | 84.0 | 117 | 0.96 |
 <!-- END GENERATED: baroreflex-septic -->
 
 ---

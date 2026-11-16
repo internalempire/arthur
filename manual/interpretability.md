@@ -40,7 +40,7 @@ The full reason remains on the numerical tile. Panels whose central reading depe
 | PPV | spontaneous effort | VT below 8 mL/kg for an assumed <!-- CONSISTENCY: reference-weight -->70 kg<!-- /CONSISTENCY --> reference, fewer than 3.6 beats/breath, RV/LV EDV ratio above 1.2, or selected baseline abdominal pressure above 12 cmH₂O |
 | closed at end expiration / opening excursion | no complete breath under the current settings, including after an occlusion | internal model quantities; no anatomical or bedside index interpretation |
 | plateau pressure | spontaneous effort | — |
-| wedge surrogate | — | the zone 3 pressure-margin index is below 0.95 |
+| wedge surrogate | — | minimum Pv − Palv over the last complete breath is below 0 mmHg, or measurement of a complete fresh breath is pending |
 | derived PVR | no meaningful forward flow | the wedge surrogate is cautioned |
 
 For PPV and plateau, the implementation treats spontaneous mode or an effort setting above 0.5 cmH₂O as active breathing; the stress-index rule requires exactly zero selected effort. These are explicit model thresholds, not clinically validated limits below which patient activity becomes harmless.
@@ -55,11 +55,11 @@ When comparing Pins, apply these checks separately to the current patient and th
 
 ### Similar names that are deliberately separated
 
-The pulmonary circulation reports both the model's resistance coefficient and $(mPAP-P_{LA})/CO$. The first is what the integrator uses; the second is the catheter-like aggregate resulting from resistance, waterfall conditions and flow. They need not change by the same percentage.
+The pulmonary circulation separates its geometric resistance reference, the current pressure-sensitive segmental resistance sum, and $(mPAP-P_{LA})/CO$. The reference describes inflation/opening geometry; the sum also includes narrowing and the distal outlet; the catheter-style ratio uses smoothed pressures and completed-beat output. They need not agree, especially while compartments are storing or releasing blood.
 
 The default Guyton Live view updates both local RV-function and venous-return formulas from one-heartbeat summaries, preserving respiratory movement without separate loading simulations. Mean switches both relations to respiratory summaries. The trail uses one-heartbeat means; the measured venous-inflow marker retains its respiratory mean. The predicted-equilibrium crossing is shown only in Mean, since temporary storage prevents the live crossing from being interpreted as instantaneous whole-circuit output. Deep CO is an explicit opt-in that adds a separately settled whole-heart response and a measured mean LV-output marker. Its fixed autonomic drive and shared reference trajectories define a different analysis. Invalid or unsettled loading points are omitted; an invalid patient also withholds the LV-output marker and its text. Switching back, changing a parameter or resetting cancels the deep calculation. Neither the local RV crossing nor agreement at the deep reference point is independent clinical validation.
 
-The pulmonary-transit page separates represented blood volume, the central-volume estimate and the bounded staged-buffer time. None is labelled as a contrast-bolus measurement.
+The pulmonary-storage page separates actual contained blood, the observed volume/flow residence estimate and the mechanical time course of LV filling. The estimate controls no flow and is not a contrast-bolus measurement.
 
 ---
 
@@ -79,7 +79,7 @@ The rules are mechanism-specific rather than scenario-specific. A spontaneous pa
 - Several thresholds are pragmatic model rules rather than universal clinical boundaries.
 - A green badge means the model has the required conditions, not that the model is quantitatively validated for that use.
 - Automated documentation checks verify rendering, links, generated numerical examples and selected repeated facts; they cannot establish general agreement between prose, code and literature.
-- The zone 3 rule is a conservative pressure-margin heuristic in a non-regional lung, not a measured fraction of perfused human lung.
+- The pulmonary caution uses the minimum Pv − Palv over the last complete breath in a non-regional lung. A negative minimum identifies compression during that breath; the instantaneous margin is a separate readout. Changing a setting or performing a hold invalidates the old result and the partial breath, so caution remains pending until an entirely new breath is complete. A non-negative minimum does not establish regional catheter validity.
 
 ### Of clinical application
 

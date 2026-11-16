@@ -28,7 +28,7 @@ $$
 
 The additional low-volume traction term has zero value and zero slope at zero strain. It steepens the low-volume limb without shifting the minimum. These are didactic shape coefficients; the algebra sets the minimum instead of estimating it from a patient's response.
 
-The patient's total resistance also includes open and closed pathways in parallel, with hypoxic vasoconstriction confined to the closed pathway. The separate alveolar waterfall affects the pressure available to drive flow. The minimum of the fully open reference curve therefore does not specify the response of the entire circulation to PEEP.
+The patient's total resistance also includes open and closed pathways in parallel, with hypoxic vasoconstriction confined to the closed pathway. Pressure-dependent middle-outlet narrowing and the three pressure-bearing pulmonary stores additionally affect flow. The minimum of the fully open reference curve therefore does not specify the response of the entire circulation to PEEP.
 
 ## Why this construction
 
@@ -38,7 +38,7 @@ The evidence serves different purposes. Human in-vivo PEEP measurements constrai
 
 - The model cannot determine where the human nadir truly lies: its position is assumed before the simulation starts.
 - The position applies to the fully open mechanical curve. It does not identify the PEEP with lowest total RV load or highest cardiac output.
-- Vascular pressures oppose or support flow through their gradients, but pressure-induced widening and recruitment of vessels do not modify the resistance coefficient.
+- Vascular pressures drive flow and can narrow the middle outlet below alveolar pressure. Pressure-induced widening or recruitment of already-distended resistance vessels does not modify the geometric reference.
 - Calibration of an internal pressure–flow response is not independent catheter validation. Derived PVR inherits the [wedge surrogate's](pulmonary-artery-wedge-pressure.md) interpretability limits.
 
 ## Validation

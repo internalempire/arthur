@@ -2,6 +2,56 @@
 
 > This is a dated decision history. Earlier entries preserve the assumptions and conclusions at that time; later corrections can supersede them. For current behavior use the [manual](../manual/home.md), [physiology overview](PHYSIOLOGY.md) and [scenario evidence](SCENARIO_VALIDATION.md).
 
+## 2026-11-15 — Pressure-bearing pulmonary storage without a prescribed LV delay
+
+The clinician supplied six complete primary papers (Permutt, Howell and Roos
+1961; Hakim 1982; Brower 1985; Peták 2009) and explicitly authorized implementation
+with Claude Fable 5.2/high adversarial review. The chosen topology follows the
+aggregate storage argument in Brower's appendix: arterial, alveolar-exposed
+middle and venous blood stores, each with its own pressure and conservative
+inflow/outflow balance. The eight pressureless transport stages and the
+zone-index-weighted venous zero-volume displacement are retired. Mean PBV/RV
+flow remains descriptive and controls no physiological transfer.
+
+Each store has a linear distended pressure–volume branch and an exponential
+compressed branch, joined continuously in volume and compliance. The middle
+store is exposed to alveolar pressure; extra-alveolar stores use pleural pressure
+minus 0.2 times transpulmonary pressure. The latter is a rounded reading of
+Howell Fig. 6 (about 5.8 cmH2O horizontal displacement over 30 cmH2O inflation,
+one excised canine lobe), not a fitted human traction coefficient. Zero-pressure
+volumes 50/60/60 mL and distended compliances 4.2/8.4/8.5 mL/mmHg are explicit
+aggregate assumptions. The middle compliance uses a two-to-one relation to the
+retained arterial coefficient; no primary paper identifies this entire human
+parameter set. Absolute vascular volume changes remain unvalidated.
+
+The middle outlet has a smooth, signed, dissipative collapse law. Its relative
+conductance is unity at non-negative transmural pressure and exponential below
+zero, integrated along the endpoint pressure gradient. The pressure scale is
+middle V0/C; the deep-collapse asymptote consequently has an effective closing
+pressure below alveolar pressure by half that scale. This is an aggregate smooth
+transition, not a measured critical closing pressure. Pressure-dependent dilation
+of an already distended resistive throat is deliberately absent. Storage and
+resistive elements are separate, as in the source's lumped circuit; arbitrary
+area-squared dilution of a prescribed vascular lesion was rejected.
+
+The existing lung-volume resistance law sets the geometric reference. Above the
+normal reference prescription, excess vascular resistance and the HPV increment
+act precapillary; they do not create a venous obstruction. The no-HPV reference
+at the same lung volume and open fraction preserves the loss of conducting beds.
+Its extra-alveolar contribution is split equally upstream and downstream; an
+explicit 0.008 mmHg s/mL outlet contribution is retained. This partition is an
+aggregate assumption, not the anatomical arterial/venous partition measured by
+occlusion. The PVR panel and numerical readouts distinguish geometric reference,
+current pressure-sensitive resistance and the catheter-style pressure/flow ratio.
+
+Acceptance concerns physical consistency and source-matched qualitative
+mechanisms, not a desired PPV, LV-nadir phase or CPAP response. Peták response
+magnitudes and Hakim's venous-gradient direction are not reproduced fully by the
+retained geometric law. Further tuning is not justified by those discrepancies
+without resolving species, loading and segment-definition differences. See the
+current evidence limits and actionable questions rather than treating regression
+snapshots as external validation.
+
 ## 2026-09-29 — Separate volume intervention, actual total and observed venous fraction
 
 Expose the actual blood intervention as a signed difference from an explicit

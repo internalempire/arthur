@@ -65,10 +65,10 @@ for (const sc of SCENARIOS) {
   const s = new Simulator();
   s.applyScenario(sc);
   s.advance(40, true);
-  // `vPt` is the conserved aggregate; its eight internal stage volumes must be
-  // positive as well, or the aggregate could hide a numerically invalid path.
-  const min = Math.min(...COMPARTMENTS.map((k) => s.circ[k]),
-    ...s.circ.pulmonaryTransit.volume);
+  // All ten stores, including the pressure-bearing middle pulmonary store.
+  const min = Math.min(...COMPARTMENTS.map((k) => s.circ[k]));
+  check(`${sc.id}: all pulmonary store pressures are finite`,
+    [s.circ.p.pa, s.circ.p.cap, s.circ.p.pv].every(Number.isFinite));
   check(sc.id, min > 0, `smallest compartment ${min.toFixed(2)} mL`);
 }
 
@@ -98,8 +98,9 @@ section('Compartment positivity across a control-space sweep');
     s.reset();
     s.advance(20, true);
     worstVolume = Math.min(worstVolume,
-      ...COMPARTMENTS.map((k) => s.circ[k]), ...s.circ.pulmonaryTransit.volume);
+      ...COMPARTMENTS.map((k) => s.circ[k]));
     const m = s.metrics;
+    if (![s.circ.p.pa, s.circ.p.cap, s.circ.p.pv].every(Number.isFinite)) nonFinite++;
     for (const [, v] of Object.entries(m)) {
       if (typeof v === 'number' && !Number.isFinite(v)) nonFinite++;
     }

@@ -37,7 +37,7 @@ Pulmonary load includes the volume-dependent [PVR J-curve](pulmonary-vascular-re
 
 RV dilatation affects the LV through two explicit routes. Diastolic septal coupling raises the LV filling penalty as the RV becomes larger, and pericardial pressure rises when total cardiac volume exceeds the selected capacity. The same shared pressure can also restrict the RV preferentially because its normal filling pressure is lower. A separate systolic term permits LV contraction to assist RV pressure generation. These coefficients are teaching representations, not echocardiographic measurements. The [cardiac tamponade](cardiac-tamponade.md) page isolates the pericardial route.
 
-The pulmonary blood stores buffer and spread the effect of changing RV output on LV filling. Their [transport timescale](pulmonary-transit.md) does not impose a strict delay before any left-sided response; pleural pressure, the pulmonary venous piston and ventricular interaction provide immediate mechanical routes. This distinction explains why the right and left ventricular effects of one breath can appear in different respiratory phases.
+The pulmonary blood stores buffer and spread the effect of changing RV output on LV filling. Their [pressure-driven storage response](pulmonary-transit.md) imposes no fixed waiting period before a left-sided effect. Pleural pressure, alveolar compression, extra-alveolar expansion and ventricular interaction provide simultaneous mechanical routes. This distinction explains why the right and left ventricular effects of one breath can appear in different respiratory phases.
 
 ### Follow one intervention across both ventricles
 

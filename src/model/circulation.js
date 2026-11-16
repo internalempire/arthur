@@ -1,27 +1,8 @@
-// Closed-loop lumped circulation: nine pressure-bearing compartments and one
-// pressureless pulmonary transport pathway, all included in conserved blood.
-// Systemic arteries reference atmosphere; the systemic venous reservoir and
-// IVC use the aggregate abdominal relation; atria and ventricles reference
-// pleural plus additional pericardial pressure; PA/PV reference pleural pressure.
-// Pressure transmission, storage, valve gradients, caval closing pressure and
-// pulmonary vascular loading interact. Abdominal transmission can raise the
-// upstream venous pressure alongside right atrial pressure; aortic pressure is
-// free to respond to flow. RV load includes the pulmonary law and waterfall,
-// not lung volume alone. See manual/the-four-effects-of-a-breath.md.
-
+// Closed-loop lumped circulation with ten pressure-bearing blood compartments.
+// Pulmonary artery, alveolar-compressed middle bed and pulmonary veins exchange
+// blood through signed pressure-driven flows. See pulmonary-vessels.js.
 import { cmH2OtoMmHg, clamp } from './units.js';
-import { pvrAt } from './lung.js';
-
-// Only the alveolar microvascular share is exposed directly to an alveolar
-// waterfall. The old circuit put the entire pulmonary resistance behind
-// max(Ppv, Palv), so a small crossing of those mean pressures switched the whole
-// lung from zone III to zone II and added several Wood units at high PEEP. Human
-// lungs contain alveolar and extra-alveolar segments in series and regions in
-// different West zones; 0.45 is the upper end of the 34–45% alveolar-capillary
-// partition reported by indicator-dilution and micropuncture studies. It is a
-// deliberately transparent aggregate, not a claim that every patient has this
-// exact fraction.
-const ALVEOLAR_WATERFALL_FRACTION = 0.45;
+import { PULMONARY_VESSELS, pulmonaryVascularState } from './pulmonary-vessels.js';
 
 // Unstressed volumes (mL) and compliances (mL/mmHg) that are not user-facing.
 export const VASC = {
@@ -30,12 +11,11 @@ export const VASC = {
   // Its 50 mL zero-pressure capacity is included in total blood. The selected
   // 20 mL/mmHg compliance is a didactic coefficient, not a validated human range.
   vuSv: 2750,
-  // Part of the former PA/PV zero-pressure volume now lives in the transport
-  // pathway below. Their stressed volumes — and therefore resting pressures —
-  // are unchanged: (100 - 50) == (140 - 90), and (115 - 60) == (235 - 180).
-  vuPa: 50, cPa: 4.2,
-  vuPv: 60, cPv: 8.5,
-  rPulVen: 0.008,
+  vuPa: PULMONARY_VESSELS.arterial.volume0,
+  cPa: PULMONARY_VESSELS.arterial.compliance,
+  vuPv: PULMONARY_VESSELS.venous.volume0,
+  cPv: PULMONARY_VESSELS.venous.compliance,
+  rPulVen: PULMONARY_VESSELS.venousOutletResistance,
 };
 
 // Inferior vena cava: a thin-walled conduit between the splanchnic reservoir
@@ -56,65 +36,14 @@ export const IVC = {
 // is a didactic choice; total rvr is unchanged.
 const RVR_UP_FRACTION = 0.33;
 
-// A pressure wave crosses the pulmonary circuit much faster than blood volume.
-// The PA-to-PV pressure gradient therefore remains algebraic, while this
-// volume-conserving transport pathway delays the *flow* delivered to the
-// pulmonary veins. Eight small well-mixed stages approximate an advective
-// distribution: unlike one exponential reservoir they retain useful respiratory
-// amplitude, and unlike a pure delay they do not create a rigid echo in the
-// closed loop. At the reference flow their 160 mL gives a 2 s mean time. The
-// active time now follows the central-volume relation (volume / RV output), so
-// low flow traverses the same pathway more slowly and high flow more quickly.
-// This is the explicit transport subvolume, not a contrast-derived RV-to-LV
-// transit time for the entire pulmonary vascular bed. The initial 160 mL is not
-// new blood: the same amount was removed from the PA/PV zero-pressure volumes
-// above.
-export const PULMONARY_TRANSIT = {
-  referenceMeanTime: 2, // s at the reference 80 mL/s flow
-  // At reset the pulmonary artery, staged pathway and pulmonary vein contain
-  // 100 + 160 + 115 mL. The staged pathway therefore supplies this share of
-  // the model's PA-to-LA residence time; the pressure-bearing PA/PV
-  // compartments already provide the remainder of the storage dynamics.
-  explicitVolumeFraction: 160 / 375,
-  minimumMeanTime: 0.8, // s, numerical/interpretive guardrail at very high flow
-  maximumMeanTime: 6, // s, lets stored blood drain during profound low flow
-  adaptationTime: 2, // s, suppresses breath-by-breath velocity aliasing
-  stages: 8,
-  initialVolume: 160, // mL, reference allocation at 80 mL/s steady flow
-};
-
-/**
- * Mean residence time of the explicit pulmonary transport volume.
- *
- * The most recent complete RV beat supplies a stable forward-flow estimate;
- * instantaneous pulmonic flow would fall to zero every diastole and make blood
- * velocity jump between artificial extremes. The clamp is a model-domain
- * boundary, not a physiological normal range. It prevents an almost arrested
- * circulation from turning one pressureless compartment into an arbitrarily
- * long numerical memory while still allowing low-output states to lengthen the
- * delay substantially.
- */
+/** Observed mean residence estimate; never controls the pressure/flow equations. */
 export function pulmonaryTransitEstimate(p, c) {
-  // `svRv` is first measured at the initial beat boundary; use the seeded LV
-  // stroke volume during that one-beat bootstrap rather than letting an
-  // undefined flow contaminate every conserved compartment with NaN.
   const rvStrokeVolume = c.svRv ?? c.sv;
-  const rvOutput = Math.max(0, rvStrokeVolume / (c.beatDuration ?? 60 / p.hr)); // mL/s
+  const rvOutput = Math.max(0, rvStrokeVolume / (c.beatDuration ?? 60 / p.hr));
   const pulmonaryBloodVolume = c.vPa + c.vPt + c.vPv;
-  // Keep the displayed circuit estimate finite near arrest. The staged buffer
-  // has its own tighter bound below, so this reporting guardrail does not alter
-  // ordinary transport dynamics.
+  // Finite reporting guard near arrest, not a finite physiological residence time.
   const circuitMeanTime = pulmonaryBloodVolume / Math.max(rvOutput, 1);
-  const transportMeanTime = clamp(
-    circuitMeanTime * PULMONARY_TRANSIT.explicitVolumeFraction,
-    PULMONARY_TRANSIT.minimumMeanTime,
-    PULMONARY_TRANSIT.maximumMeanTime,
-  );
-  return { rvOutput, pulmonaryBloodVolume, circuitMeanTime, transportMeanTime };
-}
-
-export function pulmonaryTransitMeanTime(p, c) {
-  return pulmonaryTransitEstimate(p, c).transportMeanTime;
+  return { rvOutput, pulmonaryBloodVolume, circuitMeanTime };
 }
 
 const VALVE = { tricuspid: 0.004, pulmonic: 0.004, mitral: 0.005, aortic: 0.006 };
@@ -159,11 +88,8 @@ export function createCirculationState(p) {
     vRa: 55,
     vRv: 130,
     vPa: 100,
-    vPt: PULMONARY_TRANSIT.initialVolume,
+    vPt: PULMONARY_VESSELS.initialMiddleVolume,
     vPv: 115,
-    // Allocated on the first integration step. It records how `vPt` is divided
-    // among the stages; it is not a second copy of that conserved blood volume.
-    pulmonaryTransit: null,
     vLa: 72,
     vLv: 118,
     tCardiac: 0,
@@ -233,23 +159,11 @@ function valveFlow(pUp, pDown, r) {
   return dp > 0 ? dp / r : 0;
 }
 
-function pulmonaryTransitState(c) {
-  if (!c.pulmonaryTransit) {
-    const volume = new Float64Array(PULMONARY_TRANSIT.stages);
-    volume.fill(c.vPt / PULMONARY_TRANSIT.stages);
-    c.pulmonaryTransit = {
-      volume,
-      circuitMeanTime: PULMONARY_TRANSIT.referenceMeanTime
-        / PULMONARY_TRANSIT.explicitVolumeFraction,
-      meanTime: PULMONARY_TRANSIT.referenceMeanTime,
-    };
-  }
-  return c.pulmonaryTransit;
-}
+
 
 // Which compartment each flow drains, and which it fills, when the flow is
-// positive. Two of them (systemic capillary and pulmonary venous) can reverse,
-// so the source is decided by sign at the time.
+// positive. Unvalved systemic and pulmonary links can reverse, so the source
+// is decided by sign at the time.
 // The venous return is split: splanchnic reservoir → IVC (no collapse), then
 // IVC → RA (Starling resistor with caval collapse at pCrit).
 const FLOW_EDGES = [
@@ -360,9 +274,6 @@ export function stepCirculation(p, c, resp, dt) {
   const ppl = cmH2OtoMmHg(resp.ppl);
   const palv = cmH2OtoMmHg(resp.palv);
   const pab = cmH2OtoMmHg(resp.pab);
-  // Volume above the lung's *resting* volume, which is now an outcome of the
-  // pressure-volume curve rather than the `frc` parameter — recruitment moves it.
-  const vAboveFrc = resp.lungVolume - resp.relaxVolume;
 
   // --- pericardium: the four chambers share one space ----------------------
   const vHeart = c.vRa + c.vRv + c.vLa + c.vLv;
@@ -405,14 +316,9 @@ export function stepCirculation(p, c, resp, dt) {
   const pmsfElastic = venousVolume.elasticPressure;
   const abdZone = clamp((pmsfElastic - 2) / 8, 0, 1);
   const pmsf = pmsfElastic + ABD_VENOUS_FRACTION * pab * abdZone;
-  const pPa = (c.vPa - VASC.vuPa) / VASC.cPa + ppl;
-
-  // Lung inflation squeezes the pulmonary vascular bed toward the left atrium,
-  // but only where the capillaries are open (zone III).
-  const pPvRaw = (c.vPv - VASC.vuPv) / VASC.cPv + ppl;
-  const zone3 = clamp((pPvRaw - palv) / 4, 0, 1);
-  const vuPvEff = VASC.vuPv - p.piston * Math.max(0, vAboveFrc) * zone3;
-  const pPv = (c.vPv - vuPvEff) / VASC.cPv + ppl;
+  const pulmonary = pulmonaryVascularState(p, c, resp);
+  const pPa = pulmonary.pa;
+  const pPv = pulmonary.pv;
 
   // --- flows ---------------------------------------------------------------
   // The resistance to venous return is split: upstream (splanchnic reservoir →
@@ -457,35 +363,10 @@ export function stepCirculation(p, c, resp, dt) {
 
   const qSys = (pSa - pmsf) / p.svr;
 
-  const pvr = pvrAt(p, resp.lungVolume, resp.plSolved, resp.openFraction);
-  // Vascular waterfall: alveolar pressure can replace pulmonary venous pressure
-  // as downstream pressure, but only for the alveolar microvascular share. The
-  // extra-alveolar share remains referenced to pulmonary venous pressure.
-  const pPulDownstream = pPv
-    + ALVEOLAR_WATERFALL_FRACTION * Math.max(0, palv - pPv);
-  const qPul = Math.max(0, (pPa - pPulDownstream) / pvr);
-  // A pressure change still affects qPul immediately. Eight serial mixing
-  // stages approximate the distribution of pulmonary path
-  // lengths. All stage volumes are physical parts of `vPt`; the array only
-  // records their internal distribution and is not additional hidden blood.
-  const transit = pulmonaryTransitState(c);
+  const qPul = pulmonary.arterialFlow;
+  const qPulTransit = pulmonary.middleFlow;
+  const qPulVen = (pPv - pLa) / pulmonary.venousResistance;
   const transitEstimate = pulmonaryTransitEstimate(p, c);
-  // Let sustained haemodynamics, rather than alternation between individual
-  // respiratory beats, set transport velocity. Without this small low-pass the
-  // beat used to estimate RV output also changes stage speed, and the model can
-  // move the LV nadir between inspiration and expiration by numerical aliasing.
-  const transitAdaptation = 1 - Math.exp(-dt / PULMONARY_TRANSIT.adaptationTime);
-  transit.circuitMeanTime += transitAdaptation
-    * (transitEstimate.circuitMeanTime - transit.circuitMeanTime);
-  transit.meanTime = clamp(
-    transit.circuitMeanTime * PULMONARY_TRANSIT.explicitVolumeFraction,
-    PULMONARY_TRANSIT.minimumMeanTime,
-    PULMONARY_TRANSIT.maximumMeanTime,
-  );
-  const transitMeanTime = transit.meanTime;
-  const transitStageTime = transitMeanTime / PULMONARY_TRANSIT.stages;
-  const qPulTransit = transit.volume[transit.volume.length - 1] / transitStageTime;
-  const qPulVen = (pPv - pLa) / VASC.rPulVen;
 
   const qTv = valveFlow(pRa, pRv, VALVE.tricuspid);
   const qPv = valveFlow(pRv, pPa, VALVE.pulmonic);
@@ -512,19 +393,6 @@ export function stepCirculation(p, c, resp, dt) {
   // First forward ejection follows AV closure and isovolumic contraction.
   if (q.av > 0 && c.lvEdvRun === undefined) c.lvEdvRun = c.vLv;
   if (q.pv > 0 && c.rvEdvRun === undefined) c.rvEdvRun = c.vRv;
-  // Advance every stage from the same pre-step outflows. The final outflow may
-  // have been limited if the aggregate pathway approached its volume floor.
-  let transitInflow = q.pul;
-  let transitVolume = 0;
-  for (let i = 0; i < transit.volume.length; i++) {
-    const transitOutflow = i === transit.volume.length - 1
-      ? q.pulTransit : transit.volume[i] / transitStageTime;
-    transit.volume[i] += (transitInflow - transitOutflow) * dt;
-    transitVolume += transit.volume[i];
-    transitInflow = transitOutflow;
-  }
-  c.vPt = transitVolume;
-
   // --- integrate -----------------------------------------------------------
   c.vSa += (q.av - q.sys) * dt;
   c.vSv += (q.sys - q.svToIvc) * dt;
@@ -532,6 +400,7 @@ export function stepCirculation(p, c, resp, dt) {
   c.vRa += (q.vr - q.tv) * dt;
   c.vRv += (q.tv - q.pv) * dt;
   c.vPa += (q.pv - q.pul) * dt;
+  c.vPt += (q.pul - q.pulTransit) * dt;
   c.vPv += (q.pulTransit - q.pulVen) * dt;
   c.vLa += (q.pulVen - q.mv) * dt;
   c.vLv += (q.mv - q.av) * dt;
@@ -541,18 +410,17 @@ export function stepCirculation(p, c, resp, dt) {
     ra: pRa, rv: pRv, la: pLa, lv: pLv, sa: pSa, pa: pPa, pv: pPv,
     pmsf, pCrit, pPeri, ppl, palv, pab, rvrEff, abdZone,
     pIvcAtm, pIvcTm, vIVC: c.vIVC,
-    pulmonaryTransitVolume: c.vPt,
-    pulmonaryTransportTime: transitMeanTime,
-    // Keep the displayed central-volume estimate algebraically transparent.
-    // Only the time used by the staged buffer is smoothed; otherwise the
-    // reported PBV / RV-output relation would temporarily be untrue.
+    cap: pulmonary.middle,
+    pExtra: pulmonary.extraPressure,
+    capillaryDownstreamTransmural: pulmonary.downstreamTransmural,
+    pvrEffective: pulmonary.effectiveResistance,
     pulmonaryTransitTime: transitEstimate.circuitMeanTime,
     pulmonaryBloodVolume: transitEstimate.pulmonaryBloodVolume,
     venousToneVolume: venousVolume.toneVolume,
     venousUnstressed: venousVolume.unstressedVolume,
     stressedVenous: venousVolume.stressedVolume,
     raTm: pRaTm, rvTm: pRvTm, lvTm: pLvTm, laTm: pLaTm,
-    zone3, pvr, vHeart,
+    pvr: pulmonary.geometricResistance, vHeart,
   };
   c.q = {
     vr: q.vr, sys: q.sys, pul: q.pul, pulTransit: q.pulTransit,

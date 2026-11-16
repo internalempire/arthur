@@ -128,9 +128,9 @@ const TILES = [
       ? ['warning', 'above the 2 WU threshold'] : null),
   },
   {
-    id: 'pvrCoeff', label: 'Pulmonary resistance coefficient', unit: 'Wood units', kind: 'coefficient',
+    id: 'pvrCoeff', label: 'Pulmonary resistance reference', unit: 'Wood units', kind: 'coefficient',
     get: (m) => m.pvrCoefficientWood.toFixed(2),
-    sub: (m) => `${m.pvrDyn.toFixed(0)} dyn·s·cm⁻⁵ · from the J-curve`,
+    sub: (m) => `${m.pvrDyn.toFixed(0)} dyn·s·cm⁻⁵ · geometry, vessels distended`,
   },
   {
     id: 'rvlv', label: 'RV : LV end-diastolic volume', unit: 'model ratio', kind: 'coefficient',
@@ -208,10 +208,10 @@ const TILES = [
   {
     id: 'wedge', label: 'Wedge surrogate', unit: 'mmHg', kind: 'derived',
     get: (m) => m.paop.toFixed(1),
-    // This is a normalised pressure-margin heuristic, not the anatomical share
-    // of a regional lung in zone 3. Calling it a fraction overclaimed what a
-    // one-compartment pulmonary bed can know.
-    sub: (m) => `zone 3 index ${(m.zone3 * 100).toFixed(0)}%`,
+    // Minimum over a complete breath, not an anatomical fraction or a catheter test.
+    sub: (m) => Number.isFinite(m.lastBreathPulmonaryMargin)
+      ? `min Pv − Palv ${signed(m.lastBreathPulmonaryMargin, 1)} mmHg · last complete breath`
+      : 'Pv − Palv minimum pending a complete fresh breath',
     quality: (m) => m.interpretability.wedge,
   },
   {

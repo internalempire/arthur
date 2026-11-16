@@ -1,6 +1,6 @@
 # Bibliography
 
-> Every source cited by the current manual, collected from the page-level reference lists. 148 unique entries.
+> Every source cited by the current manual, collected from the page-level reference lists. 149 unique entries.
 
 ---
 
@@ -34,7 +34,6 @@ A citation documents the physiological or methodological claim made on its sourc
 - Cecconi M, Collino F, Pinsky MR. Heart–lung interactions in ARDS: practical bedside implications. *Intensive Care Med* 2026;52:2031–2034. [doi:10.1007/s00134-026-08583-3](https://doi.org/10.1007/s00134-026-08583-3) — Fig. 1C is the clinical two-limb synthesis this page follows.
 - Chantler PD, Lakatta EG, Najjar SS. Arterial–ventricular coupling: mechanistic insights into cardiovascular performance at rest and during exercise. *J Appl Physiol* 2008;105:1342–51. [doi:10.1152/japplphysiol.90600.2008](https://doi.org/10.1152/japplphysiol.90600.2008)
 - Chapleau MW, Abboud FM. Determinants of sensitization of carotid baroreceptors by pulsatile pressure in dogs. *Circ Res*. 1989;65:566–577. [doi:10.1161/01.RES.65.3.566](https://doi.org/10.1161/01.RES.65.3.566)
-- Chase SC, Taylor BJ, Cross TJ, et al. Influence of thoracic fluid compartments on pulmonary congestion in chronic heart failure. *J Card Fail*. 2017;23:690–696. [doi:10.1016/j.cardfail.2017.07.394](https://doi.org/10.1016/j.cardfail.2017.07.394)
 - Chen L, Chen G-Q, Shore K, et al. Implementing a bedside assessment of respiratory mechanics in patients with acute respiratory distress syndrome. *Crit Care* 2017;21:84. [doi:10.1186/s13054-017-1671-8](https://doi.org/10.1186/s13054-017-1671-8)
 - Chen L, Del Sorbo L, Grieco DL, et al. Potential for lung recruitment estimated by the recruitment-to-inflation ratio in ARDS. *Am J Respir Crit Care Med*. 2020;201:178–187. [doi:10.1164/rccm.201902-0334OC](https://doi.org/10.1164/rccm.201902-0334OC)
 - Chiumello D, Carlesso E, Cadringher P, et al. Lung stress and strain during mechanical ventilation for acute respiratory distress syndrome. *Am J Respir Crit Care Med*. 2008;178:346–355. [doi:10.1164/rccm.200710-1589OC](https://doi.org/10.1164/rccm.200710-1589OC)
@@ -77,6 +76,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Henderson WR, Griesdale DEG, Walley KR, Sheel AW. Clinical review: Guyton — the role of mean circulatory filling pressure and right atrial pressure in controlling cardiac output. *Crit Care*. 2010;14:243. [doi:10.1186/cc9247](https://doi.org/10.1186/cc9247)
 - Hickling KG. Best compliance during a decremental, but not incremental, positive end-expiratory pressure trial is related to open-lung positive end-expiratory pressure. *Am J Respir Crit Care Med* 2001;163:69–78. [doi:10.1164/ajrccm.163.1.9905084](https://doi.org/10.1164/ajrccm.163.1.9905084)
 - Himelman RB, Kircher B, Rockey DC, Schiller NB. Inferior vena cava plethora with blunted respiratory response: a sensitive echocardiographic sign of cardiac tamponade. *J Am Coll Cardiol*. 1988;12:1470–1477. [doi:10.1016/S0735-1097(88)80011-1](https://doi.org/10.1016/S0735-1097(88)80011-1)
+- Howell JBL, Permutt S, Proctor DF, Riley RL. Effect of inflation of the lung on different parts of pulmonary vascular bed. *J Appl Physiol*. 1961;16:71–76. [doi:10.1152/jappl.1961.16.1.71](https://doi.org/10.1152/jappl.1961.16.1.71)
 - Humbert M, Kovacs G, Hoeper MM, et al. 2022 ESC/ERS Guidelines for the diagnosis and treatment of pulmonary hypertension. *Eur Heart J*. 2022;43:3618–3731. [doi:10.1093/eurheartj/ehac237](https://doi.org/10.1093/eurheartj/ehac237)
 ## I
 
@@ -132,6 +132,7 @@ A citation documents the physiological or methodological claim made on its sourc
 - Pepe PE, Marini JJ. Occult positive end-expiratory pressure in mechanically ventilated patients with airflow obstruction: the auto-PEEP effect. *Am Rev Respir Dis* 1982;126:166–70. [doi:10.1164/arrd.1982.126.1.166](https://doi.org/10.1164/arrd.1982.126.1.166)
 - Pereira C, Bohé J, Rosselli S, et al. Sigmoidal equation for lung and chest wall volume-pressure curves in acute respiratory failure. *J Appl Physiol*. 2003;95:2064–2071. [doi:10.1152/japplphysiol.00385.2003](https://doi.org/10.1152/japplphysiol.00385.2003)
 - Permutt S, Bromberger-Barnea B, Bane HN. Alveolar pressure, pulmonary venous pressure and the vascular waterfall. *Med Thorac* 1962;19:239–60. [doi:10.1159/000192224](https://doi.org/10.1159/000192224)
+- Permutt S, Howell JBL, Proctor DF, Riley RL. Effect of lung inflation on static pressure-volume characteristics of pulmonary vessels. *J Appl Physiol*. 1961;16:64–70. [doi:10.1152/jappl.1961.16.1.64](https://doi.org/10.1152/jappl.1961.16.1.64)
 - Permutt S, Riley RL. Hemodynamics of collapsible vessels with tone: the vascular waterfall. *J Appl Physiol*. 1963;18:924–932. [doi:10.1152/jappl.1963.18.5.924](https://doi.org/10.1152/jappl.1963.18.5.924)
 - Persichini R, Lai C, Teboul JL, et al. Venous return and mean systemic filling pressure: physiology and clinical applications. *Crit Care*. 2022;26:150. [doi:10.1186/s13054-022-04024-x](https://doi.org/10.1186/s13054-022-04024-x)
 - Persichini R, Silva S, Teboul JL, et al. Effects of norepinephrine on mean systemic pressure and venous return in human septic shock. *Crit Care Med*. 2012;40:3146–3153. [doi:10.1097/CCM.0b013e318260c6c3](https://doi.org/10.1097/CCM.0b013e318260c6c3)

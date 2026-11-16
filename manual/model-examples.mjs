@@ -178,11 +178,11 @@ function pvrOpeningBlock() {
   return [
     `*Executable setup: the shared literature-check phenotype, distinct from the shipped ARDS/RV preset: ${p.mode === 'vcv' && p.pmus === 0 ? 'passive volume control' : p.mode + ', effort ' + p.pmus + ' cmH₂O'}, VT ${p.vt} mL, ${p.rr}/min, aerated-lung compliance ${p.clung} mL/cmH₂O, ${p.collapsed * 100}% compromised, transpulmonary opening midpoint ${p.pOpen} cmH₂O, opening memory ${p.hysteresis}, baroreflex ${p.baroreflexEnabled ? 'on' : 'off'}, baseline pulmonary coefficient ${p.pvrBase} mmHg·s/mL and HPV multiplier ${p.hpv}. Each PEEP level is initialized independently and run for ${SETTLING_SECONDS} additional s after automatic initialization, rather than reached by a sequential PEEP step.*`,
     '',
-    '| reopenable share | internal coefficient (WU), PEEP 4 → 14 | pressure–flow estimate (WU), PEEP 4 → 14 | open fraction at sampling, PEEP 4 → 14 |',
+    '| reopenable share | geometric reference (WU), PEEP 4 → 14 | pressure–flow estimate (WU), PEEP 4 → 14 | open fraction at sampling, PEEP 4 → 14 |',
     '|---|---:|---:|---:|',
     ...rows,
     '',
-    'The internal coefficient and open fraction are instantaneous samples at the end of that run, not respiratory means or dedicated end-expiratory measurements. The pressure–flow estimate combines pulmonary arterial and left atrial pressures smoothed with a 3 s exponential time constant (both relative to atmosphere) with forward aortic output from the last completed heartbeat. The displayed changes compare those specified samples; their size is not an independently validated clinical effect.',
+    'The geometric reference and open fraction are instantaneous samples at the end of that run, not respiratory means or dedicated end-expiratory measurements. The pressure–flow estimate combines pulmonary arterial and left atrial pressures smoothed with a 3 s exponential time constant (both relative to atmosphere) with forward aortic output from the last completed heartbeat. The displayed changes compare those specified samples; their size is not an independently validated clinical effect.',
   ].join('\n');
 }
 
@@ -263,9 +263,9 @@ function wedgeExampleDetails(title, setup, overrides, peepLevels, conclusion) {
     '',
     `*${setup} Each PEEP level is settled independently for ${SETTLING_SECONDS} s.*`,
     '',
-    '| PEEP (cmH₂O) | wedge surrogate (mmHg) | mean Ppl (mmHg) | mean Pperi (mmHg) | LA transmural (mmHg) | LA volume (mL) | LVEDV (mL) | CO (L/min) | zone 3 index |',
-    '|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
-    ...states.map(({ peep, metrics, meanPpl, laVolume }) => `| ${peep} | ${fixed(metrics.paop, 1)} | ${fixed(meanPpl, 1)} | ${fixed(metrics.pPeri, 1)} | ${fixed(metrics.laTransmural, 1)} | ${Math.round(laVolume)} | ${Math.round(metrics.lvEdv)} | ${fixed(metrics.co, 2)} | ${Math.round(metrics.zone3 * 100)}% |`),
+    '| PEEP (cmH₂O) | wedge surrogate (mmHg) | mean Ppl (mmHg) | mean Pperi (mmHg) | LA transmural (mmHg) | LA volume (mL) | LVEDV (mL) | CO (L/min) | instantaneous Ppv − Palv (mmHg) | last-breath minimum (mmHg) |',
+    '|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|',
+    ...states.map(({ peep, metrics, meanPpl, laVolume }) => `| ${peep} | ${fixed(metrics.paop, 1)} | ${fixed(meanPpl, 1)} | ${fixed(metrics.pPeri, 1)} | ${fixed(metrics.laTransmural, 1)} | ${Math.round(laVolume)} | ${Math.round(metrics.lvEdv)} | ${fixed(metrics.co, 2)} | ${fixed(metrics.capillaryDownstreamTransmural, 1)} | ${fixed(metrics.lastBreathPulmonaryMargin, 1)} |`),
     '',
     conclusion(states),
     '',
@@ -284,7 +284,7 @@ function wedgePeepExamplesBlock() {
       'Passive volume control, VT 450 mL and 14/min.',
       passive,
       [0, 15],
-      ([zero, high]) => `The wedge surrogate rises by ${fixed(high.metrics.paop - zero.metrics.paop, 1)} mmHg, but LA transmural pressure falls by ${fixed(zero.metrics.laTransmural - high.metrics.laTransmural, 1)} mmHg and LVEDV falls by ${Math.round(zero.metrics.lvEdv - high.metrics.lvEdv)} mL. The higher atmospheric pressure therefore reflects external pressure transmission, not greater left-heart filling. At PEEP 15 the zone 3 index also removes an unqualified catheter-like interpretation.`,
+      ([zero, high]) => `The wedge surrogate rises by ${fixed(high.metrics.paop - zero.metrics.paop, 1)} mmHg, but LA transmural pressure falls by ${fixed(zero.metrics.laTransmural - high.metrics.laTransmural, 1)} mmHg and LVEDV falls by ${Math.round(zero.metrics.lvEdv - high.metrics.lvEdv)} mL. The higher atmospheric pressure therefore reflects external pressure transmission, not greater left-heart filling. A negative instantaneous Ppv − Palv indicates compression at the downstream end of the middle vascular segment. The badge uses the minimum over the last complete breath, shown separately; neither value measures an anatomical zone fraction.`,
     ),
     '',
     wedgeExampleDetails(
@@ -308,7 +308,7 @@ function wedgePeepExamplesBlock() {
       'The normal passive setup after removing 400 mL with Blood volume change.',
       { ...passive, stressedVolume: 300 },
       [0, 15],
-      ([zero, high]) => `The wedge surrogate rises by ${fixed(high.metrics.paop - zero.metrics.paop, 1)} mmHg while LA transmural pressure, LVEDV and output all fall. The zone 3 index is already ${Math.round(zero.metrics.zone3 * 100)}% at zero PEEP and falls further with PEEP, so both wedge and derived PVR must be read with caution throughout this comparison.`,
+      ([zero, high]) => `The wedge surrogate rises by ${fixed(high.metrics.paop - zero.metrics.paop, 1)} mmHg while LA transmural pressure, LVEDV and output all fall. The instantaneous downstream transmural pressure changes from ${fixed(zero.metrics.capillaryDownstreamTransmural, 1)} to ${fixed(high.metrics.capillaryDownstreamTransmural, 1)} mmHg. The minimum over the last complete breath determines the compression caution for wedge and derived PVR. It does not measure a fraction of lung.`,
     ),
   ].join('\n');
 }
@@ -384,7 +384,7 @@ function lungWallEquilibriumBlock() {
 
 function pulmonaryTransitBlock() {
   const common = {
-    baroreflex: 0, mode: 'vcv', pmus: 0, vt: 450, peep: 5,
+    baroreflexEnabled: false, mode: 'vcv', pmus: 0, vt: 450, peep: 5,
     rr: 18, ti: 1, hr: 75,
   };
   const cases = [
@@ -397,13 +397,13 @@ function pulmonaryTransitBlock() {
     }],
   ];
   return [
-    '*Executable setup: passive volume control, HR 75/min, RR 18/min, VT 450 mL, inspiratory time 1.0 s and PEEP 5 cmH₂O; baroreflex disabled; each phenotype is settled for 45 s.*',
+    '*Executable setup: passive volume control, HR 75/min, RR 18/min, VT 450 mL, inspiratory time 1.0 s and PEEP 5 cmH₂O; baroreflex disabled; each phenotype is sampled after automatic initialization (15 s) and 45 additional seconds (60 s total).*',
     '',
-    '| phenotype | pulmonary blood volume (mL) | estimated PA-to-LA transit (s) | staged buffer (s) |',
+    '| phenotype | pulmonary blood volume (mL) | PBV / last-beat RV flow (s) | middle-store volume (mL) |',
     '|---|---:|---:|---:|',
     ...cases.map(([label, parameters]) => {
       const metrics = settled(parameters);
-      return `| ${label} | ${Math.round(metrics.pulmonaryBloodVolume)} | ${fixed(metrics.pulmonaryTransitTime, 1)} | ${fixed(metrics.pulmonaryTransportTime, 1)} |`;
+      return `| ${label} | ${Math.round(metrics.pulmonaryBloodVolume)} | ${fixed(metrics.pulmonaryTransitTime, 1)} | ${fixed(metrics.pulmonaryMiddleVolume, 1)} |`;
     }),
   ].join('\n');
 }

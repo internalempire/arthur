@@ -19,7 +19,7 @@ export async function checkMechanismsUI(check) {
     { metrics: { valid: true }, circ: { svRv: 50, beatDuration: 1 } });
   check('RV output uses integrated forward stroke volume and measured beat duration',
     rv.now.text === '4.50' && rv.before.text === '3.00' && rv.delta === 'Δ +1.50'
-    && mechanismFields.pvr.label.includes('Internal')
+    && mechanismFields.pvr.label.includes('Geometric')
     && mechanismFields.lvesp.clock === 'last completed beat');
 
   const attrs = new Map();

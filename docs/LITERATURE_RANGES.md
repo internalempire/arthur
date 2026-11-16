@@ -17,8 +17,7 @@ A failing row calls for checking the implementation, the source reading and
 whether the measurement and model conditions are actually comparable. An
 intentional omission or a mismatch of population/protocol can also explain a
 discrepancy. Passing a calibrated row is not independent external validation;
-all active rows currently agree, while the historical notes below document
-superseded investigations.
+all active rows in this file currently agree. This does not include the three open independent-audit criteria for prone RV unloading and tamponade pressure/IVC behaviour; see [scenario validation](SCENARIO_VALIDATION.md) and [the audit registry](../tests/audit-expectations.json). The historical notes below document superseded investigations.
 
 ## Rows
 
@@ -38,8 +37,8 @@ superseded investigations.
 | `ph-classification` | Under an admissible model zone-3 surrogate, a hypervolaemic failing left ventricle with a wedge above 15 mmHg and mPAP above 20 is classified post-capillary; a high-resistance phenotype with a wedge at or below 15 mmHg, mPAP above 20 and PVR above 2 WU is classified pre-capillary. | agrees | Humbert et al., ESC/ERS guidelines, *Eur Heart J* 2022;43:3618–731 |
 | `venous-return-plateau` | Venous return stops rising once right atrial pressure falls below the pressure surrounding the great veins: the curve has a plateau. | agrees | Guyton et al., *Am J Physiol* 1957;189:609–15 |
 | `venous-tone-volume-shift` | At fixed blood volume, increasing venous tone lowers unstressed volume and mobilises the same amount as stressed volume, raising mean systemic pressure without requiring a change in the pressure–volume slope. | agrees | Young, *Control of Cardiac Output* 2010, ch. 2; Adda et al., *Crit Care* 2021;25:302 |
-| `pulmonary-transit-beats` | After an isolated sustained fall in RV output, the first LV beat remains buffered and the LV response becomes detectable over the following 2–3 beats. This is a timing constraint, not a PPV-amplitude calibration. | agrees | Pinsky, *Crit Care Clin* 1990;6:663–678; Yuriditsky et al., *ATS Scholar* 2025;6:94–108 |
-| `pulmonary-transit-central-volume` | Mean PA-to-LA transit follows pulmonary blood volume divided by forward flow. With respiratory rate, heart rate and ventilation matched, the model therefore gives a longer estimate in pulmonary embolism than in the reference circulation, and a still longer estimate in congested low-output LV failure. The ordering is constrained; the exact model values are not clinical targets. | agrees | Levinson et al., *Am Heart J* 1964;67:734–41; Seraphim et al., *JACC Cardiovasc Imaging* 2021;14:2107–19; Chase et al., *J Card Fail* 2017;23:690–6 |
+| `pulmonary-pressure-storage` | PA, middle and PV stores obey pressure–volume relations; signed pulmonary transfers follow their endpoint gradients and conserve blood. Mechanical LV-response timing is an outcome, not a required two-to-three-beat interval or respiratory phase. This is a physical-consistency constraint supported by an aggregate storage topology, not human quantitative validation. | agrees | Brower et al., *J Appl Physiol* 1985;58:954–963; Permutt et al. and Howell et al., *J Appl Physiol* 1961;16:64–76 |
+| `pulmonary-transit-central-volume` | The observed PA-to-LA mean-residence estimate is total PA + middle + PV blood divided by completed-beat RV forward flow. At fixed volume, halving flow doubles the estimate; at fixed flow, increasing volume lengthens it. The estimate controls no physiological transfer and is not a contrast measurement or a prescribed RV-to-LV response delay. | agrees | Levinson et al., *Am Heart J* 1964;67:734–41; central-volume principle; Seraphim et al., *JACC Cardiovasc Imaging* 2021;14:2107–19 for the distinct clinical contrast-timing context |
 
 The earlier ≥1.5× `peep-volume-status` threshold was retired during phase 4 after
 the source was re-read. The human experiment supports the effect of central
@@ -138,37 +137,46 @@ systemic pressure. The model's 200 mL recruitment per unit of reflex outflow is
 a transparent didactic coefficient, not a norepinephrine dose–response
 calibration.
 
-## Current pulmonary calibration and its limits
+## Current pulmonary evidence and its limits
 
-The active calibration is deliberately hierarchical:
+Three kinds of evidence have different jobs. The reference geometric resistance curve expresses the familiar opposing inflation effects near resting lung volume. Primary isolated-lung experiments support storage, compression, traction and sensitivity to vascular pressure reference under controlled conditions. Human catheter studies provide a comparison for selected intact-circulation pressure/flow responses. None can stand in for the others.
 
-1. Human in-vivo catheter measurements constrain the absolute PVR and the
-   response to PEEP in low- and high-recruitability ARDS phenotypes.
-2. The contemporary clinical review constrains the human teaching geometry:
-   the mechanical minimum lies near FRC and both deflation and overdistension
-   raise RV afterload.
-3. Thomas, Hakim and the isolated-lung work constrain only the qualitative
-   volume-dependent mechanism. Their exact nadir, maximal-inflation ratios and
-   vascular partitions are no longer executable human targets.
+The circuit contains three pressure-bearing stores and a smooth narrowing law at the middle outlet. Their exact human-scale compliance, volume and resistance partition are not identified by the available measurements. The negative-transmural-pressure exponential continuation and quadratic conductance proxy are transparent constitutive assumptions. At positive transmural pressure the resistive segment retains its geometric reference; it does not become arbitrarily less resistant merely because an adjacent store contains more blood.
 
-The executable comparison in `tests/literature.mjs` retains the published
-cohort IQRs and the declared model tolerance bands in the table above. Current
-run-specific numbers belong in generated results rather than in a second
-hand-maintained calibration table. The ratio of cohort medians is not a
-median paired response and should not be treated as such.
+### What the six supplied full papers constrain
 
-At the higher PEEP, the aggregate model can leave its zone-3 condition. Its
-left-atrial pressure is still known internally, so a pressure–flow ratio can be
-calculated, but its equivalence to a valid catheter wedge-based PVR is then
-cautioned. Agreement with the cohort ranges does not resolve that mismatch,
-validate the internal resistance coefficient, or make the explicitly selected
-opening shares measured human recruitability.
+| source and preparation | controlled conditions and observation | appropriate use and boundary |
+|---|---|---|
+| Permutt et al. 1961; excised canine lobes filled with dextran solution | Static vascular pressure–volume curves at different inflation levels, mainly on deflation; vascular pressures referenced to lung surroundings and lobe height. Inflation could increase or decrease contained volume depending on vascular filling. | Opposing storage mechanisms and pressure dependence. Absolute vascular volumes were not identified by every plotted curve; a graph's arbitrary volume origin is not measured V₀. |
+| Howell et al. 1961; excised canine lobes, dextran compared with kerosene excluded from small vessels | Inflation expands the experimentally accessible larger-vessel compartment; subtraction estimates a compressed compartment. Extra-alveolar pressure–volume curves shift with inflation. | Support for traction and compression. The preparation does not identify exact anatomical arterial/capillary/venous boundaries. The model's k = 0.20 is rounded from a graphical displacement of about 5.8 cmH₂O over a 30 cmH₂O inflation in Fig. 6, not a human coefficient. |
+| Roos et al. 1961; left lung of live dogs with vascular and respiratory pressures independently varied | More than 350 pressure–flow curves in 10 dogs; inflation effects depend strongly on vascular pressure and its reference. | Match vascular pressures and inflation method before comparing resistance. The paper's closed-chest breathing synthesis is a calculation from controlled findings, not a separately observed patient breath. |
+| Hakim et al. 1982; isolated canine lobes, constant flow with arterial/venous occlusions | Negative-pressure inflation gives a U-shaped total and segmental pressure-drop response. Positive-pressure inflation produces a different partition when vascular pressures retain their atmospheric reference. | Constant-flow segmental constraints. The middle occlusion segment includes distensible small extra-alveolar vessels; it is not an anatomical capillary measurement. |
+| Brower et al. 1985; eight isolated perfused canine lungs, open chest, constant arterial inflow and controlled LA outlet pressure | Inflation can transiently increase venous delivery and lower total lung blood in predominant zone 3, or decrease delivery and raise blood volume in predominant zone 2. | A direct check of opposing storage and outflow responses under the specified boundary conditions. Whole-lung blood change is not PV volume alone. The zone characteristic is a functional pressure-response slope, not an anatomical fraction or an instantaneous pressure-margin gate. |
+| Peták et al. 2009; isolated perfused rat lungs with vascular reservoir pressures referenced to atmosphere | Across a 2.5–22 cmH₂O transpulmonary-pressure inflation, total resistance rises by 15 ± 1% with positive inflation and falls by 3 ± 0.3% with negative expansion. The protocol holds pressure boundaries, not constant flow. | A warning against treating equal inflation or equal transpulmonary pressure as equal vascular loading. These magnitudes are not established matches of the aggregate model or portable human targets. |
 
-The calibration phenotype is not the shipped “ARDS with right ventricular
-failure” preset. It uses normal RV contractility and `pvrBase=0.09`, because the
-study did not describe a uniform severe-RV-failure cohort. Reusing the extreme
-preset made its internally high afterload validate itself and produced values
-around 10–16 WU, far outside the human measurements.
+Brower's whole-lung regression combines compliance and traction parameters rather than identifying them separately. In its appendix, the coefficient multiplying inflation pressure and the zone characteristic constrains a sum of arterial and alveolar compliances; the remaining term combines arterial compliance with extra-alveolar traction. Matching those combinations in an isolated canine bench does not determine a unique human parameter set. The running model's coefficients therefore remain didactic, and its PPV amplitude and mechanical delay are not calibration targets.
+
+The open/closed reference conductances still represent an equivalent mixture. There are no separate blood stores or surrounding pressures for aerated and compromised regions. All of the middle store sees global alveolar pressure. This limitation matters at high PEEP and in heterogeneous lung disease even if conservation and time-step checks pass.
+
+### Human PEEP comparisons
+
+The executable cohort comparison in `tests/literature.mjs` retains declared study intervals and model tolerance bands. The selected fixture is distinct from the severe shipped ARDS/RV preset and keeps its respiratory and cardiac prescription explicit. Opening shares are internal coefficients, not measured CT fractions, anatomical recruitability or R/I.
+
+A pressure-flow ratio can remain computable even when its downstream pressure lacks a catheter interpretation. Check the instantaneous Pv − Palv margin and propagated wedge caution separately from whether a numerical cohort interval is met. A ratio of cohort medians is not a median paired response; a fitting or regression check is not independent validation. New compartment laws must be evaluated on their current results rather than inheriting a quantitative claim from the geometric reference curve.
+
+The central-volume row is an identity for an observed residence estimate under steady-through-flow interpretation. It does not impose a delay on vascular transfer. The pressure-storage row tests physical consistency. Neither establishes pulmonary arterial pulse-pressure fidelity, a universal RC constant, a two-to-three-beat LV response or an expiratory LV nadir.
+
+Primary sources: [Permutt 1961](https://doi.org/10.1152/jappl.1961.16.1.64), [Howell 1961](https://doi.org/10.1152/jappl.1961.16.1.71), [Roos 1961](https://doi.org/10.1152/jappl.1961.16.1.77), [Hakim 1982](https://doi.org/10.1152/jappl.1982.53.5.1110), [Brower 1985](https://doi.org/10.1152/jappl.1985.58.3.954), [Peták 2009](https://doi.org/10.1152/japplphysiol.00831.2007). These studies were read from the clinician-supplied full texts; experimental figures, units and reference conditions remain part of each comparison, not interchangeable universal constants.
+
+## Current isolated-lung protocol comparisons
+
+The nominal adult pulmonary circuit is also examined under boundary conditions derived from Peták, Roos and Hakim. These are protocol analogues, without species, body-size, perfusate or haematocrit scaling. Equilibrium calculations do not recreate inflation/deflation hysteresis, dynamic occlusion measurements or the original sampling filters.
+
+- Peták: with PA and LA pressure fixed relative to atmosphere, the endpoint directions of positive- and negative-pressure inflation agree. The model's positive-pressure resistance increase is substantially larger than reported, and its negative-pressure trajectory has a deeper intermediate minimum. Neither magnitude nor full trajectory is quantitatively replicated.
+- Hakim: at constant inflow, the predominant rise in middle pressure drop is reproduced. The extra-alveolar/venous drop falls rather than showing the measured slight increase at high inflation, including the matched pressure window and the study's nominal inflow. The model's geometric extra-alveolar branch lacks that high-inflation rise. The occlusion-defined experimental middle segment also includes small distensible extra-alveolar vessels, so it cannot be equated exactly to the model middle store.
+- Roos: selected effects of increased vascular filling and release of compression are reproduced. There is no separate resistance reduction with further distension once the model's outlet is fully open. These checks therefore support only those tested pressure-regime directions.
+
+The discrepancies are not removed by fitting a desired PPV, respiratory phase or transit delay. They remain explicit limits of the aggregate pulmonary construction and prevent a claim of full segmental or human quantitative validation.
 
 ## Historical calibration notes (superseded)
 
@@ -225,9 +233,7 @@ invented COPD pulmonary vasculopathy.
 transit delay." That was wrong. The pulmonary circulation is already two
 compartments in series, and transit delay is a question about their volumes and
 compliances — parallel lung regions have nothing to do with it. Transit delay
-was still open at that point and was unrelated to that work. It is now addressed
-separately by the pressureless flow pathway recorded in
-[MODEL_DECISIONS.md](MODEL_DECISIONS.md).
+was still open at that point and was unrelated to that work. The subsequent pressureless-pathway decision belongs to that historical stage; the current pressure-bearing construction is described above and in the manual.
 
 ### What making recruitment mechanical changed
 

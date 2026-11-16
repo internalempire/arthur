@@ -28,7 +28,8 @@ The order is causal. Position resolves the effective mechanics. The reflex reads
 | `src/model/baroreflex.js` | one bounded, slow aggregate compensator |
 | `src/model/respiratory.js` | equation of motion, breath generator, EFL and holds |
 | `src/model/lung.js` | nonlinear P–V relation, recruitment state and PVR components |
-| `src/model/circulation.js` | chamber elastance, valves, vascular compartments, venous return and pulmonary transit |
+| `src/model/circulation.js` | chamber elastance, valves, conservative vascular transfers and venous return |
+| `src/model/pulmonary-vessels.js` | pulmonary pressure–volume relations, extra-alveolar traction and smooth middle-outlet narrowing |
 | `src/model/simulator.js` | integration, settlement, traces, measurements and validity rules |
 | `src/model/index.js` | selective public API used by UI modules |
 | `src/ui/` | controls, tiles, descriptions and drawings |
@@ -37,7 +38,7 @@ The public API is a deliberate boundary. Browser UI modules import model functio
 
 ## State and integration
 
-The circulation contains nine pressure-bearing compliant compartments—systemic artery, systemic venous reservoir, a separate inferior vena cava, both atria and ventricles, pulmonary artery and pulmonary vein—plus one pressureless pulmonary transport volume represented by eight mixing stages. The stages subdivide that transport volume; they are not eight additional blood-volume allocations. Blood moves through one closed loop and total represented blood volume is conserved unless the user adds or removes blood with the volume control.
+The circulation contains ten pressure-bearing compartments: systemic artery, systemic venous reservoir, a separate inferior vena cava, both atria and ventricles, pulmonary artery, an alveolar-exposed middle vascular store and pulmonary veins. Blood moves according to pressure differences through one closed loop; total represented blood is conserved unless the user explicitly adds or removes it. The pulmonary stores use linear distended and exponential compressed pressure–volume branches. Their changing storage shapes delivery to the left heart without a separately imposed transport clock.
 
 The ordinary differential equations use forward Euler integration with a fixed 0.25 ms step. The small step is required by low valve resistances. Protective flow limiting prevents a compartment from being drained below its numerical volume floor; reaching that protection marks the result invalid rather than silently treating the clipped state as physiology.
 

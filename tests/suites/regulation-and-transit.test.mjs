@@ -1,127 +1,50 @@
-// Beat-to-beat transport, aggregate autonomic control and occlusion manoeuvres.
+// Pulmonary storage/readouts, aggregate autonomic control and occlusion manoeuvres.
 import {
-  Simulator, defaultParams, pulmonaryTransitEstimate, PULMONARY_TRANSIT,
+  Simulator, defaultParams, pulmonaryTransitEstimate,
   applyBaroreflex, BARO,
   section, check, near, settled, totalVolume,
 } from '../support/model.mjs';
 
-section('Pulmonary transit');
+section('Pulmonary residence estimate and pressure-bearing storage');
 {
-  // Isolate serial flow transport from the immediate septal, pericardial and
-  // lung-piston routes. An abrupt loss of RV contractility then asks one clean
-  // question: how many beats pass before the LV loses what the RV stopped
-  // sending? This is a mechanistic timing test, not a PPV calibration.
+  // Central-volume identity at a declared steady forward flow. This is a
+  // residence estimate, not a pressure-wave delay or a prescribed LV phase.
+  const p = defaultParams();
+  const c = { vPa: 100, vPt: 160, vPv: 115, svRv: 70, sv: 70, beatDuration: 0.8 };
+  const snapshot = JSON.stringify(c);
+  const reference = pulmonaryTransitEstimate(p, c);
+  const halfFlow = pulmonaryTransitEstimate(p, { ...c, svRv: 35 });
+  const doubleVolume = pulmonaryTransitEstimate(p, { ...c, vPa: 200, vPt: 320, vPv: 230 });
+  check('mean residence estimate is pulmonary blood volume divided by completed-beat RV flow',
+    near(reference.rvOutput, 70 / 0.8, 1e-12)
+      && near(reference.circuitMeanTime, 375 / (70 / 0.8), 1e-12));
+  check('halving flow or doubling blood volume doubles the residence estimate',
+    near(halfFlow.circuitMeanTime, reference.circuitMeanTime * 2, 1e-12)
+      && near(doubleVolume.circuitMeanTime, reference.circuitMeanTime * 2, 1e-12));
+  check('residence uses the actual completed-beat duration, not a changed selected heart rate',
+    near(pulmonaryTransitEstimate({ ...p, hr: 150 }, c).circuitMeanTime,
+      reference.circuitMeanTime, 1e-12));
+  check('calculating residence does not mutate the vascular state', JSON.stringify(c) === snapshot);
+  const arrested = pulmonaryTransitEstimate(p, { ...c, svRv: 0 });
+  check('near-arrest reporting floor is explicit and finite rather than a physiological finite transit',
+    arrested.rvOutput === 0 && arrested.circuitMeanTime === arrested.pulmonaryBloodVolume);
+
+  // No required two/three-beat dead time, phase of LV nadir or six-second
+  // transport cap. The pressure-bearing stores determine timing; their signed
+  // local flow balances are tested separately in pulmonary-vessels.test.mjs.
   const s = new Simulator();
-  s.params = {
-    ...defaultParams(), baroreflex: 0, septal: 0, pericardium: 0, piston: 0,
-    vt: 0, peep: 0, pmus: 0, eesRv: 0.58,
-  };
+  s.params = { ...defaultParams(), baroreflexEnabled: false, septal: 0,
+    pericardium: 0, vt: 0, peep: 0, pmus: 0 };
   s.reset();
   s.advance(30, true);
-  const baseline = { rv: s.circ.svRv, lv: s.circ.sv, pt: s.circ.vPt };
-  const bloodBefore = totalVolume(s.circ);
+  const before = { rv: s.circ.svRv, lv: s.circ.sv, blood: totalVolume(s.circ) };
   s.setParam('eesRv', 0.18);
-
-  let beatSeen = s.circ.beatCount;
-  const beats = [];
-  for (let i = 0; i < 500 && beats.length < 4; i++) {
-    s.advance(0.01, true);
-    if (s.circ.beatCount !== beatSeen) {
-      beatSeen = s.circ.beatCount;
-      beats.push({ rv: s.circ.svRv, lv: s.circ.sv, pt: s.circ.vPt });
-    }
-  }
-
-  check('the first affected RV beat has not yet reached the LV',
-    beats.length === 4 && beats[0].rv < baseline.rv - 10
-      && Math.abs(beats[0].lv - baseline.lv) < baseline.lv * 0.01,
-    `RV ${baseline.rv.toFixed(1)} -> ${beats[0]?.rv.toFixed(1)}, `
-      + `LV ${baseline.lv.toFixed(1)} -> ${beats[0]?.lv.toFixed(1)} mL`);
-  check('the LV response emerges over the following two to three beats',
-    baseline.lv - beats[1].lv < baseline.lv * 0.02
-      // The 1.5% floor separates a true transported response from integrator
-      // noise; its amplitude is not a claimed in-vivo calibration. The cited
-      // observation constrains timing (2–3 beats), not the size of this severe
-      // isolated contractility step.
-      && baseline.lv - beats[3].lv > baseline.lv * 0.015,
-    `LV ${beats.map((b) => b.lv.toFixed(1)).join(' -> ')} mL`);
-  check('the transport pathway supplies the interval without creating blood',
-    beats[1].pt < baseline.pt - 10
-      && near(totalVolume(s.circ), bloodBefore, 0.01)
-      && Number.isFinite(s.metrics.pulmonaryTransitTime)
-      && Number.isFinite(s.metrics.pulmonaryTransportTime),
-    `pathway ${baseline.pt.toFixed(1)} -> ${beats[1].pt.toFixed(1)} mL, `
-      + `blood ${bloodBefore.toFixed(2)} -> ${totalVolume(s.circ).toFixed(2)} mL`);
-
-  // Central-volume behaviour is the new structural constraint. Hold volume
-  // fixed and halve flow, then hold flow fixed and add pulmonary blood: both
-  // operations must lengthen the estimate without inventing a disease-specific
-  // correction term.
-  const p = defaultParams();
-  const referenceState = { vPa: 100, vPt: 160, vPv: 115, svRv: 70, sv: 70 };
-  const referenceTransit = pulmonaryTransitEstimate(p, referenceState);
-  const lowFlowTransit = pulmonaryTransitEstimate(p, { ...referenceState, svRv: 35 });
-  const highVolumeTransit = pulmonaryTransitEstimate(p, { ...referenceState, vPv: 215 });
-  check('mean transit time follows pulmonary blood volume divided by RV output',
-    near(lowFlowTransit.circuitMeanTime, referenceTransit.circuitMeanTime * 2, 1e-12)
-      && highVolumeTransit.circuitMeanTime > referenceTransit.circuitMeanTime,
-    `${referenceTransit.circuitMeanTime.toFixed(1)} s reference, `
-      + `${lowFlowTransit.circuitMeanTime.toFixed(1)} s at half flow, `
-      + `${highVolumeTransit.circuitMeanTime.toFixed(1)} s with added volume`);
-
-  // Matched respiratory rate, heart rate and ventilator settings isolate the
-  // pulmonary circulation. The magnitudes are model outputs, but the ordering
-  // is the intended bedside lesson: obstruction and especially congested low
-  // output prolong transit rather than sharing one fixed two-second delay.
-  const common = {
-    baroreflex: 0, mode: 'vcv', pmus: 0, vt: 450, peep: 5,
-    rr: 18, ti: 1, hr: 75,
-  };
-  const reference = settled(common, 45);
-  const embolism = settled({
-    ...common, pvrBase: 0.44, eesRv: 0.32,
-    stressedVolume: 1050, svr: 1.25,
-  }, 45);
-  const congestion = settled({
-    ...common, eesLv: 0.8, lvStiff: 0.03,
-    stressedVolume: 950, svr: 1.25,
-  }, 45);
-  check('matched transit examples stay inside the cardiac and respiratory domains',
-    reference.metrics.valid && embolism.metrics.valid && congestion.metrics.valid);
-  check('embolism prolongs transit in a matched ventilatory experiment',
-    embolism.metrics.pulmonaryTransitTime > reference.metrics.pulmonaryTransitTime + 2
-      && embolism.metrics.pulmonaryBloodVolume > reference.metrics.pulmonaryBloodVolume,
-    `${reference.metrics.pulmonaryTransitTime.toFixed(1)} -> `
-      + `${embolism.metrics.pulmonaryTransitTime.toFixed(1)} s`);
-  check('congested low output prolongs it further',
-    congestion.metrics.pulmonaryTransitTime > embolism.metrics.pulmonaryTransitTime + 5
-      && near(congestion.metrics.pulmonaryTransportTime, PULMONARY_TRANSIT.maximumMeanTime, 0.02),
-    `${embolism.metrics.pulmonaryTransitTime.toFixed(1)} -> `
-      + `${congestion.metrics.pulmonaryTransitTime.toFixed(1)} s; staged buffer `
-      + `${congestion.metrics.pulmonaryTransportTime.toFixed(1)} s`);
-
-  // In positive-pressure ventilation the RV loses preload during inspiration;
-  // after pulmonary transit, the LV nadir belongs in expiration. Only the phase
-  // is asserted — not a diagnostic amplitude or cutoff.
-  const ventilated = new Simulator();
-  ventilated.params = {
-    ...defaultParams(), baroreflex: 0, mode: 'vcv', pmus: 0, vt: 560,
-    peep: 8, rr: 18, ti: 1.2, hr: 75,
-  };
-  ventilated.reset();
-  ventilated.advance(30, true);
-  beatSeen = ventilated.circ.beatCount;
-  const respiratoryBeats = [];
-  for (let i = 0; i < 1000 && respiratoryBeats.length < 10; i++) {
-    ventilated.advance(0.01, true);
-    if (ventilated.circ.beatCount !== beatSeen) {
-      beatSeen = ventilated.circ.beatCount;
-      respiratoryBeats.push({ sv: ventilated.circ.sv, phase: ventilated.resp.phase });
-    }
-  }
-  const lvNadir = respiratoryBeats.reduce((a, b) => (b.sv < a.sv ? b : a));
-  check('the delayed LV stroke-volume nadir occurs during expiration',
-    lvNadir.phase === 'exp', `nadir ${lvNadir.sv.toFixed(1)} mL in ${lvNadir.phase}`);
+  s.advance(30, true);
+  check('sustained reduction in RV ejection reduces downstream LV delivery after redistribution',
+    s.circ.svRv < before.rv && s.circ.sv < before.lv,
+    `RV ${before.rv.toFixed(2)} -> ${s.circ.svRv.toFixed(2)}, LV ${before.lv.toFixed(2)} -> ${s.circ.sv.toFixed(2)} mL`);
+  check('serial ventricular response conserves total circulating blood',
+    near(totalVolume(s.circ), before.blood, 1e-7));
 }
 
 section('Baroreflex');

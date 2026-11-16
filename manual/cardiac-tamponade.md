@@ -53,16 +53,16 @@ The **Cardiac tamponade** preset represents a compensated, spontaneously breathi
 
 | state | capacity (mL) | P<sub>peri</sub> (mmHg) | CVP (mmHg) | RV end-diastolic pressure (mmHg) | PA diastolic (mmHg) | wedge surrogate (mmHg) |
 |---|---:|---:|---:|---:|---:|---:|
-| constrained preset | 100 | 9.4 | 6.3 | 8.8 | 14.9 | 10.1 |
-| capacity restored | 430 | 0.0 | -1.4 | -0.6 | 16.1 | 9.0 |
+| constrained preset | 100 | 9.2 | 6.1 | 9.2 | 16.1 | 9.7 |
+| capacity restored | 430 | 0.0 | -1.5 | -0.9 | 16.6 | 8.3 |
 
 | state | RV EDV (mL) | LV EDV (mL) | cardiac output (L/min) | MAP (mmHg) |
 |---|---:|---:|---:|---:|
-| constrained preset | 73 | 100 | 5.27 | 96.7 |
-| capacity restored | 120 | 145 | 7.90 | 143.5 |
+| constrained preset | 76 | 97 | 5.02 | 97.5 |
+| capacity restored | 114 | 142 | 7.68 | 142.7 |
 <!-- END GENERATED: cardiac-tamponade -->
 
-The constrained state brings the four clinically compared diastolic pressures into the same broad range, markedly reduces both ventricular end-diastolic volumes and depresses flow. Restoring capacity lowers pericardial pressure and CVP while RV filling recovers proportionally more than LV filling. This preferential RV effect emerges from the shared pressure acting on a lower-pressure chamber; it is not scripted into the scenario.
+The constrained state narrows the spread of the four clinically compared diastolic pressures relative to the decompressed state, reduces both ventricular end-diastolic volumes and depresses flow. It does not satisfy the audit’s declared requirement that this pressure spread be below 8 mmHg. That number is a model acceptance criterion, not a universal diagnostic cutoff. Restoring capacity lowers pericardial pressure and CVP while RV filling recovers proportionally more than LV filling. This preferential RV effect emerges from the shared pressure acting on a lower-pressure chamber; it is not scripted into the scenario.
 
 The pressure comparison is deliberately approximate. CVP and the wedge surrogate use exponential smoothing with a three-second time constant, whereas RV end-diastolic and pulmonary artery diastolic pressure come from the latest completed beat. The table shows the broad pressure pattern; its mixed timing does not test simultaneous pressure equalisation or reproduce a catheter tracing.
 
@@ -74,14 +74,15 @@ A literal effusion-volume slider would be easier to recognise but physiologicall
 
 No fluid compartment is added, and changing capacity does not add or remove circulating blood. This keeps the intervention mechanistic and computationally small while preserving the central pressure–volume relation.
 
-The scenario is also not forced to meet a numerical diagnostic threshold. It must show high pericardial pressure, convergence of diastolic pressures, preferential restriction of RV filling, depressed output and improvement with restored capacity. Those are executable directional contracts. Absolute pressure, output and volume changes are illustrative.
+The scenario demonstrates high shared pericardial pressure, preferential restriction of RV filling, and improved filling and output when capacity is restored. Those mechanical requirements are retained as executable checks. The additional pressure-spread and IVC-volume excursion requirements remain separately measured open findings; passing the core lesson does not mean they have been met. Absolute pressure, output and volume changes are illustrative.
 
 ## What the model does not reproduce
 
 - **Pulsus paradoxus is not quantitatively calibrated.** Respiratory arterial variation increases in the constrained state, but the preset is not required to cross the clinical 10 mmHg threshold. The existing PPV tile is unavailable during spontaneous breathing and must not be repurposed as a pulsus-paradoxus measurement.
 - There is no pericardial fluid compartment, accumulation rate, drainage flow or loculated effusion. Capacity is an aggregate surrogate, not an echocardiographic volume.
 - There is no right-atrial or right-ventricular wall collapse represented geometrically. The thorax panel shows pressure and chamber volume, not diagnostic echocardiographic signs.
-- The inferior vena cava is modelled as a compliant compartment whose volume remains high but still varies modestly through the breath; see [inferior vena cava](inferior-vena-cava.md). The thorax panel preserves this blunted excursion, but its displayed calibre is not an ultrasound collapsibility measurement.
+- The inferior vena cava remains larger with constraint, but its respiratory volume excursion divided by mean volume is not smaller than after decompression. This expected ordering remains an open audit finding. The [caval schematic](inferior-vena-cava.md) can show a smaller relative width change because width is a square-root transformation of distending volume; that graphical result does not validate ultrasound collapsibility or resolve the volume finding.
+- The four diastolic readouts remain outside the declared spread below 8 mmHg. Their narrower range during constraint supports the shared-pressure mechanism, but does not meet the complete pressure-band criterion or demonstrate simultaneous haemodynamic equalisation.
 - Coronary perfusion, myocardial ischaemia and the effect of falling arterial pressure on RV performance are absent.
 - The model does not represent low-pressure tamponade, regional postoperative tamponade, severe pulmonary hypertension masking right-sided collapse, constrictive or effusive–constrictive pericarditis.
 - Autonomic compensation senses filtered systemic MAP only. It does not respond directly to pericardial pressure, chamber stretch or venous congestion.

@@ -64,7 +64,7 @@ Use **Save patient** after creating a useful phenotype. The application download
 
 The file preserves applied blood, its starting-volume reference and the resulting balance. A prepared but unsubmitted dose is not saved. Opening settings retain their full precision even when a displayed percentage is rounded. Loading a file discards any pending dose.
 
-The application accepts version-2 files. If a file is rejected, the current patient is unchanged. Unknown settings are reported and ignored; a known setting outside its allowed range is rejected. Recovery of older files is an optional technical task, described in the [offline recovery instructions](https://github.com/internalempire/arthur/blob/main/tools/archive/ri/README.md); it is not needed to use Save and Load with current files.
+The application accepts version-2 files. If a file is rejected, the current patient is unchanged. Unknown settings are reported and ignored; this includes a saved `piston` value, which does not control the pulmonary circulation. A known setting outside its allowed range is rejected. Recovery of older files is an optional technical task, described in the [offline recovery instructions](https://github.com/internalempire/arthur/blob/main/tools/archive/ri/README.md); it is not needed to use Save and Load with current files.
 
 ## Limits
 

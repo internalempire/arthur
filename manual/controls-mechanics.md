@@ -64,7 +64,7 @@ Abdominal pressure can raise upstream systemic venous pressure while also increa
 
 `pab0` does not automatically set `cwLoad`. The abdomen-to-thorax pressure transfer depends on posture, diaphragm geometry and abdominal mechanics that the model does not resolve. The intra-abdominal-hypertension preset selects both controls explicitly, while leaving them independent for exploration.
 
-Prone position is deliberately coarse. It combines directional changes intended to provoke thought about competing mechanics, not to predict an individual response.
+Prone position combines changes in chest-wall compliance, abdominal pressure and opening midpoint. In the audited ARDS/RV phenotype, opening improves and the geometric resistance reference falls, but plateau pressure and RV/LV volume ratio rise. The rise in plateau pressure is a primary discrepancy of this position transformation; the intended RV-unloading effect is also not reproduced. See [body position and the abdomen](pleural-pressure.md#body-position-and-the-abdomen). This combined transformation illustrates competing mechanical effects; it does not reproduce the full clinical benefit of proning, including effects involving PaCO₂ or regional ventilation/perfusion.
 
 ## Limits
 
@@ -75,7 +75,7 @@ Prone position is deliberately coarse. It combines directional changes intended 
 - The compromised fraction and reopenable share are internal teaching quantities, not CT tissue fractions. The reopenable share is not a measured R/I or a prescribed amount of opening during one PEEP step.
 - Recruitment has one diseased population; opening pressures are distributed but not spatially assigned.
 - EFL has one aggregate choke, without regional small-airway heterogeneity, a separate airway opening/closure process or gas compression.
-- Prone effects are directional and not patient-specific.
+- The prone transformation is not patient-specific and does not satisfy the current RV-unloading audit criterion.
 
 ## References
 

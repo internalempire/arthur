@@ -24,22 +24,26 @@ Together these experiments support distinguishing inflation geometry from vascul
 
 Both limbs of the [mechanical J-curve](pulmonary-vascular-resistance.md) use strain: volume per open unit relative to that tissue's resting volume. Open and closed vascular pathways contribute conductances in parallel, and hypoxic vasoconstriction raises resistance in the closed pathway.
 
-Pressure enters other parts of the circulation explicitly:
+Pressure also enters the circulation explicitly:
 
-- Pulmonary arterial pressure opposes RV ejection and contributes to the gradient driving pulmonary inflow.
-- Pulmonary venous pressure contributes to the downstream pressure for that flow.
-- Alveolar pressure raises effective downstream pressure in a fixed share of the bed when it exceeds pulmonary venous pressure.
-- Fixed arterial and venous compliances relate stored blood volume to vascular pressure; respiratory pressure and the represented lung-inflation displacement effect also contribute.
+- PA pressure opposes RV ejection and drives flow into the middle pulmonary store.
+- Alveolar pressure surrounds that middle store and affects narrowing of its outlet toward PV.
+- Pleural pressure and transpulmonary traction determine the external pressure around the arterial and venous stores.
+- The pressure–volume relations convert the blood actually stored into intravascular pressure. Those pressures drive the three signed vascular flows and determine further redistribution.
 
-**For the user:** matching airway pressure is not sufficient for comparing two states. Record how pressure is generated, pleural pressure, lung volume and open fraction, and upstream/downstream vascular pressures. The same apparent PEEP or transpulmonary pressure can coexist with a different RV ejection load.
+The graph displays the **geometric resistance reference**, with a distended middle outlet. The running circulation's current segmental resistance sum additionally includes pressure-dependent narrowing and the fixed distal venous resistance. A catheter-style $(mPAP-wedge)/CO$ estimate is a third quantity, with different measurements and assumptions.
 
-The resistance law itself contains no pressure-induced vascular widening or recruitment. Compliant blood storage and pressure-dependent resistance are separate mechanisms; representing the first does not imply that the second is present.
+**For the user:** matching airway pressure is insufficient for comparing two states. Record how inflation is produced, pleural and alveolar pressure, lung volume and open fraction, and upstream/downstream vascular pressures. The same PEEP or transpulmonary pressure can coexist with different vascular filling and RV ejection load.
+
+## Why keep these mechanisms separate
+
+Storage volume does not uniquely identify resistance. A vessel can become longer while containing more blood; local calibre, number of flowing paths and shape also matter. The model therefore represents pressure-dependent storage and a specified narrowing law, without turning every extra millilitre into a universal reduction in resistance. The geometric reference supplies the remaining inflation dependence.
 
 ## Limits
 
-The model cannot answer how much a patient's vessels distend or recruit when intravascular pressure rises. It also omits regional vascular networks, pressure-dependent arterial compliance and wave reflection. Its extra-alveolar resistance limb approaches a floor at high volume; it does not reproduce every segmental high-volume rise seen in isolated-lung experiments.
+The model cannot determine how much a patient's already-distended vessels widen or recruit when intravascular pressure rises. It omits regional vascular networks, regional pressure references, resistance-dependent arterial compliance and wave reflection. Its extra-alveolar geometric limb approaches a floor at high volume; it does not reproduce every segmental high-volume rise in isolated-lung experiments. Peták's rat-lung pressure protocol and quantitative response are not established human calibration targets for this circuit.
 
-A lower resistance coefficient does not guarantee higher cardiac output: pulmonary arterial pressure, downstream pressure, ventricular filling and output evolve together. Read [RV function](the-right-ventricle.md), vascular pressures and actual forward flow alongside the resistance curve.
+A lower geometric reference does not guarantee higher output: PA pressure, downstream pressure, ventricular filling and flow evolve together. Read [RV function](the-right-ventricle.md), vascular pressures and actual forward flow alongside the curve.
 
 ## References
 

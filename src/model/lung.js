@@ -587,7 +587,8 @@ export function pvrComponents(p, lungVolume, plKnown = null, phiKnown = null) {
     + LOW_VOLUME_TRACTION_GAIN * deflation * deflation
   );
   const openPath = perUnitAlveolar + perUnitExtra;
-  const closedPath = p.pvrBase * CLOSED_PATH_FACTOR * (1 + (p.hpv ?? 0) * HPV_GAIN);
+  const closedPathWithoutHpv = p.pvrBase * CLOSED_PATH_FACTOR;
+  const closedPath = closedPathWithoutHpv * (1 + (p.hpv ?? 0) * HPV_GAIN);
   const openConductance = r.openFraction / openPath;
   const closedConductance = r.closedFraction / closedPath;
   const totalConductance = openConductance + closedConductance;
@@ -600,6 +601,7 @@ export function pvrComponents(p, lungVolume, plKnown = null, phiKnown = null) {
     extraAlveolarPath: perUnitExtra,
     openPath,
     closedPath,
+    closedPathWithoutHpv,
     openBed: openPath / r.openFraction,
     // No closed compartment means the bed is absent, not infinitely resistant.
     // `null` keeps that semantic explicit and prevents an otherwise valid fully

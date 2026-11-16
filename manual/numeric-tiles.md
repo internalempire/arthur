@@ -58,9 +58,9 @@ Read each card's measurement label and time window:
 - Pleural pressure is instantaneous, in cmH₂O relative to atmosphere. Lung gas volume, open fraction, the internal PVR coefficient and pulmonary blood volume are instantaneous model states.
 - The venous forward-driving gradient uses three-second exponential mean determinants: systemic filling pressure minus effective downstream pressure, which uses a smooth transition between right atrial and caval critical pressure. This is a gradient calculated from mean determinants, not a time average of the instantaneous gradient. It is not a measurement of net flow; resistance, collapse and backflow also matter.
 - RV and LV end-diastolic volumes and forward outputs refer to the latest completed beat. RV output divides integrated forward pulmonary-valve volume by that beat's measured duration; systemic output uses forward aortic volume. These outputs can differ during redistribution.
-- Mean arterial and pulmonary arterial pressures are referenced to atmosphere and use exponential smoothing with a three-second time constant. The internal PVR coefficient is not catheter-derived PVR and does not describe the whole RV afterload.
+- Mean arterial and pulmonary arterial pressures are referenced to atmosphere and use exponential smoothing with a three-second time constant. The pulmonary resistance reference describes geometry with the middle outlet distended. It is distinct from the pressure-sensitive segmental resistance sum and catheter-derived PVR; none describes the whole RV afterload.
 - LV end-ejection transmural pressure is the pressure at the last forward-ejection sample in the completed beat, after subtracting pleural and additional pericardial pressure. It is a measured outcome of loading and contraction, not an independently prescribed afterload or proof of improved ejection. Read it alongside filling, stroke volume and output.
-- Pulmonary blood volume includes arteries, the transport buffer and veins. The displayed transport-buffer mean time is an internal timescale, not a fixed delay or a clinical transit measurement.
+- Pulmonary blood volume includes the arterial, alveolar-exposed middle and venous stores. The mean-residence estimate is that total divided by completed-beat RV flow; it is an observation, not a controller or a fixed delay. The thorax inspector also reports the middle-store blood, atmospheric pressure and outflow to PV, together with the extra-alveolar surrounding pressure.
 
 The same elapsed time does not guarantee matched cardiac or respiratory phases. Different histories may also leave different states despite identical control settings. Therefore a difference at one instant is neither a steady-state conclusion nor an isolated causal effect. Invalid states and missing measurements are withheld independently for each patient; Δ is withheld if either value is unavailable.
 
@@ -140,7 +140,7 @@ Related pages: [The right ventricle](the-right-ventricle.md) · [Pulmonary arter
 
 The tile is an exponential mean of atmospheric left atrial pressure with a three-second time constant. It is not produced by a catheter occlusion and is not sampled specifically at end-expiration. Pleural and pericardial pressure are included in the displayed value, so it must not be equated automatically with transmural left-heart filling pressure.
 
-The subtitle reports a **zone 3 index**, a normalised pulmonary-venous-to-alveolar pressure margin. It is not an anatomical percentage of lung. The tile is cautioned when this index does not support an uninterrupted downstream pressure column.
+The instantaneous **Pv − Palv** value in the inspector is the pressure difference between the pulmonary venous compartment and alveoli, in mmHg. The subtitle and badge use the **minimum over the last complete breath**: a negative minimum means that the venous end lay below its surrounding pressure during part of that breath. A currently positive margin does not clear that caution. After a setting change or airway hold, the badge remains cautioned until a complete uninterrupted new breath has been measured. The subtitle reports that this measurement is pending; it can take nearly two respiratory periods, because the remaining partial breath is discarded. Neither value is an anatomical percentage of lung, and a non-negative minimum does not validate a regional catheter measurement.
 
 Related page: [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md)
 
@@ -164,23 +164,15 @@ Because cardiac output is in the denominator, derived PVR can rise when flow fal
 
 Related pages: [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Vascular waterfalls](vascular-waterfalls.md)
 
-### Pulmonary resistance coefficient
+### Pulmonary resistance reference
 
-This is the resistance used inside the pulmonary flow equation after the alveolar and extra-alveolar J-curve, open and derecruited pathways and hypoxic-tone surrogate have been combined. The waterfall pressure is handled separately in the circulation. It is displayed in Wood units and dyn·s·cm⁻⁵ for scale, but it is not a catheter measurement and need not equal derived PVR.
+The main value is the geometric pulmonary coefficient at the current lung volume, open fraction and HPV setting, expressed in Wood units. It describes the equivalent bed with a distended middle outlet; it does not include pressure-dependent narrowing or the fixed distal venous outlet resistance. The [PVR panel](panel-pvr-curve.md) shows this same reference.
 
-Related pages: [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Hypoxic vasoconstriction](hypoxic-vasoconstriction.md)
+The inspector separately reports the **current segmental resistance sum**, including the actual narrowing of the middle outlet and the distal resistance. During redistribution, the three segment flows differ; their sum of effective resistances is not a single PA-to-LA instantaneous pressure/flow ratio. Derived PVR is a third quantity with its own pressure/output averaging and wedge-surrogate caution.
 
-### RV:LV end-diastolic volume
+The reported resistance swing uses the maximum and minimum of this **current segmental sum** over the last completed breath: `(maximum − minimum) / [(maximum + minimum) / 2]`, expressed as a percentage. The denominator is the midpoint of the extrema, not a time average. This captures resistance variation, including narrowing, but not every component of pulsatile RV afterload. A setting change or airway hold invalidates this observation. The inspector reports it as pending until one complete uninterrupted new breath has been observed, excluding the remaining partial breath; an imposed control step is therefore not counted as respiratory variation.
 
-The ratio compares the model chambers' end-diastolic volumes and prints both absolute volumes. It helps reveal ventricular imbalance and septal competition, but it is not the mid-cavity diameter ratio used in echocardiography. Its colour describes a model geometry; it does not diagnose acute cor pulmonale.
-
-Related pages: [The right ventricle](the-right-ventricle.md) · [Ventricular interdependence](ventricular-interdependence.md) · [PV loops](panel-pv-loops.md)
-
-### LV ejection fraction
-
-EF is the geometric volume reduction, 100 × (EDV − ESV) / EDV, for the latest completed beat. EDV is sampled immediately before first forward ejection and ESV at its end. The subtitle reports independently integrated forward stroke volume. In an admissible cycle without filling during ejection these agree; the model flags throughflow and incompatible pressure relations as outside its physiological domain. If the geometric volumes do not define an EF within 0–100%, EF is unavailable and the state is invalid; it is not clipped to a plausible percentage.
-
-Related pages: [PV loops](panel-pv-loops.md) · [Ventriculo-arterial coupling](ventriculo-arterial-coupling.md)
+Related pages: [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [PVR panel](panel-pvr-curve.md) · [Pulmonary storage](pulmonary-transit.md)
 
 ---
 
@@ -279,7 +271,7 @@ Related page: [Stress index](stress-index.md)
 
 ### Pulse pressure variation
 
-PPV and SVV compare completed cardiac beats in a trailing window of about one respiratory period (1.05 times the period set by respiratory rate). If that contains fewer than two beats, the calculation falls back to up to four recent beats. This is not a phase-synchronised average over several complete breaths. The tile explicitly labels them as descriptive rather than a verdict on filling state, and the model deliberately does not colour them with a fluid-responsiveness cutoff. In particular, a low PPV can coexist with substantial [preload reserve](preload-reserve.md) when severe underfilling weakens transmission through the pulmonary circulation. Spontaneous effort makes the tile unavailable; low tidal volume, too few beats per breath, RV dilatation or high abdominal pressure add caution because they weaken or confound the usual mechanism.
+PPV and SVV compare completed cardiac beats in a trailing window of about one respiratory period (1.05 times the period set by respiratory rate). If that contains fewer than two beats, the calculation falls back to up to four recent beats. This is not a phase-synchronised average over several complete breaths. The tile explicitly labels them as descriptive rather than a verdict on filling state, and the model deliberately does not colour them with a fluid-responsiveness cutoff. In particular, a low PPV can coexist with substantial [preload reserve](preload-reserve.md) depending on respiratory stimulus, pulmonary/atrial storage and the timing of the competing mechanical effects. Spontaneous effort makes the tile unavailable; low tidal volume, too few beats per breath, RV dilatation or high abdominal pressure add caution because they weaken or confound the usual mechanism.
 
 Related page: [Pulse pressure variation](pulse-pressure-variation.md)
 

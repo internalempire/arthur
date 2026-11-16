@@ -220,13 +220,13 @@ section('The two-compartment lung');
     const preset = SCENARIOS.find((x) => x.id === 'ards-rv').params;
     const at = (peep, over) => settled({ ...preset, peep, ...over }, 45).metrics;
 
-    // Measured from PEEP 4 rather than 0, because below that even a consolidated
-    // lung is reopening its *normal* units — those close at very low volume and
-    // need almost no pressure back. That gives it a shallow optimum of its own
-    // around PEEP 8, which is real and worth not asserting away.
+    // Compare established low/high PEEP states, not a universal monotonic law
+    // from zero PEEP: even the normal share can open at low inflation. Cappio
+    // Borlino 2024 (PMID 38924520) compared about 4 versus 14 cmH2O; 20 here is
+    // a model stress extension, not an exact reproduction of that protocol.
     const consLow = at(4, { reopenable: 0 }), consHigh = at(20, { reopenable: 0 });
     const recrLow = at(4, {}), recrHigh = at(20, {});
-    // On the derived value, because that is what a catheter reads and what the
+    // On the derived value, because that is the pressure/flow ratio calculated from catheter-style measurements and what the
     // trial these claims come from measured. The model's own coefficient falls
     // with PEEP in both lungs; the difference between them is what the bedside
     // sees, and it runs the other way.
@@ -242,14 +242,23 @@ section('The two-compartment lung');
       consLow.co - consHigh.co > recrLow.co - recrHigh.co,
       `${(recrLow.co - recrHigh.co).toFixed(2)} vs ${(consLow.co - consHigh.co).toFixed(2)} L/min lost`);
 
-    // Even with nothing recruitable there is a best PEEP, and it is not zero.
-    // No optimum at all in the consolidated lung: every increment of PEEP costs
-    // it. That is what the corrected curve says, and it is the sharper teaching
-    // point — there is nothing to recruit, so there is nothing to trade against.
-    const sweep = [0, 4, 8, 12, 16, 20].map((peep) => at(peep, { reopenable: 0 }).pvrDerivedWood);
-    check('and in a consolidated lung there is no best PEEP — every increment costs it',
-      sweep.every((v, i) => i === 0 || v > sweep[i - 1]),
-      sweep.map((v, i) => `${[0, 4, 8, 12, 16, 20][i]}:${v.toFixed(1)}`).join('  '));
+    // A single-phase (mPAP-wedge)/last-beat CO snapshot does not establish
+    // monotonic resistance across every PEEP step, nor does the cited two-state
+    // clinical comparison imply that universal rule. Test the actual mechanical
+    // claim separately: with ALL units held open, increasing volume above that
+    // lung's reference volume traverses the rising limb. This is a constitutive
+    // reference experiment, not a claim that the consolidated preset is fully
+    // open or that its whole-circuit output must decrease at every PEEP.
+    const reference = defaultParams();
+    const frc = pvrComponents(reference, 2.2, null, 1).vascularFrc;
+    const strains = [0, 0.2, 0.4, 0.6, 0.8, 1, 1.2, 1.4, 1.6, 1.8];
+    const rightLimb = strains.map(strain => pvrComponents(reference, frc * (1 + strain), null, 1));
+    check('distension above reference volume raises mechanical resistance when all units are held open',
+      rightLimb.every((component, i) => component.openFraction === 1
+        && near(component.strain, strains[i], 1e-12)
+        && (i === 0 || component.total > rightLimb[i - 1].total)),
+      rightLimb.map((component, i) => `strain ${strains[i]}: ${component.total.toFixed(4)}`).join('; '));
+
   }
 
   check('open fraction is bounded and monotone in volume',

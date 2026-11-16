@@ -20,6 +20,17 @@ const TRACE_LEN = TRACE_SAMPLE_HZ * TRACE_SECONDS;
 const MEAN_TIME_CONSTANT = 3; // s, for the mean-pressure moving averages
 export const COMPARTMENTS = ['vSa', 'vSv', 'vIVC', 'vRa', 'vRv', 'vPa', 'vPt', 'vPv', 'vLa', 'vLv'];
 
+function pulmonaryMarginQuality(margin) {
+  if (!Number.isFinite(margin)) return {
+    level: 'caution',
+    reasons: ['Pulmonary pressure margin measurement pending a complete fresh breath.'],
+  };
+  return margin < 0 ? {
+    level: 'caution',
+    reasons: ['alveolar pressure exceeded downstream pulmonary venous pressure during the last complete breath; left atrial pressure may not represent an occluded pulmonary arterial pressure'],
+  } : { level: 'ok', reasons: [] };
+}
+
 class Ring {
   constructor(n) { this.buf = new Float32Array(n); this.n = n; this.i = 0; this.filled = 0; }
   push(v) { this.buf[this.i] = v; this.i = (this.i + 1) % this.n; if (this.filled < this.n) this.filled++; }
@@ -154,13 +165,29 @@ export class Simulator {
     this.cycleFlowDuration = 0;
     // Occlusion manoeuvres, and the (pressure, flow) pairs they measure.
     this.hold = null;
-    this.pvrBreath = -1;
-    this.pvrLo = Infinity;
-    this.pvrHi = -Infinity;
-    this.lastPvrSwing = 0;
+    this.invalidatePulmonaryMargin();
     this.measuredPoints = [];
     // Settle the model so the first frame the user sees is a steady state.
     this.advance(15, true);
+  }
+
+  /** Discard changed or interrupted breaths from both pulmonary observations. */
+  invalidatePulmonaryMargin() {
+    this.pulmonaryMarginBreath = this.resp.breathCount;
+    this.pulmonaryMarginMin = Infinity;
+    this.pulmonaryMarginStartedAtBoundary = false;
+    this.lastBreathPulmonaryMargin = null;
+    this.pvrLo = Infinity;
+    this.pvrHi = -Infinity;
+    this.lastPvrSwing = null;
+    if (this.metrics) {
+      this.metrics.lastBreathPulmonaryMargin = null;
+      this.metrics.pvrSwing = null;
+      this.metrics.interpretability.wedge = pulmonaryMarginQuality(null);
+      if (this.metrics.interpretability.pvrDerived.level !== 'unavailable') {
+        this.metrics.interpretability.pvrDerived = pulmonaryMarginQuality(null);
+      }
+    }
   }
 
   /**
@@ -196,6 +223,7 @@ export class Simulator {
       }
     }
     invalidateRecruitmentCycle(this.resp);
+    this.invalidatePulmonaryMargin();
     if (this.metrics) {
       this.metrics.closedEndExpiratoryFraction = null;
       this.metrics.tidalOpenExcursion = null;
@@ -271,6 +299,7 @@ export class Simulator {
    */
   startHold(kind, seconds = 12) {
     if (this.hold || this.resp.hold || this.resp.holdPending) return false;
+    this.invalidatePulmonaryMargin();
     this.resp.holdElapsed = 0;
     this.resp.holdStartPaw = null;
     this.resp.holdStartVolume = null;
@@ -280,6 +309,7 @@ export class Simulator {
   }
 
   cancelHold() {
+    this.invalidatePulmonaryMargin();
     this.resp.hold = null;
     this.resp.holdPending = null;
     this.resp.holdElapsed = 0;
@@ -323,19 +353,36 @@ export class Simulator {
 
   accumulate() {
     const c = this.circ;
-    // How much right ventricular afterload moves within a breath. Latched per
-    // breath like the respiratory quantities, because it is the amplitude over a
-    // cycle that matters and a single sample is a sample at a phase.
-    if (this.resp.breathCount !== this.pvrBreath) {
-      this.pvrBreath = this.resp.breathCount;
-      this.lastPvrSwing = this.pvrHi > this.pvrLo
-        ? (this.pvrHi - this.pvrLo) / Math.max(1e-6, (this.pvrHi + this.pvrLo) / 2)
-        : 0;
+    // The wedge caution belongs to an entire respiratory pressure cycle, not
+    // the current display frame. A changed or occluded cycle is discarded;
+    // begin at the next inspiratory boundary and publish at the following one.
+    const marginInterrupted = !!(this.resp.hold || this.resp.holdPending);
+    if (marginInterrupted) {
+      this.pulmonaryMarginStartedAtBoundary = false;
+      this.lastBreathPulmonaryMargin = null;
+      this.lastPvrSwing = null;
+    }
+    if (this.resp.breathCount !== this.pulmonaryMarginBreath) {
+      const complete = this.pulmonaryMarginStartedAtBoundary;
+      this.lastBreathPulmonaryMargin = complete && Number.isFinite(this.pulmonaryMarginMin)
+        ? this.pulmonaryMarginMin : null;
+      // Respiratory excursion of the current segmental secant resistance sum,
+      // including compression and the distal venous connection. A parameter
+      // step must not masquerade as a respiratory excursion. Both observations
+      // therefore share the same complete, uninterrupted respiratory interval.
+      // This is resistive loading, not total RV afterload: normalise max-minus-min
+      // by the mean of those extrema, not a temporal mean.
+      this.lastPvrSwing = complete && Number.isFinite(this.pvrLo) && Number.isFinite(this.pvrHi)
+        ? (this.pvrHi - this.pvrLo) / Math.max(1e-6, (this.pvrHi + this.pvrLo) / 2) : null;
+      this.pulmonaryMarginBreath = this.resp.breathCount;
+      this.pulmonaryMarginMin = Infinity;
       this.pvrLo = Infinity;
       this.pvrHi = -Infinity;
+      this.pulmonaryMarginStartedAtBoundary = !marginInterrupted;
     }
-    this.pvrLo = Math.min(this.pvrLo, c.p.pvr);
-    this.pvrHi = Math.max(this.pvrHi, c.p.pvr);
+    this.pulmonaryMarginMin = Math.min(this.pulmonaryMarginMin, c.p.capillaryDownstreamTransmural);
+    this.pvrLo = Math.min(this.pvrLo, c.p.pvrEffective);
+    this.pvrHi = Math.max(this.pvrHi, c.p.pvrEffective);
 
     this.trackHold();
     this.sysRun = Math.max(this.sysRun, c.p.sa);
@@ -607,18 +654,21 @@ export class Simulator {
     const ppvLevel = spontaneousEffort ? 'unavailable' : ppvReasons.length ? 'caution' : 'ok';
 
     const plateauLevel = spontaneousEffort ? 'unavailable' : 'ok';
-    const wedgeLevel = c.p.zone3 >= 0.95 ? 'ok' : 'caution';
+    // Use the minimum over the last complete, uninterrupted breath: an
+    // instantaneous positive margin must not clear an inspiratory caution.
+    // A non-negative completed minimum removes only this compression caution;
+    // it does not validate a catheter measurement or identify anatomical zones.
+    const wedgeQuality = pulmonaryMarginQuality(this.lastBreathPulmonaryMargin);
+    const wedgeLevel = wedgeQuality.level;
     // Derived PVR depends on the wedge surrogate as well as forward flow. Its
-    // arithmetic remains available outside zone 3, but its catheter meaning
+    // arithmetic remains available during compression, but its catheter meaning
     // does not; propagate that dependency instead of displaying an apparently
     // unqualified PVR beside a cautioned downstream pressure.
     const pvrDerivedLevel = co <= 0.05 ? 'unavailable'
       : wedgeLevel === 'caution' ? 'caution' : 'ok';
     const pvrDerivedReasons = pvrDerivedLevel === 'unavailable'
       ? ['no forward flow to divide by']
-      : pvrDerivedLevel === 'caution'
-        ? ['the left-atrial-pressure wedge surrogate is uncertain outside West zone 3 conditions']
-        : [];
+      : pvrDerivedLevel === 'caution' ? [...wedgeQuality.reasons] : [];
 
     // ESC/ERS 2022: pulmonary hypertension is mPAP above 20 mmHg; the
     // pre-capillary component additionally requires PVR above 2 Wood units with
@@ -644,11 +694,7 @@ export class Simulator {
         reasons: r.lastClosedEndExpiratory === null ? ['waiting for a complete uninterrupted breath'] : [],
       },
       plateau: { level: plateauLevel, reasons: plateauLevel === 'unavailable' ? ['no passive plateau during spontaneous effort'] : [] },
-      wedge: {
-        level: wedgeLevel,
-        reasons: wedgeLevel === 'ok' ? []
-          : ['left atrial pressure is only a wedge surrogate under West zone 3 conditions'],
-      },
+      wedge: wedgeQuality,
       pvrDerived: { level: pvrDerivedLevel, reasons: pvrDerivedReasons },
     };
 
@@ -739,11 +785,11 @@ export class Simulator {
         ? Math.max((crs / 1000) * p.raw, EXPIRATORY_FLOW_LIMIT.minimumTimeConstant)
         : (crs / 1000) * p.raw,
       pvr: c.p.pvr,
-      // The J-curve coefficient the model integrates with. Not the same number a
-      // clinician derives from a catheter, because the model also carries an
-      // alveolar waterfall and zone conditions that the catheter formula folds
-      // into its single resistance. Both are reported, separately named.
+      // Geometric reference coefficient with distended vessels. Current
+      // segmental pressure-flow resistance also depends on vessel compression.
+      // Neither is the ratio of mean PA-to-LA pressure to beat output.
       pvrCoefficientWood: c.p.pvr * RESISTANCE_TO_WOOD,
+      pvrEffectiveWood: c.p.pvrEffective * RESISTANCE_TO_WOOD,
       // null rather than NaN: at arrest there is no derivable resistance, and a
       // readout should say so instead of propagating a number that is not one.
       pvrDerivedWood: pvrDerived,
@@ -753,12 +799,14 @@ export class Simulator {
       pvrOpenBed: pvrComp.openBed,
       pvrClosedBed: pvrComp.closedBed,
       pvrOpenFlowShare: pvrComp.openFlowShare,
-      zone3: c.p.zone3,
+      capillaryDownstreamTransmural: c.p.capillaryDownstreamTransmural,
+      lastBreathPulmonaryMargin: this.lastBreathPulmonaryMargin,
       pulmonaryTransitTime: c.p.pulmonaryTransitTime,
-      pulmonaryTransportTime: c.p.pulmonaryTransportTime,
       pulmonaryBloodVolume: c.p.pulmonaryBloodVolume,
-      pulmonaryTransitVolume: c.vPt,
-      pulmonaryTransitFlow: (c.q.pulTransit * 60) / 1000,
+      pulmonaryMiddleVolume: c.vPt,
+      pulmonaryMiddlePressure: c.p.cap,
+      pulmonaryExtraPressure: c.p.pExtra,
+      pulmonaryMiddleOutflow: (c.q.pulTransit * 60) / 1000,
       minuteVentilation: (r.lastVt * p.rr) / 1000,
       bloodVolume: COMPARTMENTS.reduce((t, k) => t + c[k], 0),
       minCompartment: Math.min(...COMPARTMENTS.map((k) => c[k])),

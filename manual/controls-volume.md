@@ -48,7 +48,7 @@ Blood redistribution can change blood present, stressed volume and its percentag
 
 ### Venous compliance
 
-**Venous compliance (slope)** adjusts only the systemic venous reservoir. It does not adjust the separate IVC, pulmonary veins or atrial wall. A change can redistribute blood and alter left-sided pressures indirectly, while their intrinsic coefficients remain fixed. See [pulmonary and atrial compliance](controls-pulmonary.md#compliance-capacity-and-filling-are-different).
+**Venous compliance (slope)** adjusts only the systemic venous reservoir. It does not adjust the separate IVC, pulmonary veins or atrial wall. A change can redistribute blood and alter left-sided pressures indirectly, while their intrinsic coefficients remain fixed; the pulmonary stores can nevertheless move between distended and compressed branches of their pressure–volume relation. See [pulmonary and atrial compliance](controls-pulmonary.md#compliance-capacity-and-filling-are-different).
 
 At the same stressed volume, lower compliance generates higher elastic filling pressure. It does not itself reclassify blood from unstressed to stressed. The manual and reflex venous-capacity shifts are separate and explained under [venous tone](venous-tone.md).
 

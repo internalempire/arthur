@@ -42,7 +42,7 @@ section('Public model API');
     'createPatientState',
     'lungRegions', 'lungVolumeAtPl', 'openBand', 'openFractionFromRecruitmentState',
     'parsePatientState', 'patientParameterOverrides', 'pericardialPressure', 'preloadLimbs',
-    'pvrComponents', 'recruitmentBand', 'relaxationVolume',
+    'pvrComponents', 'pulmonaryResistancePartition', 'recruitmentBand', 'relaxationVolume',
     'staticEndExpiratoryVolume',
     'respiratorySystemCompliance', 'stepOpenFraction', 'stepRecruitedFraction',
     'venousReturnCurve',
@@ -153,15 +153,22 @@ section('Pulmonary vascular claims exposed to the user stay qualified');
     pvrManual.includes('inflation and deflation points fall approximately on the same curve')
       && !pvrManual.includes('approach one relation'));
 
-  const zoneThree = settled({ mode: 'vcv', pmus: 0, peep: 0 }).metrics;
-  const waterfall = settled({ mode: 'vcv', pmus: 0, peep: 10 }).metrics;
+  // Exercise observed pressure conditions, not a universal PEEP threshold.
+  // The whole-breath margin is positive in the reference PEEP-0 fixture and
+  // negative at PEEP 15; PEEP alone does not identify an anatomical West zone.
+  const openBed = settled({ mode: 'vcv', pmus: 0, peep: 0 }).metrics;
+  const compressedBed = settled({ mode: 'vcv', pmus: 0, peep: 15 }).metrics;
   check('derived PVR is unqualified only with a defensible wedge surrogate',
-    zoneThree.interpretability.wedge.level === 'ok'
-      && zoneThree.interpretability.pvrDerived.level === 'ok');
-  check('derived PVR inherits wedge uncertainty outside zone 3',
-    waterfall.interpretability.wedge.level === 'caution'
-      && waterfall.interpretability.pvrDerived.level === 'caution'
-      && waterfall.interpretability.pvrDerived.reasons[0].includes('wedge surrogate'));
+    openBed.lastBreathPulmonaryMargin >= 0
+      && openBed.interpretability.wedge.level === 'ok'
+      && openBed.interpretability.pvrDerived.level === 'ok');
+  check('derived PVR inherits the observed complete-breath compression caution',
+    compressedBed.lastBreathPulmonaryMargin < 0
+      && compressedBed.interpretability.wedge.level === 'caution'
+      && compressedBed.interpretability.pvrDerived.level === 'caution'
+      && compressedBed.interpretability.pvrDerived.reasons.length > 0
+      && JSON.stringify(compressedBed.interpretability.pvrDerived.reasons)
+        === JSON.stringify(compressedBed.interpretability.wedge.reasons));
 
   const wedgePage = readFileSync(new URL('../../manual/pulmonary-artery-wedge-pressure.md', import.meta.url), 'utf8');
   const limitsPage = readFileSync(new URL('../../manual/global-limits.md', import.meta.url), 'utf8');
@@ -180,8 +187,8 @@ section('PPV remains descriptive rather than a filling-state verdict');
   const figures = readFileSync(new URL('../../manual/figure/generate.mjs', import.meta.url), 'utf8');
   check('the numerical tile disclaims a filling-state interpretation',
     stats.includes('descriptive only · not a filling-state verdict'));
-  check('the manual exposes both non-monotonic filling extremes',
-    page.includes('severe underfilling')
+  check('the manual separates descriptive variation from the independent reserve',
+    page.includes('independent local RV preload-reserve')
       && page.includes('quantitative limitation of the model')
       && page.includes('neither a low nor a high model PPV identifies filling state'));
   check('the filling comparison is generated from the model rather than drawn by hand',
@@ -204,8 +211,9 @@ section('Tamponade IVC remains plethoric without being drawn as immobile');
     ivcPage.includes('BEGIN GENERATED: ivc-respiratory-calibre')
       && ivcPage.includes('END GENERATED: ivc-respiratory-calibre'));
   check('scenario validation distinguishes the schematic from ultrasound',
-    validation.includes('directional volume-based schematic')
-      && validation.includes('non-zero displayed respiratory excursion'));
+    validation.includes('Neither quantity is an ultrasound diameter measurement')
+      && validation.includes('non-zero respiratory excursion')
+      && validation.includes('does not resolve the open volume criterion'));
 }
 
 section('The drawn curves agree with the integrator');

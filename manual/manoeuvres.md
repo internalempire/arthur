@@ -12,6 +12,8 @@ During the hold, airway flow is stopped at the selected lung volume. The model a
 
 At least two points permit a linear fit and a zero-flow intercept. That intercept is labelled extrapolated because flow is not actually reduced to zero. It can differ from the exactly known internal Pmsf because each hold can alter abdominal pressure and sample a different effective venous-return relation. See [Pmsf and occlusions](pmsf-and-occlusions.md).
 
+A hold also interrupts the ordinary respiratory measurement used to qualify the wedge surrogate. The wedge and derived-PVR badges remain cautioned while a hold is pending or active and until a fresh uninterrupted breath has been completed after its release. This is a pending assessment, not evidence that the hold itself made a clinical wedge invalid. The instantaneous Pv − Palv remains available in the inspector. See [wedge interpretability](pulmonary-artery-wedge-pressure.md#how-the-quality-badge-is-decided).
+
 ### What an inspiratory hold shows during pressure support
 
 The same inspiratory hold also makes the patient's pressure contribution visible during assisted ventilation. The sequence is easier to understand from the [waveforms](panel-waveforms.md):

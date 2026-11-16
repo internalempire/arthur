@@ -49,12 +49,12 @@ An obstructed phenotype at 26 breaths per minute:
 
 | applied PEEP (cmH₂O) | total PEEP (cmH₂O) | dynamic trapped volume (mL) | end-expiratory volume (L) | cardiac output (L/min) |
 |---:|---:|---:|---:|---:|
-| 0 | 11.4 | 1361 | 3.74 | 4.77 |
-| 5 | 11.7 | 780 | 3.77 | 4.75 |
-| 6 | 12.5 | 746 | 3.86 | 4.72 |
-| 8 | 14.4 | 720 | 4.07 | 4.62 |
-| 10 | 16.3 | 698 | 4.28 | 4.48 |
-| 13 | 19.2 | 658 | 4.57 | 4.28 |
+| 0 | 11.4 | 1361 | 3.74 | 5.02 |
+| 5 | 11.7 | 780 | 3.77 | 5.00 |
+| 6 | 12.5 | 746 | 3.86 | 4.96 |
+| 8 | 14.4 | 720 | 4.07 | 4.86 |
+| 10 | 16.3 | 698 | 4.28 | 4.75 |
+| 13 | 19.2 | 658 | 4.57 | 4.57 |
 <!-- END GENERATED: efl-peep -->
 
 For this phenotype, total PEEP and end-expiratory volume are essentially unchanged from applied PEEP 0 to 5 cmH₂O. The departure becomes detectable just above 5 and is clear by 8–10 cmH₂O: applied pressure is then adding to absolute lung volume rather than merely substituting for part of intrinsic pressure. Dynamic trapped volume can fall while absolute end-expiratory volume rises because it is measured above the passive equilibrium volume at the same applied PEEP.
@@ -68,8 +68,8 @@ Without the explicit flow cap, the same phenotype has a different PEEP response:
 
 | applied PEEP (cmH₂O) | total PEEP (cmH₂O) | end-expiratory volume (L) | cardiac output (L/min) |
 |---:|---:|---:|---:|
-| 0 | 6.6 | 3.18 | 5.22 |
-| 5 | 11.5 | 3.74 | 4.77 |
+| 0 | 6.6 | 3.18 | 5.29 |
+| 5 | 11.5 | 3.74 | 5.02 |
 <!-- END GENERATED: efl-off-peep -->
 
 Here, raising applied PEEP increases both total PEEP and absolute end-expiratory volume, while output falls. This is the model's response to resistive incomplete emptying without an explicit choke; it is not evidence that every non-flow-limited patient behaves that way.

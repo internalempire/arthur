@@ -1,14 +1,14 @@
 import { Panel, niceTicks } from '../plot.js';
-import { lungVolumeAtPl, pvrComponents, RESISTANCE_TO_WOOD } from '../../model/index.js';
+import {
+  lungVolumeAtPl, pvrComponents, pulmonaryResistancePartition, RESISTANCE_TO_WOOD,
+} from '../../model/index.js';
 
-// The classical two-limb construction of pulmonary vascular resistance.
-//
-// Alveolar vessels are compressed as lung volume rises; extra-alveolar vessels
-// are pulled open by radial traction. These resistances are in series within an
-// open vascular path, so their sum is the mechanical J-curve. Derecruitment and
-// HPV still affect the patient's actual point, but are not drawn as another
-// curve: mixing that separate mechanism into this construction obscured the two
-// opposing limbs the panel exists to teach.
+// Geometric resistance reference with distended vessels. The two opposing
+// components describe the selected lung-volume dependence. They exclude the
+// current pressure-dependent vascular compression and the separate distal
+// venous connection. Prescribed excess resistance is assigned upstream through
+// the same partition helper used by the integrator. The live reference point includes current lung opening
+// and HPV; it is not the sum of actual segmental pressure-drop/flow ratios.
 
 const ZOOM_LEVELS = Object.freeze([1, 1.5, 2, 3]);
 
@@ -98,7 +98,7 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
   function render(sim, colors) {
     panel.resize();
     const ctx = panel.begin();
-    const { params: p, resp: r } = sim;
+    const p = sim.effective ?? sim.params, r = sim.resp;
 
     // The excursion the current breath makes along the curve — reset on a
     // breath, not after a fixed number of frames.
@@ -129,12 +129,14 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
     let yHi = 0;
     for (let i = 0; i < samples; i++) {
       const v = xLo + ((xHi - xLo) * i) / (samples - 1);
-      // Holding phi at one isolates the mechanical vascular construction. The
-      // two named components add in series and their sum is exactly openPath.
+      // Hold the lung open and use the integrator's resistance partition.
+      // Prescribed excess load enters the upstream component; the two curves
+      // still sum to the geometric reference, excluding the distal outlet.
       const comp = pvrComponents(p, v, null, 1);
-      const a = comp.alveolarPath * RESISTANCE_TO_WOOD;
-      const e = comp.extraAlveolarPath * RESISTANCE_TO_WOOD;
-      const j = comp.openPath * RESISTANCE_TO_WOOD;
+      const parts = pulmonaryResistancePartition(p, comp);
+      const a = parts.middleResistance * RESISTANCE_TO_WOOD;
+      const e = parts.extraResistanceTotal * RESISTANCE_TO_WOOD;
+      const j = parts.geometricResistance * RESISTANCE_TO_WOOD;
       alveolar.push(v, a);
       extraAlveolar.push(v, e);
       total.push(v, j);
@@ -142,7 +144,7 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
     }
 
     const patient = pvrComponents(p, r.lungVolume, r.plSolved, r.openFraction);
-    const patientPvr = patient.total * RESISTANCE_TO_WOOD;
+    const patientPvr = pulmonaryResistancePartition(p, patient).geometricResistance * RESISTANCE_TO_WOOD;
     const patientVisible = r.lungVolume >= xLo && r.lungVolume <= xHi;
     if (patientVisible) yHi = Math.max(yHi, patientPvr);
     const fullYHi = yHi * 1.05;
@@ -156,7 +158,7 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
       xTicks: Object.values(landmarks), xFormat: () => '',
       yTicks: niceTicks(view.yLo, view.yHi, 4), yFormat: (v) => v.toFixed(1),
       xLabel: 'Lung volume (L)',
-      yLabel: 'PVR (Wood units)',
+      yLabel: 'Reference resistance (WU)',
     });
 
     panel.clip();
@@ -179,21 +181,21 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
 
     const at = (arr, frac) => { const i = (Math.floor(arr.length * frac) & ~1); return [arr[i], arr[i + 1]]; };
     let [lx, ly] = at(extraAlveolar, 0.18);
-    panel.label('Extra-alveolar vessels', lx, ly,
+    panel.label('Extra-alveolar / upstream', lx, ly,
       { color: colors.text.pleural, dx: 5, dy: -10, halo: colors.surface });
     [lx, ly] = at(alveolar, 0.84);
     panel.label('Alveolar vessels', lx, ly,
       { color: colors.text.airway, align: 'right', dx: -5, dy: 11, halo: colors.surface });
     [lx, ly] = at(total, 0.34);
-    panel.label('Total PVR', lx, ly,
+    panel.label('Open-lung reference', lx, ly,
       { color: colors.text.flow, dx: 5, dy: -12, halo: colors.surface });
 
-    // One point keeps the plot connected to the live simulation without turning
-    // derecruitment and HPV into a competing curve. When it sits above the
-    // mechanical sum, that gap is the contribution of the patient's closed bed.
+    // The point uses the current opening/HPV state at the same distended-vessel
+    // reference as the curves. Actual pressure-dependent resistance belongs
+    // in the inspector and is not projected onto a different constitutive law.
     if (patientVisible) {
       panel.dot(r.lungVolume, patientPvr, { color: colors.ink, r: 4, ring: colors.surface });
-      panel.label('Patient', r.lungVolume, patientPvr,
+      panel.label('Current reference', r.lungVolume, patientPvr,
         { color: colors.inkSecondary, dx: 6, dy: 11, halo: colors.surface });
     }
 
@@ -212,7 +214,7 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
     }
     ctx.restore();
 
-    panel.title('PVR vs lung volume', colors, 'alveolar + extra-alveolar vessels');
+    panel.title('Resistance reference', colors, 'distended vessels · alveolar + upstream');
   }
 
   return { render };

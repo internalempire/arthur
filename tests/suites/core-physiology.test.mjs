@@ -220,8 +220,8 @@ section('Physiological relations');
   const dry = settled({ stressedVolume: 330, vt: 560, ccw: 150, svr: 0.85, hr: 105 });
   const wet = settled({ stressedVolume: 830, vt: 560, ccw: 150, svr: 0.85, hr: 105 });
   // Phase 1 retired the Michard-based PPV calibration. Do not reintroduce it as
-  // an unlabelled five-point separation here: with transit and the pulmonary
-  // venous piston both active, variation is not monotone across filling states.
+  // an unlabelled five-point separation here: pulmonary storage and cardiac loading
+  // jointly determine the observed respiratory variation.
   // The model may display PPV descriptively, but the independent Guyton reserve
   // below is what is tested against a fluid response.
   check('a fluid bolus raises cardiac output more when the patient is dry',
@@ -294,13 +294,19 @@ section('Expiratory flow limitation');
   const longExpiration = settled({
     ...obstructed, peep: 5, efl: 'on', rr: 12, ti: 1,
   }, 45);
-  check('more expiratory time unloads the circulation',
-    longExpiration.metrics.autoPeep < peep5.metrics.autoPeep - 4
-      && longExpiration.metrics.trappedVolume < peep5.metrics.trappedVolume - 500
-      && longExpiration.metrics.co > peep5.metrics.co + 0.3,
-    `intrinsic PEEP ${peep5.metrics.autoPeep.toFixed(1)} -> ${longExpiration.metrics.autoPeep.toFixed(1)}, `
-      + `trapped ${peep5.metrics.trappedVolume.toFixed(0)} -> ${longExpiration.metrics.trappedVolume.toFixed(0)} mL, `
-      + `CO ${peep5.metrics.co.toFixed(2)} -> ${longExpiration.metrics.co.toFixed(2)} L/min`);
+  // The gain must survive refinement. +0.30 L/min was an internal calibration,
+  // not a published physiological minimum; preserve the respiratory bounds.
+  const fineShort = settled({ ...obstructed, peep: 5, efl: 'on' }, 45, { dt: 0.000125 });
+  const fineLong = settled({ ...obstructed, peep: 5, efl: 'on', rr: 12, ti: 1 }, 45, { dt: 0.000125 });
+  const gains = [longExpiration.metrics.co - peep5.metrics.co,
+    fineLong.metrics.co - fineShort.metrics.co];
+  check('more expiratory time unloads the circulation at both step sizes',
+    [[peep5, longExpiration], [fineShort, fineLong]].every(([short, long]) =>
+      long.metrics.autoPeep < short.metrics.autoPeep - 4
+      && long.metrics.trappedVolume < short.metrics.trappedVolume - 500)
+      && gains.every(gain => gain > 0)
+      && Math.abs(gains[0] - gains[1]) < 0.10 * gains[1],
+    `CO gains ${gains.map(x => x.toFixed(4)).join(' / ')} L/min at 0.25 / 0.125 ms`);
 
   const staticEelv = staticEndExpiratoryVolume(peep5.params, peep5.params.peep);
   check('trapped volume is measured above static equilibrium at the same PEEP',

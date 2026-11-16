@@ -39,7 +39,7 @@ Play/Pause stops or resumes simulated time. The speed selector changes how quick
 | respiratory mechanics | lung and chest-wall mechanics, collapse, recruitment, hysteresis, flow limitation and abdominal coupling | [Mechanics controls](controls-mechanics.md) |
 | volume and vascular tone | explicit blood addition/removal, venous capacity and compliance, resistance to venous return and systemic vascular resistance | [Volume controls](controls-volume.md) |
 | cardiac function | rate, biventricular contractility, LV diastolic stiffness, baroreflex and ventricular interaction | [Heart controls](controls-heart.md) |
-| pulmonary circulation | open-lung vascular resistance, hypoxic vasoconstriction and pulmonary capacitance coupling | [Pulmonary controls](controls-pulmonary.md) |
+| pulmonary circulation | reference vascular resistance and hypoxic vasoconstriction | [Pulmonary controls](controls-pulmonary.md) |
 
 A grey control is not applicable in the current state—for example, tidal volume in pressure control, closing pressure while recruitment hysteresis is off, or baroreflex sensitivity while the reflex is disabled. The baroreflex is <!-- CONSISTENCY: baroreflex-default -->off<!-- /CONSISTENCY --> by default so the first view exposes uncompensated mechanical interaction; enabling it adds the model's aggregate pressure defence.
 
@@ -64,7 +64,7 @@ After creating a live reference with **Pin**, **Mechanisms** in the comparison t
 
 ## The physiological map
 
-A breath begins with the [equation of motion](equation-of-motion.md), which determines airway, alveolar and [pleural pressure](pleural-pressure.md). Those pressures change [transmural pressure](transmural-pressure.md), [venous return](venous-return.md), lung recruitment and the pulmonary vascular bed. Lung inflation also displaces pulmonary blood toward the left atrium, while [pulmonary transit](pulmonary-transit.md) delays the effect of changing right ventricular output.
+A breath begins with the [equation of motion](equation-of-motion.md), which determines airway, alveolar and [pleural pressure](pleural-pressure.md). Those pressures change [transmural pressure](transmural-pressure.md), [venous return](venous-return.md), lung recruitment and the pulmonary vascular bed. Alveolar compression and extra-alveolar expansion alter [pulmonary blood storage](pulmonary-transit.md); the resulting pressure-driven delivery couples changing RV output to LV filling over time.
 
 The two ventricles share a septum and a constrained space, described under [ventricular interdependence](ventricular-interdependence.md). [Cardiac tamponade](cardiac-tamponade.md) shows what happens when the available pericardial space becomes the dominant limit to filling. Ventricular output also depends on filling, contractility and arterial load; [ventriculo-arterial coupling](ventriculo-arterial-coupling.md) provides the conceptual framework. [The four effects of a breath](the-four-effects-of-a-breath.md) puts these pathways in temporal order.
 

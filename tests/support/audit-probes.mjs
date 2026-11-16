@@ -6,6 +6,93 @@ import { resolveParams } from '../../src/model/position.js';
 import { stepRespiratory } from '../../src/model/respiratory.js';
 import { stepCirculation, ventricularActivation } from '../../src/model/circulation.js';
 
+// Match the scenario-suite protocol exactly: reset (including its settling),
+// then advance the requested interval. This is distinct from settle() below.
+function scenarioSimulator(id, overrides = {}, seconds = 30) {
+  const simulator = new Simulator();
+  simulator.params = { ...defaultParams(), ...SCENARIO_BY_ID.get(id).params, ...overrides };
+  simulator.reset();
+  simulator.advance(seconds, true);
+  return simulator;
+}
+
+// Shared with the scenario suite so the unresolved IVC criterion keeps its
+// original 60 phase bins and 18-second observation, not a different protocol.
+export function respiratoryIvcProfile(simulator, seconds = 18) {
+  const bins = Array.from({ length: 60 }, () => ({ volume: 0, n: 0 }));
+  const period = 60 / simulator.params.rr;
+  for (let i = 0; i < seconds / 0.01; i++) {
+    simulator.advance(0.01, true);
+    const phase = (simulator.resp.tCycle % period) / period;
+    const bin = bins[Math.min(bins.length - 1, Math.floor(phase * bins.length))];
+    bin.volume += simulator.circ.vIVC;
+    bin.n++;
+  }
+  const volumes = bins.filter(({ n }) => n > 0).map(({ volume, n }) => volume / n);
+  const minimum = Math.min(...volumes);
+  const maximum = Math.max(...volumes);
+  const mean = volumes.reduce((sum, volume) => sum + volume, 0) / volumes.length;
+  return { mean, swing: (maximum - minimum) / mean };
+}
+
+export function tamponadeScenarioPair() {
+  const constrainedSimulator = scenarioSimulator('cardiac-tamponade', {}, 60);
+  const decompressedSimulator = scenarioSimulator('cardiac-tamponade', {
+    pericardialCapacity: 430,
+  }, 60);
+  // advance() replaces metrics rather than mutating this object. Capturing it
+  // before the profile therefore preserves the original suite's sampling time.
+  const constrained = constrainedSimulator.metrics;
+  const decompressed = decompressedSimulator.metrics;
+  const constrainedIvc = respiratoryIvcProfile(constrainedSimulator);
+  const decompressedIvc = respiratoryIvcProfile(decompressedSimulator);
+  return { constrained, decompressed, constrainedIvc, decompressedIvc };
+}
+
+export function pulmonaryPhenotypeAudit() {
+  const supine = scenarioSimulator('ards-rv');
+  const prone = scenarioSimulator('ards-rv', { position: 'prone' });
+  const measurements = simulator => {
+    const m = simulator.metrics;
+    return {
+      cardiacOutputLitresPerMinute: m.co,
+      rvEdvMl: m.rvEdv, lvEdvMl: m.lvEdv, rvLvVolumeRatio: m.rvLvRatio,
+      rvEndSystolicTransmuralPressureMmHg: simulator.circ.rvEsp,
+      geometricResistanceWood: m.pvrCoefficientWood,
+      effectiveResistanceWood: m.pvrEffectiveWood,
+      derivedResistanceWood: m.pvrDerivedWood,
+      plateauCmH2O: m.pplat,
+    };
+  };
+  return {
+    id: 'prone-rv-unloading',
+    // ORIGINAL criterion remains OPEN. Lower geometric resistance alone is
+    // not proof of net RV unloading, and is not substituted for this failure.
+    satisfied: prone.metrics.rvLvRatio < supine.metrics.rvLvRatio,
+    measurements: { supine: measurements(supine), prone: measurements(prone),
+      protocol: 'Shipped ARDS preset; reset then 30 s; live metrics at that instant. RV/LV is a volume ratio, not echocardiographic area.' },
+  };
+}
+
+export function tamponadePhenotypeAudit() {
+  const { constrained, decompressed, constrainedIvc, decompressedIvc } = tamponadeScenarioPair();
+  const diastolic = [constrained.cvp, constrained.rvEdp, constrained.papDia, constrained.paop];
+  const spread = Math.max(...diastolic) - Math.min(...diastolic);
+  return [{
+    id: 'tamponade-diastolic-spread',
+    satisfied: spread < 8,
+    measurements: { diastolicMmHg: diastolic, spreadMmHg: spread,
+      strictUpperLimitMmHg: 8, pericardialMmHg: constrained.pPeri,
+      decompressedPericardialMmHg: decompressed.pPeri,
+      protocol: 'Original CVP/RVEDP/PAPdiastolic/wedge spread after reset plus 60 s.' },
+  }, {
+    id: 'tamponade-ivc-volume-excursion',
+    satisfied: constrainedIvc.swing < decompressedIvc.swing,
+    measurements: { constrained: constrainedIvc, decompressed: decompressedIvc,
+      protocol: 'After reset plus 60 s, 18 s sampled every 0.01 s into 60 respiratory-phase bins; swing=(max-min)/mean, volume in mL. Not ultrasound collapsibility.' },
+  }];
+}
+
 export function settle(params, dt = 0.00025) {
   const s = new Simulator({ dt });
   s.applyScenario({ params });

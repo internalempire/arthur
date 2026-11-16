@@ -12,13 +12,13 @@ A positive-pressure inspiration activates four interacting pathways. The directi
 
 **2 · Right ventricular afterload rises.** Lung inflation moves the lung along the [J-shaped resistance curve](pulmonary-vascular-resistance.md). On its high-volume limb, alveolar-vessel compression can increase resistance; where alveolar pressure exceeds pulmonary venous pressure, the alveolar segment sits behind a waterfall. The right ventricle ejects less for the same filling.
 
-**3 · Left ventricular preload can rise briefly before falling.** Inflation can squeeze blood out of the pulmonary vascular bed toward the left atrium — the *piston* effect — while the reduced right ventricular output arrives later. The observed sequence depends on pulmonary vascular volume, zone conditions, flow and transit time; the early rise is not obligatory in every patient.
+**3 · Left ventricular preload can rise briefly before falling.** Inflation can squeeze blood out of the pulmonary vascular bed toward the left atrium  while the reduced right ventricular output arrives later. The observed sequence depends on pulmonary vascular volume, zone conditions, flow and transit time; the early rise is not obligatory in every patient.
 
 **4 · Left ventricular afterload falls.** The pressure component of LV afterload depends on ejection pressure relative to pressure around the heart, approximately aortic pressure minus pleural and pericardial pressure during ejection — see [transmural pressure](transmural-pressure.md). Raising pleural pressure lowers it, so a given contraction can eject more at the same filling. The [LV-failure preset](scenarios.md#lv-failure) demonstrates pressure unloading together with reduced filling and a modest fall in forward output; the net response depends on both effects.
 
 ### Why the timing matters
 
-Effects (1) and (2) act on the right ventricle *during* inspiration. The reduced RV delivery in effect (3) can influence LV filling **later and more gradually** because the pulmonary circulation stores and releases blood. This is a storage-mediated mechanical response, not a strict waiting period for the same parcel of blood to reach the LA; pressure effects can be immediate. The model's staged buffering component is close to two seconds in the reference circulation, while its whole PA-to-LA central-volume estimate is longer. Both change with pulmonary blood volume and forward flow.
+Effects (1) and (2) act on the right ventricle *during* inspiration. The reduced RV delivery in effect (3) can influence LV filling **later and more gradually** because the pulmonary circulation stores and releases blood. This is a storage-mediated mechanical response, not a strict waiting period for the same parcel of blood to reach the LA; pressure effects can be immediate. The time course depends on how the pulmonary stores fill and empty and on the pressures that drive their flows. The whole PA-to-LA volume/flow residence estimate answers a different question.
 
 At common heart and respiratory rates, the arterial pressure trough caused by inspiration often appears in **expiration**. A clinician who expects cause and effect to coincide may attribute the fall to the wrong phase of the breath. The exact phase depends on heart rate, respiratory rate and pulmonary transit.
 
@@ -28,35 +28,37 @@ Spontaneous inspiration reverses the sign of (1) and (4): pleural pressure falls
 
 ## In the model
 
-The four effects are not added as corrections to the displayed waveforms, but neither are they assumption-free. Each arises from an explicit model relation: surrounding pressure alters filling and afterload, lung volume shapes PVR, a piston coefficient shifts pulmonary venous unstressed volume, and a transport pathway delays volume delivery.
+Each pathway arises from the same circulation's pressure, volume and flow relations. Pleural pressure affects the heart and vascular surroundings; lung inflation changes reference resistance; alveolar pressure compresses a middle pulmonary blood store; extra-alveolar traction favours arterial and venous storage.
 
-| effect | where it comes from |
-|---|---|
-| RV preload | pleural pressure enters the pressure surrounding the right atrium, narrowing the venous return gradient |
-| RV afterload | lung volume enters `pvrAt`, and alveolar pressure enters the effective downstream pressure of the pulmonary circuit |
-| LV preload, piston | lung volume above resting volume lowers the pulmonary venous unstressed volume, in proportion to the zone III index |
-| LV afterload | pleural and pericardial pressures are added to intrinsic LV pressure to obtain cavity pressure; at a given aortic pressure, a rise in surrounding pressure reduces the transmural pressure required for ejection |
-| the delay | storage and release through the eight-stage [pulmonary transit](pulmonary-transit.md) pathway, with mean time derived from pulmonary blood volume and RV output; this does not impose a strict dead time |
+| effect | represented mechanism | useful observations |
+|---|---|---|
+| RV filling | pressure around the RA changes the venous-return gradient; the cava can become flow-limited | measured and transmural CVP, RV end-diastolic volume, net venous inflow |
+| RV ejection load | PA pressure opposes ejection; pulmonary resistance and middle-outlet narrowing influence that pressure | PA pressure, RV loop, geometric resistance reference and actual forward RV output |
+| LV filling | alveolar compression and extra-alveolar expansion redistribute conserved pulmonary blood; venous delivery fills the LA | pulmonary total and middle-store volume, LA transmural pressure, LV end-diastolic volume |
+| LV ejection load | pleural and pericardial pressures alter the transmural pressure required to eject into the systemic artery | LV loop, end-ejection transmural pressure and aortic output |
+| timing | all stores fill or empty according to inflow minus outflow; their pressures determine subsequent flow | RV and LV beat responses, pulmonary storage and respiratory phase |
 
-The **Pulmonary capacitance coupling** control sets the piston coefficient. Arthur weights that effect with its zone III pressure-margin index. This is a chosen aggregate rule, not a measured fraction of open capillaries or proof that pulmonary blood displacement vanishes outside zone III.
+### Where blood can accumulate or be expelled
 
-### What the model shows
+The middle pulmonary vascular compartment is exposed to alveolar pressure. When that pressure rises, it can drive blood into adjacent segments. The pulmonary arterial and venous compartments experience pleural pressure plus the effect of tissue traction: expansion of the lung lowers their external pressure relative to pleural pressure and permits additional blood storage.
 
-After an isolated sustained fall in RV contractility, the first affected RV beat has not yet changed LV stroke volume. The left-sided response becomes detectable over the following two to three beats. Total blood volume remains conserved while the staged pulmonary compartment supplies that interval.
+Both effects occur during the same inflation. Actual intravascular pressures determine how much each compartment fills or empties. Increased pressure in the pulmonary artery can support flow into the lung while also increasing RV ejection load. Greater pulmonary venous pressure can help delivery to the LA while opposing delivery from the middle compartment. Calling the entire process “squeezing blood toward the LV” would omit these competing stores and gradients.
 
-The delay depends on pulmonary blood volume and RV output. In matched passive experiments, pulmonary embolism lengthens the PA-to-LA estimate relative to the reference circulation, and congested low-output LV failure lengthens it further. The [pulmonary transit](pulmonary-transit.md) page gives the experiment, the three separate readouts and their limits.
+The [pulmonary storage page](pulmonary-transit.md) explains the three compartments, their pressure–volume law and conservation. The [waterfall page](vascular-waterfalls.md) explains pressure-dependent narrowing of the middle outlet. Neither mechanism prescribes a bolus, a fixed RV-to-LV delay or a chosen arterial waveform phase.
 
-This timing result does not validate PPV or SVV amplitude. The compliant pulmonary circuit filters the RV variation, while the piston, septum, pericardium and LV afterload act through separate immediate routes. Their superposition determines the final arterial waveform.
+### Read the early response separately from the settled response
+
+Pin one settled patient and change PEEP alone. First observe external pressure, pulmonary storage and the next RV/LV beats. Then compare several complete breaths after redistribution has settled. An early increase in aortic flow does not prove improved sustained cardiac output or isolate LV unloading: pulmonary blood already present can contribute to that early delivery.
+
+Conversely, a later fall in aortic flow need not equal the first RV change beat for beat. Pulmonary and atrial storage, cardiac phase and immediate mechanical effects shape the response. The displayed pulmonary volume/RV-flow ratio estimates blood residence; it does not control delivery or establish when the LV nadir must occur. PPV remains descriptive and quantitatively unvalidated.
 
 ---
 
-## Why this and not something else
+## Why this construction
 
-The model computes the four effects through shared compartment pressures and flows, allowing them to reinforce or offset one another. This coupling provides internal consistency, but each relation still carries its own physiological assumptions.
+Three pressure-bearing pulmonary stores make opposing compression and expansion inspectable within one conserved circulation. Their outflows follow pressure differences rather than a selected target for LV output. Keeping the circuit aggregate preserves a small ordinary calculation; there is no separate settling experiment during each breath.
 
-Here they arise from a shared set of pressure, volume and flow relations rather than four waveform-level effects. The model can therefore be run to ask whether its piston or afterload term dominates in a given simulated phenotype, whether raising PEEP helps or harms that phenotype, and whether variation is driven mainly by preload or afterload. Those answers describe the model and require external validation before they are transferred to a patient.
-
-[Pulmonary transit](pulmonary-transit.md) represents the timing and dispersion of blood delivery from the right to the left heart. Its mean depends on represented pulmonary blood volume and RV output; it is distinct from pressure-wave propagation.
+That mechanical consistency is not external validation. The compartment boundaries, compliances and traction coefficient simplify distributed vessels. Comparing a specified experimental protocol with its measured pressures, storage and flows is needed before accepting an effect size.
 
 ---
 
@@ -64,17 +66,17 @@ Here they arise from a shared set of pressure, volume and flow relations rather 
 
 ### Of the construction
 
-- **The four effects are the four this model has.** Bronchial circulation, direct compression of the heart by inflated lung, and the mechanical effect of lung volume on cardiac fossa geometry are absent.
-- **Transit remains aggregate.** Its mean changes with represented pulmonary blood volume and RV output, but one staged path cannot reproduce regional capillary transit, shunt or contrast kinetics. The staged portion is bounded to 0.8–6 s for numerical stability.
-- **One pleural pressure**, so no regional differences in how the breath reaches different parts of the heart.
-- The piston is a single coefficient acting on pulmonary venous unstressed volume. It is a stand-in for a distributed squeezing of a compliant bed, not a representation of it.
-- Spontaneous effort is one aggregate activation with one amplitude control and a regular post-inspiratory decay. Pressure support includes an inspiratory trigger threshold and can show delayed or ineffective triggering with trapped pressure. There is no separately recruited expiratory-muscle pressure, fatigue adaptation or complete dyssynchrony model.
+- The model has no bronchial circulation, regional pleural gradient, gravity-dependent pulmonary vascular network or direct cardiac-fossa compression by inflated lung.
+- The pulmonary middle compartment uses one global alveolar pressure, including when lung is compromised. Open and closed vascular territories do not have independently resolved pressure or storage.
+- Blood residence, the delay of a mechanical response and arterial pressure decay are different quantities. No universal beat count or respiratory phase is imposed on the LV response.
+- Distended pulmonary compliance is fixed. Middle-outlet narrowing is represented, but pressure-driven recruitment and widening of the already-distended resistance bed are not.
+- Spontaneous effort follows one aggregate activation and regular post-inspiratory decay. PSV includes triggering and can show ineffective efforts, but fatigue, automatic effort adaptation and a complete dyssynchrony model are absent.
 
 ### Of clinical application
 
-- The timing examples belong to specified model phenotypes. They demonstrate a sequence, not a fixed delay or effect size to expect in a patient.
-- **The delay is the most transferable finding on this page and the least quantitative.** That the arterial consequence follows the right-sided cause is robust; its exact interval and respiratory phase depend on the selected model state.
-- Nothing here tells you which of the four dominates in a given patient. The model can be used to explore its own phenotypes, but it cannot identify the dominant mechanism in an individual patient from a table or waveform alone.
+- The four pathways can reinforce or oppose each other. A pressure change alone cannot establish their relative contributions in a patient.
+- A lower LV transmural ejection pressure can coexist with lower filling and lower output; neither a change in one pressure nor an early flow increase proves clinical benefit.
+- The model's PPV, blood redistribution and response timing are not calibrated patient predictions. Separate controlled experiments are required to isolate one contribution within the model itself.
 
 ---
 

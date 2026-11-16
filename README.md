@@ -93,9 +93,9 @@ The model also represents:
 - the classical J-shaped relationship between PVR and lung volume;
 - aggregate West-zone and vascular-waterfall behaviour;
 - distinct internal resistance and catheter-derived PVR readouts;
-- lung inflation displacing pulmonary blood toward the left atrium;
-- state-dependent pulmonary transit based on represented central blood volume and RV output;
-- delayed serial coupling between RV and LV output.
+- opposing alveolar compression and extra-alveolar arterial/venous storage during inflation;
+- three pressure-bearing pulmonary stores with conservative, reversible vascular flows;
+- an observed pulmonary volume/RV-flow residence estimate, distinct from the mechanical time course of LV filling.
 
 Detailed pages: **[Pulmonary vascular resistance](manual/pulmonary-vascular-resistance.md)**, **[Vascular waterfalls](manual/vascular-waterfalls.md)**, **[Hypoxic vasoconstriction](manual/hypoxic-vasoconstriction.md)** and **[Pulmonary transit](manual/pulmonary-transit.md)**.
 
@@ -110,10 +110,10 @@ These include:
 - airway, alveolar, pleural and abdominal pressures;
 - end-expiratory alveolar pressure during active breathing, or total/intrinsic PEEP and trapped volume during passive ventilation;
 - plateau pressure, driving pressure and respiratory compliance;
-- effective systemic resistance coefficient, mPAP, wedge surrogate, pulmonary resistance coefficient and derived PVR;
+- effective systemic resistance coefficient, mPAP, wedge surrogate, geometric pulmonary resistance reference, current segmental resistance sum and derived PVR;
 - stress index, pulse pressure variation and stroke volume variation;
 - mean systemic filling pressure and model preload reserve;
-- instantaneous open fraction, closed fraction at end expiration, within-breath opening excursion and pulmonary transit estimates.
+- instantaneous open fraction, closed fraction at end expiration, within-breath opening excursion, pulmonary blood storage and a volume/flow residence estimate.
 
 Values can be marked *caution* or withheld as *unavailable* when their assumptions are absent. See **[Numerical tiles](manual/numeric-tiles.md)** and **[Interpretability](manual/interpretability.md)**.
 
@@ -134,7 +134,7 @@ Five control groups are generated from a single parameter registry:
 | respiratory mechanics | lung compliance and capacity, chest-wall compliance and load, resistance, collapse, recruitment, EFL and abdomen | [Mechanics controls](manual/controls-mechanics.md) |
 | volume and vascular tone | explicit blood addition/removal, total blood volume, venous tone effect, current reservoir blood/V₀/stressed volume, venous compliance, venous-return resistance and SVR | [Volume controls](manual/controls-volume.md) |
 | cardiac function | heart rate, contractility, LV stiffness, baroreflex and ventricular interaction | [Heart controls](manual/controls-heart.md) |
-| pulmonary circulation | vascular resistance, hypoxic vasoconstriction and pulmonary capacitance coupling | [Pulmonary controls](manual/controls-pulmonary.md) |
+| pulmonary circulation | reference vascular resistance and hypoxic vasoconstriction | [Pulmonary controls](manual/controls-pulmonary.md) |
 
 Six linked visual panels show the same simulation:
 
@@ -230,7 +230,7 @@ npm run snapshots
 
 A changed snapshot is a model change that requires review, not an automatic test repair. A green suite demonstrates numerical and mechanistic contracts; it does not establish patient-level quantitative validation. See **[Validation](manual/validation.md)**.
 
-Every pull request, scheduled run and publication checkout uses `npm run verify`, which runs the complete verification path. The seven registered independent audit criteria are enforced regression checks with resolved status; strict mode requires all of them to pass. A passing audit still does not establish quantitative agreement with human patients. See [Validation](manual/validation.md).
+Every pull request, scheduled run and publication checkout uses `npm run verify`, which runs the complete verification path. Seven independent audit criteria are resolved regression checks. Three remain openly unmet: prone RV unloading, the tamponade diastolic-pressure band and the relative IVC-volume excursion ordering. The ordinary audit reports these as `KNOWN_FAILURE`; strict mode rejects unresolved findings. A passing verification run therefore does not imply that those physiological expectations have been met or establish quantitative agreement with human patients. See [Validation](manual/validation.md).
 
 ---
 

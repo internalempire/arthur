@@ -68,7 +68,7 @@
 
 **RV preload reserve.** Local change in an analytic RV/venous-return intersection when mean systemic filling pressure rises. It does not independently test LV reserve and belongs to the fast RV construction and is distinct from the optional deep whole-heart curve. It is an internal coefficient, not a validated bedside index.
 
-**Pulmonary vascular resistance (PVR).** Clinically, $(mPAP-PAWP)/CO$, reported in Wood units. The model separately reports this derived aggregate and the coefficient used in its pulmonary flow law. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
+**Pulmonary vascular resistance (PVR).** Clinically, $(mPAP-PAWP)/CO$, reported in Wood units. The model separately reports the catheter-style ratio, a geometric resistance reference and the current pressure-sensitive segmental resistance sum. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 
 ## R–Z
 
@@ -94,11 +94,11 @@
 
 **Vascular waterfall.** Flow limitation in which downstream pressure ceases to control flow once it falls below a critical closing pressure. See [vascular waterfalls](vascular-waterfalls.md).
 
-**Venous piston.** Didactic shorthand for lung inflation displacing blood from pulmonary capacitance toward the left atrium.
+**Pulmonary blood storage.** Blood contained in the pulmonary arterial, alveolar-exposed middle and venous compartments. Inflation can compress the middle store while expanding extra-alveolar capacity; the net redistribution follows pressure-driven inflow and outflow. See [pulmonary storage and transit](pulmonary-transit.md).
 
-**Wedge / PAWP.** [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md). Clinically it is the distal pressure measured after occluding a pulmonary arterial branch. The model instead uses smoothed atmospheric left atrial pressure as a surrogate and qualifies it with a zone 3 pressure-margin index.
+**Wedge / PAWP.** [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md). Clinically it is the distal pressure measured after occluding a pulmonary arterial branch. The model instead uses smoothed atmospheric left atrial pressure as a surrogate and qualifies it when the instantaneous pulmonary venous pressure is below alveolar pressure.
 
-**West zones.** Relations among alveolar, pulmonary arterial and pulmonary venous pressure that alter pulmonary vascular flow. The model represents zone-2 waterfall behaviour and a zone-3 pressure-margin index in aggregate.
+**West zones.** Relations among alveolar, pulmonary arterial and pulmonary venous pressure that alter pulmonary vascular flow. The model represents pressure-dependent narrowing of one alveolar-exposed outlet and reports the instantaneous Pv − Palv margin in mmHg, without identifying anatomical zone fractions.
 
 ## Units and conversions
 

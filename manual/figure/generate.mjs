@@ -18,6 +18,7 @@ import {
   chestWallPressure, chestWallNeutralVolume,
 } from '../../src/model/lung.js';
 import { RESISTANCE_TO_WOOD } from '../../src/model/units.js';
+import { pulmonaryResistancePartition } from '../../src/model/pulmonary-vessels.js';
 import { Simulator } from '../../src/model/simulator.js';
 import { cardiacResponseCurve } from '../../src/model/cardiac-response.js';
 import { cardiacResponseParameters } from '../../src/model/cardiac-response-client.js';
@@ -90,11 +91,12 @@ function jCurveFigure() {
     // phi = 1 pins the lung fully open: this is the mechanical curve, not the
     // path a derecruiting lung would actually travel.
     const c = pvrComponents(p, v, null, 1);
+    const parts = pulmonaryResistancePartition(p, c);
     samples.push({
       v,
-      alv: c.alveolarPath * RESISTANCE_TO_WOOD,
-      extra: c.extraAlveolarPath * RESISTANCE_TO_WOOD,
-      total: c.total * RESISTANCE_TO_WOOD,
+      alv: parts.middleResistance * RESISTANCE_TO_WOOD,
+      extra: parts.extraResistanceTotal * RESISTANCE_TO_WOOD,
+      total: parts.geometricResistance * RESISTANCE_TO_WOOD,
     });
   }
 
@@ -474,9 +476,9 @@ function hpvRedistributionFigure() {
     }),
   }));
   return chart({
-    title: 'Selective tone redirects model flow toward the open pulmonary bed',
+    title: 'HPV changes the reference conductance mixture',
     xLabel: 'Lung open (%)',
-    yLabel: 'Pulmonary flow through the open bed (%)',
+    yLabel: 'Open-bed share of reference conductance (%)',
     series, xTick: 10, yTick: 10, xDomain: [0, 100], yDomain: [0, 100],
     padRight: 205,
     notes: ['absolute volume held at FRC', 'oxygen tension is not modelled', 'curves show conductance sharing'],
@@ -641,7 +643,7 @@ function ppvFillingFigure() {
     `<circle cx="${x(sample.stressedVolume).toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" style="fill:${colour};stroke:none"/>`;
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${FW} ${FH}" class="${ROOT}" role="img"
-  aria-label="Two aligned model plots against blood added or removed relative to the neutral starting volume. Pulse pressure variation is low at severe underfilling, rises and falls through intermediate filling, and rises again at high filling. Preload reserve falls steadily as filling increases, showing that low pulse pressure variation does not identify a full circulation.">
+  aria-label="Two aligned model plots against blood added or removed relative to the neutral starting volume. The upper plot shows descriptive pulse pressure variation; the lower plot shows the independently calculated local right-ventricular preload reserve. The curves are generated from the current model and impose no target pattern or diagnostic cutoff.">
 <style>${STYLE}</style>
 <rect class="bg" width="${FW}" height="${FH}"/>
 <text class="title" x="${left}" y="18">PPV does not identify filling state in the model</text>

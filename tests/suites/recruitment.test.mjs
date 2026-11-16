@@ -5,6 +5,10 @@ import {
   lungVolumeAtPl, lungComplianceAt, openBand,
   section, check, near, settled,
 } from '../support/model.mjs';
+import { pvrComponents } from '../../src/model/lung.js';
+import { cmH2OtoMmHg } from '../../src/model/units.js';
+import { pulmonaryResistancePartition, collapsiblePulmonaryFlow,
+  PULMONARY_VESSELS } from '../../src/model/pulmonary-vessels.js';
 
 section('Recruitment changes the mechanics');
 {
@@ -326,14 +330,43 @@ section('Body position');
   check('and the units it opens now hold gas, so resting volume rises',
     ardsProne.resp.relaxVolume > ardsSupine.resp.relaxVolume,
     `${ardsSupine.resp.relaxVolume.toFixed(3)} -> ${ardsProne.resp.relaxVolume.toFixed(3)} L at rest`);
-  check('proning a recruitable lung lowers pulmonary vascular resistance',
+  check('proning a recruitable lung lowers the geometric pulmonary resistance coefficient',
     // Proning is explicitly thought-generating in this app; direction is useful,
     // but its magnitude is too patient-specific to encode as a 5% calibration.
     ardsProne.metrics.pvrCoefficientWood < ardsSupine.metrics.pvrCoefficientWood,
     `${ardsSupine.metrics.pvrCoefficientWood.toFixed(2)} -> ${ardsProne.metrics.pvrCoefficientWood.toFixed(2)} Wood units`);
-  check('proning a recruitable lung unloads the right ventricle',
-    ardsProne.metrics.rvLvRatio < ardsSupine.metrics.rvLvRatio,
-    `RV:LV ${ardsSupine.metrics.rvLvRatio.toFixed(2)} -> ${ardsProne.metrics.rvLvRatio.toFixed(2)}`);
+  // Net RV unloading is NOT established by the geometric coefficient above.
+  // The original prone RV/LV < supine RV/LV criterion remains OPEN and executes
+  // in test:audit as prone-rv-unloading, including plateau and RV pressure.
+  // The separate experiment below asks only whether opening more pathways can
+  // lower required PA pressure at fixed flow, LA pressure, Palv and Ppl. It does
+  // not validate the complete prone phenotype (or an echocardiographic ratio).
+  const isolatedOpening = pOpen => {
+    const p = { ...defaultParams(), ...ARDS, pOpen };
+    const pl = 15; // cmH2O; Ppl = 0, so Palv equals transpulmonary pressure.
+    const palv = cmH2OtoMmHg(pl), flow = 60, pla = 10; // mmHg, mL/s, mmHg.
+    const phi = openFractionAt(p, pl), volume = lungVolumeAtPl(p, pl);
+    const resistance = pulmonaryResistancePartition(p, pvrComponents(p, volume, pl, phi));
+    const pv = pla + flow * resistance.venousResistance;
+    const scale = PULMONARY_VESSELS.middle.volume0 / PULMONARY_VESSELS.middle.compliance;
+    let low = pv, high = pv + 100;
+    for (let i = 0; i < 80; i++) {
+      const middle = (low + high) / 2;
+      if (collapsiblePulmonaryFlow(middle, pv, palv, resistance.middleResistance, scale) > flow) {
+        high = middle;
+      } else low = middle;
+    }
+    const middle = (low + high) / 2;
+    return { phi, pa: middle + flow * resistance.arterialResistance,
+      solvedFlow: collapsiblePulmonaryFlow(middle, pv, palv, resistance.middleResistance, scale) };
+  };
+  const lessOpen = isolatedOpening(ARDS.pOpen);
+  const moreOpen = isolatedOpening(Math.max(5, ARDS.pOpen - 6));
+  check('isolated opening lowers the PA pressure required for the same flow and pressure boundaries',
+    moreOpen.phi > lessOpen.phi && moreOpen.pa < lessOpen.pa
+      && near(lessOpen.solvedFlow, 60, 1e-9) && near(moreOpen.solvedFlow, 60, 1e-9),
+    `open ${lessOpen.phi.toFixed(3)} -> ${moreOpen.phi.toFixed(3)}; `
+      + `required PA ${lessOpen.pa.toFixed(2)} -> ${moreOpen.pa.toFixed(2)} mmHg at 60 mL/s`);
 
   const normalSupine = settled({});
   const normalProne = settled({ position: 'prone' });

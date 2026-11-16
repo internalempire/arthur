@@ -82,26 +82,53 @@ The pressure smoothing does not make the entire flow law smooth: the non-negativ
 
 ### On the pulmonary side
 
-Only the alveolar microvascular share of the bed sees the alveolar waterfall. The effective downstream pressure of the pulmonary circuit is a weighted blend:
+The pulmonary artery, alveolar-exposed middle compartment and pulmonary veins each store blood and carry pressure. The artery feeds the middle compartment through an extra-alveolar resistance. The middle compartment drains toward the pulmonary veins through a segment whose conductance falls when its internal pressure is below alveolar pressure. The veins then drain to the LA through the remaining ordinary extra-alveolar resistance and a fixed outlet resistance. Excess baseline resistance and the HPV-associated increment are assigned before the middle store, so an arterial load does not also become a venous obstruction. See [pulmonary storage](pulmonary-transit.md).
+
+Both pressure at the entrance to the middle outlet and pressure at its venous end matter. If both exceed alveolar pressure, that segment has its reference geometric resistance. As either end falls below alveolar pressure, the represented segment narrows. Lowering venous pressure further then produces progressively less extra forward flow. This is a smooth approach to a waterfall, rather than a discontinuous whole-lung switch. The same law allows backward flow when the endpoint pressure order reverses; equal pressures produce exactly zero flow.
+
+For readers who want the constitutive detail, define pressure relative to the segment's surroundings as $x=P-P_{alv}$. Relative local conductance is:
 
 $$
-P_{\text{down}} = (1-w)\,P_{pv} + w \cdot \max(P_{pv},\, P_{alv}), \qquad w = 0.45
+g(x)=\begin{cases}1,&x\geq0,\\ \exp(2x/s),&x<0,\end{cases}
+\qquad s=V_{0,m}/C_m
 $$
 
-- $P_{\text{down}}$ — effective downstream pressure of the pulmonary circuit, mmHg
-- $P_{pv}$ — pulmonary venous pressure, mmHg
-- $P_{alv}$ — alveolar pressure, mmHg
-- $w$ — share of the pulmonary bed exposed to alveolar pressure
+- $g$ — dimensionless conductance relative to the distended reference;
+- $x$ — local intravascular pressure minus alveolar pressure, in mmHg;
+- $s$ — pressure scale, in mmHg, formed from the middle store's $V_{0,m}=60$ mL and $C_m=8.4$ mL/mmHg.
 
-The weighted relation applies alveolar compression to a fixed share of the aggregate bed. It represents coexistence of vascular segments with different surrounding pressures, without resolving regional zones. Crossing the alveolar-pressure threshold therefore affects that share rather than switching the whole lung between two states. See [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
+The pressure–volume law's compressed branch motivates a quadratic volume/area proxy for conductance, giving the exponent 2. This is an explicit idealisation of narrowing, not a measured human capillary cross-section law. Distended vascular storage and the short resistive segment are different aggregate elements: further distension above zero transmural pressure does not automatically reduce its reference resistance. The geometric resistance curve and the storage relation do not derive a unique shared vessel radius; they summarise different contributions of a distributed bed.
 
-The model also tracks a **zone III index** — how far pulmonary venous pressure sits above alveolar pressure — and uses it to qualify the displayed [wedge surrogate](pulmonary-artery-wedge-pressure.md) rather than to switch the vascular behaviour. It is a normalised pressure margin, not the anatomical fraction of lung in zone III.
+The signed flow is:
+
+$$
+Q_{m\to pv}=\frac{F(P_m-P_{alv})-F(P_{pv}-P_{alv})}{R_{m,geom}},\qquad
+F(x)=\begin{cases}x,&x\geq0,\\(s/2)[\exp(2x/s)-1],&x<0.\end{cases}
+$$
+
+- $Q_{m\to pv}$ — flow from the middle store toward pulmonary veins, mL/s; a negative value means reversal;
+- $P_m$ and $P_{pv}$ — middle and pulmonary venous pressures relative to atmosphere, mmHg;
+- $P_{alv}$ — alveolar pressure relative to atmosphere, mmHg;
+- $R_{m,geom}$ — the middle outlet's geometric resistance, mmHg·s/mL;
+- $F$ — the integral of relative conductance with respect to pressure, in mmHg.
+
+The relation joins continuously across zero transmural pressure. It introduces neither a target flow nor a prescribed respiratory phase. Actual transfer also respects the shared donor-volume protection, which is a numerical safeguard and not a physiological closure mechanism.
+
+The narrowing law has a specific asymptotic limitation. If venous pressure falls far below alveolar pressure while middle pressure remains at or above it, $F(P_{pv}-P_{alv})$ approaches $-s/2$. Flow then approaches:
+
+$$
+Q_{m\to pv}\approx\frac{P_m-(P_{alv}-s/2)}{R_{m,geom}}.
+$$
+
+Thus the apparent downstream pressure in this limit is $P_{alv}-s/2$, about 3.6 mmHg below alveolar pressure with the current coefficients. This offset follows from the chosen mathematical shape; it is not a measured critical closing pressure. It is also not a hard zero-flow threshold: when upstream pressure is below alveolar pressure, the exponential branch must be used, and finite conductance remains. The law represents progressive flow limitation, not an exact anatomical collapse pressure.
+
+The instantaneous **Pv − Palv** margin is pressure at the venous end relative to alveolar pressure, in mmHg. The [wedge surrogate](pulmonary-artery-wedge-pressure.md) and derived PVR are cautioned when the minimum of that margin over the last complete breath is negative. After a setting change or hold, caution remains pending until an entirely new breath has been measured. The instantaneous value does not clear the badge between compressed phases. Neither quantity is a percentage of lung in zone 3, and an entirely non-negative breath does not validate a real catheter position.
 
 ### Recognise a plateau without calling it zero flow
 
 In the **Mean** Guyton view, inspect the flat part of the venous-return relation at low right atrial pressure. It means that lowering atrial pressure further buys little additional return; it does not mean that return has stopped. Raise abdominal pressure and watch the closing-pressure marker and effective gradient as well as Pmsf. A higher Pmsf can coexist with lower flow if the effective back-pressure also rises.
 
-For the pulmonary counterpart, compare PEEP states using the worked examples on [wedge pressure](pulmonary-artery-wedge-pressure.md#worked-examples). Follow the zone index and caution badge alongside the actual LA pressure surrogate. The model does not replace that surrogate with alveolar pressure: it flags the limits of its catheter-like interpretation.
+For the pulmonary counterpart, compare PEEP states using the worked examples on [wedge pressure](pulmonary-artery-wedge-pressure.md#worked-examples). Follow Pv − Palv and the caution badge alongside the actual LA pressure surrogate. The model does not replace that surrogate with alveolar pressure: it flags the limits of its catheter-like interpretation.
 
 ---
 
@@ -109,17 +136,9 @@ For the pulmonary counterpart, compare PEEP states using the worked examples on 
 
 **The smoothed closing-pressure transition.** The softplus connects the open-vessel and flow-limited asymptotes without a sharp corner in effective back-pressure. Its width is a numerical and didactic choice. It does not calculate wall motion or flutter. Exchanging the source and receiving ends applies the same collapse relation to backward flow. The near-equilibrium zero-flow interval remains a limitation of the law.
 
-**A fraction rather than a switch on the pulmonary side.** A whole-lung switch is an all-or-none behaviour standing in for a regional one. The model has no regional geography, so a fractional exposure is a transparent way to express that only part of the aggregate bed is affected. The value 0.45 is a didactic coefficient informed by published vascular partitions; it is not a measured fraction of the whole human bed that enters a waterfall simultaneously.
+**One alveolar-exposed compartment is an anatomical simplification.** Alveolar compression and extra-alveolar traction are assigned to different pressure-bearing stores, so their storage effects can oppose each other. However, one global alveolar pressure surrounds the middle store. The model does not resolve gravity-dependent regions or different vascular surroundings in aerated and nonaerated lung. A smooth collapse law does not supply that missing geography.
 
-**Why the venous side is not treated the same way, and what that costs.**
-
-Pulmonary and systemic venous flow use different aggregate representations. The pulmonary bed has a fractional exposure to alveolar pressure; systemic venous return uses a single caval closing pressure.
-
-On the pulmonary side the bed is split: 45% of it sits behind the alveolar waterfall, the rest does not. On the venous side there is a single closing pressure for all venous return. The venous anatomy presents an analogous regional problem: the superior vena cava is surrounded predominantly by **pleural** pressure, while the inferior route is strongly influenced by **abdominal** pressure. Those pressures can diverge — for example with high PEEP and a soft abdomen, or intra-abdominal hypertension at modest PEEP — so the two routes need not approach collapse at the same pressure or time in the breath.
-
-The model collapses both at one pressure, derived from the abdomen alone. Two things follow that a clinician should know before teaching from the plateau. Raising PEEP in this model does not selectively truncate superior caval return, and raising abdominal pressure does not selectively truncate the inferior route: both act through one closing pressure, so the model shows a single blended plateau instead of two limbs reaching their own. And because the closing pressure is built from abdominal pressure alone, ventilation reaches it only indirectly.
-
-The executable checks do not compare separate superior and inferior caval closing conditions. A passing suite therefore does not validate this regional simplification. The model can illustrate an aggregate flow-limited plateau, but cannot predict how flow divides between the two caval routes.
+**The systemic venous approximation is different.** The superior caval route is mainly exposed to pleural pressure and the inferior route to abdominal pressure. Those pressures can diverge, yet systemic return uses one aggregate closing pressure derived from the abdomen. It cannot show one route collapsing while the other remains patent. The executable checks therefore do not validate regional SVC/IVC behaviour; the model shows one combined venous-return plateau.
 
 ---
 
@@ -129,14 +148,14 @@ The executable checks do not compare separate superior and inferior caval closin
 
 - **One closing pressure for all venous return.** No separate superior and inferior caval routes, no hepatic waterfall, no azygos rerouting. A real hold manoeuvre recruits these differently, which is one reason the model's [extrapolated intercept](pmsf-and-occlusions.md) does not match the porcine measurement.
 - **The 5 cmH₂O of tolerated transmural compression is a single coefficient**, not a measured caval property, and does not vary with vessel filling or tone.
-- **No West zone map.** There is no gravitational gradient and no vertical distribution of blood flow, so the fractional waterfall weight and zone index are coefficients rather than an anatomical count of regions. The model cannot show zone I at all.
+- **No West zone map.** There is no gravitational gradient or distribution of regional vascular pressures. The aggregate middle outlet can become poorly conductive at negative transmural pressure, but this is not a measurement of the extent of zone I or zone II.
 - **The knee width is a numerical choice** as much as a physiological one.
-- **Some unvalved connections remain forward-only.** The reservoir-to-IVC segment and pulmonary arterial inflow still exclude reversal. The symmetric caval extension is not a fitted human pressure-flow relation and adds no vessel-wall dynamics.
-- The zone III index qualifies a readout; it does not change the perfusion distribution, because there is no distribution to change.
+- **Systemic reservoir-to-IVC flow remains forward-only.** The three pulmonary vascular connections permit reversal; the caval law also permits reversal but is not a fitted human pressure-flow relation. Cardiac valves remain one-way.
+- The pulmonary pressure margin qualifies a readout. It does not identify regional perfusion, capillary recruitment or a clinical wedge measurement.
 
 ### Of clinical application
 
-- The model can show *why* a left-atrial-pressure surrogate becomes unreliable when alveolar pressure governs part of the downstream bed. It cannot determine whether a particular patient's measured wedge is valid, and the zone III index must not be read as a measurement.
+- The model can show *why* a left-atrial-pressure surrogate becomes unreliable when alveolar pressure governs part of the downstream bed. It cannot determine whether a particular patient's measured wedge is valid, and the aggregate Pv − Palv margin is not a regional measurement.
 - The arithmetic $(\overline{P}_{pa}-P_{la})/\dot Q$ remains computable when the wedge surrogate is flagged, but the derived-PVR tile inherits the same caution and must be read as an internal hydraulic gradient rather than a catheter-derived PVR.
 - The closing pressure is not a bedside quantity. Nothing here supports estimating a patient's critical closing pressure from an abdominal pressure measurement.
 - The plateau of the venous return curve in a patient is reached through mechanisms the model does not have, including vessel tone and reflex responses that alter caval collapsibility.
@@ -145,7 +164,7 @@ The executable checks do not compare separate superior and inferior caval closin
 
 ## References
 
-[West et al.](https://journals.physiology.org/doi/abs/10.1152/jappl.1964.19.4.713) varied vascular and alveolar pressures in an isolated, perfused dog lung and measured regional flow. The study supports pressure-dependent zone behaviour, not Arthur's fixed 0.45 waterfall weight or its non-regional zone index.
+[West et al.](https://journals.physiology.org/doi/abs/10.1152/jappl.1964.19.4.713) varied vascular and alveolar pressures in an isolated, perfused dog lung and measured regional flow. The study supports pressure-dependent zone behaviour, not the model's particular smooth narrowing law or its aggregate pressure-margin caution.
 
 - Permutt S, Riley RL. [Hemodynamics of collapsible vessels with tone: the vascular waterfall](https://doi.org/10.1152/jappl.1963.18.5.924). *J Appl Physiol* 1963;18:924–32.
 - West JB, Dollery CT, Naimark A. [Distribution of blood flow in isolated lung; relation to vascular and alveolar pressures](https://doi.org/10.1152/jappl.1964.19.4.713). *J Appl Physiol* 1964;19:713–24.

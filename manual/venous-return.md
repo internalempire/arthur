@@ -86,11 +86,11 @@ A passive patient at 500 mL, 14 breaths per minute:
 
 | PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |
 |---:|---:|---:|---:|
-| 0 | 7.2 | -0.5 | 5.56 |
-| 5 | 8.6 | 1.2 | 5.55 |
-| 10 | 9.7 | 2.8 | 5.30 |
-| 15 | 10.8 | 4.4 | 4.89 |
-| 20 | 11.9 | 6.0 | 4.60 |
+| 0 | 7.3 | -0.5 | 5.79 |
+| 5 | 8.6 | 1.1 | 5.57 |
+| 10 | 9.9 | 2.8 | 5.36 |
+| 15 | 11.2 | 4.4 | 5.15 |
+| 20 | 12.3 | 6.0 | 4.89 |
 <!-- END GENERATED: venous-return-peep -->
 
 In this sweep, internal Pmsf rises with PEEP as abdominal transmission and blood redistribution change the reservoir pressure, yet output falls. The relevant downstream term includes both right atrial pressure and the caval closing pressure: compare the effective venous gradient, not Pmsf or CVP in isolation. The two tabulated pressure columns also use different averaging windows, so their subtraction is not a separately measured gradient.

@@ -12,6 +12,8 @@ import {
 import { endExpiratoryPressurePresentation } from './stats.js';
 
 const n = (v, d = 1) => (Number.isFinite(v) ? v.toFixed(d) : '—');
+const signed = (v, d = 1) => Number.isFinite(v) ? `${v > 0 ? '+' : ''}${v.toFixed(d)}` : '—';
+const resistance = (v) => !Number.isFinite(v) ? 'unavailable' : Math.abs(v) >= 1e4 ? v.toExponential(2) : v.toFixed(2);
 
 const PANELS = [
   {
@@ -166,9 +168,9 @@ const PANELS = [
   },
   {
     match: 'Pulmonary vascular resistance against lung volume',
-    title: 'Pulmonary vascular resistance',
+    title: 'Pulmonary resistance: geometric reference',
     // This warning qualifies only the catheter-style derived number. The
-    // mechanical J-curve and its patient point remain valid model constructs.
+    // geometric reference curve does not display current pressure-dependent resistance.
     quality: (sim) => ({ label: 'Derived PVR', ...sim.metrics.interpretability.pvrDerived }),
     // The PVR panel also carries zoom controls in its header. The full title is
     // already the region label, so the compact disclosure name avoids covering
@@ -176,20 +178,27 @@ const PANELS = [
     disclosureTitle: 'PVR',
     summary: (sim) => {
       const m = sim.metrics;
-      const comp = pvrComponents(sim.params, m.lungVolume);
+      const comp = pvrComponents(sim.effective ?? sim.params, m.lungVolume, sim.resp.plSolved, sim.resp.openFraction);
       const side = m.lungVolume < comp.vascularFrc ? 'below' : 'above';
       return `Lung volume ${n(m.lungVolume, 2)} L, ${side} this patient's ${n(comp.vascularFrc, 2)} L `
-        + `resting volume if fully open. `
-        + `${n(m.openFraction * 100, 0)}% of the lung is open, so each open unit is holding `
-        + `${m.lungStrain >= 0 ? `${n(m.lungStrain * 100, 0)}% more` : `${n(-m.lungStrain * 100, 0)}% less`} `
-        + `than it would at rest. The model's `
-        + `resistance coefficient is ${n(m.pvrCoefficientWood, 2)} Wood units; the value derived from mean `
-        + `pulmonary artery pressure, wedge and cardiac output is `
-        + `${m.pvrDerivedWood === null ? 'not derivable at this flow' : `${n(m.pvrDerivedWood, 2)} Wood units`}.`;
+        + `resting volume if fully open. The curves show the geometric resistance reference `
+        + `with distended vessels. The reference point uses current lung opening and hypoxic vasoconstriction: `
+        + `${n(m.pvrCoefficientWood, 2)} Wood units. Resistance prescribed above the default and `
+        + `hypoxic vasoconstriction are assigned upstream of the middle compartment. `
+        + `These are aggregate loads, not a representation of clot burden. Current vessel compression also changes flow. `
+        + `The sum of current segmental pressure-drop/flow ratios is ${resistance(m.pvrEffectiveWood)} Wood units; `
+        + `these instantaneous flows may differ while blood accumulates. `
+        + `Its last-complete-breath swing is (maximum − minimum) divided by the mean of those two extrema. `
+        + `This internal index describes resistive loading, not the whole RV afterload. `
+        + `The separate (mean pulmonary artery pressure − wedge surrogate) / cardiac output is `
+        + `${m.pvrDerivedWood === null ? 'not derivable at this flow' : `${n(m.pvrDerivedWood, 2)} Wood units`}. `
+        + `The wedge and derived-PVR caution uses the minimum downstream venous-minus-alveolar pressure over the last complete breath, `
+        + `not the instantaneous margin. After a parameter change or occlusion it waits for a fresh, uninterrupted breath. `
+        + `A non-negative minimum removes only this pressure-related caution; it does not validate a catheter wedge measurement.`;
     },
     rows: (sim) => {
       const m = sim.metrics;
-      const comp = pvrComponents(sim.params, m.lungVolume);
+      const comp = pvrComponents(sim.effective ?? sim.params, m.lungVolume, sim.resp.plSolved, sim.resp.openFraction);
       return [
         ['Lung volume', `${n(m.lungVolume, 2)} L`],
         ['Fully open vascular FRC', `${n(comp.vascularFrc, 2)} L`],
@@ -199,18 +208,23 @@ const PANELS = [
         ['Reopenable share of compromised lung', `${n(m.reopenableShare * 100, 1)}%`],
         ['Open-fraction excursion, last complete breath', m.tidalOpenExcursion === null
           ? 'waiting for a complete breath' : `${n(m.tidalOpenExcursion * 100, 1)} percentage points`],
-        ['Open-unit vascular bed', `${n(comp.openBed * RESISTANCE_TO_WOOD, 2)} Wood units`],
+        ['Open-unit geometric reference', `${n(comp.openBed * RESISTANCE_TO_WOOD, 2)} Wood units`],
         // A logistic opening curve never reaches exactly 100%, so an otherwise
         // normal lung can retain a mathematically tiny closed branch with a
         // several-thousand-WU equivalent resistance. Suppress that numerical
         // artefact when less than 0.5% of the lung belongs to the branch.
-        ['Derecruited-unit vascular bed', comp.closedFraction >= 0.005 && Number.isFinite(comp.closedBed)
+        ['Derecruited-unit geometric reference', comp.closedFraction >= 0.005 && Number.isFinite(comp.closedBed)
           ? `${n(comp.closedBed * RESISTANCE_TO_WOOD, 2)} Wood units`
           : 'not present'],
-        ['Flow through open units', `${n(comp.openFlowShare * 100, 0)}% of pulmonary flow`],
-        ['Model resistance coefficient', `${n(m.pvrCoefficientWood, 2)} Wood units`],
+        ['Open-unit share of reference conductance', `${n(comp.openFlowShare * 100, 0)}%`],
+        ['Geometric resistance reference', `${n(m.pvrCoefficientWood, 2)} Wood units`],
+        ['Current segmental resistance sum (instantaneous)', `${resistance(m.pvrEffectiveWood)} Wood units`],
+        ['Segmental resistance swing, last complete breath', Number.isFinite(m.pvrSwing)
+          ? `${n(m.pvrSwing * 100, 1)}%` : 'pending a complete fresh breath'],
         ['Derived (mPAP − wedge) / CO', m.pvrDerivedWood === null ? 'not derivable' : `${n(m.pvrDerivedWood, 2)} Wood units`],
-        ['Zone 3 index', `${n(m.zone3 * 100, 0)}%`],
+        ['Downstream Pv − Palv (instantaneous)', `${signed(m.capillaryDownstreamTransmural)} mmHg`],
+        ['Minimum Pv − Palv (last complete breath)', Number.isFinite(m.lastBreathPulmonaryMargin)
+          ? `${signed(m.lastBreathPulmonaryMargin)} mmHg` : 'pending a complete fresh breath'],
       ];
     },
   },
@@ -234,10 +248,11 @@ const PANELS = [
         ['Central venous pressure', `${n(m.cvp)} mmHg`],
         ['Transmural central venous pressure', `${n(m.cvpTransmural)} mmHg`],
         ['Pulmonary vascular blood volume', `${n(m.pulmonaryBloodVolume, 0)} mL`],
-        ['Estimated PA-to-LA mean transit', `${n(m.pulmonaryTransitTime, 1)} s`],
-        ['Explicit staged buffer time', `${n(m.pulmonaryTransportTime, 1)} s`],
-        ['Staged pathway volume', `${n(m.pulmonaryTransitVolume, 0)} mL`],
-        ['Flow leaving transport pathway', `${n(m.pulmonaryTransitFlow, 2)} L/min`],
+        ['Pulmonary mean residence estimate (PBV / RV flow)', `${n(m.pulmonaryTransitTime, 1)} s`],
+        ['Middle pulmonary blood volume', `${n(m.pulmonaryMiddleVolume, 0)} mL`],
+        ['Middle pulmonary pressure (instantaneous)', `${n(m.pulmonaryMiddlePressure)} mmHg vs atmosphere`],
+        ['Extra-alveolar surrounding pressure', `${n(m.pulmonaryExtraPressure)} mmHg vs atmosphere`],
+        ['Flow from middle bed to pulmonary veins', `${n(m.pulmonaryMiddleOutflow, 2)} L/min`],
         ['RV : LV end-diastolic volume', `${n(m.rvLvRatio, 2)}`],
         ['Septal transmural pressure (end-diastolic)', `${n(sim.circ.septalShift ?? 0)} mmHg`],
         ['Pericardial pressure', `${n(m.pPeri)} mmHg`],

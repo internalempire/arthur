@@ -7,8 +7,9 @@
 
 import { Simulator } from '../src/model/simulator.js';
 import { defaultParams, REFERENCE_WEIGHT_KG } from '../src/model/parameters.js';
-import { pvrComponents, NORMAL_FRC } from '../src/model/lung.js';
-import { systemicVenousVolumeState, venousReturnFlow } from '../src/model/circulation.js';
+import { pvrComponents, NORMAL_FRC, lungVolumeAtPl, openFractionAt } from '../src/model/lung.js';
+import { systemicVenousVolumeState, venousReturnFlow, pulmonaryTransitEstimate } from '../src/model/circulation.js';
+import { pulmonaryVascularState } from '../src/model/pulmonary-vessels.js';
 import { applyBaroreflex } from '../src/model/baroreflex.js';
 import { HUMAN_ARDS_PVR as HUMAN_ARDS, PVR_REOPENABLE_SHARES } from '../tools/fixtures/pulmonary-pvr.mjs';
 
@@ -230,7 +231,7 @@ export const LITERATURE = {
       pass: post.phClass === 'post-capillary' && pre.phClass === 'pre-capillary'
         && post.interpretability.wedge.level === 'ok'
         && pre.interpretability.wedge.level === 'ok',
-      detail: `failing LV → ${post.phClass} (wedge ${post.paop.toFixed(0)}, zone index ${post.zone3.toFixed(2)}), high resistance → ${pre.phClass} (wedge ${pre.paop.toFixed(0)}, zone index ${pre.zone3.toFixed(2)})`,
+      detail: `failing LV → ${post.phClass} (wedge ${post.paop.toFixed(0)}, downstream transmural ${post.capillaryDownstreamTransmural.toFixed(2)} mmHg), high resistance → ${pre.phClass} (wedge ${pre.paop.toFixed(0)}, downstream transmural ${pre.capillaryDownstreamTransmural.toFixed(2)} mmHg)`,
     };
   },
 
@@ -274,65 +275,42 @@ export const LITERATURE = {
     };
   },
 
-  'pulmonary-transit-beats': () => {
-    const s = new Simulator();
-    s.params = {
-      ...defaultParams(), baroreflex: 0, septal: 0, pericardium: 0, piston: 0,
-      vt: 0, peep: 0, pmus: 0, eesRv: 0.58,
-    };
-    s.reset();
-    s.advance(30, true);
-    const baseline = { rv: s.circ.svRv, lv: s.circ.sv };
-    s.setParam('eesRv', 0.18);
-    let seen = s.circ.beatCount;
-    const beats = [];
-    for (let i = 0; i < 500 && beats.length < 4; i++) {
-      s.advance(0.01, true);
-      if (s.circ.beatCount !== seen) {
-        seen = s.circ.beatCount;
-        beats.push({ rv: s.circ.svRv, lv: s.circ.sv });
-      }
-    }
+  'pulmonary-pressure-storage': () => {
+    // Structural consequence of pressure-bearing storage, supported qualitatively
+    // by isolated-lung inflation experiments. This is not an independently fitted
+    // human response time or a requirement for a 2–3-beat LV dead time.
+    const p = defaultParams();
+    const resp = { ppl: 0, palv: 4, plSolved: 4,
+      lungVolume: lungVolumeAtPl(p, 4), openFraction: openFractionAt(p, 4) };
+    const c = { vPa: 180, vPt: 200, vPv: 180 };
+    const before = pulmonaryVascularState(p, c, resp);
+    const after = pulmonaryVascularState(p, { ...c, vPt: c.vPt + 1 }, resp);
     return {
-      pass: beats.length === 4 && beats[0].rv < baseline.rv - 10
-        && Math.abs(beats[0].lv - baseline.lv) < baseline.lv * 0.01
-        && baseline.lv - beats[1].lv < baseline.lv * 0.02
-        // This is a timing constraint. The small amplitude floor only keeps
-        // numerical noise from being mislabeled as a delayed LV response.
-        && baseline.lv - beats[3].lv > baseline.lv * 0.015,
-      detail: `after RV ${baseline.rv.toFixed(1)} → ${beats[0]?.rv.toFixed(1)} mL, `
-        + `LV beats ${beats.map((b) => b.lv.toFixed(1)).join(' → ')} mL`,
+      pass: after.middle > before.middle
+        && after.arterialFlow < before.arterialFlow && after.middleFlow > before.middleFlow,
+      detail: `1 mL added to middle store: pressure ${before.middle.toFixed(3)} → ${after.middle.toFixed(3)} mmHg; `
+        + `inflow ${before.arterialFlow.toFixed(3)} → ${after.arterialFlow.toFixed(3)}, `
+        + `outflow ${before.middleFlow.toFixed(3)} → ${after.middleFlow.toFixed(3)} mL/s; structural, not human timing validation`,
     };
   },
 
   'pulmonary-transit-central-volume': () => {
-    // Match the ventilator and both clocks so the comparison is about pulmonary
-    // vascular volume and forward flow, not respiratory or chronotropic phase.
-    const common = {
-      baroreflex: 0, mode: 'vcv', pmus: 0, vt: 450, peep: 5,
-      rr: 18, ti: 1, hr: 75,
-    };
-    const reference = settle(common, 45);
-    const embolism = settle({
-      ...common, pvrBase: 0.44, eesRv: 0.32,
-      stressedVolume: 1050, svr: 1.25,
-    }, 45);
-    const congestion = settle({
-      ...common, eesLv: 0.8, lvStiff: 0.04,
-      stressedVolume: 950, svr: 1.25,
-    }, 45);
+    // Central-volume theorem under a matched steady forward-flow definition.
+    // Disease labels alone cannot fix the ordering: both blood volume and output
+    // change. No prescribed phenotype gap or hidden delay ceiling is asserted.
+    const p = defaultParams();
+    const c = { vPa: 100, vPt: 160, vPv: 115, svRv: 70, beatDuration: 0.8 };
+    const reference = pulmonaryTransitEstimate(p, c);
+    const halfFlow = pulmonaryTransitEstimate(p, { ...c, svRv: 35 });
+    const doubleVolume = pulmonaryTransitEstimate(p, { ...c, vPa: 200, vPt: 320, vPv: 230 });
+    const equal = (a, b) => Math.abs(a - b) < 1e-12;
     return {
-      pass: reference.pulmonaryTransitTime > 3
-        && embolism.pulmonaryTransitTime > reference.pulmonaryTransitTime + 2
-        && congestion.pulmonaryTransitTime > embolism.pulmonaryTransitTime + 5
-        && embolism.pulmonaryBloodVolume > reference.pulmonaryBloodVolume
-        && congestion.pulmonaryBloodVolume > embolism.pulmonaryBloodVolume,
-      detail: `reference ${reference.pulmonaryTransitTime.toFixed(1)} s / `
-        + `${reference.pulmonaryBloodVolume.toFixed(0)} mL, embolism `
-        + `${embolism.pulmonaryTransitTime.toFixed(1)} s / `
-        + `${embolism.pulmonaryBloodVolume.toFixed(0)} mL, congestion `
-        + `${congestion.pulmonaryTransitTime.toFixed(1)} s / `
-        + `${congestion.pulmonaryBloodVolume.toFixed(0)} mL`,
+      pass: equal(reference.circuitMeanTime, 375 / (70 / 0.8))
+        && equal(halfFlow.circuitMeanTime, reference.circuitMeanTime * 2)
+        && equal(doubleVolume.circuitMeanTime, reference.circuitMeanTime * 2),
+      detail: `PBV/Q ${reference.circuitMeanTime.toFixed(3)} s; `
+        + `half flow ${halfFlow.circuitMeanTime.toFixed(3)} s; `
+        + `double volume ${doubleVolume.circuitMeanTime.toFixed(3)} s; readout, not ODE timing`,
     };
   },
 };

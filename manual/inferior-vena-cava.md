@@ -75,7 +75,7 @@ $$
 
 Below its unstressed volume of 50 mL the IVC collapses to a slender line. A volume of about 150 mL—equivalent to 5 mmHg of model transmural distension—defines the **reference dilated calibre**, not a hard maximum. Above that point the drawing can widen further, up to a distant safety guardrail, so a plethoric IVC does not lose every visible respiratory change merely because it is dilated.
 
-This is not an echocardiographic diameter equation. It is a visually compressed transformation of an aggregate volume state. Its purpose is to preserve two simultaneous observations: the vessel is larger in tamponade, and its remaining respiratory excursion is smaller but not forced to zero.
+This is not an echocardiographic diameter equation. It is a visually compressed transformation of an aggregate volume state. It makes the larger stored volume visible and preserves a non-zero width excursion. Because the transformation uses distending volume above the fixed zero-pressure volume, relative width change is not the same statistic as relative total-volume change. The displayed width can vary less in tamponade even when the latter statistic does not.
 
 ### IVC behaviour across scenarios
 
@@ -84,14 +84,14 @@ This is not an echocardiographic diameter equation. It is a visually compressed 
 
 | state | mean IVC volume (mL) | respiratory volume swing (% of mean) | change in displayed calibre (%) |
 |---|---:|---:|---:|
-| healthy spontaneous preset | 93 | 16.8 | 15.2 |
-| cardiac-tamponade preset | 168 | 10.8 | 7.0 |
-| same tamponade state, capacity restored | 107 | 14.0 | 11.3 |
+| healthy spontaneous preset | 93 | 15.9 | 14.4 |
+| cardiac-tamponade preset | 165 | 14.9 | 9.6 |
+| same tamponade state, capacity restored | 105 | 13.6 | 11.1 |
 <!-- END GENERATED: ivc-respiratory-calibre -->
 
-The respiratory volume swing is not the same as ultrasound collapsibility. The displayed-calibre column reports only how much the schematic width changes after the square-root transformation. In the tamponade preset, the underlying IVC volume varies through the breath and the drawing displays that small excursion. A distended cava can therefore remain visibly distended while still changing calibre.
+The respiratory volume swing is not the same as ultrasound collapsibility. The displayed-calibre column reports only how much the schematic width changes after the square-root transformation. In the tamponade preset, the underlying IVC volume varies through the breath and the drawing displays that small excursion. A distended cava can therefore remain visibly distended while still changing calibre. The expected ordering of respiratory volume swing is not reproduced: the constrained state’s `(maximum − minimum) / mean` is not smaller than after decompression. This is an open audit finding. The smaller displayed-calibre change does not erase it or convert either quantity into an ultrasound measurement.
 
-The magnitude is deliberately not calibrated to an ultrasound cutoff. [Himelman and colleagues](https://www.jacc.org/doi/10.1016/S0735-1097%2888%2980011-1) reviewed 115 patients with moderate or large pericardial effusions, including 33 with tamponade. Plethora was defined as less than 50% diameter reduction with deep inspiration; the 83 patients with plethora averaged an 18% reduction. That subgroup was not composed exclusively of tamponade patients. The model uses ordinary regular breaths, has no ultrasound plane or longitudinal vessel deformation, and should therefore reproduce only the direction: **dilated and less collapsible**, not a particular diagnostic percentage.
+The magnitude is deliberately not calibrated to an ultrasound cutoff. [Himelman and colleagues](https://www.jacc.org/doi/10.1016/S0735-1097%2888%2980011-1) reviewed 115 patients with moderate or large pericardial effusions, including 33 with tamponade. Plethora was defined as less than 50% diameter reduction with deep inspiration; the 83 patients with plethora averaged an 18% reduction. That subgroup was not composed exclusively of tamponade patients. The model uses ordinary regular breaths and has no ultrasound plane or longitudinal vessel deformation. The clinical study therefore does not validate a particular model percentage or require the aggregate volume statistic to equal diameter collapsibility. The model shows a dilated conduit, but its unmet relative-volume criterion must remain distinct from both that clinical observation and the schematic width.
 
 ---
 
@@ -121,7 +121,7 @@ The magnitude is deliberately not calibrated to an ultrasound cutoff. [Himelman 
 ### Of clinical application
 
 - The IVC diameter in the thorax panel is a visual encoding of a model state; it is not an ultrasound measurement and cannot be compared to a patient's IVC diameter in centimetres.
-- Displayed calibre and "plethora" are model quantities derived from a lumped compartment. They convey the right direction and ordering but not the magnitude a clinician would measure.
+- Displayed calibre and "plethora" are schematic quantities derived from a lumped compartment. Mean distension is greater in tamponade, but the expected ordering of respiratory volume excursion is not reproduced. The smaller relative display-width change is a property of the graphical transformation, not independent validation of a clinical sign.
 - The IVC is not a separate user control and offers no independent diagnostic threshold.
 
 ---

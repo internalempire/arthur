@@ -1,12 +1,14 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { evaluateAuditResults } from './support/audit-status.mjs';
-import { cardiacAudit, pressureDomainAudit, activationAudit, respiratoryAudit, venousAudit } from './support/audit-probes.mjs';
+import { cardiacAudit, pressureDomainAudit, activationAudit, respiratoryAudit, venousAudit,
+  pulmonaryPhenotypeAudit, tamponadePhenotypeAudit } from './support/audit-probes.mjs';
 const expectations = JSON.parse(readFileSync(new URL('./audit-expectations.json', import.meta.url), 'utf8'));
 const args = new Set(process.argv.slice(2));
 if ([...args].some(arg => arg !== '--strict')) throw new Error('Supported option: --strict');
 const results = [];
-for (const probe of [cardiacAudit, pressureDomainAudit, activationAudit, respiratoryAudit, venousAudit]) {
+for (const probe of [cardiacAudit, pressureDomainAudit, activationAudit, respiratoryAudit, venousAudit,
+  pulmonaryPhenotypeAudit, tamponadePhenotypeAudit]) {
   results.push(...[probe()].flat());
 }
 const evaluated = evaluateAuditResults(results, expectations, { strict: args.has('--strict') });

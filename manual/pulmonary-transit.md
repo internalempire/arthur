@@ -1,145 +1,154 @@
-# Pulmonary transit
+# Pulmonary storage and transit
 
-> The pulmonary circulation stores blood between the ventricles. A change in RV output can therefore affect LV filling over subsequent beats, while pressure transmission and pulmonary venous emptying also have immediate effects.
+> Blood can accumulate in the pulmonary vessels or leave them faster than the right ventricle supplies it. That changing store links right-heart output to left-heart filling; its response follows pressures, vascular compliance and resistance.
 
 ---
 
 ## Physiology
 
-The ventricles are coupled in series, with a compliant blood reservoir between them. When RV output falls, this reservoir can temporarily continue supplying the left heart. Its changing storage and outflow spread the left-sided filling response over time. The familiar two-to-three-beat description is a useful account of a delayed respiratory response, not a period during which the left heart is mechanically isolated from the right.
+The two ventricles are connected through vessels that contain a substantial blood volume. Their instantaneous outputs need not be equal. If the right ventricle ejects more than the pulmonary veins deliver to the left atrium, blood accumulates in the lung. If pulmonary venous delivery is greater, the lung releases previously stored blood. No blood is created or lost in either case.
 
-That beat count is not a universal transit time. The same number of seconds contains more beats during tachycardia, and the pulmonary circulation can hold different volumes of blood. Congestion, pulmonary vascular disease, cardiac output and the landmarks used to start and stop a contrast measurement all change the reported interval.
+Inflation affects that store in two opposing ways. Rising pressure around **alveolar vessels** can compress them and expel blood. At the same time, expanding lung tissue pulls **extra-alveolar arteries and veins** open, allowing them to accommodate more blood. Which effect dominates depends on the pressures inside the vessels, the pressures around them and the paths available for blood to enter or leave. Inflation therefore need not always increase pulmonary venous flow.
 
-For steady through-flow, the central-volume principle relates mean blood residence time to contained blood volume:
+Brower and colleagues demonstrated this distinction in eight isolated, perfused canine lungs with constant arterial inflow. Inflation predominantly under zone-3 conditions transiently increased venous outflow and reduced total lung blood volume; predominantly zone-2 conditions produced the opposite response. These were open-chest preparations with controlled outlet pressure, not closed human circulations undergoing an ordinary breath. The measured blood-volume change belonged to the whole lung, not specifically to its veins.
+
+### Three different meanings of time
+
+**Blood residence time** asks how long blood stays between defined entry and exit boundaries. At steady through-flow, the central-volume relation is:
 
 $$
-T_{pul} = \frac{V_{pul}}{Q_{RV}}
+T_{pul}=\frac{V_{pul}}{Q_{RV}}
 $$
 
-- $T_{pul}$ is mean pulmonary transit time, in seconds.
-- $V_{pul}$ is the blood volume between the selected pulmonary arterial and left-sided landmarks, in millilitres.
-- $Q_{RV}$ is mean forward right ventricular output, in millilitres per second.
+Here $V_{pul}$ is contained pulmonary blood in mL and $Q_{RV}$ is mean forward RV output in mL/s, giving seconds. At unchanged volume, lower flow lengthens this estimate; at unchanged flow, more contained blood also lengthens it.
 
-**Mean residence time is not the same as the delay of a pressure wave or the time to the first LV response.** A tracer mean transit time, an arterial-waveform phase shift and the time until output reaches its nadir are different observations. Arthur uses the volume/flow relationship to scale its aggregate flow-delivery delay; that is a teaching construction, not a derivation of every pulsatile response from tracer kinetics.
+**The time course of LV filling** asks how pulmonary pressures and outflow respond after RV output changes. Blood already in the lung can continue supplying the left heart. Storage can spread the response over subsequent beats, while altered surrounding pressures have immediate effects. A blood cell's travel time is not a compulsory waiting period before any LV response. The two-to-three-beat sequence often used in clinical teaching is not a universal transport constant.
 
-The implication is more important than any single normal value. At the same pulmonary blood volume, halving flow doubles mean transit time. At the same flow, pulmonary vascular engorgement lengthens it. This is why a congested low-output circulation can retain an important right-to-left delay even when heart rate is high.
-
-### Why the phase of the arterial response moves
-
-During positive-pressure inspiration, right ventricular filling and sometimes right ventricular ejection fall first. The left ventricular consequence arrives after pulmonary transit and may therefore appear during expiration. Its exact phase depends on heart rate, respiratory rate, pulmonary blood volume, forward flow and competing immediate effects such as pulmonary venous emptying and reduced [left ventricular transmural afterload](transmural-pressure.md).
-
-The delay should therefore be used to understand sequence, not to assign every expiratory arterial trough to one mechanism. A different clock ratio or a dominant direct-filling effect can move the observed nadir.
+**Arterial pressure-decay time** describes a different process. For one compliant reservoir emptying through a resistance, with no inflow and a fixed downstream pressure, pressure above that downstream level decays with time constant $R\,C$. Resistance in mmHg·s/mL multiplied by compliance in mL/mmHg gives seconds. A larger compliance releases more blood for the same fall in pressure, so that pressure fall takes longer at the same resistance. A pulmonary circulation with several stores, cardiac ejection and changing surrounding pressures does not have one universal exponential decay.
 
 ---
 
 ## In the model
 
-The represented pulmonary blood volume is the blood physically contained in three serial compartments: pulmonary artery, the pressureless transport pathway and pulmonary vein. Mean RV flow is obtained by integrating pulmonic flow over the most recent complete beat and dividing by its measured duration. The displayed whole-circuit estimate is their ratio.
+The model contains three pulmonary blood stores in series:
 
-Eight well-mixed mathematical stages sit between pulmonary arterial inflow and pulmonary venous delivery. They contain conserved blood and distribute its delivery over time; they are not eight anatomical structures. This construction permits a spread of arrival times rather than requiring an identical waveform to reappear after one fixed interval.
+| compartment | what it represents | pressure around it |
+|---|---|---|
+| pulmonary artery | aggregate arterial storage before the alveolar-exposed bed | pleural pressure minus the model's extra-alveolar traction contribution |
+| middle vascular compartment | an aggregate blood store compressed by alveolar pressure | alveolar pressure |
+| pulmonary veins | aggregate venous storage delivering blood to the left atrium | pleural pressure minus the same traction contribution |
 
-The stages do not use the whole PA-to-LA time because pulmonary artery and pulmonary vein already store blood as pressure-bearing compliant compartments. They use the fraction corresponding to the pathway's initial 160 mL allocation within the initial 375 mL pulmonary circuit:
+The middle compartment is a mechanical representation, not a measured anatomical capillary volume. The boundaries between alveolar and extra-alveolar vessels cannot be identified exactly from the supplied isolated-lung experiments. All three stores carry pressure, and all are included in total circulating blood. The traction term applies to the entire aggregate PA store, including the volume that would anatomically belong to extrapulmonary arteries. Those proximal vessels do not experience the same parenchymal traction as intrapulmonary branches; their separate surroundings are not represented.
+
+### How inflation changes the available space
+
+For the extra-alveolar stores, surrounding pressure is:
 
 $$
-T_{stage,target} = T_{pul} \times \frac{160}{375}
+P_{ext,extra}=P_{pl}-kP_L,\qquad P_L=P_{alv}-P_{pl},\qquad k=0.20
 $$
 
-- $T_{stage,target}$ is the target mean time of the eight-stage pathway, in seconds.
-- $T_{pul}$ is the whole-circuit estimate defined above.
-- $160/375$ is the explicit pathway's initial share of represented pulmonary blood volume.
+All terms are expressed in mmHg in the circulation calculation. $P_L$ is transpulmonary pressure, converted from the respiratory model's cmH₂O. The dimensionless $k$ represents parenchymal traction: at unchanged pleural pressure, greater lung distending pressure lowers the pressure outside the extra-alveolar vessels. At the same intravascular pressure they can then hold more blood. At unchanged blood volume their intravascular pressure initially falls, changing inflow and outflow until redistribution follows.
 
-The active staged time adapts toward that target over 2 seconds and is limited to 0.8–6 seconds. The gradual adaptation smooths changes derived from successive RV beats. Each stage delivers blood according to its current volume and transit time, so changing the time changes the delivered flow as well as its timing. The adaptation is not a neutral clock adjustment and is not independently calibrated to human respiratory flow variation. The bounds allow stored pulmonary blood to continue draining during profound low flow without creating an arbitrarily long numerical memory. The fraction, adaptation time and bounds are implementation choices, not measured human reference ranges.
+The middle compartment instead has $P_{ext,middle}=P_{alv}$. At unchanged blood volume, a rise in alveolar pressure raises its intravascular pressure. This can drive blood out, while simultaneously altering the pressure differences that admit blood from the pulmonary artery and deliver it toward the pulmonary veins. If intravascular pressure rises as much as surrounding pressure, the compartment need not lose blood.
 
-Three readouts are deliberately kept separate:
+These are external-pressure effects. The intrinsic zero-transmural-pressure volume $V_0$ remains fixed; it is not shifted by breathing or by systemic venous tone. A change in the volume a vessel can hold at a given **atmospheric** pressure is distinct from changing its intrinsic $V_0$.
 
-| readout | meaning |
-|---|---|
-| pulmonary vascular blood volume | blood currently held in PA, staged pathway and PV |
-| estimated PA-to-LA mean transit | central-volume estimate, pulmonary blood volume divided by RV output |
-| explicit staged buffer time | the bounded portion actually used by the eight transport stages |
+### Pressure follows the blood actually present
 
-### Why the LV variation can be smaller
+Each pulmonary store uses the same form of pressure–volume relation:
 
-If more blood arrives from the right ventricle during part of a breath, the pulmonary circulation can retain some of that extra volume and release it later. Pulmonary venous and left-atrial storage can further reduce the variation in flow crossing the mitral valve. Thus the left ventricle can receive a more uniform supply even when right-sided output varies substantially. This concerns the **size of the variation**, not loss of blood: once net storage has settled, mean right- and left-sided outputs must agree over a sufficiently long observation.
+$$
+V(P_{tm})=\begin{cases}
+V_0+C P_{tm}, & P_{tm}\geq0,\\
+V_0\exp(CP_{tm}/V_0), & P_{tm}<0,
+\end{cases}
+\qquad P_{tm}=P_{inside}-P_{ext}
+$$
 
-Immediate inflation-related displacement of blood already in the pulmonary veins also contributes to LV filling. Its timing relative to the delayed RV contribution matters: the two can reinforce or oppose one another. Shortening a transport delay therefore does not guarantee a larger LV stroke-volume variation or a higher PPV. Nor does a longer volume/flow estimate prove that low flow is the cause of a small PPV. The magnitudes and timing of these combined effects are model outputs, not validated human response sizes.
+Here $V$ is stored blood volume in mL, $V_0$ is the volume at zero transmural pressure in mL, $C$ is the distended-branch compliance in mL/mmHg, and $P_{tm}$ is internal minus surrounding pressure in mmHg. The positive-pressure branch has constant compliance $C$. On the negative-pressure branch, volume remains positive and compliance decreases as the store empties. Pressure and slope join continuously at zero transmural pressure. This is a compact constitutive assumption, not a reconstruction of a vessel’s cross-sectional shape.
 
-The pulmonary venous compliance coefficient and passive left-atrial stiffness are fixed internally. Their contribution to storage is distinct from the **Pulmonary capacitance coupling** control, which shifts pulmonary venous zero-transmural-pressure volume during inflation. The systemic **Venous compliance (slope)** control does not adjust either left-sided compartment. See [which controls affect storage](controls-pulmonary.md#compliance-capacity-and-filling-are-different).
+| store | $V_0$ (mL) | distended-branch $C$ (mL/mmHg) |
+|---|---:|---:|
+| pulmonary artery | 50 | 4.2 |
+| middle compartment | 60 | 8.4 |
+| pulmonary veins | 60 | 8.5 |
 
-### Blood transit and arterial pressure decay are different times
+The storage relation and geometric resistance law do not identify a unique shared vascular radius or length. These are aggregate teaching coefficients. The traction coefficient is informed by the displacement of the extra-alveolar pressure–volume curves in Howell's isolated canine-lobe experiment; neither that graphical estimate nor the compartment coefficients are identified human normal values. Permutt and Howell support opposing storage effects and pressure-dependent emptying, not these complete human-scale parameter values.
 
-Mean blood residence time answers how long blood spends between chosen landmarks, using volume divided by flow. The delay to an observed LV change depends additionally on storage, cardiac timing and immediate mechanical effects. Neither is the arterial pressure-decay time constant.
+### Flow and conservation
 
-In a simplified compliant arterial reservoir draining through a resistance, with no inflow and a constant downstream pressure, the time constant is resistance multiplied by compliance. It describes the decay of the arterial pressure **above that downstream pressure**, not travel of a blood cell. Resistance in mmHg·s/mL multiplied by compliance in mL/mmHg gives seconds. Arthur also includes pulsatile ejection, changing downstream pressure and a vascular waterfall; its arterial waveform is not one universal exponential decay. The pulmonary arterial compliance coefficient is fixed, with no law that links it to resistance. Agreement of volume/flow timing does not validate arterial pulse pressure or pulsatile RV loading.
+Blood passes from PA to the middle store, from the middle store to PV, and from PV to LA according to their current pressure differences and resistance. Resistance above the neutral baseline and the HPV-associated increment are assigned upstream of the middle store; these represent precapillary load rather than venous obstruction. These vascular connections permit reversal. Cardiac valves remain one-way. A smooth narrowing law restricts the alveolar-exposed outlet when its internal pressure falls below alveolar pressure; [vascular waterfalls](vascular-waterfalls.md) explains the flow relation.
+
+For each store:
+
+$$
+\frac{dV}{dt}=Q_{in}-Q_{out}
+$$
+
+Here $t$ is time in seconds, and $Q_{in}$ and $Q_{out}$ are signed inflow and outflow in mL/s. Exactly the same transfer leaves one compartment and enters the next. A change in pressure redistributes existing blood; it does not prescribe a bolus or a target LV waveform. No independently selected transit time controls these flows.
+
+### What the readouts mean
+
+Pulmonary blood volume is the instantaneous sum of PA, middle and PV blood. The middle-compartment volume and pressure describe the same represented store. Its pressure is relative to atmosphere, not a measured pulmonary capillary pressure or an oedema threshold.
+
+The PA-to-LA residence estimate divides total pulmonary blood by RV forward flow from the most recent completed beat. It is an observation only: changing that calculated estimate does not change a flow, a resistance or a compartment. In a transient, the denominator and volume do not describe a steady tracer experiment, so the number is a descriptive approximation.
+
+### Why LV variation can be smaller
+
+A change in right-heart delivery can temporarily fill pulmonary stores instead of crossing the mitral valve immediately. Pulmonary venous and left-atrial storage can further reduce the variation reaching the LV. The missing instantaneous flow remains as blood volume and can be released later; after net storage settles, long-window mean flows must agree.
+
+Breathing also changes vascular surrounding pressures, cardiac surrounding pressure and ventricular interaction. Their effects can reinforce or oppose the response to RV output. A longer volume/flow residence estimate therefore does not prove stronger attenuation or predict PPV in one direction. Both the size and phase of respiratory LV variation remain quantitative limitations of this model.
+
+The systemic **Venous compliance (slope)** control does not adjust pulmonary or atrial compliance. See [pulmonary controls](controls-pulmonary.md#compliance-capacity-and-filling-are-different) for the fixed internal coefficients and indirect effects of user controls.
 
 ### A matched model experiment
 
-With passive ventilation, HR 75/min, RR 18/min, VT 450 mL and PEEP 5 cmH2O held constant:
+The following table is generated from a declared model protocol. It compares represented storage and its volume/flow estimate, not measured human contrast timing.
 
 <!-- BEGIN GENERATED: pulmonary-transit -->
-*Executable setup: passive volume control, HR 75/min, RR 18/min, VT 450 mL, inspiratory time 1.0 s and PEEP 5 cmH₂O; baroreflex disabled; each phenotype is settled for 45 s.*
+*Executable setup: passive volume control, HR 75/min, RR 18/min, VT 450 mL, inspiratory time 1.0 s and PEEP 5 cmH₂O; baroreflex disabled; each phenotype is sampled after automatic initialization (15 s) and 45 additional seconds (60 s total).*
 
-| phenotype | pulmonary blood volume (mL) | estimated PA-to-LA transit (s) | staged buffer (s) |
+| phenotype | pulmonary blood volume (mL) | PBV / last-beat RV flow (s) | middle-store volume (mL) |
 |---|---:|---:|---:|
-| reference circulation | 404 | 4.5 | 2.0 |
-| pulmonary embolism | 546 | 8.3 | 3.6 |
-| congested low-output LV failure | 765 | 15.2 | 6.0 |
+| reference circulation | 409 | 4.5 | 129.5 |
+| pulmonary embolism | 455 | 6.7 | 109.1 |
+| congested low-output LV failure | 789 | 15.5 | 272.2 |
 <!-- END GENERATED: pulmonary-transit -->
 
-The ordering is the lesson. The embolism and LV-failure numbers are outputs of selected model phenotypes, not expected clinical values or diagnostic thresholds. The longer estimate in the low-output LV phenotype means slow transport in that model state; it is neither a normal clinical range nor a patient-level prediction. The LV phenotype reaches the staged numerical ceiling, while the longer whole-circuit estimate remains visible. Near arrest, the reporting calculation uses a minimum denominator of 1 mL/s to avoid an infinite displayed estimate; the true zero-flow residence time is not finite.
-
-Pressure is not delayed with blood. Pulmonary venous pressure still enters the pulmonary pressure gradient immediately, and [ventricular interdependence](ventricular-interdependence.md), pericardial interaction and the pulmonary venous piston remain immediate mechanical routes. The stages delay delivery of changing blood flow only.
-
----
-
-## Why this and not something else
-
-Deriving transit time from pulmonary blood volume and RV output makes delivery depend on both storage and flow. The estimate uses the aggregate circulation; it does not require a regional lung network or another user control.
-
-Pulmonary blood volume is the sum of blood in the pulmonary artery, pressureless pathway and pulmonary vein. The pathway can drain while the artery fills; summing all three compartments prevents loss of volume from one compartment alone from being interpreted as a shorter whole-circuit transit time.
-
-The transport pathway is not a contrast-kinetic model. It has no injection or sampling protocol, tracer recirculation or regional path-length distribution. Its teaching question is when a right-sided flow change reaches left ventricular preload, rather than how to interpret a particular imaging biomarker.
+The disease labels describe selected model phenotypes. Their absolute blood volumes and residence estimates are not clinical reference ranges. Low flow and congestion can both lengthen the estimate; the response of LV output must still be inspected separately. Near arrest a finite numerical display cannot be interpreted as a finite physiological zero-flow transit time.
 
 ---
 
 ## Limits
 
-### Of the construction
-
-- One aggregate pulmonary pathway: no regional perfusion distribution, shunt, dead-space pathway, bronchial circulation or gravity-dependent transit.
-- Pulmonary vascular blood volume is the sum of lumped compartments, not a directly simulated indicator-dilution volume.
-- RV output comes from the most recent complete beat; beat-related changes enter the staged pathway through its smoothed target. Arrhythmia and a separately resolved intrabeat blood-velocity profile are not represented.
-- The staged pathway stores blood without a pressure–volume relation. PA and PV carry pressure and compliance; the stages affect both timing and the size of flow variation.
-- The 2-second adaptation smooths the target time; its influence on flow variation is not validated human vascular recruitment or transport kinetics.
-
-### Of clinical application
-
-- The displayed estimate is PA-to-LA within the model. CMR studies often measure RV-to-LV or RV-to-LA contrast timing, so their absolute values are not interchangeable with this readout.
-- A long transit time does not diagnose pulmonary embolism or heart failure. It can result from low flow, increased pulmonary blood volume, different measurement landmarks or several simultaneous abnormalities.
-- The model does not reproduce contrast curves and cannot be used to infer a patient's pulmonary blood volume from an observed bolus time.
-- At fixed pulmonary volume, lower forward flow lengthens the volume/flow residence-time estimate; at fixed flow, a larger volume lengthens it. Neither statement establishes a fixed delay to the first LV response or a predictable PPV amplitude.
-
----
+- The pulmonary circuit has one aggregate alveolar-exposed store and two extra-alveolar stores. It has no regional perfusion, gravitational pressure gradient, bronchial circulation, shunt, tracer recirculation or measured distribution of transit paths.
+- The middle store uses the global alveolar pressure even when some lung is compromised. Different surrounding pressures in open and closed regions are not represented; open/closed conductances still influence the reference resistance mixture.
+- The distended branches have fixed compliance. No resistance–compliance law imposes a constant pulmonary arterial RC time, and arterial pulse pressure is not quantitatively validated by conservation or the central-volume identity.
+- Collapse alters the middle outlet's conductance. Pressure-dependent widening of a fully distended resistance bed is not represented. More contained blood does not automatically mean less resistance: vascular length, geometry and perfused pathways also matter.
+- Absolute storage changes, PPV amplitude and RV-to-LV timing are not calibrated human predictions. The model is not required to place a nadir in a selected respiratory phase.
 
 ## Validation
 
-Executable checks require the model to conserve total blood during transport, preserve the two-to-three-beat response after an isolated RV-output fall, obey the central-volume relation at fixed volume or flow, and prolong transit in matched pulmonary-embolism and congested low-output experiments. The reference ventilated circulation must retain a delayed LV stroke-volume nadir in expiration.
+Checks distinguish physical consistency from external evidence: conserve blood, allow pressure-driven reversal, produce no flow at equal endpoint pressures, maintain positive storage and agree after time-step refinement. Isolated-lung comparisons must state whether flow or vascular pressure is held fixed and whether pressures are referenced to atmosphere or to lung surroundings. A matching direction under those conditions does not validate every coefficient or the complete intact-human response.
 
-The full constraints are recorded in [literature ranges](../docs/LITERATURE_RANGES.md) and the implementation rationale in [model decisions](../docs/MODEL_DECISIONS.md).
+## Scope of the experimental support
 
----
+The supplied isolated-lung studies support opposing alveolar compression and extra-alveolar expansion, but do not identify a complete human compartment model. Pressure-matched protocol analogues expose further limits: the model overstates the resistance rise during positive-pressure inflation compared with Peták's rat preparation, and does not reproduce Hakim's slight high-inflation increase in the venous pressure drop. These are specific discrepancies, in addition to differences in species, scale and segment definitions. See the [resistance comparison](pulmonary-vascular-resistance.md#what-the-isolated-lung-comparisons-do-and-do-not-establish).
+
+Consequently, conservation of blood and the emergence of a plausible redistribution mechanism do not establish a quantitatively correct venous pulse, PPV amplitude or RV-to-LV response delay. Those outputs must be read as conditional model responses.
 
 ## References
 
-Levinson and colleagues measured human pulmonary vascular volume using dilution curves. Seraphim and colleagues derived first-pass contrast timing between RV and LV blood pools in 985 patients referred for perfusion CMR. These observations concern blood volume and tracer timing; they do not independently validate the eight stages, their adaptation rule, or the phase of Arthur's LV stroke-volume response.
-
+- Permutt S, Howell JBL, Proctor DF, Riley RL. Effect of lung inflation on static pressure-volume characteristics of pulmonary vessels. *J Appl Physiol*. 1961;16:64–70. [doi:10.1152/jappl.1961.16.1.64](https://doi.org/10.1152/jappl.1961.16.1.64)
+- Howell JBL, Permutt S, Proctor DF, Riley RL. Effect of inflation of the lung on different parts of pulmonary vascular bed. *J Appl Physiol*. 1961;16:71–76. [doi:10.1152/jappl.1961.16.1.71](https://doi.org/10.1152/jappl.1961.16.1.71)
+- Brower R, Wise RA, Hassapoyannes C, et al. Effect of lung inflation on lung blood volume and pulmonary venous flow. *J Appl Physiol*. 1985;58:954–963. [doi:10.1152/jappl.1985.58.3.954](https://doi.org/10.1152/jappl.1985.58.3.954)
 - Levinson GE, Frank MJ, Hellems HK. The pulmonary vascular volume in man: measurement from atrial dilution curves. *Am Heart J*. 1964;67:734–741. [doi:10.1016/0002-8703(64)90174-7](https://doi.org/10.1016/0002-8703(64)90174-7)
-- Pinsky MR. The effects of mechanical ventilation on the cardiovascular system. *Crit Care Clin*. 1990;6:663–678. [doi:10.1016/S0749-0704(18)30360-9](https://doi.org/10.1016/S0749-0704(18)30360-9)
 - Seraphim A, Knott KD, Menacho K, et al. Prognostic value of pulmonary transit time and pulmonary blood volume estimation using myocardial perfusion CMR. *JACC Cardiovasc Imaging*. 2021;14:2107–2119. [doi:10.1016/j.jcmg.2021.03.029](https://doi.org/10.1016/j.jcmg.2021.03.029)
-- Chase SC, Taylor BJ, Cross TJ, et al. Influence of thoracic fluid compartments on pulmonary congestion in chronic heart failure. *J Card Fail*. 2017;23:690–696. [doi:10.1016/j.cardfail.2017.07.394](https://doi.org/10.1016/j.cardfail.2017.07.394)
+- Pinsky MR. The effects of mechanical ventilation on the cardiovascular system. *Crit Care Clin*. 1990;6:663–678. [doi:10.1016/S0749-0704(18)30360-9](https://doi.org/10.1016/S0749-0704(18)30360-9)
 
 ---
 
 ## See also
 
-[The four effects of a breath](the-four-effects-of-a-breath.md) · [Ventricular interdependence](ventricular-interdependence.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Transmural pressure](transmural-pressure.md) · [Clinical scenarios](scenarios.md)
+[The four effects of a breath](the-four-effects-of-a-breath.md) · [Pulmonary controls](controls-pulmonary.md) · [Vascular waterfalls](vascular-waterfalls.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md) · [Transmural pressure](transmural-pressure.md)

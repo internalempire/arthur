@@ -99,6 +99,8 @@ A collapsed, stiff lung therefore finds equilibrium at a lower volume, where the
 
 Prone position reduces the selected chest-wall compliance to 65% of its supine value, raises abdominal pressure by 2 cmH₂O and lowers the opening midpoint of recruitable lung by 6 cmH₂O, with a minimum of 5 cmH₂O. The closing setting and reopenable potential are not independently recalibrated by position; if the effective opening midpoint falls to or below the closing setting, the effective memory gap is zero. These are coarse, simultaneous transformations. Recruitment may offset the expected change in mean pleural pressure, so the model validates chest-wall stiffening from the **larger within-breath pleural swing**, not by requiring mean pleural pressure to rise in every phenotype.
 
+In the audited ARDS/RV phenotype, this combined position transformation raises plateau pressure despite opening more lung. That pressure response is a primary limitation of the prone comparison. [Vieillard-Baron and colleagues](https://pubmed.ncbi.nlm.nih.gov/17925425/) observed reduced airway pressure and PaCO₂ during clinical proning. The model does not calculate PaCO₂, and its prescribed chest-wall/opening changes do not reproduce that complete manoeuvre. The accompanying failure to reduce RV/LV volume ratio remains an open audit finding.
+
 The obesity and intra-abdominal-hypertension scenarios also use a positive wall load. This pressure is selected independently from abdominal pressure because the model has no geometry from which to calculate transmission. It must not be read as a measured abdominal-to-pleural transmission fraction.
 
 ---
@@ -123,7 +125,7 @@ Pressure transmission is an outcome of lung recoil, wall recoil, volume and load
 - Oesophageal pressure measurement, calibration, positional artefact and occlusion testing are absent.
 - Muscle pressure is one aggregate activation with post-inspiratory decay. Separate expiratory-muscle recruitment, variable neural drive, fatigue and a full dyssynchrony model are absent.
 - PSV uses one fixed flow trigger, pressure rise and cycling percentage; displayed Ppl is not a simulated oesophageal-balloon signal.
-- Prone coefficients are representative directional choices, not predictions for an individual patient.
+- Prone coefficients prescribe simultaneous aggregate changes. In the audited ARDS/RV phenotype, greater opening and a lower geometric resistance reference coexist with higher plateau pressure and a higher RV/LV volume ratio. The intended RV-unloading effect remains unmet; the model omits PaCO₂ and regional gas-exchange effects that can contribute clinically.
 
 ---
 

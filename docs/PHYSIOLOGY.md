@@ -111,41 +111,27 @@ no new dynamic state, compartment, worker or integration pass.
 
 ---
 
-## 4. Pulmonary transit is a volume-to-flow relation, not a pressure delay
+## 4. Pulmonary storage, pressure-driven delivery and residence time
 
-The pulmonary artery and vein are pressure-bearing compartments in series with an eight-stage, pressureless blood-transport pathway. Its initial 160 mL is included in conserved total blood. It buffers the transmission of changes in flow without imposing the same delay on pressure.
+The pulmonary circulation has three pressure-bearing blood stores: artery, an alveolar-exposed middle compartment and veins. All are included in conserved blood volume. Each changes by inflow minus outflow; the resulting volume and external pressure determine its intravascular pressure. The middle compartment is a mechanical aggregate, not an anatomically measured capillary volume.
 
-Mean PA-to-LA transit is estimated from the central-volume relation:
+Alveolar pressure surrounds the middle store. Extra-alveolar arterial and venous stores experience `Ppl − k × PL`, with PL = Palv − Ppl and a dimensionless traction coefficient k = 0.20. All circulation pressures are converted to mmHg. Rising alveolar pressure can compress the middle store, while lung traction favours storage in the extra-alveolar compartments. Actual gradients, not a prescribed direction of displacement, determine where existing blood moves.
 
-`mean transit time = represented pulmonary blood volume / mean RV output`.
+Each pulmonary pressure–volume relation is linear at non-negative transmural pressure and exponential below it: `V = V0 + C × Ptm` or `V = V0 × exp(C × Ptm / V0)`. Both volume and compliance join continuously. Intrinsic V0 remains fixed during breathing. Distended compliances are fixed; the negative-pressure branch becomes less compliant as it empties. The coefficients are documented in [pulmonary controls](../manual/controls-pulmonary.md), with their experimental limits in [storage and transit](../manual/pulmonary-transit.md). The systemic venous tone/compliance controls do not directly modify these pulmonary coefficients or the prescribed atrial stiffness.
 
-Represented pulmonary blood volume is the sum of the PA, staged pathway and PV
-compartments. The integrated pulmonic volume divided by the measured completed-beat duration supplies a
-mean forward flow without treating the normal zero pulmonic-valve flow of
-diastole as circulatory arrest. The eight stages use the share of whole-circuit
-time corresponding to their original 160 mL allocation, bounded to 0.8–6 s and
-adapted over 2 s to prevent respiratory beat-to-beat aliasing.
+The lung-volume/open-fraction/HPV law supplies a geometric reference coefficient. The ordinary reference bed is partitioned using alveolar/extra-alveolar proportions: half of its extra-alveolar resistance lies before the middle store and half after the veins, with the fixed venous outlet resistance added to the latter. Additional resistance from a selected baseline above neutral and from HPV is placed upstream of the middle store, preserving a precapillary lesion without assigning the same excess to veins. The middle outlet narrows smoothly below alveolar pressure. Relative conductance is one when distended and decreases exponentially under compression; integrating that conductance over the endpoint pressure difference gives signed flow. All three pulmonary connections allow reversal, conserve blood and give zero flow at equal pressures. Cardiac valves remain one-way.
 
-This distinction matters. Pulmonary venous pressure still acts immediately on
-the pressure gradient across the lung; a pressure wave is not held back with the
-blood volume.
-What is buffered is blood flow: in the reference experiment, after an isolated fall in RV contractility the
-first LV beat remains essentially unchanged, the second changes little, and the
-effect becomes detectable over the next two to three beats. In the tested passive reference, the delayed LV stroke-volume nadir occurs in expiration. Other heart rates, respiratory periods and pulmonary storage states can change this timing; the staged pathway does not impose a universal beat count or strict dead time.
+The geometric reference is distinct from the instantaneous sum of the three effective segmental resistances and from `(mPAP − wedge) / CO`. During storage, the three flows differ, so their resistance sum is not one whole-circuit instantaneous pressure/flow quotient. Pressure-dependent narrowing is represented; pressure-induced recruitment or widening of an already distended resistance bed is deliberately omitted. More blood held in a vessel does not uniquely identify a lower resistance because length, geometry and perfused paths also matter.
 
-The transport pathway stores actual blood already included in total circulating volume. The separate pulmonary venous “piston” remains active: inflation can displace blood already on the venous side toward the LV before the change in RV output arrives. Eight stages disperse the flow signal rather than producing a rigid delayed copy. Their response shortens when flow is high relative to represented pulmonary volume and lengthens when flow is low. The whole-circuit volume/flow estimate and the staged delay are different quantities; neither is the time to an identical visible fall in LV output under every intervention.
+The displayed pulmonary mean-residence estimate is total PA + middle + PV blood divided by forward RV output from the most recent complete beat. This is an observation only; it controls no flow or timing. It approximates the central-volume relation at steady through-flow and is not a simulated contrast measurement. Mechanical changes in LV filling arise from vascular storage, pressure gradients, cardiac phases and simultaneous respiratory effects. They are not constrained to begin after a fixed number of beats or reach their nadir in a selected respiratory phase.
 
-The displayed whole-circuit value is still a model estimate, not a contrast
-transit measurement. Measurement landmarks matter: an RV-to-LV CMR bolus time
-includes chamber and sampling effects that this PA-to-LA volume relation does
-not. Regional capillary perfusion and patient-specific transit distributions
-remain absent.
+Pulmonary venous and atrial storage can reduce the variation reaching the LV while conserving blood. Compression, traction, ventricular interaction and LV ejection-pressure changes can reinforce or oppose the RV contribution. A longer volume/flow estimate alone therefore cannot explain small PPV or establish stronger low-flow attenuation. Response magnitude and timing remain quantitatively unvalidated in humans.
 
-Storage and timing determine different aspects of the response. Pulmonary veins and the left atrium can temporarily retain an increase in delivered blood and release it later, reducing the variation in LV filling while conserving blood. The adaptive staged pathway changes the amplitude as well as the timing of delivered flow. Inflation-related venous displacement and other immediate heart–lung effects can reinforce or oppose the delayed RV contribution. A longer volume/flow estimate therefore does not, by itself, establish stronger attenuation of respiratory LV output variation.
+The instantaneous `Ppv − Palv` margin describes pressure at the venous end of the alveolar-exposed outlet. Wedge and derived-PVR caution uses its minimum over the last complete breath. A negative minimum keeps the caution through phases with a currently positive margin. After a parameter change or hold, both the old minimum and partial breath are discarded; caution remains pending until an entire fresh breath has been measured. Both margins are in mmHg, not anatomical zone fractions. A non-negative minimum is not proof that a real catheter measurement is valid.
 
-The pulmonary venous compliance coefficient and the passive atrial stiffness coefficient are fixed internally; the atrial relation also changes with prescribed contraction during each heartbeat. **Venous compliance (slope)** adjusts the systemic reservoir only. **Pulmonary capacitance coupling** changes pulmonary venous zero-transmural-pressure volume during inflation, not its compliance coefficient. Pericardial controls change the pressure outside the atrium; ventricular controls change its emptying conditions. See [pulmonary controls](../manual/controls-pulmonary.md) and [heart controls](../manual/controls-heart.md). These distinctions do not imply that the combined pressure–volume response is fixed: the pericardial constraint and pressure-dependent weighting of pulmonary displacement can change that response.
+Mean residence time, delay of the observed LV response and arterial pressure-decay time are separate. In a single compliant store without inflow and at constant downstream pressure, the latter is `R × C`; the full circuit has pulsatile ejection, several stores and changing external pressure. No resistance-dependent pulmonary arterial compliance law is implemented, and the arterial pulse-pressure/RV pulsatile-load question is not resolved by conservation alone.
 
-Pulmonary arterial compliance is also fixed internally. The decay of arterial pressure within a heartbeat is a separate question from blood residence time or respiratory RV-to-LV flow variation. The size and timing of those responses are not jointly validated by the central-volume relation; no resistance-dependent arterial compliance law is implemented.
+The full-text isolated-lung sources support the opposing mechanisms and the need for specified pressure references: Permutt and Howell (1961), Roos (1961), Hakim (1982), Brower (1985), and Peták (2009). They do not jointly identify the model's human-scale coefficients. Constant-flow and fixed-pressure experiments are different protocols. Regional pressure heterogeneity, including different surroundings in compromised lung, remains absent; all of the middle store sees global alveolar pressure.
 
 ---
 
@@ -312,27 +298,7 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
 - **No gas exchange.** There is no oxygen, CO₂, pH or shunt. Hypoxic pulmonary
   vasoconstriction is a coefficient on derecruited lung, not a consequence of an
   alveolar oxygen tension.
-- **Pulse pressure variation need not vary monotonically with filling.** A small
-  PPV can coexist with marked preload reserve, particularly with a small pleural
-  pressure excursion. Its size depends on the respiratory stimulus, pulmonary
-  and atrial storage, immediate inflation-related displacement and the timing
-  of the RV contribution. Low flow can prolong the volume/flow transit estimate,
-  but this does not establish stronger attenuation as the cause of low PPV.
-  The response depends on the conditions; it is not a human hypovolaemia rule.
-  At high filling, direct pulmonary venous displacement can raise variation
-  again even when additional filling buys little output.
-
-  The filled-end rise has a represented mechanism. Once the capillaries are open
-  along their whole length, lung inflation can squeeze blood forward into the
-  left atrium with each breath — the `piston` term. Removing that term suppresses
-  the rise. This is the direct-filling component of the classical Δup.
-
-  The other classical sources are still absent:
-  irregular, variable-depth efforts and arrhythmia, neither of which this model
-  has, since neural effort follows a reproducible rising waveform with activation and post-inspiratory relaxation, and the cardiac rhythm is regular.
-
-  The analytic RV preload-reserve measure asks a different question from PPV: the local response of the fast RV/venous-return construction to increased filling pressure. It does not independently test LV reserve or validate clinical fluid responsiveness.
-
+- **Pulse pressure variation is not a filling-state measurement.** Its size depends on the respiratory stimulus, pressure-dependent pulmonary outflow, pulmonary and atrial storage, ventricular interaction and LV ejection conditions. Their timing can reinforce or oppose the contribution from RV output. A volume/flow residence estimate alone does not establish how strongly the lung attenuates a respiratory signal. PPV is descriptive and cannot identify fluid responsiveness. The separate analytical RV preload-reserve measure describes the local fast RV/venous-return construction; it does not independently measure LV reserve.
 - **Variation is not quantitatively validated as a fluid-response test.** It
   scales with driving pressure and retains the expected qualitative dependence
   on loading conditions, but no 13% cutoff or PPV–fluid-response regression is
@@ -351,26 +317,19 @@ Stated plainly, because a simulator that hides these teaches the wrong lesson.
   therefore passes through the actual end-systolic point and may have a steeper
   effective slope than the selected intrinsic RV Ees. It is a single-beat visual
   construction, not a multi-load conductance-catheter measurement.
-- **Pulmonary transit is an eight-stage aggregate approximation.** Its mean time
-  changes with represented pulmonary blood volume and RV output, but it
-  still has no regional perfusion, shunt, bronchial flow or contrast kinetics.
-  The 0.8–6 s staged bounds and 2 s adaptation are numerical guardrails, and the
-  displayed PA-to-LA estimate must not be interpreted as a measured RV-to-LV
-  contrast transit time or as quantitative PPV validation.
+- **Pulmonary storage is aggregate.** Three pressure-bearing stores conserve blood and couple the ventricles through actual pressure-driven flows. There is no regional perfusion, bronchial flow, shunt, contrast kinetics or independently imposed transport delay. The displayed volume/flow residence estimate must not be interpreted as measured RV-to-LV contrast timing or as quantitative PPV validation.
 - **Hysteresis is optional and instantaneous.** With the flag off, opening is a function of current transpulmonary pressure without an opening-state memory gap. This does not remove gas trapping, muscle-activation dynamics or circulatory storage. With it on, previously opened units close across a pressure distribution centred on `pClose`; retained opening depends on the pressure history. Incremental and decremental pressure paths can therefore differ. What
   is still missing is the time course: a unit opens within the step that reaches
   its threshold, so there is no additional biological time-dependent recruitment at fixed transpulmonary pressure. Duration can still affect the pressure reached, gas flow and circulatory settlement. Real opening kinetics depend on both pressure and time, beyond this memory law.
 - **The pulmonary circulation remains spatially lumped.** Open and derecruited
   unit populations have separate vascular conductances in parallel, and the
-  alveolar waterfall is limited to a fixed aggregate share. There are still no
+  equivalent alveolar-exposed store has one global surrounding pressure. There are no
   dependent/non-dependent regions, gravitational pressure gradients, local West
   zones or regional HPV. This aggregate split does not reproduce spatial perfusion or the full heterogeneity of ARDS.
 - **Pulmonary vascular load is an effective aggregate.** The mechanical
-  coefficient integrated by the model is reported separately from catheter-
-  derived `(mPAP − wedge) / CO`, and an alveolar waterfall contributes its own
-  closing-pressure load. The model does not additionally separate thrombotic
+  geometric reference coefficient, current pressure-sensitive segmental resistance sum and catheter-derived `(mPAP − wedge) / CO` are reported separately. Smooth narrowing under alveolar compression changes middle-outlet conductance. The model does not additionally separate thrombotic
   obstruction, non-alveolar critical closing pressure, blood viscosity or
-  haematocrit, pressure/flow-dependent vascular recruitment and distension,
+  haematocrit, pressure/flow-dependent recruitment and widening of already distended resistance vessels,
   characteristic impedance or wave reflection. Acute pulmonary embolism is
   therefore represented by a raised effective `pvrBase`, not by clot anatomy or
   a claim that calibre alone explains the load. This is sufficient to study the

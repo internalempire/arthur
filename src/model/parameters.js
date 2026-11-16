@@ -228,9 +228,9 @@ export const PARAMETERS = [
 
   // ------------------------------------------------------------------- pulmonary
   {
-    id: 'pvrBase', group: 'pulmonary', label: 'Open-lung PVR at FRC', unit: 'mmHg·s/mL',
+    id: 'pvrBase', group: 'pulmonary', label: 'Reference open-lung resistance at FRC', unit: 'mmHg·s/mL',
     min: 0.03, max: 0.60, step: 0.01, default: 0.07,
-    help: 'The resistance coefficient of a fully open lung at its resting volume. Collapse and hypoxic vasoconstriction then redistribute flow between open and derecruited vascular pathways.',
+    help: 'Sets the geometric resistance coefficient of a fully open lung at its resting volume, with distended vessels. Increases above the default add arterial load upstream of the middle pulmonary bed. Hypoxic vasoconstriction also adds upstream load; these are aggregate resistance prescriptions, not clot burden. Lung opening and vascular compression further influence resistance. The setting differs from catheter-derived (mean pulmonary artery pressure minus wedge) / cardiac output.',
   },
   {
     id: 'pOpen', group: 'mechanics', advanced: 'recruitment', label: 'Opening midpoint (transpulmonary)', unit: 'cmH₂O',
@@ -256,12 +256,7 @@ export const PARAMETERS = [
   {
     id: 'hpv', group: 'pulmonary', label: 'Hypoxic vasoconstriction', unit: '×',
     min: 0, max: 3, step: 0.1, default: 1.0,
-    help: 'Raises resistance only in the vascular pathway of derecruited units. It can redirect flow toward open lung, but severe collapse still reduces the vascular bed available to the right ventricle.',
-  },
-  {
-    id: 'piston', group: 'pulmonary', label: 'Pulmonary capacitance coupling', unit: 'mL/L',
-    min: 0, max: 200, step: 5, default: 85,
-    help: 'Sets how strongly lung inflation can push existing pulmonary venous blood toward the left atrium. It reduces the volume held at zero transmural pressure, with strength weighted by the zone-3 pressure condition; it does not change venous compliance or add blood. Actual flow follows the resulting pressures.',
+    help: 'Raises the resistance assigned to the compromised lung in the reference conductance mixture. The resulting additional load acts upstream of the middle vascular store. Regional blood flow and oxygen-driven feedback are not resolved.',
   },
 ];
 

@@ -39,7 +39,7 @@ This is a test of which variable is the better **state descriptor in that prepar
 
 Thomas, Griffo and Roos used static negative-pressure inflation in excised dog lungs while holding vascular pressures constant. Resistance showed marked inflation-history dependence when plotted against transpulmonary pressure but was relatively consistent when plotted against volume. Hakim, Michel and Chang then compared positive- and negative-pressure inflation in isolated canine lobes and separated arterial, middle and venous pressure drops: they found similar small volume-related increases in alveolar and extra-alveolar resistance, superimposed on pressure-related effects that differed with inflation mode and vascular reference pressure. Peták and colleagues later showed the importance of that distinction directly: over the same 2.5–22 cmH₂O transpulmonary-pressure sweep, total resistance rose by 15 ± 1% with positive-pressure inflation but fell slightly (−3 ± 0.3%) with negative-pressure expansion in isolated perfused rat lungs.
 
-The model therefore uses **strain—volume per open unit—to shape the two mechanical limbs**, while representing the main pressure-specific mechanism separately through the alveolar waterfall. Pressure still matters: it determines volume through lung mechanics, changes transmural vascular pressures and can replace pulmonary venous pressure as the effective downstream pressure. The choice is not “volume matters and pressure does not”; it is “do not make transpulmonary pressure stand in for every mechanism at once.”
+The model uses **strain—volume per open unit—to shape the geometric resistance reference**. It represents pressure effects separately through blood storage and narrowing of the alveolar-exposed outlet. Pressure determines lung volume, changes transmural vascular pressures and drives flow between the represented stores. The geometric curve alone therefore cannot predict flow or the change in pulmonary blood volume.
 
 Three further mechanisms load the low-volume limb in a real patient, and the J-curve of the *mechanically* open lung is only part of the story:
 
@@ -69,9 +69,9 @@ Allow complete breaths and several beats for a persistent comparison. Immediate 
 
 ## In the model
 
-The scale of the whole bed is set by `pvrBase` — see [pulmonary circulation controls](controls-pulmonary.md). The resistance coefficient depends on strain in aerated units, the shares of open and closed lung, and hypoxic vasoconstriction in the closed pathway. These determine how easily blood can pass through the aggregate bed.
+The **Reference open-lung resistance at FRC** control sets a geometric reference: how the represented bed would resist flow if its alveolar-exposed outlet were distended. It depends on strain in aerated units, the open/closed lung mixture and hypoxic tone. The running circuit additionally includes pressure-dependent narrowing of the middle outlet, three pressure-bearing blood stores and a fixed venous outlet resistance.
 
-Intravascular pressure does not directly enlarge the vessels or recruit additional vascular pathways in this resistance law. Pulmonary arterial and venous compartments do have fixed compliances: they store blood, and their pressure changes with stored volume and surrounding pressure. That storage function is distinct from a pressure-dependent change in the resistance coefficient.
+Storage, geometry and narrowing are therefore related but distinct. [Pulmonary storage](pulmonary-transit.md) explains how alveolar pressure compresses the middle compartment while parenchymal traction permits extra-alveolar arterial and venous expansion. Intravascular pressures determine filling and flow. Above zero transmural pressure, widening of the already-distended resistance bed is not simulated: its geometric reference is not automatically diluted by a larger stored blood volume.
 
 ### Strain, not absolute volume
 
@@ -85,7 +85,7 @@ where $V$ is absolute lung volume, $\varphi$ the open fraction, and $V_{\text{un
 
 ### The two limbs
 
-For the open population, per unit of lung:
+The following two limbs construct the open pathway’s geometric reference, per unit of lung. They describe the reference shape. Their allocation to the running circuit is explained below: resistance added above the neutral setting is placed before the middle store, so the plotted extra-alveolar/upstream component also contains that added precapillary load.
 
 $$
 R_{\text{alv}} = P \cdot f_a \, e^{k\varepsilon}
@@ -131,34 +131,23 @@ $$
 
 HPV raises **only the closed pathway**. The closed fraction is used as a surrogate for the territory receiving selective vasoconstrictor tone. There is no calculated alveolar or arterial oxygen tension and no oxygen-driven feedback.
 
-### The waterfall applies to a share, not the whole lung
+### Where the reference resistance acts
 
-Only the alveolar microvascular share sees an alveolar waterfall. The effective downstream pressure of the pulmonary circuit is
+The parallel open/closed calculation produces one equivalent geometric coefficient. The ordinary reference bed is partitioned using the open pathway's alveolar/extra-alveolar proportions. Half its extra-alveolar part lies between PA and the middle store and half between PV and LA; the latter also includes a fixed 0.008 mmHg·s/mL outlet resistance. Its alveolar part lies at the middle-to-PV connection. These are aggregate assignments, not measured anatomical partitions.
 
-$$
-P_{\text{down}} = (1-w)\,P_{pv} + w \cdot \max(P_{pv},\, P_{alv}), \qquad w = 0.45
-$$
+The additional resistance from a selected baseline above the neutral 0.07 mmHg·s/mL reference, and the additional resistance associated with HPV, are placed upstream of the middle store. Thus a high-resistance or HPV phenotype adds precapillary load without turning the same intervention into venous obstruction. The total geometric coefficient remains the open/closed mixture. This location choice does not resolve clot anatomy, individual arteries or regional HPV.
 
-- $P_{pv}$ — pulmonary venous pressure, mmHg
-- $P_{alv}$ — alveolar pressure, mmHg
-- $w$ — share of the bed exposed to alveolar pressure
+When that middle outlet is distended along its length, its flow is the pressure difference divided by its geometric resistance. If internal pressure falls below alveolar pressure, its conductance decreases smoothly. Both endpoint pressures enter the same signed relation, so flow can reverse and is zero at equal pressures. See [vascular waterfalls](vascular-waterfalls.md#on-the-pulmonary-side) for the equation and its limitations.
+
+The open/closed mixture describes reference conductance. It does not give each population a separate blood store, pressure or external pressure. In particular, the middle compartment uses global alveolar pressure even when some lung is compromised. This limits comparisons with regional ARDS perfusion and with measured segmental resistance.
 
 ### Pressure, ventricular load and flow are coupled
 
-The pressure gradient determines inflow from the pulmonary artery into the transport pathway:
+A higher PA pressure increases the gradient into the middle store and simultaneously opposes RV ejection through the pulmonary valve. A higher venous or LA pressure can impede downstream delivery while increasing blood stored upstream. The flows change compartment volumes; their pressure–volume relations then change the pressures driving the next transfer.
 
-$$
-Q_{pul} = \max\left(0,\frac{P_{pa}-P_{down}}{R_{total}}\right)
-$$
+Raising alveolar pressure affects both middle-compartment pressure and its outlet conductance. It can expel blood already present, obstruct incoming delivery, or coexist with extra-alveolar accumulation. The result cannot be inferred from one coefficient alone. All three vascular connections permit pressure-driven reversal, with the same volume subtracted from the donor and added to the receiving compartment.
 
-- $Q_{pul}$ — requested forward pulmonary inflow, mL/s; actual transfer is also limited by available donor volume
-- $P_{pa}$ — pulmonary arterial pressure relative to atmosphere, mmHg
-- $P_{down}$ — effective downstream pressure defined above, relative to atmosphere, mmHg
-- $R_{total}$ — internal pulmonary resistance coefficient, mmHg·s/mL in the flow equations
-
-Higher pulmonary arterial pressure can increase this driving gradient, but it also opposes RV ejection through the pulmonary valve. Higher pulmonary venous pressure can raise the downstream pressure and reduce the gradient. The resulting flows change vascular and chamber volumes, which change pressures and subsequent filling and ejection. These quantities evolve together in the closed circulation.
-
-A fall in the resistance coefficient therefore does not guarantee lower RV ejection pressure or greater cardiac output. Read the coefficient alongside pulmonary arterial and left atrial pressure, RV filling, and measured forward output. A pressure that helps explain flow through a vascular segment can simultaneously represent a load on the ventricle supplying it.
+A lower geometric reference therefore does not guarantee lower RV ejection pressure or greater cardiac output. Read PA and LA pressures, pulmonary blood storage, RV filling and actual forward output together. The [PVR panel](panel-pvr-curve.md) deliberately labels the geometric reference separately from the current pressure-sensitive segmental resistance sum and the catheter-style ratio.
 
 ### What the fully open normal lung does
 
@@ -176,27 +165,26 @@ The crossover — the volume at which the dominant mechanism changes — sits at
 
 The point labelled “RV” is the model's low-volume reference at zero transpulmonary pressure. Residual volume is not independently modelled, so the label should not be interpreted as a predicted physiological RV.
 
-### Two numbers that are not the same number
+### Three resistance quantities with different meanings
 
-The model reports pulmonary resistance twice, and they are different kinds of quantity. This distinction is the subject of [interpretability](interpretability.md).
-
-- **Pulmonary resistance coefficient** — the model's own internal $R$, the thing the equations divide by. Not measurable in a patient, and not a Poiseuille resistance.
-- **PVR, derived** — $(\overline{P}_{pa} - P_{la})/\dot{Q}$, computed from mean pulmonary arterial pressure, model left atrial pressure and cardiac output. It has the form of catheter PVR only while left atrial pressure is a defensible [wedge surrogate](pulmonary-artery-wedge-pressure.md), and inherits that tile's caution automatically.
+- **Pulmonary resistance reference** is the instantaneous geometric coefficient determined by lung inflation, opening and HPV. It describes the aggregate bed with its middle outlet distended. The graph displays this reference, not the full pressure-sensitive circuit load.
+- **Current segmental resistance sum** adds the effective resistance of the three vascular connections at their current pressures. It includes middle-outlet narrowing and the fixed venous outlet resistance. During redistribution the three flows differ, so this sum is not the ratio of the entire PA-to-LA gradient to any single instantaneous flow.
+- **PVR, derived** is $(\overline P_{pa}-\overline P_{la})/CO$, using smoothed atmospheric pressures and last-completed-beat aortic output. It resembles catheter PVR only under appropriate [wedge-surrogate](pulmonary-artery-wedge-pressure.md) conditions. Different sampling windows, storage and narrowing can make it differ from both quantities above.
 
 They can move in opposite directions. The derived value includes the downstream-pressure effects, pulsatile storage and averaging choices as well as flow in its denominator; it is not obtained simply by reading the internal resistor. A fall in flow alone would not change the ratio in an ideal steady resistor if its pressure gradient fell proportionally. In the research calibration phenotype, compare PEEP 4 and 14 cmH₂O at fixed low and high reopenable shares of the same compromised component:
 
 <!-- BEGIN GENERATED: pvr-opening-peep -->
 *Executable setup: the shared literature-check phenotype, distinct from the shipped ARDS/RV preset: passive volume control, VT 350 mL, 24/min, aerated-lung compliance 40 mL/cmH₂O, 42% compromised, transpulmonary opening midpoint 17.5 cmH₂O, opening memory off, baroreflex on, baseline pulmonary coefficient 0.09 mmHg·s/mL and HPV multiplier 1.6. Each PEEP level is initialized independently and run for 45 additional s after automatic initialization, rather than reached by a sequential PEEP step.*
 
-| reopenable share | internal coefficient (WU), PEEP 4 → 14 | pressure–flow estimate (WU), PEEP 4 → 14 | open fraction at sampling, PEEP 4 → 14 |
+| reopenable share | geometric reference (WU), PEEP 4 → 14 | pressure–flow estimate (WU), PEEP 4 → 14 | open fraction at sampling, PEEP 4 → 14 |
 |---|---:|---:|---:|
-| low (6.2% of compromised lung) | 2.41 → 2.40 (−0.4%) | 2.71 → 3.52 (+29.8%) | 58 → 61% |
-| high (75.0% of compromised lung) | 2.38 → 1.72 (−28.0%) | 2.44 → 2.60 (+6.3%) | 59 → 89% |
+| low (6.2% of compromised lung) | 2.41 → 2.40 (−0.4%) | 2.60 → 3.61 (+38.8%) | 58 → 61% |
+| high (75.0% of compromised lung) | 2.38 → 1.72 (−28.0%) | 2.39 → 2.39 (−0.2%) | 59 → 89% |
 
-The internal coefficient and open fraction are instantaneous samples at the end of that run, not respiratory means or dedicated end-expiratory measurements. The pressure–flow estimate combines pulmonary arterial and left atrial pressures smoothed with a 3 s exponential time constant (both relative to atmosphere) with forward aortic output from the last completed heartbeat. The displayed changes compare those specified samples; their size is not an independently validated clinical effect.
+The geometric reference and open fraction are instantaneous samples at the end of that run, not respiratory means or dedicated end-expiratory measurements. The pressure–flow estimate combines pulmonary arterial and left atrial pressures smoothed with a 3 s exponential time constant (both relative to atmosphere) with forward aortic output from the last completed heartbeat. The displayed changes compare those specified samples; their size is not an independently validated clinical effect.
 <!-- END GENERATED: pvr-opening-peep -->
 
-Reading the coefficient as though it were the pressure–flow estimate would report the opposite direction. However, at PEEP 14 these model runs fall outside the zone III assumption and the wedge surrogate is flagged. The table therefore demonstrates an internal pressure–flow response and its dependence on recruitability; it does not independently reproduce a valid catheter measurement at both PEEP levels.
+The coefficient and pressure–flow estimate answer different questions. Check the instantaneous Pv − Palv margin, its completed-breath minimum and the wedge caution separately at each sampled state. This table compares internal model responses and their dependence on opening; it does not independently validate a human catheter measurement or a universal PEEP response.
 
 ---
 
@@ -206,21 +194,21 @@ Reading the coefficient as though it were the pressure–flow estimate would rep
 
 The fully open mechanical minimum is constructed at zero strain, near the tissue's resting volume. This follows the clinical teaching geometry of a minimum near FRC. Primary measurements in isolated animal lungs support opposing mechanical effects but can place the minimum nearer half maximal volume; that location is not treated as a measured human target.
 
-Four features determine the aggregate response: open and closed conductances in parallel, HPV confined to the closed pathway, a fractional alveolar waterfall, and the strain-dependent open pathway. The evidence hierarchy is explicit:
+The reference geometry combines open and closed conductances in parallel, HPV confined to the closed pathway and the strain-dependent open pathway. Pressure-bearing storage and smooth middle-outlet narrowing determine the running circuit response. The evidence serves several distinct roles:
 
-1. **Human in-vivo catheter measurements** constrain the approximate magnitude and recruitability-dependent PEEP response of a selected phenotype. Cappio Borlino and colleagues studied 23 patients with ARDS with a 10 cmH₂O PEEP difference and classified recruitability using a measured R/I. Arthur uses explicit opening shares instead; its coefficients are not estimates of those patients' anatomy.
+1. **Human in-vivo catheter measurements** provide an external comparison for the magnitude and recruitability-dependent PEEP response of a selected phenotype. Cappio Borlino and colleagues studied 23 patients with ARDS with a 10 cmH₂O PEEP difference and classified recruitability using measured R/I. The model uses explicit opening shares; those coefficients do not estimate the patients' anatomy. A pressure-sensitive circulation must be reassessed under matched measurement conditions rather than inheriting a validation claim from its reference geometry.
 2. **The contemporary clinical synthesis** supplies the human teaching topology: a minimum near FRC with resistance rising toward both lower and higher volume.
 3. **Isolated-animal preparations** support volume dependence and the existence of opposing mechanical effects, but their exact nadir and maximal-inflation ratios are not numerical human targets.
 
 The nadir is consequently at FRC *by construction*—$K$ is solved to put it there—not because the model discovered or fitted its location. The model cannot be used to ask where the human nadir truly belongs, and anyone teaching from the figure should state that boundary.
 
-### Both limbs follow volume, not transpulmonary pressure
+### The reference geometric limbs follow volume
 
-The experimental argument is described [above](#why-the-mechanical-curve-uses-volume). It supports volume as an organising variable for the model's **mechanical curve**, not a pressure-free pulmonary circulation. Strain describes inflation of aerated units; the separate waterfall describes the effect of alveolar pressure on the downstream pressure for flow. Hakim's and Peták's inflation-mode results show why this distinction matters: pressure-related effects remain real even when volume better organises the mechanical relation in a particular preparation.
+The experimental argument is described [above](#why-the-mechanical-curve-uses-volume). It supports volume as an organising variable for the model’s **mechanical curve**. Strain describes inflation of aerated units; vascular pressures separately determine filling, flow and outlet narrowing. Hakim’s and Peták’s inflation-mode results show why this distinction matters: pressure-related effects remain real even when volume better organises the mechanical relation in a particular preparation.
 
 ### Conductances in parallel, not a divided single path
 
-The two populations contribute parallel conductances. A derecruited unit remains poorly perfused, and HPV acts on that pathway. The mixture varies continuously with open fraction; alveolar pressure contributes separately through the fractional waterfall.
+The two populations contribute parallel reference conductances. The closed pathway retains conductance, and HPV reduces it. This mixture varies continuously with open fraction. Its equivalent coefficient is then assigned to the aggregate pressure-bearing circuit; there is no separate regional flow measurement or blood store for each population.
 
 ### Coefficients that are declared rather than cited
 
@@ -233,7 +221,7 @@ Several numbers here are **didactic shape coefficients**: they were chosen to ex
 | $G$ | 4 | the nonlinear left limb below FRC |
 | closed-path factor | 3 | how much narrower a derecruited pathway is |
 
-The equal split deserves a word, because it looks like something that could be measured and is not. Published partitions of the pulmonary bed do not measure the same boundary and do not agree — the alveolar share has been reported below 16% by occlusion, 34% by indicator dilution and 45% by micropuncture, and the middle distensible segment alone swings from 7% to 53% with haematocrit. No measurement settles it. Equal shares at FRC are a didactic crossover, not an anatomical claim. The 45% waterfall share is the upper end of that same reported range and is likewise an aggregate.
+Published partitions of pulmonary resistance depend on the preparation and measurement method. An occlusion-defined middle segment is not necessarily identical to anatomical septal capillaries, and viscosity can change the observed distribution of pressure drops. Equal reference shares at FRC therefore specify a didactic crossover, not a measured anatomical split. The same limitation applies to assigning half the extra-alveolar reference resistance to each side of the middle store.
 
 The closed-path factor and phenotype were constrained jointly against the numerical pattern of a human PEEP study. Because the model uses left atrial pressure as the downstream pressure even when its wedge surrogate is cautioned, this is calibration of an internal phenotype rather than independent validation of catheter-derived PVR.
 
@@ -243,10 +231,10 @@ The closed-path factor and phenotype were constrained jointly against the numeri
 
 ### Of the construction
 
-- One aggregate bed. There is no regional zonal network, no gravitational gradient, no distribution of transit paths through parallel regions. West zones appear as a fractional share, not as a map.
-- No pressure- or flow-dependent vascular recruitment and distension in the resistance law. Its determinants are lung strain, open fraction, HPV and the reference resistance scale. Compliant vascular storage is present, but it does not change resistance through pressure-induced vessel widening. A pressure–flow response outside these mechanisms cannot be inferred from this model.
+- One aggregate bed. There is no regional zonal network, gravitational gradient or distribution of perfused paths. The middle store uses global alveolar pressure, including when lung is compromised.
+- Pressure-dependent middle-outlet narrowing is represented. Pressure-driven widening or recruitment of an already-distended resistance bed is not. Stored blood volume does not uniquely identify calibre, length or the number of flowing vessels.
 - No blood rheology. Viscosity and haematocrit do not exist, although the partition they most affect is one of the model's chosen constants.
-- No vascular remodelling, characteristic impedance or wave reflection. Pulmonary pressures and flows vary during each beat in a resistive and compliant circuit, but there is no distributed pressure-wave propagation. Volume delivery is delayed by [pulmonary transit](pulmonary-transit.md).
+- No vascular remodelling, characteristic impedance or wave reflection. Pulmonary pressures and flows vary through three compliant stores, but there is no distributed pressure-wave propagation or independently imposed blood-delivery delay. See [storage and transit](pulmonary-transit.md).
 - HPV is a gain applied to the derecruited pathway, not a response to a measured oxygen tension. There is no gas exchange, no V/Q, no CO₂.
 - The secondary high-volume rise found outside the alveolar segment in isolated lobes is not represented; the clinical two-limb decomposition is followed instead.
 - The minimum is at FRC by construction. See the caveat above.
@@ -254,12 +242,20 @@ The closed-path factor and phenotype were constrained jointly against the numeri
 ### Of clinical application
 
 - **Do not read the coefficient as a patient's PVR.** It is an internal quantity. The value labelled *derived* is comparable in form to catheter PVR only when the left-atrial-pressure wedge surrogate is valid.
-- **The absolute pressure–flow values are calibrated in one phenotype**, at PEEP 4–14, against one human ARDS cohort. The high-PEEP rows are outside the model's zone III assumption, so this should not be described as catheter-level validation. Elsewhere in the control space the model is directionally interpretable and quantitatively unvalidated.
+- **Absolute pressure–flow responses remain quantitatively unvalidated.** The PEEP 4–14 comparison uses one selected phenotype and one human ARDS cohort. Matching a numerical interval without matching vascular pressure references, respiratory phase and wedge conditions would not establish catheter-level validation.
 - **This is not a PEEP titration tool.** A large reopenable share does not establish that high PEEP is safe, and the model does not turn the PEEP response of resistance into a recommendation.
 - **In the pulmonary embolism preset**, a raised `pvrBase` is an *effective aggregate load*. It reproduces the pressure, flow and right-ventricular consequences of obstruction without representing clot burden, embolic distribution or a right-shifted pressure–flow relation as separate quantities. See [acute pulmonary embolism](scenarios.md#acute-pulmonary-embolism).
 - Nothing here defends right ventricular **coronary** perfusion, which is absent from the model and is a real part of the clinical spiral.
 
 ---
+
+### What the isolated-lung comparisons do and do not establish
+
+Applying the experimental pressure references to the nominal adult model gives only partial agreement with the supplied animal experiments. In a Peták-style comparison, PA and LA pressures are fixed relative to atmosphere while the lung is inflated by positive airway pressure or negative surrounding pressure. The endpoint directions agree, but positive-pressure inflation produces a much larger resistance increase in the model, and the full negative-pressure trajectory is not reproduced quantitatively. The comparison uses adult teaching coefficients without scaling species, lung size or perfusate; it is not a replication of the rat experiment.
+
+In a Hakim-style constant-inflow comparison, positive-pressure inflation mainly increases the middle pressure drop, as in the canine experiment. The model's extra-alveolar/venous pressure drop nevertheless falls where the measured venous drop rises slightly at high inflation. The falling extra-alveolar geometric limb cannot reproduce that component of the experiment. Moreover, an occlusion-defined experimental segment is not identical to the model's compartment boundaries.
+
+Roos-style pressure sweeps reproduce selected effects of releasing compression. They do not establish the additional distension-dependent reduction in resistance that can occur when vessels are already open, which this construction omits. These discrepancies limit quantitative and segmental interpretation; agreement in a whole-lung direction does not validate every constituent mechanism.
 
 ## Validation
 
