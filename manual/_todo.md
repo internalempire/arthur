@@ -4,7 +4,7 @@
 
 ---
 
-## Pulmonary review before blood-distribution presentation
+## Pulmonary review checkpoint
 
 The pulmonary circuit now uses three pressure-bearing stores. Its volume/flow residence estimate imposes no delay. The remaining questions are specific:
 
@@ -12,7 +12,7 @@ The pulmonary circuit now uses three pressure-bearing stores. Its volume/flow re
 - Reconcile the retained geometric resistance law with segmental inflation data. The isolated-protocol comparison reproduces the central resistance rise but not Hakim's venous-gradient direction; Peták's positive-inflation effect is much smaller than the model analogue. Separate anatomical segment definitions, pressure boundaries and species/size from a proposed constitutive correction. Do not fit coefficients merely to restore a preferred whole-circuit result.
 - Seek matched evidence for absolute pulmonary storage and the magnitude/phase of RV-to-LV respiratory variation. The fixed storage coefficients, extra-alveolar traction and collapse smoothing are not a human quantitative calibration. Varying middle compliance also changes the adopted collapse pressure scale; it is not an isolated intervention on storage.
 
-Blood-distribution presentation follows this review. Substantive work beyond the current authorization still needs a clinician-facing explanation and agreement. A small PPV cannot be attributed to long blood residence time alone.
+Resume with the middle pressure drop in the Hakim constant-inflow experiment. The positive-pressure analogue of Peták and the coupled ARDS comparison identify narrowing at the middle outlet as a material sensitivity. Substantive work beyond the current authorization still needs a clinician-facing explanation and agreement. A small PPV cannot be attributed to long blood residence time alone.
 
 ## Model
 
@@ -38,7 +38,7 @@ Constrain the magnitude of within-breath opening and its plateau/compliance cons
 
 ## Teaching presentation — discuss before implementation
 
-Discuss blood-volume redistribution across existing compartments and pressure history across a manoeuvre before implementation. Quantifying the separate effects of simultaneous interventions would require specifically controlled experiments; the Mechanisms view reports their combined state differences and does not perform that attribution. The independent venous-capacity control is implemented; showing where the conserved blood redistributes follows the venous-state and pulmonary-transit reviews above. These views must show observed changes without implying that a causal contribution has been quantitatively isolated. Do not add quizzes, blood-gas calculations or automatic pressure selection. The private discussion is `codex-notes/Arthur-discussione-spunti-didattici-2026-09-24.md`; it does not authorize these remaining model or interface changes.
+Discuss the time course of airway and transpulmonary pressures, lung opening and end-expiratory gas volume across a manoeuvre. Quantifying the separate effects of simultaneous interventions would require specifically controlled experiments; the Mechanisms view reports their combined state differences and does not perform that attribution. The live Pin table and blood-distribution view already cover state comparisons. These views must show observed changes without implying that a causal contribution has been quantitatively isolated. Do not add quizzes, blood-gas calculations or automatic pressure selection. The private discussion is `codex-notes/Arthur-discussione-spunti-didattici-2026-09-24.md`; it does not authorize these remaining model or interface changes.
 
  ### Fit the waveform cursor status on very narrow screens
 

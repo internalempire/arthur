@@ -101,7 +101,16 @@ class CycleRing {
   }
 }
 
+// Observation belongs to a displayed simulation. Symbol properties are omitted
+// by structuredClone, so a Pin never inherits another world's observer.
+const volumeObserver = Symbol('volumeObserver');
+
 export class Simulator {
+  observeBloodVolumes(observer) {
+    this[volumeObserver] = observer;
+    return () => { if (this[volumeObserver] === observer) delete this[volumeObserver]; };
+  }
+
   /** `dt` is exposed so the convergence test can halve it. */
   constructor({ dt = DEFAULT_DT } = {}) {
     this.dt = dt;
@@ -165,14 +174,15 @@ export class Simulator {
     this.cycleFlowDuration = 0;
     // Occlusion manoeuvres, and the (pressure, flow) pairs they measure.
     this.hold = null;
-    this.invalidatePulmonaryMargin();
+    this.invalidateBreathObservations();
     this.measuredPoints = [];
     // Settle the model so the first frame the user sees is a steady state.
     this.advance(15, true);
   }
 
   /** Discard changed or interrupted breaths from both pulmonary observations. */
-  invalidatePulmonaryMargin() {
+  invalidateBreathObservations() {
+    this[volumeObserver]?.reset(this.resp.breathCount);
     this.pulmonaryMarginBreath = this.resp.breathCount;
     this.pulmonaryMarginMin = Infinity;
     this.pulmonaryMarginStartedAtBoundary = false;
@@ -223,7 +233,7 @@ export class Simulator {
       }
     }
     invalidateRecruitmentCycle(this.resp);
-    this.invalidatePulmonaryMargin();
+    this.invalidateBreathObservations();
     if (this.metrics) {
       this.metrics.closedEndExpiratoryFraction = null;
       this.metrics.tidalOpenExcursion = null;
@@ -299,7 +309,7 @@ export class Simulator {
    */
   startHold(kind, seconds = 12) {
     if (this.hold || this.resp.hold || this.resp.holdPending) return false;
-    this.invalidatePulmonaryMargin();
+    this.invalidateBreathObservations();
     this.resp.holdElapsed = 0;
     this.resp.holdStartPaw = null;
     this.resp.holdStartVolume = null;
@@ -309,7 +319,7 @@ export class Simulator {
   }
 
   cancelHold() {
-    this.invalidatePulmonaryMargin();
+    this.invalidateBreathObservations();
     this.resp.hold = null;
     this.resp.holdPending = null;
     this.resp.holdElapsed = 0;
@@ -409,6 +419,7 @@ export class Simulator {
     this.cycleAorticVolume += c.q.av * this.dt;
     this.cycleFlowDuration += this.dt;
     if (this.cycleTick++ % Math.max(1, Math.round(1 / (CYCLE_HZ * this.dt))) === 0) {
+      this[volumeObserver]?.sample(this);
       this.cycle.ra.push(c.p.ra);
       this.cycle.flow.push((c.q.vr * 60) / 1000);
       this.cycle.aorticFlow.push(this.cycleAorticVolume / this.cycleFlowDuration * 0.06);

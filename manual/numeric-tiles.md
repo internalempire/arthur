@@ -68,6 +68,10 @@ The same elapsed time does not guarantee matched cardiac or respiratory phases. 
 
 The map is **created only on request**. Its module is loaded at the first opening; closing removes its display and disconnects its layout observer. Open values share the tile refresh schedule, approximately eight updates per second while running. Connectors are redrawn only when layout dimensions change. The view reads already available state and measurements; it starts no simulation, worker, independent intervention experiment or Deep CO calculation. The existing live references keep their usual computational cost whether the map is open or closed.
 
+### Compare regional blood volume
+
+With a Pin selected, open **Blood distribution** beside **Mechanisms**. Read total blood first, then compare the five regional bars over complete breaths. A change in venous tone can redistribute blood at constant total, while an applied dose changes the total as well. The [volume controls guide](controls-volume.md#where-does-the-blood-go) walks through both experiments.
+
 ### Lifetime and computational scope
 
 Choosing a preset, loading a patient file or resetting the simulation clears the references. They are not saved in patient files and do not survive page reloads. References run the same physiological equations and integration step as the current patient, without additional plotted traces or a Deep CO calculation. Computational work grows with the number of references; the four-reference limit bounds this cost. Removing an unused reference releases its simulation.

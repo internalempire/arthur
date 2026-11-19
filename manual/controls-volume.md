@@ -14,6 +14,14 @@
 | resistance to venous return | 0.020–0.300 mmHg·s/mL | sets the falling slope of the aggregate venous-return relation |
 | systemic vascular resistance | 0.25–3.00 mmHg·s/mL | aggregate resistance opposing LV outflow |
 
+### Where does the blood go?
+
+Press **Pin**, then **Blood distribution** below the numerical tiles. The total at the top sums all the blood in each patient now. The five bars compare the amount **held** in each region, in mL, averaged over each patient's latest complete breath. From top to bottom the regions are the systemic veins and vena cava, right atrium and ventricle, pulmonary vessels (arterial, middle and venous stores), left atrium and ventricle, and systemic arteries. Each drop of simulated blood belongs to one group. A bar to the right means the current region contains more blood than the same region in the selected live Pin. All bars share the labelled scale around zero. The scale expands when larger differences need to fit. The net regional change sums unrounded differences; individual labels are rounded to whole mL.
+
+Try two comparisons from the same healthy volume-controlled preset. First Pin and increase **Venous tone effect** by 100 mL. The venous reservoir now holds less blood at a given distending pressure. The total difference stays zero. Watch which groups gain blood as others lose it. Reselect the preset, Pin again and **apply +100 mL** instead. The total difference rises immediately; once the next uninterrupted breath has been observed, the bars show where that additional volume and the resulting redistribution appear. These bars compare stored amounts. They cannot trace individual blood cells or attribute a regional change to a single intervention if several controls have changed. The stressed share shown in the sidebar is a pressure–volume property of the systemic reservoir and is already included in its anatomical volume.
+
+The regional comparison starts after a complete breath has been observed in each state while the panel is open. A setting change or airway hold discards the affected observation. Pause retains a completed comparison; Play lets a pending one finish. Each state can breathe at its own rate. Selecting another Pin starts observation of that reference. Inspecting waveform history suspends the comparison. Closing the panel releases both observers.
+
 ### Blood volume change
 
 Choose an amount, then press **Apply +… mL** or **Remove … mL**. Moving the selector only prepares the next intervention; it does not change the patient, the saved prescription or the Pin comparisons. Positive values add blood and negative values remove it. The button is disabled at zero. Each application changes total circulating blood by exactly the selected amount, including while paused, and returns the selector to zero. That return does not remove blood already given. Two applications of +250 mL add a cumulative 500 mL.

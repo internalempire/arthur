@@ -354,6 +354,9 @@ check('returning to fast mode terminates an active worker immediately',
 const { checkMechanismsUI } = await import('./mechanisms-ui.mjs');
 await checkMechanismsUI(check);
 
+const { checkBloodDistribution } = await import('./blood-distribution-ui.mjs');
+checkBloodDistribution(check);
+
 if (failures.length) {
   console.error(`\n${failures.length} UI smoke failure(s):`);
   for (const failure of failures) console.error(`- ${failure}`);
