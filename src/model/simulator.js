@@ -112,6 +112,16 @@ export class Simulator {
     return () => { if (this[volumeObserver] === observer) delete this[volumeObserver]; };
   }
 
+  // A frame-level quality flag can describe a different instant when the UI
+  // advances many steps at once. Recorders check the actual integrating state.
+  validObservation() {
+    const r = this.resp, c = this.circ;
+    return !r.atCapacity && !r.hitCapacity && c.limitTicks <= 0 && !c.cardiacPhaseInvalid
+      && !c.pressureDomainInvalid && !c.pressureDomainRun && c.lvEdv > 0 && c.lvEsv >= 0
+      && c.lvEsv <= c.lvEdv && Number.isFinite(c.co + c.p.sa)
+      && COMPARTMENTS.every(key => c[key] > 1.5);
+  }
+
   observeManoeuvre(observer) {
     this[historyObserver] = observer;
     return () => { if (this[historyObserver] === observer) delete this[historyObserver]; };

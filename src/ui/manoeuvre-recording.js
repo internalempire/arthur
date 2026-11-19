@@ -1,17 +1,11 @@
 // Optional observation of a single trajectory. Only completed breaths are retained.
-import { COMPARTMENTS, PARAM_BY_ID } from '../model/index.js';
+import { PARAMETERS } from '../model/index.js';
 import { pinSettingChanges } from './live-pins.js';
 
 const changedLung = new Set(['collapsed', 'reopenable', 'recruitmentProfile', 'hysteresis', 'pClose',
   'pOpen', 'clung', 'lungCapacity', 'ccw', 'cwLoad']);
 export const HISTORY_BREATHS = 4;
 const maxBreaths = 360, maxEvents = 120;
-
-function outsideDomain({ resp: r, circ: c }) {
-  return r.atCapacity || r.hitCapacity || c.limitTicks > 0 || c.cardiacPhaseInvalid
-      || c.pressureDomainInvalid || c.pressureDomainRun || COMPARTMENTS.some(k => c[k] <= 1.5)
-      || !(c.lvEdv > 0 && c.lvEsv >= 0 && c.lvEsv <= c.lvEdv) || !Number.isFinite(c.co + c.p.sa);
-}
 
 export function pinOutput(window) {
   if (!window || !Number.isFinite(window.from.pinML) || !Number.isFinite(window.to.pinML)
@@ -56,7 +50,7 @@ export function createRecording(sim, reference = null) {
           Object.assign(mark, { pinML, invalidTicks });
         }
         pinML += world.circ.q.av * world.dt;
-        if (outsideDomain(world) || world.hold) invalidTicks++;
+        if (!world.validObservation() || world.hold) invalidTicks++;
       },
     });
   }
@@ -86,7 +80,7 @@ export function createRecording(sim, reference = null) {
       recording.version++;
       return;
     }
-    const name = PARAM_BY_ID.get(id)?.label ?? id;
+    const name = PARAMETERS.find(spec => spec.id === id)?.label ?? id;
     if (changedLung.has(id)) { stop(name + ' changed'); return; }
     const text = pinSettingChanges({ ...sim.params, [id]: before }, sim.params)[0]?.text;
     interrupt(text ?? name);
@@ -140,7 +134,7 @@ export function createRecording(sim, reference = null) {
     breath.ml += c.q.av * world.dt;
     breath.min = Math.min(breath.min, r.pl);
     breath.max = Math.max(breath.max, r.pl);
-    breath.invalid ||= outsideDomain(world);
+    breath.invalid ||= !world.validObservation();
   }
   detach = sim.observeManoeuvre({ change, interrupt, sample, stop });
   return Object.assign(recording, { stop, releasePin, getElapsed: () => recording.active ? sim.time - start : recording.elapsed });
