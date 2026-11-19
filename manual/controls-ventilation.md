@@ -78,7 +78,7 @@ The set exposes the minimum respiratory inputs needed to distinguish negative- f
 
 ## Limits
 
-- No selectable flow waveform, trigger sensitivity, pressure rise, cycling percentage or pause time. PSV uses one fixed trigger, rise time and cycling percentage.
+- PSV uses fixed trigger sensitivity, pressure rise and cycling percentage. Select **Airway flow** in the monitor to follow triggering and cycling; routine pause duration is fixed by the manoeuvre.
 - Volume control uses constant flow throughout inspiration and has no inspiratory pause.
 - Pressure support can represent trigger delay from intrinsic PEEP, ineffective effort and early cycling. It does not model auto-triggering, double triggering, late-cycling classification, leaks, circuit compliance or ventilator-specific servo behaviour.
 - Assisted inspiratory holds assume a leak-free occlusion and regular relaxation. A bedside plateau may be unreadable when muscle activity persists or recurs; the model does not reproduce agitation or irregular drive.

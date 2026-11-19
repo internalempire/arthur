@@ -7,10 +7,10 @@
 // directly. This is a plain ES module; it adds no runtime dependency or build
 // step.
 
-export { Simulator, TRACE_SECONDS, TRACE_SAMPLE_HZ } from './simulator.js';
+export { Simulator, COMPARTMENTS, TRACE_SECONDS, TRACE_SAMPLE_HZ } from './simulator.js';
 export { createCardiacResponseWorker, cardiacResponseParameters } from './cardiac-response-client.js';
 export { SCENARIOS, SCENARIO_BY_ID } from './scenarios.js';
-export { PARAMETERS, GROUPS } from './parameters.js';
+export { PARAMETERS, PARAM_BY_ID, GROUPS } from './parameters.js';
 export {
   PATIENT_STATE_FORMAT, PATIENT_STATE_VERSION,
   patientParameterOverrides, createPatientState, parsePatientState,

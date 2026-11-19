@@ -2,6 +2,10 @@
 
 Updated: 2026-11-19
 
+## Monitor, manoeuvre recording and waiting states — November 19
+
+The clinician approved the waveforms-first layout, optional airway/caval/aortic flow and LV stroke volume, phase-end transpulmonary pressure, timestamped occlusions, enlarged waveforms and the on-demand pressure history. This change adds observations and presentation only. Patient and Pin use the same elapsed intervals for the optional recorded output comparison. Paused, loading, waiting for breaths and background computation are distinguished in the interface. Waveform sampling now retains its clock across animation frames. The earlier pulmonary checkpoint still applies. See [the monitor guide](../manual/panel-waveforms.md).
+
 ## Blood distribution and pulmonary checkpoint — November 19
 
 The clinician paused physiological development after the November 17 isolated and coupled experiments on commit 56e8c68. Resume with Hakim's occlusion-defined segmental pressure drops at imposed flow. The diagnostic removal of middle-outlet narrowing changed the sign of the ARDS preset's response to PEEP in that comparison. The experiment did not change the adopted law. The private checkpoint is in `codex-notes/Arthur-checkpoint-fisiologia-2026-11-19.md`; the numerical output is in `outputs/Arthur-pulmonary-resistance-2026-11-17/`.

@@ -80,6 +80,8 @@ The experiment opens the systemic return pathway only in the copies. The externa
 
 The first minute permits redistribution. Subsequent complete minute windows check agreement of imposed inflow, RV output and LV output and stability between windows. A point is accepted only within a 0.5% flow tolerance, with finite values, conserved central volume and valid cardiac phases/pressure relations. Mean right atrial pressure must also change by less than 0.05 mmHg plus 0.5% of its magnitude between windows. Slow cases may use up to five minutes of simulated loading. Unsettled or invalid points are omitted, and lines do not bridge missing intervals.
 
+The progress indicator appears when Deep CO is requested. While the worker prepares, the bar shows activity; once the loading series starts it shows completed experiments out of the reported total. It follows calculation progress even if the displayed patient is paused. Choosing **Live RV** cancels the job.
+
 The plotted line interpolates a finite set of loading experiments. It is conditioned on the selected reference respiratory and vascular state, including its inflow waveform. Agreement at the reference point is an internal consistency check, not independent clinical validation or an unrestricted prediction of a different circulation.
 
 ![Optional deep whole-heart response at two PEEP levels](figure/guyton-deep.svg)

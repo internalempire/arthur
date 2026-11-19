@@ -25,7 +25,7 @@ export async function checkMechanismsUI(check) {
   const attrs = new Map();
   let toggle;
   const button = { addEventListener: (name, fn) => { toggle = fn; }, setAttribute: (k, v) => attrs.set(k, v) };
-  const host = { hidden: true, textContent: '', replaceChildren() { this.textContent = ''; } };
+  const host = { setAttribute() {}, hidden: true, textContent: '', replaceChildren() { this.textContent = ''; } };
   let context = { reference: { id: 1 }, historical: false };
   let loads = 0, mounts = 0, renders = 0, destroys = 0;
   let resolveLoad;

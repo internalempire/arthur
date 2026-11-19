@@ -42,7 +42,7 @@ class Ring {
   }
 }
 
-const CHANNELS = ['paw', 'ppl', 'pl', 'palv', 'art', 'cvp', 'pap', 'paop', 'flow', 'volume', 'co', 'insp'];
+const CHANNELS = ['paw', 'ppl', 'pl', 'palv', 'art', 'cvp', 'pap', 'paop', 'flow', 'volume', 'co', 'caval', 'hold', 'insp'];
 
 // The Guyton panel needs two clocks. A one-heartbeat boxcar removes atrial
 // pulsatility while preserving the respiratory excursion used for the trail.
@@ -104,11 +104,17 @@ class CycleRing {
 // Observation belongs to a displayed simulation. Symbol properties are omitted
 // by structuredClone, so a Pin never inherits another world's observer.
 const volumeObserver = Symbol('volumeObserver');
+const historyObserver = Symbol('historyObserver');
 
 export class Simulator {
   observeBloodVolumes(observer) {
     this[volumeObserver] = observer;
     return () => { if (this[volumeObserver] === observer) delete this[volumeObserver]; };
+  }
+
+  observeManoeuvre(observer) {
+    this[historyObserver] = observer;
+    return () => { if (this[historyObserver] === observer) delete this[historyObserver]; };
   }
 
   /** `dt` is exposed so the convergence test can halve it. */
@@ -129,7 +135,8 @@ export class Simulator {
     return copy;
   }
 
-  reset() {
+  reset({ recordTraces = false } = {}) {
+    this[historyObserver]?.stop('Patient reset');
     this.params = normalizeRecruitmentParameters(this.params);
     this.resp = createRespiratoryState();
     this.baro = createBaroreflexState();
@@ -177,7 +184,7 @@ export class Simulator {
     this.invalidateBreathObservations();
     this.measuredPoints = [];
     // Settle the model so the first frame the user sees is a steady state.
-    this.advance(15, true);
+    this.advance(15, !recordTraces);
   }
 
   /** Discard changed or interrupted breaths from both pulmonary observations. */
@@ -187,6 +194,8 @@ export class Simulator {
     this.pulmonaryMarginMin = Infinity;
     this.pulmonaryMarginStartedAtBoundary = false;
     this.lastBreathPulmonaryMargin = null;
+    this.breathPressures = null;
+    if (this.metrics) this.metrics.breathPressures = null;
     this.pvrLo = Infinity;
     this.pvrHi = -Infinity;
     this.lastPvrSwing = null;
@@ -218,6 +227,7 @@ export class Simulator {
       ? (this.resp.relaxVolume || relaxationVolume(resolveParams(this.params))) + this.resp.v
       : null;
     if (id === 'riRatio') throw new Error('Use an explicit opening profile or reopenable share.');
+    const previous = this.params[id];
     this.params[id] = value;
     if (id === 'recruitmentProfile' && RECRUITMENT_PROFILES[value]) {
       Object.assign(this.params, RECRUITMENT_PROFILES[value]);
@@ -266,6 +276,7 @@ export class Simulator {
         this.resp.lastPsvCycleTime = null;
       }
     }
+    this[historyObserver]?.change(id, previous, this.params[id]);
     if (mechanicsChanged) {
       const after = relaxationVolume(resolveParams(this.params));
       this.resp.v = Math.max(-after * 0.9, absoluteVolume - after);
@@ -313,12 +324,14 @@ export class Simulator {
     this.resp.holdElapsed = 0;
     this.resp.holdStartPaw = null;
     this.resp.holdStartVolume = null;
+    this[historyObserver]?.interrupt(kind + ' hold requested');
     this.resp.holdPending = kind;
     this.hold = { kind, seconds, elapsed: 0, engaged: false, sumPra: 0, sumFlow: 0, n: 0 };
     return true;
   }
 
   cancelHold() {
+    if (this.hold) this[historyObserver]?.interrupt('Hold cancelled');
     this.invalidateBreathObservations();
     this.resp.hold = null;
     this.resp.holdPending = null;
@@ -356,7 +369,7 @@ export class Simulator {
       stepCirculation(this.effective, this.circ, this.resp, dt);
       this.time += dt;
       this.accumulate();
-      if (!silent && s % sampleEvery === 0) this.sample();
+      if (!silent && this.sampleAccum++ % sampleEvery === 0) this.sample();
     }
     this.metrics = this.computeMetrics();
   }
@@ -374,6 +387,8 @@ export class Simulator {
     }
     if (this.resp.breathCount !== this.pulmonaryMarginBreath) {
       const complete = this.pulmonaryMarginStartedAtBoundary;
+      this.breathPressures = complete && !marginInterrupted
+        ? { ee: this.resp.endExpiratoryPl, ei: this.resp.endInspiratoryPl } : null;
       this.lastBreathPulmonaryMargin = complete && Number.isFinite(this.pulmonaryMarginMin)
         ? this.pulmonaryMarginMin : null;
       // Respiratory excursion of the current segmental secant resistance sum,
@@ -394,6 +409,7 @@ export class Simulator {
     this.pvrLo = Math.min(this.pvrLo, c.p.pvrEffective);
     this.pvrHi = Math.max(this.pvrHi, c.p.pvrEffective);
 
+    this[historyObserver]?.sample(this);
     this.trackHold();
     this.sysRun = Math.max(this.sysRun, c.p.sa);
     this.diaRun = Math.min(this.diaRun, c.p.sa);
@@ -509,10 +525,13 @@ export class Simulator {
           pra: h.sumPra / h.n,
           flow: h.sumFlow / h.n,
           airwayPressure: this.resp.paw,
+          transpulmonaryPressure: this.resp.pl,
+          airFlow: this.resp.flow * 60,
           at: this.time,
         });
         if (this.measuredPoints.length > 8) this.measuredPoints.shift();
       }
+      this[historyObserver]?.interrupt('Hold completed');
       this.resp.hold = null;
       this.resp.holdElapsed = 0;
       this.resp.holdStartPaw = null;
@@ -537,6 +556,8 @@ export class Simulator {
     this.traces.paop.push(c.p.la);
     this.traces.flow.push(r.flow * 60); // L/min
     this.traces.volume.push((r.v * 1000)); // mL above FRC
+    this.traces.caval.push(c.q.vr * 0.06);
+    this.traces.hold.push(r.hold === 'inspiratory' ? 1 : r.hold === 'expiratory' ? -1 : 0);
     this.traces.co.push((c.q.av * 60) / 1000);
     this.traces.insp.push(r.flow > 0.002 ? 1 : 0);
   }
@@ -743,6 +764,8 @@ export class Simulator {
         - venousReturnBackPressure(respiratoryOperatingPoint.pra,
           respiratoryOperatingPoint.pCrit),
       ppl: r.ppl, palv: r.palv, paw: r.paw, pl: r.pl,
+      breathPressures: this.breathPressures,
+      airFlow: r.flow * 60, cavalFlow: c.q.vr * 0.06, aorticFlow: c.q.av * 0.06,
       pressureSupportTiming: p.mode === 'psv' ? {
         triggerDelay: r.lastPsvTriggerDelay,
         triggerFlow: r.lastPsvTriggerFlow === null ? null : r.lastPsvTriggerFlow * 60,

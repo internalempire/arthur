@@ -40,6 +40,11 @@ const PANELS = [
         ['Arterial pressure', `${n(m.sbp, 0)}/${n(m.dbp, 0)}, mean ${n(m.map, 0)} mmHg`],
         ['Pulmonary artery', `${n(m.papSys, 0)}/${n(m.papDia, 0)}, mean ${n(m.papMean, 0)} mmHg`],
         ['Central venous pressure', `${n(m.cvp)} mmHg (transmural ${n(m.cvpTransmural)})`],
+        ['Airway flow (inward positive)', `${n(m.airFlow)} L/min`],
+        ['Caval inflow to RA (backflow negative)', `${n(m.cavalFlow)} L/min`],
+        ['Instantaneous aortic flow', `${n(m.aorticFlow)} L/min`],
+        ['LV stroke volume, last completed beat', `${n(m.sv)} mL/beat`],
+        ['Transpulmonary pressure, end-expiration / end-inspiration', `${n(m.breathPressures?.ee)} / ${n(m.breathPressures?.ei)} cmH₂O`],
         ['Tidal volume delivered', `${n(m.vtDelivered, 0)} mL`],
         ['Minute ventilation', `${n(m.minuteVentilation)} L/min`],
       ];

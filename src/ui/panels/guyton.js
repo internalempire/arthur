@@ -66,6 +66,10 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
   responseStatus.className = 'guyton-response-status';
   responseStatus.setAttribute('role', 'status');
   responseStatus.setAttribute('aria-live', 'polite');
+  const progress = document.createElement('progress');
+  progress.setAttribute('aria-label', 'Deep CO loading experiments');
+  const message = document.createElement('span');
+  responseStatus.append(progress, message);
   canvas.insertAdjacentElement('afterend', responseStatus);
   const responseToggle = document.createElement('button');
   responseToggle.type = 'button';
@@ -127,7 +131,10 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     syncClockToggle();
     const job = responseJob.getState();
     responseStatus.hidden = !deep;
-    responseStatus.textContent = job.message;
+    if (message.textContent !== job.message) message.textContent = job.message;
+    progress.hidden = job.status !== 'running';
+    if (job.total > 0) { progress.max = job.total; progress.value = job.completed; }
+    else if (progress.hasAttribute('value')) progress.removeAttribute('value');
     responseStatus.dataset.status = job.status;
     const response = deep && job.result?.valid ? job.result : null;
     // In deep mode the two steady curves share a settled reference and fixed

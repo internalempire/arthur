@@ -2,7 +2,7 @@ import { Panel, niceTicks } from '../plot.js';
 import { tilePrimaryValue } from '../stats.js';
 import { TRACE_SECONDS, TRACE_SAMPLE_HZ } from '../../model/index.js';
 
-// Three time-aligned strips. Respiratory and haemodynamic pressures are kept on
+// Time-aligned strips. Respiratory and haemodynamic pressures are kept on
 // separate strips rather than sharing one plot with two y-axes: cmH2O and mmHg
 // are different scales, and a dual axis would invite reading one against the
 // other. Each strip also owns a fixed readout rail. Beat- and breath-level
@@ -100,6 +100,16 @@ const STRIPS = [
       },
     ],
   },
+  ...[
+    ['flow', 'Airway flow', 'Airway', 'flow', 'airFlow', 'air'],
+    ['caval', 'Caval flow to the right atrium', 'Caval', 'venous', 'cavalFlow', 'caval'],
+    ['co', 'Instantaneous aortic flow', 'Aortic', 'arterial', 'aorticFlow', 'aorta'],
+    ['sv', 'LV stroke volume per completed beat', 'LV stroke volume', 'arterial', 'sv', 'aorta'],
+  ].map(([channel, label, short, color, metric, option]) => ({
+    id: channel, label, unit: channel === 'sv' ? 'mL/beat' : 'L/min', height: 0.8, option,
+    zero: channel !== 'sv', series: [{ channel, color, label: short,
+      summary: m => m.valid && Number.isFinite(m[metric]) ? m[metric].toFixed(1) : '—' }],
+  })),
   {
     id: 'vol',
     label: 'Lung volume above FRC',
@@ -117,7 +127,7 @@ const STRIPS = [
   },
 ];
 
-export function createWaveforms(container, { onSeek } = {}) {
+export function createWaveforms(container, { onSeek, onViewChange } = {}) {
   container.classList.add('waveform-stack');
   const timeline = document.createElement('div');
   timeline.className = 'waveform-timeline';
@@ -138,7 +148,42 @@ export function createWaveforms(container, { onSeek } = {}) {
   timelineStatus.htmlFor = timelineInput.id;
   timelineStatus.textContent = 'Pause to inspect';
   timeline.append(timelineLabel, timelineInput, timelineStatus);
-  container.appendChild(timeline);
+  const toolbar = document.createElement('div');
+  toolbar.className = 'wave-options';
+  toolbar.innerHTML = `<div role="group" aria-label="Optional flow traces">
+    <label><input type="checkbox" value="air"> Airway flow</label>
+    <label><input type="checkbox" value="caval"> Caval flow</label>
+    <label><input type="checkbox" value="aorta"> Aortic flow &amp; stroke volume</label></div>
+    <button class="btn" type="button" aria-pressed="false">Enlarge</button>`;
+  const expand = toolbar.querySelector('button');
+  const section = container.closest('section');
+  const syncExpanded = () => {
+    const active = document.fullscreenElement === section || section.classList.contains('expanded-inline');
+    expand.setAttribute('aria-pressed', String(active));
+    expand.textContent = active ? 'Restore size' : 'Enlarge';
+    onViewChange?.();
+  };
+  expand.addEventListener('click', async () => {
+    if (document.fullscreenElement === section) await document.exitFullscreen();
+    else if (section.classList.contains('expanded-inline')) section.classList.remove('expanded-inline');
+    else {
+      try { await section.requestFullscreen(); }
+      catch { section.classList.add('expanded-inline'); }
+    }
+    syncExpanded();
+  });
+  document.addEventListener('fullscreenchange', syncExpanded);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && section.classList.contains('expanded-inline')) {
+      section.classList.remove('expanded-inline'); syncExpanded(); expand.focus();
+    }
+  });
+  const holdReadout = document.createElement('div');
+  holdReadout.className = 'hold-reading';
+  holdReadout.hidden = true;
+  const phaseReadout = document.createElement('span');
+  phaseReadout.className = 'phase-readout';
+  container.append(toolbar, timeline, holdReadout);
 
   let timelinePaused = false;
   let timelineFraction = null;
@@ -158,11 +203,15 @@ export function createWaveforms(container, { onSeek } = {}) {
   const strips = STRIPS.map((spec) => {
     const wrap = document.createElement('div');
     wrap.className = 'strip';
+    wrap.dataset.signal = spec.id;
+    wrap.hidden = Boolean(spec.option);
     wrap.style.flexGrow = String(spec.height);
 
     const plot = document.createElement('div');
     plot.className = 'waveform-plot';
     const canvas = document.createElement('canvas');
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label', spec.label + ' in ' + spec.unit);
     plot.appendChild(canvas);
 
     const readoutList = document.createElement('dl');
@@ -196,9 +245,19 @@ export function createWaveforms(container, { onSeek } = {}) {
     }
 
     wrap.append(plot, readoutList);
+    if (spec.id === 'transpulmonary') {
+      const note = document.createElement('div');
+      note.className = 'phase-pressures';
+      const phaseLabel = document.createElement('dt');
+      phaseLabel.textContent = 'Last breath · end-exp / end-insp';
+      const phaseValue = document.createElement('dd');
+      phaseValue.append(phaseReadout);
+      note.replaceChildren(phaseLabel, phaseValue);
+      readoutList.append(note);
+    }
     container.appendChild(wrap);
     const strip = {
-      spec,
+      spec, wrap,
       plot,
       canvas,
       readouts,
@@ -228,6 +287,16 @@ export function createWaveforms(container, { onSeek } = {}) {
     return strip;
   });
 
+  toolbar.addEventListener('change', () => {
+    const enabled = new Set([...toolbar.querySelectorAll('input:checked')].map(box => box.value));
+    let extra = 0;
+    for (const strip of strips) {
+      strip.wrap.hidden = Boolean(strip.spec.option && !enabled.has(strip.spec.option));
+      if (strip.spec.option && !strip.wrap.hidden) extra++;
+    }
+    section.style.setProperty('--extra-strips', String(extra));
+    onViewChange?.();
+  });
   /**
    * Rounds a range outwards to a readable step, so the axis labels do not churn
    * through arbitrary values as the scale changes.
@@ -242,10 +311,23 @@ export function createWaveforms(container, { onSeek } = {}) {
   function render(sim, colors) {
     // Inspiratory phase shading is shared by every strip.
     const insp = sim.trace('insp');
-    const inspData = insp.data;
     const inspN = insp.n;
-
+    const spans = (trace, active) => {
+      const intervals = [];
+      let start = -1;
+      for (let i = 0; i <= trace.n; i++) {
+        const on = i < trace.n && active(trace.data[i]);
+        if (on && start < 0) start = i;
+        if (!on && start >= 0) { intervals.push([start, i]); start = -1; }
+      }
+      return intervals;
+    };
+    const inspiration = spans(insp, value => value > 0.5);
+    const occlusion = spans(sim.trace('hold'), value => value !== 0);
+    const beats = sim.beatHistory.filter(b => b.t >= sim.time - (inspN - 1) / TRACE_SAMPLE_HZ);
+    const xStart = Math.max(0, WINDOW_SECONDS - (inspN - 1) / TRACE_SAMPLE_HZ);
     for (const strip of strips) {
+      if (strip.wrap.hidden) continue;
       const { spec, panel } = strip;
       panel.resize();
       const ctx = panel.begin();
@@ -253,6 +335,10 @@ export function createWaveforms(container, { onSeek } = {}) {
       let lo = Infinity, hi = -Infinity;
       const buffers = [];
       for (const s of spec.series) {
+        if (s.channel === 'sv') {
+          for (const beat of beats) { lo = Math.min(lo, beat.sv); hi = Math.max(hi, beat.sv); }
+          continue;
+        }
         const { data, n } = sim.trace(s.channel);
         buffers.push({ ...s, data, n });
         // The complete buffer is still drawn, so the intervention remains
@@ -265,6 +351,7 @@ export function createWaveforms(container, { onSeek } = {}) {
         }
       }
       if (!isFinite(lo)) { lo = 0; hi = 1; }
+      if (spec.zero) { lo = Math.min(lo, 0); hi = Math.max(hi, 0); }
       const pad = Math.max((hi - lo) * 0.12, 1);
       const wanted = roundOut(lo - pad, hi + pad);
 
@@ -304,24 +391,29 @@ export function createWaveforms(container, { onSeek } = {}) {
       ctx.save();
       ctx.globalAlpha = 0.06;
       ctx.fillStyle = colors.ink;
-      let runStart = -1;
-      for (let i = 0; i < inspN; i++) {
-        const on = inspData[i] > 0.5;
-        if (on && runStart < 0) runStart = i;
-        if ((!on || i === inspN - 1) && runStart >= 0) {
-          const x0 = a.x + (runStart / (inspN - 1)) * a.w;
-          const x1 = a.x + (i / (inspN - 1)) * a.w;
-          ctx.fillRect(x0, a.y, Math.max(1, x1 - x0), a.h);
-          runStart = -1;
-        }
+      for (const [start,end] of inspiration) {
+        const x = panel.sx(xStart + start / TRACE_SAMPLE_HZ);
+        ctx.fillRect(x,a.y,Math.max(1,panel.sx(xStart + end / TRACE_SAMPLE_HZ)-x),a.h);
       }
       ctx.restore();
 
-      if (lo < 0 && hi > 0) panel.axisLine(colors, { y: 0 });
+      ctx.fillStyle = colors.text.transpulmonary;
+      for (const [start,end] of occlusion) {
+        const x = panel.sx(xStart + start / TRACE_SAMPLE_HZ);
+        ctx.fillRect(x,a.y,Math.max(1,panel.sx(xStart + end / TRACE_SAMPLE_HZ)-x),3);
+      }
+      for (const point of sim.measuredPoints) {
+        const t = WINDOW_SECONDS + point.at - sim.time;
+        if (t >= xStart && t <= WINDOW_SECONDS) panel.axisLine(colors, { x: t });
+      }
+      if (spec.zero || (lo < 0 && hi > 0)) panel.axisLine(colors, { y: 0 });
 
       panel.clip();
       for (const b of buffers) {
-        panel.series(b.data, b.n, 0, WINDOW_SECONDS, { color: colors[b.color], width: 1.8 });
+        panel.series(b.data, b.n, xStart, WINDOW_SECONDS, { color: colors[b.color], width: 1.8 });
+      }
+      if (spec.id === 'sv') {
+        for (const b of beats) panel.dot(WINDOW_SECONDS + b.t - sim.time, b.sv, { r: 2.7, color: colors.arterial });
       }
       panel.unclip();
 
@@ -352,8 +444,19 @@ export function createWaveforms(container, { onSeek } = {}) {
    * same content and cadence as their tiles; beat- and breath-level summaries
    * keep their existing measurement windows.
    */
-  function renderReadouts(metrics, colors) {
+  function renderReadouts(metrics, colors, view) {
+    const pressures = metrics.valid && metrics.breathPressures;
+    phaseReadout.textContent = pressures
+      ? `${pressures.ee.toFixed(1)} / ${pressures.ei.toFixed(1)} cmH₂O` : '— / —';
+    const last = view.measuredPoints.at(-1);
+    const hold = view.resp.hold ?? view.resp.holdPending;
+    const active = hold && (view.resp.hold ? `${hold} occlusion · ${view.resp.holdElapsed.toFixed(1)} s · airway flow zero` : `${hold} occlusion armed`);
+    const measured = last && `${last.kind} hold · read at ${last.at.toFixed(1)} s · Paw ${last.airwayPressure.toFixed(1)}, PL ${last.transpulmonaryPressure.toFixed(1)} cmH₂O · airway flow ${last.airFlow.toFixed(0)} L/min`;
+    holdReadout.hidden = !active && !last;
+    holdReadout.textContent = [active, measured && 'Last reading: '+measured].filter(Boolean).join(' · ');
+
     for (const strip of strips) {
+      if (strip.wrap.hidden) continue;
       for (const series of strip.spec.series) {
         const readout = strip.readouts.get(series.channel);
         readout.row.style.setProperty('--trace-color', colors.text[series.color]);
@@ -363,8 +466,8 @@ export function createWaveforms(container, { onSeek } = {}) {
   }
 
   /** Start a new visual state without deleting the preceding waveform history. */
-  function resetView(sim) {
-    viewEpoch = sim.time;
+  function resetView(sim, includeRecordedWindow = false) {
+    viewEpoch = sim.time - (includeRecordedWindow ? WINDOW_SECONDS : 0);
     for (const strip of strips) {
       strip.domain = null;
       strip.insideSince = sim.time;

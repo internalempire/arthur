@@ -87,35 +87,41 @@
       <main class="stage">
         <p class="invalid-banner" id="invalid-banner" role="status" hidden></p>
 
-        <div class="tiles" id="stats"></div>
-
-        <section id="pinned-states" class="pinned-states" aria-label="Live state comparisons" hidden></section>
-        <section id="distribution" class="blood-distribution" aria-label="Blood distribution" hidden></section>
-        <section id="mechanisms" class="mechanisms" aria-label="Heart–lung mechanisms" hidden></section>
-
-        <p class="tile-legend">
-          Readouts are classified by what they are:
-          <span class="legend-key" data-kind="measured">measurement</span> the model makes directly,
-          <span class="legend-key" data-kind="derived">derived index</span> computed from those the way a
-          clinician would, and
-          <span class="legend-key" data-kind="coefficient">internal coefficient</span> of the model, which
-          shares a name with a clinical quantity but is not measured the same way.
-          A reading whose validity conditions are not met is withheld rather than shown.
-        </p>
-
-        <section class="panel panel-waves" aria-label="Time-aligned waveforms">
-          <div id="waveforms"></div>
-        </section>
-
-        <!-- Two rows: three analytical plots above, then the pulmonary vascular
-             curve beside the schematic that ties everything together. -->
-        <div class="grid">
+        <div class="monitor-toolbar">
+          <div class="core-readings"><span>Cardiac output <strong id="core-co">—</strong> L/min <small id="core-co-status"></small></span>
+            <span>Mean arterial pressure <strong id="core-map">—</strong> mmHg <small id="core-map-status"></small></span></div>
+          <button class="btn" id="show-history" aria-expanded="false" aria-controls="manoeuvre-history" type="button">Pressure history</button>
+        </div>
+        <section class="manoeuvre-history" id="manoeuvre-history" aria-label="Recorded pressure history" hidden></section>
+        <div class="monitor-grid">
+          <section class="panel panel-waves" aria-label="Time-aligned waveforms">
+            <div id="waveforms"></div>
+          </section>
           <section class="panel panel-guyton" aria-label="Guyton diagram"><canvas id="guyton"></canvas></section>
+        </div>
+
+        <div class="grid">
           <section class="panel panel-campbell" aria-label="Campbell diagram"><canvas id="campbell"></canvas></section>
           <section class="panel panel-pv" aria-label="Ventricular pressure-volume loops"><div id="pvloops"></div></section>
           <section class="panel panel-pvr" aria-label="Pulmonary vascular resistance against lung volume"><canvas id="pvr"></canvas></section>
           <section class="panel panel-thorax" aria-label="Thoracic schematic"><canvas id="thorax"></canvas></section>
         </div>
+
+        <details class="numerical-section" open><summary>Numerical tiles</summary>
+          <div class="tiles" id="stats"></div>
+          <p class="tile-legend">
+            Readouts are classified by what they are:
+            <span class="legend-key" data-kind="measured">measurement</span> the model makes directly,
+            <span class="legend-key" data-kind="derived">derived index</span> computed from those the way a
+            clinician would, and
+            <span class="legend-key" data-kind="coefficient">internal coefficient</span> of the model, which
+            shares a name with a clinical quantity but is not measured the same way.
+            A reading whose validity conditions are not met is withheld rather than shown.
+          </p>
+        </details>
+        <section id="pinned-states" class="pinned-states" aria-label="Live state comparisons" hidden></section>
+        <section id="distribution" class="blood-distribution" aria-label="Blood distribution" hidden></section>
+        <section id="mechanisms" class="mechanisms" aria-label="Heart–lung mechanisms" hidden></section>
 
         <footer class="colophon">
           <p><strong>For teaching only.</strong> This is a simplification of human physiology and must not be used to guide the care of a patient.</p>

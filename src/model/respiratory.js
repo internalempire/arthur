@@ -447,6 +447,10 @@ export function stepRespiratory(p, r, dt) {
     return stepOcclusion();
   }
 
+  // Sample the last integrated pressure before the new phase moves gas.
+  if (r.prevPhase === 'insp' && r.phase === 'exp') r.endInspiratoryPl = r.pl;
+  if (r.prevPhase === 'exp' && r.phase === 'insp') r.endExpiratoryPl = r.pl;
+
   // Capture end-expiratory volume before the first inspiratory integration
   // step adds gas. Comparing it with the static equilibrium at the same applied
   // PEEP keeps loss-of-recoil hyperinflation separate from dynamically trapped

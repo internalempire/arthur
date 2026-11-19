@@ -6,7 +6,7 @@
 
 ## Before touching a control
 
-The application opens on the settled *Healthy, breathing spontaneously* reference circulation. Spend one breath locating three signals: airway pressure in the waveforms, pleural pressure in the thorax and waveforms, and cardiac output in the numerical tiles. The panels show one shared simulation, not independent demonstrations.
+The application opens on the settled *Healthy, breathing spontaneously* reference circulation. Spend one breath locating three signals: airway pressure in the waveforms, pleural pressure in the thorax and waveforms, and cardiac output above the monitor. The Guyton diagram sits beside the traces on wide screens and follows them on a phone. Other diagrams, numerical tiles and Pin comparisons follow below. The panels show one shared simulation, not independent demonstrations.
 
 ## Minute 1–3: reverse the sign of inspiration
 
@@ -20,7 +20,7 @@ During positive-pressure inflation, pleural pressure rises; during spontaneous i
 
 1. Return to *Healthy, passive volume control*.
 2. Press **Pin** to retain an independently evolving reference, then increase PEEP from 5 to 12 cmH₂O.
-3. Watch the first response, then wait until successive breaths repeat a similar pattern. Several breaths are a starting observation period, not a guarantee of equilibrium.
+3. Select **Airway flow** and **Caval flow** to compare the timing of gas movement and return to the right atrium. Watch the first response, then wait until successive breaths repeat a similar pattern. Several breaths are a starting observation period, not a guarantee of equilibrium.
 4. Follow pleural pressure, measured and transmural CVP, Pmsf, the venous-return gradient, PVR and output.
 
 PEEP does several things at once. It raises the pressure around the right atrium, changes abdominal pressure and, depending on the abdominal load, can alter resistance to venous return, moves the lung along the PVR–volume relation and changes LV transmural afterload. [The four effects of a breath](the-four-effects-of-a-breath.md) separates these pathways.

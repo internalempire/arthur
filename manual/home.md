@@ -56,7 +56,7 @@ After creating a live reference with **Pin**, **Mechanisms** in the comparison t
 | panel | the question it helps answer | detailed page |
 |---|---|---|
 | anatomical thorax | what is moving, what surrounds each chamber, and which pressures are being transmitted? | [Thorax](panel-thorax.md) |
-| waveforms | what happened first within the breath or cardiac cycle? | [Waveforms](panel-waveforms.md) |
+| waveforms and pressure history | when did flow change within the breath, and what persisted after restoring PEEP? | [Waveforms](panel-waveforms.md) |
 | ventricular pressure–volume loops | did filling, contractility or afterload change the beat? | [PV loops](panel-pv-loops.md) |
 | Campbell diagram | how do pleural pressure, passive recoil and inspiratory muscle pressure relate to lung volume? | [Campbell diagram](panel-campbell.md) |
 | Guyton diagram | how do venous return and RV function move with breathing? | [Guyton diagram](panel-guyton.md) |

@@ -321,6 +321,10 @@ export function tilePrimaryValue(id, metrics) {
   return quality.level === 'unavailable' ? '—' : tile.get(metrics);
 }
 
+export function tileStatus(id, metrics) {
+  return metrics.valid ? TILE_BY_ID.get(id)?.status?.(metrics) : null;
+}
+
 /** The compact comparison line used when a state has been pinned. */
 export function pinnedTilePresentation(id, metrics, label = 'Pinned') {
   const tile = TILE_BY_ID.get(id);

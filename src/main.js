@@ -3,7 +3,7 @@ import {
 } from './model/index.js';
 import { theme } from './ui/theme.js';
 import { createControls } from './ui/controls.js';
-import { createStats } from './ui/stats.js';
+import { createStats, tilePrimaryValue, tileStatus } from './ui/stats.js';
 import { createWaveforms } from './ui/panels/waveforms.js';
 import { createGuyton } from './ui/panels/guyton.js';
 import { createCampbell } from './ui/panels/campbell.js';
@@ -28,6 +28,7 @@ let dirty = true;
 const el = (id) => document.getElementById(id);
 
 const waveforms = createWaveforms(el('waveforms'), {
+  onViewChange: invalidate,
   onSeek(fraction) {
     selectedSnapshot = presentationHistory.atFraction(fraction);
     dirty = true;
@@ -51,6 +52,10 @@ const mechanisms = createMechanismsDisclosure(el('show-mechanisms'), el('mechani
 const distribution = createComparisonDisclosure(el('show-distribution'), el('distribution'), comparisonContext, {
   label: 'Blood distribution', description: 'Compare regional blood volumes with the selected live state',
   load: () => import('./ui/blood-distribution.js'), mount: (module, host) => module.createDistributionPanel(host),
+});
+const history = createComparisonDisclosure(el('show-history'), el('manoeuvre-history'), comparisonContext, {
+  label: 'Pressure history', description: 'Record the current patient through a manoeuvre', requiresReference: false,
+  load: () => import('./ui/manoeuvre-history.js'), mount: (module, host) => module.createHistoryPanel(host),
 });
 const descriptions = createDescriptions({ getGuytonMode: guyton.responseMode, getGuytonClock: guyton.curveClock });
 const controls = createControls(el('controls'), sim, (id) => {
@@ -81,9 +86,9 @@ function applyScenario(id) {
   const scenario = SCENARIO_BY_ID.get(id);
   if (!scenario) { scenarioNote.textContent = ''; return; }
   sim.applyScenario(scenario);
-  sim.advance(20, true);
+  sim.advance(20);
   controls.sync({ resetBloodDose: true });
-  clearTrails();
+  clearTrails(true);
   resetPresentationHistory();
   dirty = true;
   scenarioNote.textContent = scenario.note;
@@ -110,11 +115,11 @@ function showStateStatus(message, kind = 'ok') {
 
 function applyLoadedPatientState(parsed) {
   sim.applyPatientParameters(parsed.params, parsed.bloodVolumeReference);
-  sim.advance(20, true);
+  sim.advance(20);
   controls.sync({ resetBloodDose: true });
   scenarioSelect.value = '';
   scenarioNote.textContent = '';
-  clearTrails();
+  clearTrails(true);
   resetPresentationHistory();
   dirty = true;
 
@@ -179,14 +184,15 @@ function markCustom() {
   scenarioNote.textContent = '';
 }
 
-function clearTrails() {
-  waveforms.resetView(sim);
+function clearTrails(includeRecordedWindow = false) {
+  waveforms.resetView(sim, includeRecordedWindow);
   guyton.clearTrail();
   campbell.clearTrail();
   pvLoops.resetView();
 }
 
 function resetPresentationHistory() {
+  history.close();
   livePins.clear();
   dirty = true;
   presentationHistory.clear();
@@ -201,6 +207,7 @@ let lastFrame = performance.now();
 const playPause = el('playpause');
 playPause.addEventListener('click', () => {
   running = !running;
+  dirty = true;
   if (running) {
     selectedSnapshot = null;
   } else {
@@ -227,6 +234,15 @@ function renderComparison(view) {
   const context = { current: sim, reference: livePins.selected, historical, running };
   mechanisms.sync(context);
   distribution.sync(context);
+  history.sync(context);
+  el('core-co').textContent = tilePrimaryValue('co', view.metrics);
+  el('core-map').textContent = view.metrics.valid ? Math.round(view.metrics.map) : '—';
+  for (const id of ['co','map']) {
+    const flag = tileStatus(id,view.metrics);
+    const note = el('core-'+id+'-status');
+    note.textContent = flag?.[1] ?? '';
+    note.dataset.level = flag?.[0] ?? '';
+  }
   pinState.disabled = historical || livePins.states.length >= MAX_LIVE_PINS;
   pinState.title = historical
     ? 'Return to the latest instant or press Play before creating a live reference'
@@ -300,13 +316,13 @@ el('reset').addEventListener('click', () => {
   const current = scenarioSelect.value;
   sim.clearMeasuredPoints();
   sim.cancelHold();
-  sim.reset();
   if (current) applyScenario(current);
   else {
+    sim.reset({ recordTraces: true });
     controls.sync({ resetBloodDose: true });
     resetPresentationHistory();
+    clearTrails(true);
   }
-  clearTrails();
 });
 
 el('theme').addEventListener('click', (e) => {
@@ -340,7 +356,7 @@ function draw() {
   const view = selectedSnapshot ?? sim;
   syncTimeline(view);
   waveforms.render(sim, colors);
-  waveforms.renderReadouts(view.metrics, colors);
+  waveforms.renderReadouts(view.metrics, colors, view);
   guyton.render(view, colors);
   campbell.render(view, colors);
   pvLoops.render(view, colors);
@@ -393,7 +409,7 @@ function frame(now) {
 
     statsClock += dtWall;
     if (statsClock > 0.12 || !running) {
-      waveforms.renderReadouts(view.metrics, colors);
+      waveforms.renderReadouts(view.metrics, colors, view);
       renderComparison(view);
       descriptions.render(view);
       controls.renderReadouts();

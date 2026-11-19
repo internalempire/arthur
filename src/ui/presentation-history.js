@@ -59,7 +59,7 @@ export class PresentationHistory {
   atFraction(fraction) {
     if (!this.snapshots.length) return null;
     const f = Math.min(1, Math.max(0, Number(fraction) || 0));
-    const target = this.oldest.time + (this.newest.time - this.oldest.time) * f;
+    const target = this.newest.time - this.duration * (1 - f);
     let best = this.oldest;
     let distance = Math.abs(best.time - target);
     for (let i = 1; i < this.snapshots.length; i++) {
@@ -74,7 +74,6 @@ export class PresentationHistory {
 
   fractionOf(snapshot) {
     if (!snapshot || !this.oldest || !this.newest) return 1;
-    const span = this.newest.time - this.oldest.time;
-    return span > 0 ? Math.min(1, Math.max(0, (snapshot.time - this.oldest.time) / span)) : 1;
+    return Math.min(1, Math.max(0, 1 - (this.newest.time - snapshot.time) / this.duration));
   }
 }

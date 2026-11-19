@@ -31,6 +31,8 @@ export function createCardiacResponseJob(createWorker, onChange = () => {}, dela
         worker.onmessage = ({ data }) => {
           if (generation !== current) return;
           if (data.type === 'progress') {
+            state.completed = data.completed;
+            state.total = data.total;
             state.message = `Calculating cardiac output curve… ${data.completed}/${data.total}`;
           } else if (data.type === 'result') {
             active.terminate();

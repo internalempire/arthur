@@ -115,6 +115,8 @@ These include:
 - mean systemic filling pressure and model preload reserve;
 - instantaneous open fraction, closed fraction at end expiration, within-breath opening excursion, pulmonary blood storage and a volume/flow residence estimate.
 
+The monitor places waveforms and the Guyton diagram first. Select airway and caval flow to compare gas movement with venous return, or aortic flow and stroke volume to follow LV ejection. **Pressure history → Start recording** tracks one patient across a manoeuvre. Compare lung opening, end-expiratory gas, pleural pressure and four-breath aortic output when the original PEEP is restored. [Waveforms and pressure history](manual/panel-waveforms.md#record-a-pressure-history).
+
 Values can be marked *caution* or withheld as *unavailable* when their assumptions are absent. See **[Numerical tiles](manual/numeric-tiles.md)** and **[Interpretability](manual/interpretability.md)**.
 
 Choose **Pin → Blood distribution** to see where blood accumulates or leaves as settings change. The five regions share one scale in mL. Compare the [effects of venous tone and an applied blood dose](manual/controls-volume.md#where-does-the-blood-go).

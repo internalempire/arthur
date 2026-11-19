@@ -42,7 +42,7 @@ export function observeDistribution(sim) {
       count++;
     }
   } });
-  return { sim, get mean() { return mean; }, detach };
+  return { sim, get mean() { return mean; }, get collecting() { return collecting; }, detach };
 }
 
 const ml = n => Math.round(n).toLocaleString('en-US');
@@ -64,6 +64,8 @@ export function createDistributionPanel(host) {
     <div class="dist-body">
       <div class="dist-total"><div>Total circulating blood <strong></strong><small></small></div>
         <div>Difference from Pin <strong></strong></div></div>
+      <div class="dist-wait" hidden><progress max="2" value="0" aria-label="States with a completed breath"></progress>
+        <span class="dist-stage" role="status"></span></div>
       <p class="dist-clock"></p>
       <div class="dist-chart">
         <div class="dist-axis"><span>← Less blood</span><span>More blood →</span></div>
@@ -77,6 +79,7 @@ export function createDistributionPanel(host) {
   const find = selector => host.querySelector(selector);
   const status = find('.dist-status'), body = find('.dist-body'), chart = find('.dist-chart');
   const totals = host.querySelectorAll('.dist-total strong'), referenceTotal = find('.dist-total small');
+  const wait = find('.dist-wait'), progress = find('progress'), stage = find('.dist-stage');
   const clock = find('.dist-clock'), sumLine = find('.dist-sum');
   const scale = host.querySelectorAll('.dist-axis:last-of-type span');
   const rows = Array.from(host.querySelectorAll('li'), row => ({
@@ -108,13 +111,24 @@ export function createDistributionPanel(host) {
     totals[1].textContent = validCurrent && validPin ? signed(a-b) + ' mL' : '—';
     const c = current.mean, p = pinned.mean;
     chart.hidden = !(validCurrent && validPin && c?.every(Number.isFinite) && p?.every(Number.isFinite));
+    const waiting = chart.hidden && validCurrent && validPin;
+    wait.hidden = !waiting;
+    if (waiting) {
+      const phase = (observation, state) => observation.mean ? 'ready' : state.hold ? 'occlusion'
+        : observation.collecting ? 'collecting breath' : 'waiting for inspiration';
+      const complete = Number(Boolean(c)) + Number(Boolean(p));
+      progress.value = complete;
+      const message = `Current: ${phase(current,sim)} · ${id}: ${phase(pinned,reference.sim)} · ${complete}/2 ready`;
+      if (stage.textContent !== message) stage.textContent = message;
+      wait.classList.toggle('working', running && !sim.hold && !reference.sim.hold);
+    }
     if (chart.hidden) {
       lastCurrent = lastPinned = null;
       clock.textContent = !validCurrent || !validPin ? 'Regional comparison unavailable for an invalid state.'
         : 'Waiting for a full uninterrupted breath in each state.' + (running ? '' : ' Press Play to collect it.');
       return;
     }
-    clock.textContent = 'Regional volumes are means over the last complete breath in each state. Δ = current − Pin.';
+    clock.textContent = 'Regional volumes are means over each state’s last complete breath. A breath may end partway through a heartbeat. Δ = current − Pin.';
     if (lastCurrent === c && lastPinned === p) return;
     lastCurrent = c; lastPinned = p;
     const deltas = c.map((v,i) => v - p[i]);

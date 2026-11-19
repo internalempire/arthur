@@ -167,11 +167,12 @@ export class Panel {
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
     ctx.beginPath();
-    const step = a.w / (n - 1);
+    const start = this.sx(x0);
+    const step = (this.sx(x1) - start) / (n - 1);
     const bucket = Math.max(1, Math.floor(n / (a.w * 2)));
     if (bucket === 1) {
-      ctx.moveTo(a.x, this.sy(data[0]));
-      for (let i = 1; i < n; i++) ctx.lineTo(a.x + i * step, this.sy(data[i]));
+      ctx.moveTo(start, this.sy(data[0]));
+      for (let i = 1; i < n; i++) ctx.lineTo(start + i * step, this.sy(data[i]));
     } else {
       let started = false;
       for (let i = 0; i < n; i += bucket) {
@@ -181,7 +182,7 @@ export class Panel {
           if (data[k] < lo) lo = data[k];
           if (data[k] > hi) hi = data[k];
         }
-        const x = a.x + i * step;
+        const x = start + i * step;
         if (!started) { ctx.moveTo(x, this.sy(lo)); started = true; }
         ctx.lineTo(x, this.sy(lo));
         ctx.lineTo(x, this.sy(hi));

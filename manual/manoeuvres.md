@@ -62,7 +62,7 @@ Speed changes how many simulated seconds are advanced per wall-clock second. It 
 
 ## Reset
 
-Reset cancels holds, clears their measurements, the Guyton trail, waveform history and all live Pins, and reconstructs the patient before 15 simulated seconds of silent settlement. If a named scenario is selected, its prescription is reapplied. With **Custom**, the current parameter prescription, applied blood balance and starting-volume reference are retained; only the evolving state is restarted. A pending blood dose is discarded. Reset therefore does not undo blood already applied to a Custom patient.
+Reset cancels holds, clears their measurements, the Guyton trail, waveform history and all live Pins, and reconstructs the patient and settles the new trajectory. The monitor records the new waveforms during settlement. If a named scenario is selected, its prescription is reapplied. With **Custom**, the current parameter prescription, applied blood balance and starting-volume reference are retained; only the evolving state is restarted. A pending blood dose is discarded. Reset therefore does not undo blood already applied to a Custom patient.
 
 Reset is not a rewind to a saved physiological instant: blood redistribution, opening memory and reflex activation are rebuilt. To return to a preset’s original patient, select that preset. To preserve an evolving physiological state for immediate comparison, use Pin. A saved patient file preserves the prescription and blood-volume reference, not the full evolving state or Pins.
 
@@ -81,7 +81,7 @@ Reset is not a rewind to a saved physiological instant: blood redistribution, op
 - Only one hold can be active or pending.
 - A regression through few idealised points does not reproduce the uncertainty of bedside inspiratory-hold methods.
 - Changing PEEP between points changes more than right atrial pressure: abdominal transmission and pulmonary vascular load can also change.
-- Reset includes a 15-second silent settlement and is not an instantaneous return of a real patient to baseline.
+- Reset starts a new trajectory with 15 seconds of simulated settlement. A named scenario also receives the usual additional 20 seconds before display.
 
 ## References
 

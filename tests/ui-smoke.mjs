@@ -189,7 +189,7 @@ check('diagram warnings name the qualified interpretation rather than the whole 
     && descriptions.includes("label: 'Derived PVR'")
     && descriptions.includes('use with caution'));
 check('waveform scales start a new visual state after every parameter change',
-  mainSource.includes('waveforms.resetView(sim)')
+  mainSource.includes('waveforms.resetView(sim, includeRecordedWindow)')
     && waveformSource.includes('sim.time - viewEpoch')
     && waveformScaleStart(3000, 0.2) === 2950
     && waveformScaleStart(3000, 20) === 0);
@@ -356,6 +356,9 @@ await checkMechanismsUI(check);
 
 const { checkBloodDistribution } = await import('./blood-distribution-ui.mjs');
 checkBloodDistribution(check);
+
+const { checkManoeuvreHistory } = await import('./manoeuvre-history-ui.mjs');
+checkManoeuvreHistory(check);
 
 if (failures.length) {
   console.error(`\n${failures.length} UI smoke failure(s):`);
