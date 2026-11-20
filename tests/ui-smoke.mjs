@@ -232,14 +232,25 @@ check('Guyton axes remain fixed inside one state and expand only for off-scale d
     && expandedGuyton.xLo < guytonDomain.xLo
     && expandedGuyton.xHi > guytonDomain.xHi
     && expandedGuyton.yHi > guytonDomain.yHi);
+const reverseInflowDomain = stableGuytonDomain(guytonDomain, { ...guytonDomain, yLo: -0.3 });
+check('signed inflow stays on the same scale when net flow briefly reverses',
+  reverseInflowDomain.yLo <= -0.3
+    && stableGuytonDomain(reverseInflowDomain, guytonDomain).yLo === reverseInflowDomain.yLo);
+check('Live comparisons start hidden above the monitor with both optional panels nearby',
+  /<section id="pinned-states"[^>]* hidden>/.test(html)
+    && html.indexOf('id="pinned-states"') < html.indexOf('id="distribution"')
+    && html.indexOf('id="distribution"') < html.indexOf('id="mechanisms"')
+    && html.indexOf('id="mechanisms"') < html.indexOf('class="monitor-grid"'));
 const guytonSource = readFileSync(new URL('../src/ui/panels/guyton.js', import.meta.url), 'utf8');
 check('the Guyton preload limb is shown without the removed explanatory slogan',
   !guytonSource.includes('filling helps here'));
-check('the Guyton clock defaults to respiratory motion with a separate deep clock',
+check('the Guyton clock offers direct Mean and Live choices with a separate Deep CO reference',
   guytonSource.includes('let curveClock = DEFAULT_GUYTON_CLOCK')
     && guytonSource.includes("let deepClock = 'mean'")
     && guytonSource.includes('fastGuytonCurves(sim, curveClock)')
-    && /\.guyton-clock-toggle\s*\{/.test(css));
+    && html.includes('data-clock="mean" aria-pressed="true"')
+    && html.includes('data-clock="live" aria-pressed="false"')
+    && guytonSource.includes('const inflow = fast?.state ?? op;'));
 
 const { fastGuytonCurves, DEFAULT_GUYTON_CLOCK } = await import('../src/ui/panels/guyton.js');
 const { Simulator, SCENARIOS } = await import('../src/model/index.js');
@@ -249,13 +260,14 @@ breathingPatient.advance(60, true);
 const respiratoryViews = [];
 for (let i = 0; i < 180; i++) {
   breathingPatient.advance(0.05, true);
-  respiratoryViews.push({ live: fastGuytonCurves(breathingPatient), mean: fastGuytonCurves(breathingPatient, 'mean') });
+  respiratoryViews.push({ live: fastGuytonCurves(breathingPatient, 'live'), mean: fastGuytonCurves(breathingPatient, 'mean') });
 }
 const excursion = values => Math.max(...values) - Math.min(...values);
 const liveRvSwing = excursion(respiratoryViews.map(v => v.live.cf.xIntercept));
 const meanRvSwing = excursion(respiratoryViews.map(v => v.mean.cf.xIntercept));
 check('healthy passive breathing moves the RV curve and the mean selector suppresses its excursion',
-  DEFAULT_GUYTON_CLOCK === 'live' && liveRvSwing > 0.2 && meanRvSwing < liveRvSwing * 0.2,
+  DEFAULT_GUYTON_CLOCK === 'mean' && fastGuytonCurves(breathingPatient).state === breathingPatient.metrics.respiratoryOperatingPoint
+    && liveRvSwing > 0.2 && meanRvSwing < liveRvSwing * 0.2,
   `live ${liveRvSwing.toFixed(3)} mmHg; mean ${meanRvSwing.toFixed(3)} mmHg`);
 check('both fast curves use the selected heartbeat or respiratory state, including RV chamber anchors',
   respiratoryViews.every(v => v.live.cf.anchored && v.mean.cf.anchored

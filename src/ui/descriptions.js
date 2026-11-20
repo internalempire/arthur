@@ -72,14 +72,14 @@ const PANELS = [
       : { label: 'RV preload reserve', ...sim.metrics.interpretability.preload },
     summary: (sim, view) => {
       const m = sim.metrics, op = m.respiratoryOperatingPoint;
-      return `Over the most recent breath, mean venous inflow is ${n(op.flow, 2)} L/min at a mean right atrial pressure of ${n(op.pra)} mmHg. `
+      const live = view.guytonMode !== 'deep' && view.guytonClock === 'live';
+      const inflow = live ? m.operatingPoint : op;
+      return `The filled dot shows net caval inflow of ${n(inflow.flow, 2)} L/min at right atrial pressure ${n(inflow.pra, 2)} mmHg relative to atmosphere, averaged over ${live ? 'one heartbeat' : 'a breath'}. `
         + (view.guytonMode === 'deep'
           ? (m.valid ? `Mean LV output is ${n(op.aorticFlow, 2)} L/min. ` : 'Mean LV output is unavailable outside the model domain. ')
             + 'The optional deep curve measures aortic output in separate whole-heart loading experiments. '
-            : (view.guytonClock === 'mean'
-              ? 'Both RV and venous-return curves use determinants averaged over one breath. '
-              : 'Both RV and venous-return curves follow respiration, smoothed over one heartbeat. ')
-              + 'No deep loading experiment is running. ')
+          : live ? 'Inspect crossing to locate equal flow on the two curves in this phase. The right heart can store or release blood during the breath. '
+            : 'The cross marks equal flow on the two mean curves. The averaging window can include both sides of a recent intervention. ')
         + `Mean systemic filling pressure is ${n(op.pmsf)} mmHg, so the gradient `
         + `driving venous return on the same respiratory clock is ${n(m.respiratoryGradientVr)} mmHg. `
         + `The faint trail retains the one-heartbeat means that move through the breath.`;
@@ -266,7 +266,7 @@ const PANELS = [
   },
 ];
 
-export function createDescriptions({ getGuytonMode = () => 'fast', getGuytonClock = () => 'live' } = {}) {
+export function createDescriptions({ getGuytonMode = () => 'fast', getGuytonClock = () => 'mean' } = {}) {
   const bound = [];
 
   for (const spec of PANELS) {

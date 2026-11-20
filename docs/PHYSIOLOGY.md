@@ -213,13 +213,7 @@ patient's Pmsf.
 
 ## 7. The Guyton panel separates Live, Mean and optional Deep CO
 
-The default **Live** view shows respiratory movement of both the local
-RV-function curve and the venous-return curve. Both use determinants averaged
-over one heartbeat, attenuating cardiac pulsation while preserving respiratory
-variation. **Mean** constructs both curves from determinants averaged over a
-sliding one-breath-duration window of heartbeat means; it does not average the drawn lines point by point. The
-horizontal axis is right atrial pressure relative to atmosphere, in mmHg, and
-the vertical axis is flow in L/min.
+The initial **Mean** view constructs both local curves from determinants averaged over a moving breath-duration window of heartbeat means. **Live** uses one-heartbeat means to preserve respiratory variation. The axes show right atrial pressure relative to atmosphere in mmHg and flow in L/min.
 
 The local RV-function curve is anchored to RV end-diastolic and end-systolic
 volumes on the selected heartbeat or respiratory window, together with matching
@@ -228,14 +222,7 @@ that mean right atrial pressure equals RV end-diastolic transmural pressure.
 It remains a local analytic approximation, not an independently measured LV
 response or an instantaneous cardiac-output measurement.
 
-The dark marker averages right atrial pressure and IVC-to-right-atrial inflow
-over that sliding breath-duration window in both views. The faint trail retains one-heartbeat
-means. The compliant IVC and other compartments can temporarily store or release
-blood, so venous inflow, RV output and LV output can differ within a breath.
-Only Mean shows the hollow predicted-equilibrium marker at the crossing of the
-two respiratory-mean curves. Once storage has settled, mean flows should agree
-and the measured inflow marker should be close to that local crossing. Their
-agreement is an internal consistency check, not independent clinical validation.
+The filled point measures net IVC-to-right-atrial inflow and matching atrial pressure on the selected window. In Live it follows the head of the heartbeat-smoothed trail. A cross marks the intersection of the drawn curves in Mean and on inspection in Live. During a breath the right heart can store or release blood, so the Live crossing does not establish instantaneous equality of caval, pulmonic and aortic flow. In a settled periodic state, agreement of the mean dot with the local crossing is an internal consistency check.
 
 The caval segment permits pressure-driven reversal: the forward law
 is mirrored with the IVC and atrial endpoints exchanged when atrial pressure

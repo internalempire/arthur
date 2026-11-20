@@ -344,27 +344,23 @@ section('The Guyton points remain explicitly distinguished');
   const examples = readFileSync(new URL('../../manual/model-examples.mjs', import.meta.url), 'utf8');
   const guytonUi = readFileSync(new URL('../../src/ui/panels/guyton.js', import.meta.url), 'utf8');
 
-  check('the filled respiratory mean is identified as venous inflow rather than cardiac output',
-    panel.includes('venous inflow from the inferior vena cava into the right atrium')
-      || (panel.includes('IVC-to-right-atrial venous inflow')
-        && panel.includes('not RV output, LV output or cardiac output')));
-  check('the canvas separates venous inflow, measured LV output and the predicted crossing',
-    guytonUi.includes("panel.label('mean venous inflow'")
-      && guytonUi.includes("panel.label('predicted equilibrium'")
+  check('the filled point is identified as measured net caval inflow',
+    panel.includes('net venous inflow from the inferior vena cava into the right atrium')
+      && panel.includes('right atrial pressure relative to atmosphere'));
+  check('the plot distinguishes measured net inflow, LV output and the geometric crossing',
+    guytonUi.includes("panel.dot(simulated.x, simulated.y")
       && guytonUi.includes("panel.label('mean LV output'")
-      && guytonUi.includes('y: op.aorticFlow')
-      && !guytonUi.includes("panel.label('simulated mean'")
-      && !guytonUi.includes("panel.label('analytic'"));
-  check('the dynamic trail identifies the measured respiratory inflow path',
-    guytonUi.includes("panel.label('inflow path'")
-      && panel.toLowerCase().includes('drawing a trail from successive predicted crossings would hide'));
-  check('the panel separates heartbeat dynamics, respiratory markers and settled loading windows',
-    panel.includes('one-heartbeat means')
-      && panel.includes('moving respiratory-duration window after heartbeat smoothing')
+      && guytonUi.includes("y: op.aorticFlow")
+      && guytonUi.includes("'Crossing in this phase'") && guytonUi.includes("'Mean curve crossing'"));
+  check('the trail follows measured inflow with the future portion excluded on paused inspection',
+    guytonUi.includes('trail.push(beat.pra, beat.flow)')
+      && guytonUi.includes('count: trailCount') && panel.includes('one-heartbeat means'));
+  check('the panel separates the breath-mean crossing, optional phase crossing and settled reference',
+    panel.includes('moving respiratory-duration window after heartbeat smoothing')
       && panel.includes('complete minute windows')
       && guytonUi.includes("deepClock === 'mean' ? (reference?.ppl ?? op.ppl) : c.p.ppl")
       && guytonUi.includes(': fast.state.ppl')
-      && guytonUi.includes("const equilibrium = activeClock === 'mean'"));
+      && guytonUi.includes("deepClock === 'mean' && !!reference : !live || hovering || inspecting"));
   check('temporary right-heart storage is explained',
     venousReturn.includes('dV_{right}')
       && venousReturn.includes('temporarily store blood'));
@@ -378,8 +374,8 @@ section('The Guyton points remain explicitly distinguished');
       && guytonUi.includes("deep ? 'Cardiac output (LV)' : 'RV function'")
       && guytonUi.includes('cardiacFunctionCurve(sim.params, sim.circ, state)')
       && guytonUi.includes('fastGuytonCurves(sim, curveClock)')
-      && panel.includes('**Live** is the default')
-      && panel.includes('**Mean** switches both curves'));
+      && panel.includes('**Mean is the opening view.**')
+      && panel.includes('**Inspect crossing**'));
   check('preload reserve does not claim to test LV reserve independently',
     preloadReserve.includes('does not independently test LV reserve')
       && preloadReserve.includes('LV filling reserve and LV systolic limitation are not independently tested'));

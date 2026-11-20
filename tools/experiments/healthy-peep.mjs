@@ -41,7 +41,7 @@ function sample(seconds = 60) {
     // Last two breaths: matched display clocks, not a new deep experiment.
     if (i * dt >= seconds - 120 / p.rr && i % Math.round(.05 / dt) === 0) {
       s.metrics = s.computeMetrics();
-      const live = fastGuytonCurves(s), mean = fastGuytonCurves(s, 'mean');
+      const live = fastGuytonCurves(s, 'live'), mean = fastGuytonCurves(s, 'mean');
       trace.push({ time: s.time, phase: s.resp.phase, lungVolume: s.resp.lungVolume,
         ppl: c.p.ppl, pab: c.p.pab,
         liveRvZero: live.cf.xIntercept, meanRvZero: mean.cf.xIntercept,

@@ -235,7 +235,7 @@ function transmuralBlock(rows) {
 
 function venousReturnBlock(rows) {
   return [
-    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure uses a sliding one-breath-duration average of heartbeat-duration means, as in the filled simulated-mean point on the Guyton panel.*',
+    '*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure uses a sliding one-breath-duration average of heartbeat-duration means, as in the filled point in the Mean view of the Guyton panel.*',
     '',
     '| PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |',
     '|---:|---:|---:|---:|',

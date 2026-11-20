@@ -1,6 +1,12 @@
 # Project handover
 
-Updated: 2026-11-19
+Updated: 2026-11-20
+
+## Guyton markers and live comparisons — November 20
+
+The white dot the clinician saw standing still in Live was respiratory-mean caval inflow. The curves used one-heartbeat determinants, and the smaller crossing symbol in Mean could be obscured by the dot. The revised display opens in Mean with independent measured and construction marks. In Live the dot follows net inflow through the breath and the phase-specific crossing can be inspected. Both clocks have direct controls. The PEEP reproduction script selects its Live clock explicitly. Live comparisons and their optional panels appear above the monitor with the first Pin and close when the last reference is removed. The [Guyton guide](../manual/panel-guyton.md) and [Pin instructions](../manual/numeric-tiles.md#pin-values-for-a-comparison) explain the reading. This is a presentation change. The November pulmonary checkpoint remains the physiological restart point.
+
+Claude Fable 5.2 reviewed the display logic and wording. Browser checks used the rendered coordinates to compare the measured dot and the cross with the selected model window and the intersection of the drawn curves. They covered paused history, keyboard and touch inspection, a completed Deep CO experiment and Pin removal at desktop and mobile widths. The PEEP reproduction and the private verification results are in `outputs/guyton-ui-2026-11-20/`.
 
 ## Monitor, manoeuvre recording and waiting states — November 19
 

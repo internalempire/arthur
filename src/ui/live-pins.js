@@ -69,9 +69,13 @@ export function createLivePinTable(container, pins, onChange) {
   const rows = new Map();
 
   function render(sim, { historical = false, running = true } = {}) {
+    container.hidden = pins.states.length === 0;
+    if (container.hidden) {
+      if (rows.size) { body.replaceChildren(); rows.clear(); }
+      return;
+    }
     const params = sim.params;
     const currentTotal = volumeControlReadings(sim).total;
-    container.hidden = pins.states.length === 0;
     summary.textContent = `${pins.states.length}/${MAX_LIVE_PINS} references · ${running ? 'Running' : 'Paused'}`;
     const selected = pins.selected;
     message.textContent = historical

@@ -53,13 +53,13 @@ The caval segment permits flow in either direction. The closing-pressure law lim
 
 The analytic venous-return curve reduces the two resistances to their sum and uses the shared forward closing-pressure law. It is a forward-return approximation constructed from mean determinants. In a pulsatile circulation, applying a nonlinear law to mean pressures need not reproduce the mean of actual signed flow, even after net storage has settled. The curve therefore need not pass through the measured mean inflow marker. This distinction is particularly visible with pulmonary embolism and brief caval backflow.
 
-The fast **Live** view uses one-heartbeat averages for both RV and venous-return determinants, preserving respiratory movement. **Mean** uses respiratory averages for both. In optional deep mode, VR mean uses the separately settled reference conditions and VR live uses instantaneous return determinants. The predicted crossing is withheld in live views because storage during a breath prevents interpreting it as instantaneous whole-circuit equilibrium.
+**Mean** opens with both curves constructed from breath-averaged conditions. **Live** follows breathing with one-heartbeat averages. In Deep CO, **VR Mean** pairs the two settled reference relations. **VR Live** combines the settled cardiac curve with instantaneous venous conditions and suppresses their crossing.
 
 The internal quantity labelled Pmsf comes from the [stressed volume](stressed-volume.md) of the venous reservoir divided by its compliance, plus the [abdominal](abdominal-pressure.md) contribution where the reservoir is distended enough to have one. It is a reservoir-pressure approximation to the upstream head. Arthur does not arrest systemic flow and wait for every systemic compartment to equilibrate before calculating it.
 
 ### The marks on the diagram
 
-The faint inflow path uses one-heartbeat mean RAP and net IVC-to-right-atrial inflow. The dark mean venous-inflow marker uses a sliding respiratory-period average of the heartbeat-smoothed measurements in both Live and Mean. It updates continuously rather than waiting for an end-expiratory boundary. The hollow predicted-equilibrium point is the crossing of the two analytic curves, displayed only in Mean. Optional Deep CO adds a red mean LV-output marker and replaces the ascending relation with a separately settled whole-heart response. See [the Guyton panel](panel-guyton.md) for its loading protocol and calculation status.
+The filled dot shows net caval inflow and the matching atrial pressure. In Mean it averages the heartbeat-smoothed measurements over a sliding respiratory period. In Live it follows the head of the one-heartbeat inflow path. The cross marks the intersection of the displayed relations. It appears in Mean and is available on inspection in Live. A phase-specific crossing identifies equal flow on the drawn curves. The flow entering the right atrium can differ from RV ejection at that time. Deep CO adds a red mean LV-output marker and a separately settled whole-heart response. See [the Guyton panel](panel-guyton.md).
 
 The respiratory markers remove much of the within-breath variation but a beat or a breath need not return every compartment to exactly the same volume when the cardiac and respiratory clocks are not commensurate. The optional deep response uses complete minute windows and explicitly checks flow agreement and storage. During an intervention, differences between venous inflow and aortic output can be caused by redistribution.
 
@@ -82,7 +82,7 @@ This distinction is especially important in pulmonary embolism. A spontaneous in
 A passive patient at 500 mL, 14 breaths per minute:
 
 <!-- BEGIN GENERATED: venous-return-peep -->
-*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure uses a sliding one-breath-duration average of heartbeat-duration means, as in the filled simulated-mean point on the Guyton panel.*
+*Executable setup: passive volume control, VT 500 mL, 14/min; each PEEP level is settled for 45 s. Right atrial pressure uses a sliding one-breath-duration average of heartbeat-duration means, as in the filled point in the Mean view of the Guyton panel.*
 
 | PEEP (cmH₂O) | P<sub>msf</sub> (mmHg) | mean P<sub>ra</sub> (mmHg) | cardiac output (L/min) |
 |---:|---:|---:|---:|
@@ -99,7 +99,7 @@ In this sweep, internal Pmsf rises with PEEP as abdominal transmission and blood
 
 ## Why this and not something else
 
-The model integrates a closed loop and derives a separate Guyton analysis from its equations. Two curves and their intersection alone cannot show breath-by-breath storage. The trail retains one-heartbeat means and the measured mean markers use respiratory means. The fast relations share the selected heartbeat (Live) or respiratory (Mean) clock; optional deep relations use separately settled minute windows.
+The model integrates a closed loop and derives a separate Guyton analysis from its equations. Two curves and their intersection alone cannot show breath-by-breath storage. The trail retains one-heartbeat means and the filled point follows the selected averaging window. The fast relations share the selected heartbeat (Live) or respiratory (Mean) clock; optional deep relations use separately settled minute windows.
 
 The default RV curve is a local analytic relation anchored to RV volumes on the selected heartbeat (Live) or respiratory (Mean) clock. Optional Deep CO measures a whole-heart response in disposable loading experiments conditioned on a settled reference. The normalized inflow waveform and systemic source-pressure/respiratory trajectories are shared across the copies; cardiac and pulmonary dynamics remain active. Agreement at the unperturbed reference is an internal consistency check. The [panel page](panel-guyton.md) describes rejected ranges, numerical checks and the fixed-autonomic-drive boundary.
 
@@ -116,7 +116,7 @@ The resistance to venous return is a single control. One systemic reservoir keep
 - **One venous reservoir.** No splanchnic, cutaneous or muscular capacitance beds, and therefore no redistribution between fast and slow compartments. A fluid bolus arrives instantaneously in one place.
 - **No stress relaxation, transcapillary escape or renal removal.** Added blood redistributes among the represented vascular and cardiac compartments but remains entirely intravascular until the user removes it.
 - **The resistance to venous return is constant in a normally filled circulation.** An additional abdominal contribution is confined to the upstream segment when both the systemic reservoir and IVC are poorly distended. It does not otherwise vary with flow, tone or vessel calibre.
-- **The Guyton curves are local approximations placed under a dynamic trail.** Live uses heartbeat determinants and Mean uses respiratory determinants. The measured respiratory-mean inflow and the Mean-only predicted crossing have different definitions and need not coincide.
+- **The Guyton curves are local approximations placed under a dynamic trail.** Live uses heartbeat determinants and Mean uses respiratory determinants. The measured respiratory-mean inflow and the crossing of the mean curves have different definitions and need not coincide.
 - **The ascending analytic curve represents a local RV relation, not an independent biventricular or LV function curve.** Its RV-volume anchor follows the selected clock and does not reproduce a new closed-loop beat at every pressure on the curve.
 - **Caval reversal is an aggregate pressure-driven flow.** Vessel-wall dynamics and a separate superior caval route are absent. The zero-flow region is a mathematical limitation, not a measured physiological threshold.
 - **The filled point is venous inflow, not cardiac output.** Its height must not be read as simultaneous RV or LV forward flow.

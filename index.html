@@ -87,6 +87,9 @@
       <main class="stage">
         <p class="invalid-banner" id="invalid-banner" role="status" hidden></p>
 
+        <section id="pinned-states" class="pinned-states" aria-label="Live state comparisons" hidden></section>
+        <section id="distribution" class="blood-distribution" aria-label="Blood distribution" hidden></section>
+        <section id="mechanisms" class="mechanisms" aria-label="Heart–lung mechanisms" hidden></section>
         <div class="monitor-toolbar">
           <div class="core-readings"><span>Cardiac output <strong id="core-co">—</strong> L/min <small id="core-co-status"></small></span>
             <span>Mean arterial pressure <strong id="core-map">—</strong> mmHg <small id="core-map-status"></small></span></div>
@@ -97,7 +100,25 @@
           <section class="panel panel-waves" aria-label="Time-aligned waveforms">
             <div id="waveforms"></div>
           </section>
-          <section class="panel panel-guyton" aria-label="Guyton diagram"><canvas id="guyton"></canvas></section>
+          <section class="panel panel-guyton" aria-label="Guyton diagram">
+            <h2>Guyton diagram</h2>
+            <div class="guyton-toolbar">
+              <div class="guyton-clocks" role="group" aria-label="Curve averaging window">
+                <button type="button" class="btn" data-clock="mean" aria-pressed="true">Mean</button>
+                <button type="button" class="btn" data-clock="live" aria-pressed="false">Live</button>
+              </div>
+              <button type="button" class="btn guyton-response-toggle" aria-pressed="false">Deep CO</button>
+              <button type="button" class="btn guyton-inspect" aria-controls="guyton-cross-key" aria-pressed="false" hidden>Inspect crossing</button>
+            </div>
+            <div class="guyton-response-status" role="status" aria-live="polite" hidden>
+              <progress aria-label="Deep CO loading experiments"></progress><span></span>
+            </div>
+            <div class="guyton-plot"><canvas id="guyton" role="img" aria-label="Venous return and cardiac function plotted against right atrial pressure" aria-describedby="guyton-key"></canvas></div>
+            <div class="guyton-key" id="guyton-key">
+              <span><b aria-hidden="true">●</b> <span class="guyton-inflow"></span></span>
+              <span class="guyton-cross-key" id="guyton-cross-key"><b aria-hidden="true">×</b> <span class="guyton-crossing"></span></span>
+            </div>
+          </section>
         </div>
 
         <div class="grid">
@@ -119,9 +140,6 @@
             A reading whose validity conditions are not met is withheld rather than shown.
           </p>
         </details>
-        <section id="pinned-states" class="pinned-states" aria-label="Live state comparisons" hidden></section>
-        <section id="distribution" class="blood-distribution" aria-label="Blood distribution" hidden></section>
-        <section id="mechanisms" class="mechanisms" aria-label="Heart–lung mechanisms" hidden></section>
 
         <footer class="colophon">
           <p><strong>For teaching only.</strong> This is a simplification of human physiology and must not be used to guide the care of a patient.</p>
