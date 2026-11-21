@@ -15,10 +15,12 @@ const decode = (value) => {
 
 /** Split `#/page#section` without allowing the section to become a filename. */
 export function parseManualHash(hash) {
-  const route = String(hash ?? '').replace(/^#\/?/, '').trim();
-  const separator = route.indexOf('#');
-  const rawSlug = separator < 0 ? route : route.slice(0, separator);
-  const rawAnchor = separator < 0 ? '' : route.slice(separator + 1);
+  // An externally shared link can arrive as #%2Fpage%23section.
+  // Split at the first separator, then decode the page and section separately.
+  const route = String(hash ?? '').replace(/^#(?:\/|%2f)?/i, '').trim();
+  const separator = /#|%23/.exec(route);
+  const rawSlug = separator ? route.slice(0, separator.index) : route;
+  const rawAnchor = separator ? route.slice(separator.index + separator[0].length) : '';
   return {
     slug: decode(rawSlug).trim() || 'home',
     anchor: decode(rawAnchor).trim(),

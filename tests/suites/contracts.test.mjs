@@ -15,6 +15,13 @@ section('Manual navigation and clinical titles');
     route.slug === 'pulmonary-vascular-resistance' && route.anchor === 'what-the-model-shows');
   check('manual hashes preserve both page and in-page destination',
     manualHash(route.slug, route.anchor) === '#/pulmonary-vascular-resistance#what-the-model-shows');
+  const cvpHeading = 'why-can-cvp-rise-while-venous-return-falls';
+  check('shared CVP links reach the same section with literal or encoded separators',
+    [`#/quick-start#${cvpHeading}`, `#/quick-start%23${cvpHeading}`, `#%2Fquick-start%23${cvpHeading}`]
+      .every(hash => {
+        const { slug, anchor } = parseManualHash(hash);
+        return slug === 'quick-start' && anchor === cvpHeading;
+      }));
   check('fallback titles preserve familiar clinical notation',
     fallbackTitle('pvr-nadir-at-frc') === 'PVR nadir at FRC'
       && fallbackTitle('recruitment-and-ri') === 'Lung opening profiles');

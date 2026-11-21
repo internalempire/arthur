@@ -2,6 +2,10 @@
 
 Updated: 2026-11-21
 
+## Opening shared links to manual sections — November 21
+
+A link to the healthy PEEP reading could display “Not found” when the section separator arrived URL-encoded. The manual now recognizes literal and encoded separators before looking up the page and scrolling to the heading. The CVP exercise has a navigation regression check for both forms.
+
 ## Guided reading of CVP and venous return — November 21
 
 The quick start follows a single passive healthy circulation through PEEP 5 to 15 cmH₂O. It places atmospheric and transmural CVP beside measured mean caval inflow, locates each reading on the monitor and distinguishes their display windows from the matched one-minute reference. The manual generator runs the original and changed branches from the same state. The manual home and Guyton guide link directly to the exercise.

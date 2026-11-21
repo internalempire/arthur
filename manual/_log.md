@@ -277,3 +277,5 @@ The independent audit preserves three unmet original criteria as open: prone RV/
 **2026-11-21 — Current-breath mechanics and clinical interpretation.** The independent review identified a mixed-cycle compliance after PEEP changes, premature pulmonary hypertension subtyping and a covered mobile drawer toggle. The monitor pairs passive mechanics within one complete breath, qualifies the pulmonary subtype and describes stress-index curvature and local right-sided reserve. The first exercise distinguishes respiratory phase from comparing cardiac output in the same patient. The ARDS and tamponade notes indicate which clinical responses the presets reproduce.
 
 **2026-11-21 — Read CVP and venous inflow together.** The guided PEEP exercise uses the healthy passive preset, Pin, the two readings on the CVP tile and the measured inflow dot in Guyton Mean. The reference table integrates pressure and caval flow over the same minute in both states.
+
+**2026-11-21 — Shared links to a section.** Corrected a page lookup error reproduced with the encoded link to the guided CVP reading. Links with encoded separators open the same section as links from the manual contents.
