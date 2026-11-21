@@ -16,7 +16,7 @@ If this is your first visit, start with the [ten-minute guided exploration](quic
 
 | question | read first | then look at |
 |---|---|---|
-| Why can CVP rise while filling falls? | [Transmural pressure](transmural-pressure.md), then [venous return](venous-return.md) | pressure waveforms, transmural CVP and the Guyton inflow point during a PEEP change |
+| Why can CVP rise while venous return falls? | [Try the PEEP manoeuvre](quick-start.md#why-can-cvp-rise-while-venous-return-falls) | atmospheric and transmural CVP, then mean caval inflow on the Guyton diagram |
 | Did pressure open lung or distend tissue already open? | [Two-population lung](two-population-lung.md), then [opening profiles](recruitment-and-ri.md) | end-expiratory closed fraction, opening excursion, plateau and the mechanical PVR curve |
 | Why do the two ventricles respond at different times? | [Four effects of a breath](the-four-effects-of-a-breath.md), then [pulmonary transit](pulmonary-transit.md) | early and later RV/LV loop changes after the same intervention |
 | Did we add blood or change its pressure-generating share? | [Stressed volume](stressed-volume.md), then [venous tone](venous-tone.md) | current total blood, systemic venous stressed fraction, Pmsf and output |

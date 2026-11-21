@@ -100,6 +100,7 @@ export const STRESS_INDEX_CASES = [
 ];
 
 export const DOCUMENTED_EXAMPLE_TARGETS = [
+  { file: 'manual/quick-start.md', ids: ['healthy-cvp-return'] },
   { file: 'manual/expiratory-flow-limitation.md', ids: ['efl-peep', 'efl-off-peep'] },
   { file: 'manual/pulmonary-vascular-resistance.md', ids: ['pvr-landmarks', 'pvr-opening-peep'] },
   { file: 'manual/stress-index.md', ids: ['stress-index'] },
@@ -596,6 +597,38 @@ function swingScenarioBlock() {
   ].join('\n');
 }
 
+function healthyCvpReturnBlock() {
+  const patient = new Simulator();
+  patient.applyScenario(SCENARIOS.find(scenario => scenario.id === 'healthy-vcv'));
+  patient.advance(120, true);
+  const reference = patient.fork();
+  patient.setParam('peep', 15);
+
+  const rows = [reference, patient].map(sim => {
+    sim.advance(120, true);
+    let atrialPressure = 0, transmuralPressure = 0, cavalVolumeMl = 0;
+    const seconds = 60;
+    const stop = sim.observeManoeuvre({ sample(world) {
+      if (!world.validObservation()) throw new Error('Invalid healthy PEEP observation');
+      atrialPressure += world.circ.p.ra * world.dt;
+      transmuralPressure += world.circ.p.raTm * world.dt;
+      cavalVolumeMl += world.circ.q.vr * world.dt;
+    } });
+    sim.advance(seconds, true);
+    stop();
+    const cavalFlow = (cavalVolumeMl / 1000) / (seconds / 60);
+    return `| ${sim.params.peep} | ${fixed(atrialPressure / seconds, 1)} | ${fixed(transmuralPressure / seconds, 1)} | ${fixed(cavalFlow, 2)} |`;
+  });
+
+  return [
+    '*Model reference. Both branches start from the same settled patient with the baroreflex off. After 120 simulated seconds at each PEEP, pressures and net caval inflow are averaged over the next minute.*',
+    '',
+    '| PEEP (cmH₂O) | CVP vs atmosphere (mmHg) | Transmural CVP (mmHg) | Net caval inflow (L/min) |',
+    '|---:|---:|---:|---:|',
+    ...rows,
+  ].join('\n');
+}
+
 function ardsPeepOutputBlock() {
   const scenario = SCENARIOS.find(({ id }) => id === 'ards-rv');
   const outputs = [5, 15].map(peep => {
@@ -771,6 +804,7 @@ export function renderDocumentedExampleBlocks() {
     ['cardiac-tamponade', cardiacTamponadeBlock()],
     ['ivc-respiratory-calibre', ivcRespiratoryBlock()],
     ['swing-scenario', swingScenarioBlock()],
+    ['healthy-cvp-return', healthyCvpReturnBlock()],
     ['ards-peep-output', ardsPeepOutputBlock()],
     ['ards-scenario', ardsScenarioBlock()],
     ['baroreflex-septic', baroreflexSepticBlock()],

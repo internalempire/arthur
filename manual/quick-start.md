@@ -20,14 +20,22 @@ During positive-pressure inflation, pleural pressure rises; during spontaneous i
 
 ## Minute 3–6: raise PEEP
 
-1. Return to *Healthy, passive volume control*.
-2. Press **Pin** to retain an independently evolving reference, then increase PEEP from 5 to 12 cmH₂O.
-3. Select **Airway flow** and **Caval flow** to compare the timing of gas movement and return to the right atrium. Watch the first response, then wait until successive breaths repeat a similar pattern. Several breaths are a starting observation period, not a guarantee of equilibrium.
-4. Follow pleural pressure, measured and transmural CVP, Pmsf, the venous-return gradient, PVR and output.
+### Why can CVP rise while venous return falls?
 
-PEEP does several things at once. It raises the pressure around the right atrium, changes abdominal pressure and, depending on the abdominal load, can alter resistance to venous return, moves the lung along the PVR–volume relation and changes LV transmural afterload. [The four effects of a breath](the-four-effects-of-a-breath.md) separates these pathways.
+1. Select **Healthy, passive volume control**. At PEEP 5 cmH₂O, read the **CVP** tile. The large number is pressure inside the right atrium relative to atmosphere. The **transmural** line is the pressure difference across the atrial wall. In **Guyton diagram**, select **Mean** and note the height of the filled dot. Open **?** and read **Venous inflow (respiratory mean)** for its value in L/min. This is blood arriving in the right atrium from the cava. Note both pressures and the inflow at PEEP 5.
+2. Press **Pin**, then raise only PEEP to **15 cmH₂O**. In **Live comparisons**, confirm PEEP is the only difference between **Reference** and **Current**. Watch the pleural-pressure trace during the first breaths. Select **Caval flow** in the waveform panel to see how inflow varies within each breath.
+3. Once the pattern repeats, read the two pressures and the height of the dot again. The large CVP value rises, the transmural value falls slightly and the dot sits lower. Compare similar phases across several breaths for the small transmural change. The CVP tile smooths pressure over three seconds, and Guyton **Mean** averages inflow over a breath. The table gives longer averages from the same manoeuvre.
 
-Do not expect one universal direction for cardiac output. The point of the experiment is to identify which mechanism dominates in this selected circulation.
+<!-- BEGIN GENERATED: healthy-cvp-return -->
+*Model reference. Both branches start from the same settled patient with the baroreflex off. After 120 simulated seconds at each PEEP, pressures and net caval inflow are averaged over the next minute.*
+
+| PEEP (cmH₂O) | CVP vs atmosphere (mmHg) | Transmural CVP (mmHg) | Net caval inflow (L/min) |
+|---:|---:|---:|---:|
+| 5 | 1.1 | 2.5 | 5.60 |
+| 15 | 4.4 | 2.2 | 5.17 |
+<!-- END GENERATED: healthy-cvp-return -->
+
+**Why the readings diverge.** PEEP raises pleural pressure around the heart. Pressure inside the atrium rises relative to atmosphere, but the pressure outside rises a little more. The difference that distends the atrium therefore falls. Venous inflow answers a separate question: how much blood crosses into the atrium each minute? In this preset upstream systemic filling pressure also rises, partly offsetting the increased downstream pressure. The effective pressure difference driving return still narrows and mean caval inflow falls. The transmural value alone cannot tell you the flow. See [venous return](venous-return.md) and the [Guyton guide](panel-guyton.md#healthy-passive-volume-control-peep-5-to-15).
 
 ## Minute 6–8: compare recruitment with distension
 

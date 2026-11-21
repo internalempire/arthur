@@ -2,6 +2,10 @@
 
 Updated: 2026-11-21
 
+## Guided reading of CVP and venous return — November 21
+
+The quick start follows a single passive healthy circulation through PEEP 5 to 15 cmH₂O. It places atmospheric and transmural CVP beside measured mean caval inflow, locates each reading on the monitor and distinguishes their display windows from the matched one-minute reference. The manual generator runs the original and changed branches from the same state. The manual home and Guyton guide link directly to the exercise.
+
 ## External review corrections to bedside readouts and the teaching sequence — November 21
 
 An ARDS PEEP step from 5 to 15 cmH₂O could temporarily combine the preceding plateau with the new PEEP and display a compliance near 276 mL/cmH₂O. Plateau, driving pressure, respiratory-system compliance and stress index now wait for a complete uninterrupted breath under the current settings. Pulmonary hypertension subtyping requires an interpretable wedge surrogate and derived PVR; measured pulmonary arterial pressure remains available. Stress-index and RV-reserve wording describes the pressure curve and local RV slope. The mobile parameter drawer has a sticky internal close control, Escape and focus return. The guide introduces the different healthy prescriptions before their comparison and gives a same-patient exercise. The ARDS and tamponade scenario notes state the relevant limits at the point of use. No circulatory or respiratory pressure–flow law was recalibrated.
