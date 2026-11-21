@@ -57,7 +57,7 @@ The live compliance displayed by the model is not required to equal this setting
 - upper-limb stiffening near maximum capacity;
 - chest-wall mechanics when respiratory-system compliance is reported.
 
-Thus the aerated-lung compliance control is an input describing tissue properties, while the respiratory-system compliance tile is a breathwise output: delivered tidal volume divided by plateau minus total PEEP. The internal local slope used for some calculations is a different quantity. Plateau is calculated from passive recoil at the represented end-inspiratory volume, and total PEEP uses the model's late-expiratory pressure sample. During patient effort, the displayed ratio remains a model-derived mechanical descriptor, not a compliance measured from an assisted breath at the bedside. The distinction is necessary rather than optional: one parameter cannot simultaneously be an instantaneous readout and the anatomical volume ceiling.
+Thus the aerated-lung compliance control is an input describing tissue properties, while the respiratory-system compliance tile is a breathwise output: delivered tidal volume divided by plateau minus total PEEP. The internal local slope used for some calculations is a different quantity. The monitor pairs end-inspiratory passive recoil with alveolar pressure immediately before that inflation. Both pressures and the inspired volume belong to the same cycle. The ratio is available after a complete passive controlled breath. The distinction is necessary rather than optional: one parameter cannot simultaneously be an instantaneous readout and the anatomical volume ceiling.
 
 ### What maximum lung capacity means
 

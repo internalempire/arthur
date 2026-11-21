@@ -59,7 +59,7 @@ export const SCENARIOS = [
   {
     id: 'ards-rv',
     name: 'ARDS with right ventricular failure',
-    note: 'A collapsed, stiff lung and a failing right ventricle, with a reopenable diseased component. The RV dilates, the septum bows left and left-ventricular filling is restricted. At the starting PEEP, end-expiratory transpulmonary pressure is about 13 cmH₂O. Compare PEEP levels, then select the non-reopenable profile while leaving collapse, tissue stiffness and the thoracic load unchanged: the consolidated phenotype carries the greater pulmonary vascular and RV cost.',
+    note: 'A collapsed, stiff lung and a failing right ventricle, with a reopenable diseased component. The RV dilates, the septum bows left and left-ventricular filling is restricted. At the starting PEEP, end-expiratory transpulmonary pressure is about 13 cmH₂O. Compare PEEP levels, then select the non-reopenable profile while leaving collapse, tissue stiffness and the thoracic load unchanged: the consolidated phenotype carries the greater pulmonary vascular and RV cost. In this preset, turning prone raises plateau pressure and the RV/LV volume ratio. Use it to explore the selected mechanics; the RV unloading reported after prolonged proning in some patients with severe ARDS is outside this demonstration.',
     params: {
       mode: 'vcv', pmus: 0, vt: 350, peep: 12, rr: 24,
       collapsed: 0.42, clung: 25,
@@ -87,7 +87,7 @@ export const SCENARIOS = [
   {
     id: 'cardiac-tamponade',
     name: 'Cardiac tamponade',
-    note: 'A shared pericardial pressure increasingly opposes filling as chamber volumes rise, limiting the lower-pressure right heart most. Increase pericardial capacity to simulate decompression: pericardial pressure and CVP fall while ventricular filling, output and arterial pressure recover. Capacity is a model surrogate for available space, not a measured effusion volume. The respiratory arterial variation is directional; the preset is not a calibrated pulsus-paradoxus test.',
+    note: 'A shared pericardial pressure increasingly opposes filling as chamber volumes rise, limiting the lower-pressure right heart most. Increase pericardial capacity to simulate decompression: pericardial pressure and CVP fall while ventricular filling, output and arterial pressure recover. Capacity is a model surrogate for available space, not a measured effusion volume. Use the change in filling and output to interpret decompression. The simulated diastolic pressures remain dispersed, and caval volume excursion cannot be read as echographic collapsibility. The arterial pressure swing illustrates the direction of pulsus paradoxus; its magnitude is uncalibrated.',
     params: {
       mode: 'spont', pmus: 10, peep: 0, rr: 20,
       pericardium: 4, pericardialCapacity: 100,

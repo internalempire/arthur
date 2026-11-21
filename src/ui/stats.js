@@ -102,22 +102,20 @@ const TILES = [
     id: 'preload', label: 'RV preload reserve', unit: '%/mmHg', kind: 'coefficient',
     get: (m) => (m.preload ? (m.preload.relative * 100).toFixed(1) : '—'),
     sub: (m) => (m.preload
-      ? `${m.preload.steep ? 'steep limb' : 'plateau'} · ${(m.preload.slope).toFixed(2)} L/min per mmHg`
+      ? `local RV curve: ${m.preload.steep ? 'steep limb' : 'plateau'} · ${m.preload.slope.toFixed(2)} L/min per mmHg`
       : 'no crossing'),
     quality: (m) => m.interpretability.preload,
-    // Unlike variation, this survives spontaneous breathing and a small tidal
-    // volume, because it is read off the curves rather than off the waveform.
-    status: (m) => (m.preload && m.preload.steep
-      ? ['serious', 'filling would raise output'] : null),
   },
   {
     id: 'pap', label: 'Pulmonary artery', unit: 'mmHg', kind: 'measured',
     get: (m) => `${m.papSys.toFixed(0)}/${m.papDia.toFixed(0)}`,
     sub: (m) => `mean ${m.papMean.toFixed(0)} · wedge surrogate ${m.paop.toFixed(0)}`,
     // ESC/ERS 2022: mPAP above 20 mmHg, classified by wedge and PVR.
-    status: (m) => (m.phPresent
-      ? [m.phClass === 'unclassified' ? 'warning' : 'serious', `pulmonary hypertension, ${m.phClass}`]
-      : null),
+    status: (m) => {
+      if (!m.phPresent) return null;
+      if (!m.phClass) return ['warning', 'elevated mean PAP · subtype withheld: ' + m.interpretability.pvrDerived.reasons[0]];
+      return [m.phClass === 'unclassified' ? 'warning' : 'serious', `pulmonary hypertension, ${m.phClass}`];
+    },
   },
   {
     id: 'pvrDerived', label: 'PVR, derived', unit: 'Wood units', kind: 'derived',
@@ -144,6 +142,7 @@ const TILES = [
   {
     id: 'crs', label: 'Respiratory system compliance', unit: 'mL/cmH₂O', kind: 'derived',
     get: (m) => (m.crsMeasured === null ? '—' : m.crsMeasured.toFixed(0)),
+    quality: (m) => m.interpretability.compliance,
     // The number a ventilator prints tracks how much lung is being ventilated,
     // not how stiff the tissue is. Showing the open fraction beside it is the
     // whole point of separating the two.
@@ -162,13 +161,10 @@ const TILES = [
     id: 'stressIndex', label: 'Stress index', unit: '', kind: 'derived',
     get: (m) => (m.stressIndex === null ? '—' : m.stressIndex.toFixed(2)),
     sub: (m) => (m.stressIndex === null ? 'constant flow, passive patient'
-      : m.stressIndex > 1.05 ? 'airway pressure curling upward — running out of room'
-        : m.stressIndex < 0.95 ? 'curling downward — units still opening during the breath'
-          : 'straight — neither opening nor overdistending'),
+      : m.stressIndex > 1.05 ? 'pressure rises progressively faster at constant flow'
+        : m.stressIndex < 0.95 ? 'pressure rises progressively more slowly at constant flow'
+          : 'pressure rises almost linearly at constant flow'),
     quality: (m) => m.interpretability.stressIndex,
-    status: (m) => (m.stressIndex === null ? null
-      : m.stressIndex > 1.1 ? ['serious', 'tidal overdistension']
-        : m.stressIndex < 0.9 ? ['warning', 'tidal recruitment — PEEP may be too low'] : null),
   },
   {
     id: 'pplat', label: 'Plateau pressure', unit: 'cmH₂O', kind: 'measured',

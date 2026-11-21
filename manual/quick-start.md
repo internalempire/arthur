@@ -6,15 +6,17 @@
 
 ## Before touching a control
 
-The application opens on the settled *Healthy, breathing spontaneously* reference circulation. Spend one breath locating three signals: airway pressure in the waveforms, pleural pressure in the thorax and waveforms, and cardiac output above the monitor. The Guyton diagram sits beside the traces on wide screens and follows them on a phone. Other diagrams, numerical tiles and Pin comparisons follow below. The panels show one shared simulation, not independent demonstrations.
+The application opens on the settled *Healthy, breathing spontaneously* reference circulation. Spend one breath locating three signals: airway pressure in the waveforms, pleural pressure in the thorax and waveforms, and cardiac output above the monitor. Every panel follows the same patient. The Guyton diagram sits beside the traces on wide screens and follows them on a phone. Other diagrams, numerical tiles and Pin comparisons follow below. On a narrow screen, **Show parameters** opens the settings. **Close parameters** at the top of the drawer returns you to the monitor, including when you have scrolled down the controls. Escape also closes it.
 
 ## Minute 1–3: reverse the sign of inspiration
+
+The two healthy presets describe different circulations. They differ in initial blood volume, systemic vascular resistance and RV contractility. Use the following comparison to see **which way the pressures move during inspiration**.
 
 1. In *Healthy, breathing spontaneously*, watch pleural pressure, CVP and the Guyton operating point during inspiration.
 2. Select *Healthy, passive volume control*.
 3. Compare the direction of the pleural-pressure and measured-CVP swings.
 
-During positive-pressure inflation, pleural pressure rises; during spontaneous inspiration, it falls. Measured CVP follows surrounding thoracic pressure, whereas transmural CVP more closely reflects chamber distending pressure. This shows why an atmospheric pressure reading is not the same as preload. Compare the direction within each breath here: the two presets also differ in blood volume, systemic resistance and RV contractility, so their settled outputs do not isolate the effect of ventilation. See [transmural pressure](transmural-pressure.md).
+During positive-pressure inflation, pleural pressure rises; during spontaneous inspiration, it falls. Measured CVP follows surrounding thoracic pressure, whereas transmural CVP more closely reflects chamber distending pressure. This shows why an atmospheric pressure reading is not the same as preload. To study **cardiac output in the same circulation**, return to *Healthy, breathing spontaneously* and press **Pin**. Note tidal volume and respiratory rate. Change only the respiratory controls: select **Volume control** (effort drops to zero), keep PEEP and rate at their starting values, and set tidal volume as close as the control allows to the observed spontaneous value. After successive breaths repeat, compare pleural pressure, caval flow and aortic output with the selected Pin. The Pin table shows exactly which settings differ. See [transmural pressure](transmural-pressure.md).
 
 ## Minute 3–6: raise PEEP
 

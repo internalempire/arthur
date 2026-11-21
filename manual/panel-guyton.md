@@ -93,7 +93,7 @@ Occlusion marks retain their measured pressure/venous-inflow meaning. Their extr
 ## Limits
 
 - The curve describes the represented mechanical heart and circulation, not myocardial oxygen consumption, ischaemia, mitral regurgitation or pulmonary oedema clearance.
-- A change in curve position combines the represented loading effects. It is not automatically a change in intrinsic contractility.
+- The horizontal axis uses right atrial pressure relative to atmosphere. Increasing pleural pressure can shift the RV-function curve to higher measured atrial pressures with RV contractility held fixed. Compare transmural filling pressure and pulmonary arterial load when interpreting that shift.
 - The deep reference freezes autonomic drive; request a fresh experiment to inspect a different compensated state.
 - An unavailable tail must not be read as a validated physiological maximum.
 - Minute-window reference experiments and respiratory-window live markers are intentionally distinct; immediate post-intervention separation is not itself a model error.

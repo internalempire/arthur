@@ -147,7 +147,7 @@ Related page: [Preload reserve](preload-reserve.md)
 
 Systolic and diastolic values come from the latest pulmonary arterial beat; mPAP is an exponential mean with a three-second time constant. The subtitle includes the left-atrial-pressure wedge surrogate so the upstream and downstream pressures remain visible together. mPAP depends on flow, downstream pressure and the complete pulmonary vascular load, and a failing RV may be unable to generate a striking pressure despite severe afterload.
 
-The pulmonary-hypertension status uses the model's mPAP, wedge surrogate and derived PVR. It is descriptive, not diagnostic, and its pre-/post-capillary wording is uncertain whenever the wedge surrogate is cautioned.
+The pulmonary-hypertension status uses the model's mPAP, wedge surrogate and derived PVR. Above 20 mmHg the tile identifies elevated mean pulmonary arterial pressure. It displays a haemodynamic subtype only when the completed-breath wedge check permits interpretation and there is sufficient forward flow to calculate PVR. Otherwise the measured pressures stay visible and the tile explains why the subtype is withheld.
 
 Related pages: [The right ventricle](the-right-ventricle.md) · [Pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) · [Pulmonary vascular resistance](pulmonary-vascular-resistance.md)
 
@@ -199,19 +199,19 @@ The tile reports the ventilator-like breathwise ratio $VT/\Delta P$, using total
 
 Related pages: [Equation of motion](equation-of-motion.md) · [Pressure–volume curve](pressure-volume-curve.md) · [Two-population lung](two-population-lung.md)
 
-The compliance tile can remain visible during spontaneous effort even when the plateau tile is unavailable. In that situation it uses the model’s calculated passive recoil, not an actually measured assisted-breath plateau. It should not be treated as bedside passive compliance. After a setting change, the breathwise values can also retain the preceding breath until updated; allow stable complete cycles before comparing mechanics.
+Read compliance after a complete, uninterrupted passive breath under one set of settings. Arthur divides the inspired tidal volume by the elastic pressure rise over that same inflation. The starting pressure is the alveolar pressure immediately before gas enters, including any intrinsic PEEP. Shortly after a PEEP step this pressure can differ from both the new ventilator setting and the pressure at the end of the following expiration. A setting change or hold clears the reading until a fresh cycle finishes. During spontaneous effort the passive ratio is unavailable. Compare settled intervals when asking how PEEP affects compliance.
 
 ### Airway pressure
 
 The main tile number is instantaneous Paw; its subtitle retains the peak reached during the latest completed breath. The waveform rail follows the same hierarchy and therefore continues to update through VCV, PCV, PSV and spontaneous breathing.
 
-During passive ventilation the rail adds calculated Pplat in parentheses. Pplat is omitted—not replaced by a dash—during PSV or spontaneous effort because the passive plateau interpretation is absent while instantaneous Paw remains a valid model pressure.
+Once a complete passive controlled breath is available, the rail adds calculated Pplat in parentheses. During PSV, spontaneous effort or the wait for a fresh cycle, the rail continues to show live Paw alone.
 
 Related pages: [The waveform panel](panel-waveforms.md) · [Equation of motion](equation-of-motion.md) · [Manoeuvres](manoeuvres.md)
 
 ### Plateau pressure
 
-The model calculates static end-inspiratory recoil at the delivered volume. The ventilator does not perform a true inspiratory pause, so this is a model plateau rather than a sampled hold waveform. Driving pressure subtracts applied plus intrinsic PEEP in passive ventilation. The tile is withheld during spontaneous effort because the passive interpretation is absent.
+The model calculates static end-inspiratory recoil at the delivered volume. The ventilator does not perform a true inspiratory pause, so this is a model plateau rather than a sampled hold waveform. At the end of each uninterrupted passive cycle, driving pressure pairs that plateau with the alveolar pressure at the start of the same insufflation. After a setting change, the partial cycle is discarded. The instantaneous airway pressure remains visible while the plateau tile waits for a fresh breath.
 
 Related pages: [Equation of motion](equation-of-motion.md) · [Stress index](stress-index.md) · [Manoeuvres](manoeuvres.md)
 

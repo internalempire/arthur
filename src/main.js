@@ -331,9 +331,21 @@ el('theme').addEventListener('click', (e) => {
 });
 
 const sidebarToggle = el('sidebar-toggle');
-sidebarToggle.addEventListener('click', () => {
-  const open = document.body.classList.toggle('sidebar-open');
+const sidebarClose = el('sidebar-close');
+function setSidebarOpen(open) {
+  document.body.classList.toggle('sidebar-open', open);
   sidebarToggle.setAttribute('aria-expanded', String(open));
+  (open ? sidebarClose : sidebarToggle).focus({ preventScroll: true });
+}
+sidebarToggle.addEventListener('click', () => setSidebarOpen(!document.body.classList.contains('sidebar-open')));
+sidebarClose.addEventListener('click', () => setSidebarOpen(false));
+const narrowLayout = window.matchMedia('(max-width: 1080px)');
+narrowLayout.addEventListener('change', () => {
+  document.body.classList.remove('sidebar-open');
+  sidebarToggle.setAttribute('aria-expanded', 'false');
+});
+window.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && document.body.classList.contains('sidebar-open')) setSidebarOpen(false);
 });
 
 // Space toggles the transport only when nothing interactive has focus. A native

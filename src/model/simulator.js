@@ -197,7 +197,7 @@ export class Simulator {
     this.advance(15, !recordTraces);
   }
 
-  /** Discard changed or interrupted breaths from both pulmonary observations. */
+  /** A setting change or occlusion starts a new observation interval. */
   invalidateBreathObservations() {
     this[volumeObserver]?.reset(this.resp.breathCount);
     this.pulmonaryMarginBreath = this.resp.breathCount;
@@ -205,11 +205,21 @@ export class Simulator {
     this.pulmonaryMarginStartedAtBoundary = false;
     this.lastBreathPulmonaryMargin = null;
     this.breathPressures = null;
-    if (this.metrics) this.metrics.breathPressures = null;
+    this.completedMechanics = null;
     this.pvrLo = Infinity;
     this.pvrHi = -Infinity;
     this.lastPvrSwing = null;
     if (this.metrics) {
+      this.metrics.breathPressures = null;
+      this.metrics.pplat = null;
+      this.metrics.drivingPressure = null;
+      this.metrics.crsMeasured = null;
+      this.metrics.stressIndex = null;
+      this.metrics.phClass = null;
+      const pending = { level: 'unavailable', reasons: ['waiting for a complete uninterrupted breath'] };
+      this.metrics.interpretability.plateau = pending;
+      this.metrics.interpretability.compliance = pending;
+      this.metrics.interpretability.stressIndex = pending;
       this.metrics.lastBreathPulmonaryMargin = null;
       this.metrics.pvrSwing = null;
       this.metrics.interpretability.wedge = pulmonaryMarginQuality(null);
@@ -399,6 +409,15 @@ export class Simulator {
       const complete = this.pulmonaryMarginStartedAtBoundary;
       this.breathPressures = complete && !marginInterrupted
         ? { ee: this.resp.endExpiratoryPl, ei: this.resp.endInspiratoryPl } : null;
+      // Publish only a full, uninterrupted cycle. VT and the elastic pressure
+      // rise span the very same inflation, even when resting volume is drifting.
+      const r = this.resp;
+      this.completedMechanics = complete && !marginInterrupted && !r.atCapacity ? {
+        plateau: r.lastPplat,
+        drivingPressure: r.lastDrivingPressure,
+        tidalVolume: r.lastVt,
+        stressIndex: r.lastStressIndex,
+      } : null;
       this.lastBreathPulmonaryMargin = complete && Number.isFinite(this.pulmonaryMarginMin)
         ? this.pulmonaryMarginMin : null;
       // Respiratory excursion of the current segmental secant resistance sum,
@@ -683,7 +702,8 @@ export class Simulator {
     const siReasons = [];
     if (p.mode !== 'vcv') siReasons.push('needs volume control — the shape is only meaningful at constant flow');
     if (p.pmus > 0) siReasons.push('needs a passive patient — effort bends the airway pressure curve on its own');
-    if (r.lastStressIndex === null) siReasons.push('waiting for a complete breath');
+    const breath = this.completedMechanics;
+    if (breath?.stressIndex == null) siReasons.push('waiting for a complete uninterrupted breath');
 
     const ppvReasons = [];
     if (spontaneousEffort) ppvReasons.push('spontaneous effort — the index assumes a passive patient');
@@ -695,7 +715,15 @@ export class Simulator {
     if (p.pab0 > 12) ppvReasons.push('raised intra-abdominal pressure');
     const ppvLevel = spontaneousEffort ? 'unavailable' : ppvReasons.length ? 'caution' : 'ok';
 
-    const plateauLevel = spontaneousEffort ? 'unavailable' : 'ok';
+    const passive = (p.mode === 'vcv' || p.mode === 'pcv') && !spontaneousEffort;
+    const plateauReason = !passive ? 'requires a passive volume- or pressure-controlled breath'
+      : !breath ? 'waiting for a complete uninterrupted breath' : null;
+    const plateauQuality = plateauReason ? { level: 'unavailable', reasons: [plateauReason] }
+      : { level: 'ok', reasons: [] };
+    const drivingPressure = plateauReason ? null : breath.drivingPressure;
+    const complianceQuality = !plateauReason && drivingPressure <= 0.2
+      ? { level: 'unavailable', reasons: ['driving pressure is too small to estimate compliance'] }
+      : plateauQuality;
     // Use the minimum over the last complete, uninterrupted breath: an
     // instantaneous positive margin must not clear an inspiratory caution.
     // A non-negative completed minimum removes only this compression caution;
@@ -717,7 +745,7 @@ export class Simulator {
     // a wedge of 15 mmHg or less.
     const pvrDerived = co > 0.05 ? (papMean - paop) / co : null;
     const phPresent = papMean > 20;
-    const phClass = !phPresent ? null
+    const phClass = !phPresent || pvrDerivedLevel !== 'ok' ? null
       : (paop > 15 ? (pvrDerived !== null && pvrDerived > 2 ? 'combined' : 'post-capillary')
         : (pvrDerived !== null && pvrDerived > 2 ? 'pre-capillary' : 'unclassified'));
 
@@ -735,7 +763,8 @@ export class Simulator {
         level: r.lastClosedEndExpiratory === null ? 'unavailable' : 'ok',
         reasons: r.lastClosedEndExpiratory === null ? ['waiting for a complete uninterrupted breath'] : [],
       },
-      plateau: { level: plateauLevel, reasons: plateauLevel === 'unavailable' ? ['no passive plateau during spontaneous effort'] : [] },
+      plateau: plateauQuality,
+      compliance: complianceQuality,
       wedge: wedgeQuality,
       pvrDerived: { level: pvrDerivedLevel, reasons: pvrDerivedReasons },
     };
@@ -805,22 +834,19 @@ export class Simulator {
       relaxVolume: r.relaxVolume,
       // What a ventilator would compute, not what the tissue is: tidal volume
       // over the pressure it took to deliver it.
-      crsMeasured: (() => {
-        const driving = r.lastPplat - p.peep - r.lastAutoPeep;
-        return driving > 0.2 ? r.lastVt / driving : null;
-      })(),
+      crsMeasured: complianceQuality.level === 'ok' ? breath.tidalVolume / drivingPressure : null,
       closedFraction: regions.closedFraction,
       recruitedFraction: regions.recruited,
       lungStrain: regions.strain,
-      pplat: r.lastPplat, ppeak: r.lastPpeak, autoPeep: r.lastAutoPeep,
+      pplat: plateauReason ? null : breath.plateau, ppeak: r.lastPpeak, autoPeep: r.lastAutoPeep,
       totalPeep: p.peep + r.lastAutoPeep,
       endExpiratoryVolume: r.lastEndExpiratoryVolume,
       trappedVolume: r.lastTrappedVolume,
       expiratoryFlowLimited: r.lastEflActive,
-      drivingPressure: r.lastPplat - (p.peep + r.lastAutoPeep),
+      drivingPressure,
       pplSwing: r.lastPplSwing,
       vtDelivered: r.lastVt,
-      stressIndex: siReasons.length ? null : r.lastStressIndex,
+      stressIndex: siReasons.length ? null : breath.stressIndex,
       crs,
       // Linear Raw×Crs is the emptying time only until a flow-limited airway
       // imposes a slower maximum-expiratory-flow envelope. Report the active

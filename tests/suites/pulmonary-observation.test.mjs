@@ -1,7 +1,7 @@
 // Pressure-margin interpretation is a respiratory observation, independent of
 // the instantaneous display frame. Observe the actual integrator rather than
 // manufacturing a prescribed pressure waveform or a clinical target value.
-import { section, check, settled } from '../support/model.mjs';
+import { section, check, settled, SCENARIOS } from '../support/model.mjs';
 
 section('Pulmonary complete-breath pressure observation');
 const s = settled({ mode: 'vcv', pmus: 0, vt: 600, peep: 10, stressedVolume: 500 }, 20);
@@ -113,3 +113,69 @@ const observedSwing = (extrema.max - extrema.min) / ((extrema.max + extrema.min)
 check('the first new resistance swing uses only the independently observed complete fresh breath',
   finishedFresh && Number.isFinite(s.metrics.pvrSwing)
     && Math.abs(s.metrics.pvrSwing - observedSwing) < 1e-12);
+
+section('Read measurements from one complete breath at the selected settings');
+{
+  const ards = settled({ ...SCENARIOS.find(scenario => scenario.id === 'ards-rv').params, peep: 5 }, 30);
+  const pin = ards.fork();
+  const pending = m => m.pplat === null && m.drivingPressure === null && m.crsMeasured === null
+    && m.stressIndex === null && m.interpretability.plateau.level === 'unavailable'
+    && m.interpretability.compliance.level === 'unavailable';
+  ards.setParam('peep', 10);
+  ards.advance(0.05, true);
+  ards.setParam('peep', 15);
+  check('a repeated PEEP change immediately withholds mixed-cycle measures and preserves the Pin',
+    pending(ards.metrics) && Number.isFinite(pin.metrics.crsMeasured) && pin.params.peep === 5);
+  check('the first inspiration after the change still lacks a complete fresh cycle',
+    nextBoundary(ards) && pending(ards.metrics));
+  // Sample every integration step of the next full cycle, including the
+  // first inspiratory step, independently of the display refresh interval.
+  const start = ards.resp.breathCount + 1;
+  let inspiredMl = 0, recoil, baseline;
+  const stop = ards.observeManoeuvre({ sample(world) {
+    const r = world.resp;
+    if (r.breathCount === start - 1 && r.phase === 'exp') baseline = r.palv;
+    if (r.breathCount !== start) return;
+    if (r.phase === 'insp') {
+      inspiredMl += Math.max(0, r.flow) * world.dt * 1000;
+      recoil = r.pplatCandidate;
+    }
+  } });
+  nextBoundary(ards);
+  nextBoundary(ards);
+  stop();
+  const m = ards.metrics;
+  const driving = recoil - baseline;
+  check('plateau, driving pressure and compliance agree with measurements from the same breath',
+    m.pplat === recoil && Math.abs(m.drivingPressure - driving) < 1e-6
+      && Math.abs(m.crsMeasured - inspiredMl / driving) < 1e-6);
+  check('elevated pulmonary pressure with a cautioned wedge has no haemodynamic subtype',
+    m.phPresent && m.interpretability.wedge.level === 'caution' && m.phClass === null);
+  // Raise PEEP just before the next insufflation, while the resting lung is
+  // still at the old volume. Read its two pressure-volume endpoints directly.
+  const jump = pin.fork();
+  const period = 60 / jump.params.rr;
+  jump.advance(Math.max(0, period - jump.resp.tCycle - 2 * jump.dt), true);
+  const first = jump.resp.breathCount + 1;
+  let before = [jump.resp.palv, jump.resp.lungVolume], after;
+  jump.setParam('peep', 15);
+  const observeJump = jump.observeManoeuvre({ sample(world) {
+    const r = world.resp;
+    if (r.breathCount === first - 1 && r.phase === 'exp') before = [r.palv, r.lungVolume];
+    if (r.breathCount === first && r.phase === 'insp') after = [r.palv, r.lungVolume];
+  } });
+  nextBoundary(jump);
+  nextBoundary(jump);
+  observeJump();
+  const expected = 1000 * (after[1] - before[1]) / (after[0] - before[0]);
+  check('the first inflation after a PEEP step uses its starting pressure even as resting volume changes',
+    Math.abs(jump.resp.endExpiratoryPl - pin.resp.endExpiratoryPl) > 1
+      && Math.abs(jump.metrics.crsMeasured - expected) < 0.001);
+  ards.startHold('expiratory', 2);
+  check('a hold clears the previously completed mechanical measurements', pending(ards.metrics));
+  ards.cancelHold();
+  ards.setParam('pmus', 5);
+  ards.advance(7, true);
+  check('a completed assisted breath does not supply passive compliance or driving pressure',
+    pending(ards.metrics));
+}

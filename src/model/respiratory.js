@@ -103,6 +103,8 @@ export function createRespiratoryState() {
     peakInspFlow: 0,
     // Latched once per breath for the readouts.
     lastPplat: 0,
+    inspiratoryBaselinePalv: null,
+    lastDrivingPressure: null,
     lastPpeak: 0,
     lastVt: 0,
     lastAutoPeep: 0,
@@ -449,13 +451,13 @@ export function stepRespiratory(p, r, dt) {
 
   // Sample the last integrated pressure before the new phase moves gas.
   if (r.prevPhase === 'insp' && r.phase === 'exp') r.endInspiratoryPl = r.pl;
-  if (r.prevPhase === 'exp' && r.phase === 'insp') r.endExpiratoryPl = r.pl;
 
   // Capture end-expiratory volume before the first inspiratory integration
   // step adds gas. Comparing it with the static equilibrium at the same applied
   // PEEP keeps loss-of-recoil hyperinflation separate from dynamically trapped
   // volume. With hysteresis on, use the branch the lung is actually occupying.
   if (r.prevPhase === 'exp' && r.phase === 'insp') {
+    r.endExpiratoryPl = r.pl;
     if (r.openingCycleActive && r.lastOpenSample !== null) {
       r.lastClosedEndExpiratory = 1 - r.lastOpenSample;
       r.lastOpenExcursion = r.openingCycleMax - r.openingCycleMin;
@@ -474,6 +476,7 @@ export function stepRespiratory(p, r, dt) {
 
   // --- flow ----------------------------------------------------------------
   const palv = alveolar(r.v, r.pmus);
+  if (r.prevPhase === 'exp' && r.phase === 'insp') r.inspiratoryBaselinePalv = palv;
   const pao = airwayOpeningPressure(p, r, period);
 
   if (p.mode === 'vcv' && r.phase === 'insp') {
@@ -502,7 +505,9 @@ export function stepRespiratory(p, r, dt) {
   // is about, and with a sigmoid lung the model no longer needs to be protected
   // from it.
   r.v = Math.max(-vRelax * 0.9, r.v + r.flow * dt);
-  if (r.flow > 0) r.vtAccum += r.flow * dt;
+  // Passive controlled VT excludes gas moved by a PEEP step during expiration.
+  // In patient-triggered modes inspiratory flow can start before the trigger.
+  if (r.flow > 0 && (r.phase === 'insp' || p.mode === 'spont' || p.mode === 'psv')) r.vtAccum += r.flow * dt;
 
   // Airway pressure through the constant-flow part of the breath, for the stress
   // index. Sampled sparsely — the shape is what matters, not the resolution —
@@ -577,13 +582,14 @@ export function stepRespiratory(p, r, dt) {
     r.siSamples = [];
     r.siClock = 0;
     r.lastPplat = r.pplatCandidate ?? 0;
+    r.lastDrivingPressure = r.lastPplat - r.inspiratoryBaselinePalv;
     r.lastPpeak = r.ppeakAccum;
     r.lastPplSwing = r.pplMax - r.pplMin;
     r.lastVt = r.vtAccum * 1000;
+    r.vtAccum = 0;
     r.ppeakAccum = -Infinity;
     r.pplMin = ppl;
     r.pplMax = ppl;
-    r.vtAccum = 0;
   }
   r.prevPhase = r.phase;
 

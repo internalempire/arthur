@@ -229,7 +229,7 @@ A genuine occlusion model would require at least a regional catheter branch, a s
 
 ## Validation
 
-Contract tests check propagation of the completed-breath pressure-margin caution from wedge to derived PVR, including the pending state after a setting change. A non-negative complete-breath minimum removes that particular warning; it does not turn the underlying quantity into a simulated catheter measurement. Pre-/post-capillary labels describe model pressure/flow patterns and retain those interpretability limits.
+Contract tests check propagation of the completed-breath pressure-margin caution from wedge to derived PVR, including the pending state after a setting change. A non-negative complete-breath minimum removes that particular warning; it does not turn the underlying quantity into a simulated catheter measurement. The pulmonary artery tile withholds its haemodynamic subtype while the wedge check is pending or cautioned, or when forward flow is insufficient to calculate PVR. The measured pulmonary arterial pressures remain visible.
 
 These checks establish internal consistency: they do not validate the model surrogate against paired human PAWP and left atrial measurements.
 

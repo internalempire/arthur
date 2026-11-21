@@ -73,7 +73,7 @@
         <button id="load-patient" class="btn" type="button" aria-label="Load patient" title="Load patient parameters from an arthur JSON file">Load pt</button>
         <input id="patient-state-file" class="visually-hidden" type="file" accept="application/json,.json" tabindex="-1" aria-hidden="true">
         <button id="theme" class="btn btn-icon" type="button" aria-label="Switch colour theme" title="Switch colour theme">◐</button>
-        <button id="sidebar-toggle" class="btn btn-icon" type="button" aria-label="Show parameters" aria-expanded="false">≡</button>
+        <button id="sidebar-toggle" aria-controls="sidebar" class="btn btn-icon" type="button" aria-label="Show parameters" aria-expanded="false">≡</button>
       </div>
     </header>
 
@@ -81,6 +81,7 @@
 
     <div class="layout">
       <aside class="sidebar" id="sidebar">
+        <div class="sidebar-actions"><button type="button" class="btn" id="sidebar-close">Close parameters</button></div>
         <div class="sidebar-inner" id="controls"></div>
       </aside>
 

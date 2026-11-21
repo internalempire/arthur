@@ -189,15 +189,12 @@ function pvrOpeningBlock() {
 function stressRows() {
   return STRESS_INDEX_CASES.map((entry) => {
     const metrics = settled({ ...STRESS_INDEX_BASE, ...entry.overrides });
-    // This is the conventional breathwise respiratory-system compliance shown
-    // in the document, not the simulator's local differential-compliance metric.
-    const breathwiseCrs = entry.overrides.vt / metrics.drivingPressure;
     return {
       ...entry,
       stressIndex: metrics.stressIndex,
       plateau: metrics.pplat,
       drivingPressure: metrics.drivingPressure,
-      breathwiseCrs,
+      breathwiseCrs: metrics.crsMeasured,
     };
   });
 }

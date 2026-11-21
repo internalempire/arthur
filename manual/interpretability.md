@@ -39,17 +39,20 @@ The full reason remains on the numerical tile. Panels whose central reading depe
 | preload reserve | the Guyton curves have no finite crossing | — |
 | PPV | spontaneous effort | VT below 8 mL/kg for an assumed <!-- CONSISTENCY: reference-weight -->70 kg<!-- /CONSISTENCY --> reference, fewer than 3.6 beats/breath, RV/LV EDV ratio above 1.2, or selected baseline abdominal pressure above 12 cmH₂O |
 | closed at end expiration / opening excursion | no complete breath under the current settings, including after an occlusion | internal model quantities; no anatomical or bedside index interpretation |
-| plateau pressure | spontaneous effort | — |
+| plateau and driving pressure | no complete uninterrupted passive controlled breath under the current settings | — |
+| respiratory-system compliance | same conditions as plateau, or driving pressure at or below 0.2 cmH₂O | — |
 | wedge surrogate | — | minimum Pv − Palv over the last complete breath is below 0 mmHg, or measurement of a complete fresh breath is pending |
 | derived PVR | no meaningful forward flow | the wedge surrogate is cautioned |
 
 For PPV and plateau, the implementation treats spontaneous mode or an effort setting above 0.5 cmH₂O as active breathing; the stress-index rule requires exactly zero selected effort. These are explicit model thresholds, not clinically validated limits below which patient activity becomes harmless.
 
+When mean pulmonary arterial pressure exceeds 20 mmHg, the pulmonary artery tile can still report that pressure while withholding its subtype. A pre- or post-capillary interpretation requires an interpretable wedge surrogate and sufficient forward flow to calculate PVR.
+
 The list is intentionally inspectable rather than hidden in scenario-specific prose. Dependencies are propagated: derived PVR inherits the caution of its [wedge surrogate](pulmonary-artery-wedge-pressure.md), because valid arithmetic cannot repair an uncertain downstream pressure.
 
 ### What a missing badge cannot tell you
 
-Read the description even when no caution is displayed. For example, the respiratory-system compliance tile can remain numerical during effort because it uses internally calculated passive recoil; it does not become a measured assisted-breath compliance. Derived PVR combines smoothed pressures and the latest beat’s output, so abrupt transients can change the ratio without a corresponding change in the internal resistance coefficient. The global validity banner and the index badges do not test whether the patient has reached a settled state.
+Read the description even when no caution is displayed. Derived PVR combines smoothed pressures and the latest beat’s output, so abrupt transients can change the ratio without a corresponding change in the internal resistance coefficient. The global validity banner and the index badges do not test whether the patient has reached a settled state.
 
 When comparing Pins, apply these checks separately to the current patient and the reference. One valid number cannot rescue an unavailable comparator. A current-minus-reference difference also requires attention to respiratory phase, elapsed time and preceding pressure history.
 

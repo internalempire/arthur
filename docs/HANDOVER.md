@@ -2,6 +2,10 @@
 
 Updated: 2026-11-21
 
+## External review corrections to bedside readouts and the teaching sequence — November 21
+
+An ARDS PEEP step from 5 to 15 cmH₂O could temporarily combine the preceding plateau with the new PEEP and display a compliance near 276 mL/cmH₂O. Plateau, driving pressure, respiratory-system compliance and stress index now wait for a complete uninterrupted breath under the current settings. Pulmonary hypertension subtyping requires an interpretable wedge surrogate and derived PVR; measured pulmonary arterial pressure remains available. Stress-index and RV-reserve wording describes the pressure curve and local RV slope. The mobile parameter drawer has a sticky internal close control, Escape and focus return. The guide introduces the different healthy prescriptions before their comparison and gives a same-patient exercise. The ARDS and tamponade scenario notes state the relevant limits at the point of use. No circulatory or respiratory pressure–flow law was recalibrated.
+
 ## Pulmonary resistance partition and the ARDS PEEP comparison — November 21
 
 The clinician chose to keep the current equal split of the extra-alveolar reference resistance between the arterial and venous sides. The segment exposed to alveolar pressure, the additional precapillary disease load and the fixed venous outlet have separate contributions. The isolated Hakim comparison reproduced the central gradient rise over the positive-inflation range of 5 to 15 mmHg. Agreement on the distribution of pressure drops and their response to imposed flow was partial. The occlusions defined functional boundaries in canine lobes and did not identify a human venous fraction.

@@ -82,7 +82,7 @@ const PANELS = [
             : 'The cross marks equal flow on the two mean curves. The averaging window can include both sides of a recent intervention. ')
         + `Mean systemic filling pressure is ${n(op.pmsf)} mmHg, so the gradient `
         + `driving venous return on the same respiratory clock is ${n(m.respiratoryGradientVr)} mmHg. `
-        + `The faint trail retains the one-heartbeat means that move through the breath.`;
+        + `The faint trail follows successive heartbeats. Higher pressure around the heart can move the RV curve to the right on this atmospheric pressure axis even at unchanged contractility.`;
     },
     rows: (sim, view) => {
       const m = sim.metrics, op = m.respiratoryOperatingPoint, beat = m.operatingPoint;

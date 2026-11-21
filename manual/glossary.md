@@ -32,7 +32,7 @@
 
 ## D–H
 
-**Driving pressure.** Plateau pressure minus total PEEP. In the model plateau is calculated rather than obtained from an end-inspiratory zero-flow pause.
+**Driving pressure.** Plateau pressure minus total PEEP. Arthur calculates plateau from passive recoil and takes the starting alveolar pressure immediately before the same insufflation. That starting pressure includes intrinsic PEEP and may still be changing after a PEEP step.
 
 **Effective arterial elastance ($E_a$).** A lumped ventricular load commonly estimated as end-systolic pressure divided by stroke volume, in mmHg/mL. The model draws an $E_a$ surrogate on PV loops but does not publish a coupling ratio. See [ventriculo-arterial coupling](ventriculo-arterial-coupling.md).
 
