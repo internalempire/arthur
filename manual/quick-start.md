@@ -22,20 +22,27 @@ During positive-pressure inflation, pleural pressure rises; during spontaneous i
 
 ### Why can CVP rise while venous return falls?
 
-1. Select **Healthy, passive volume control**. At PEEP 5 cmH₂O, read the **CVP** tile. The large number is pressure inside the right atrium relative to atmosphere. The **transmural** line is the pressure difference across the atrial wall. In **Guyton diagram**, select **Mean** and note the height of the filled dot. Open **?** and read **Venous inflow (respiratory mean)** for its value in L/min. This is blood arriving in the right atrium from the cava. Note both pressures and the inflow at PEEP 5.
-2. Press **Pin**, then raise only PEEP to **15 cmH₂O**. In **Live comparisons**, confirm PEEP is the only difference between **Reference** and **Current**. Watch the pleural-pressure trace during the first breaths. Select **Caval flow** in the waveform panel to see how inflow varies within each breath.
-3. Once the pattern repeats, read the two pressures and the height of the dot again. The large CVP value rises, the transmural value falls slightly and the dot sits lower. Compare similar phases across several breaths for the small transmural change. The CVP tile smooths pressure over three seconds, and Guyton **Mean** averages inflow over a breath. The table gives longer averages from the same manoeuvre.
+**Why does CVP rise?** With higher PEEP, the lungs remain more inflated between breaths and push the chest wall farther out. Pleural pressure rises around the right atrium. A catheter zeroed to atmosphere reads the sum of the pressure outside the atrium and the pressure stretching its wall. Here the external pressure rises more than the catheter reading does. Subtracting the external pressure from CVP shows that the distending pressure (*transmural CVP*) has actually fallen.
+
+**Why does less blood reach the heart?** The right atrium is the **receiving end** of the systemic veins. A higher pressure there makes it harder for venous blood to enter. Upstream, abdominal pressure increases around the systemic venous reservoir and some blood redistributes into it. Both raise pressure in the reservoir. If upstream and downstream pressures rose equally, their difference would be preserved. Here the downstream rise is larger. The pressure difference driving blood forward shrinks and, at the same resistance, less blood passes through the cava each minute.
 
 <!-- BEGIN GENERATED: healthy-cvp-return -->
-*Model reference. Both branches start from the same settled patient with the baroreflex off. After 120 simulated seconds at each PEEP, pressures and net caval inflow are averaged over the next minute.*
+| What changes in the same patient? | PEEP 5 cmH₂O | PEEP 15 cmH₂O |
+|---|---:|---:|
+| Pressure distending the atrium (CVP − pressure outside the heart), mmHg | 1.1 − (-1.4) = **2.5** | 4.4 − 2.2 = **2.2** |
+| Pressure driving venous return (upstream − effective downstream pressure), mmHg | 8.6 − 1.9 = **6.7** | 11.2 − 5.0 = **6.2** |
+| Net blood flow entering the right atrium from the cava, L/min | **5.60** | **5.17** |
 
-| PEEP (cmH₂O) | CVP vs atmosphere (mmHg) | Transmural CVP (mmHg) | Net caval inflow (L/min) |
-|---:|---:|---:|---:|
-| 5 | 1.1 | 2.5 | 5.60 |
-| 15 | 4.4 | 2.2 | 5.17 |
+*Both states start from the same patient, with fixed blood volume and the baroreflex off. Each column is a one-minute mean after 120 simulated seconds at that PEEP. Inside and outside pressures share the atmospheric zero.*
 <!-- END GENERATED: healthy-cvp-return -->
 
-**Why the readings diverge.** PEEP raises pleural pressure around the heart. Pressure inside the atrium rises relative to atmosphere, but the pressure outside rises a little more. The difference that distends the atrium therefore falls. Venous inflow answers a separate question: how much blood crosses into the atrium each minute? In this preset upstream systemic filling pressure also rises, partly offsetting the increased downstream pressure. The effective pressure difference driving return still narrows and mean caval inflow falls. The transmural value alone cannot tell you the flow. See [venous return](venous-return.md) and the [Guyton guide](panel-guyton.md#healthy-passive-volume-control-peep-5-to-15).
+The first subtraction is **across the atrial wall**. The second is **along the path blood travels**. Its upstream term is the pressure in the systemic venous reservoir (Arthur’s mean systemic filling pressure). The effective downstream term also accounts for the pressure around the abdominal cava. External pressure can narrow this vein and limit inflow even when atrial pressure is low.
+
+**See it on the monitor**
+
+1. Select **Healthy, passive volume control** at PEEP 5 cmH₂O. Read the **CVP** tile and its **transmural** line. In **Guyton diagram**, select **Mean**. The filled dot shows right atrial pressure horizontally and net caval inflow vertically. Open **?** for **Venous inflow (respiratory mean)** and **Gradient for venous return**.
+2. Press **Pin** and raise only PEEP to **15 cmH₂O**. Watch pleural pressure rise. Select **Caval flow** to follow blood entering the atrium during each breath.
+3. Once the pattern repeats, the mean dot lies **further right and lower**, showing higher pressure in the receiving chamber and less blood arriving per minute. Compare the transmural readings at similar phases of the breath. The tile smooths pressures over three seconds and the dot averages inflow over a breath, so individual screen readings can differ slightly from the minute means above.
 
 ## Minute 6–8: compare recruitment with distension
 

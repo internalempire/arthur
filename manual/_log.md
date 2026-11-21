@@ -279,3 +279,5 @@ The independent audit preserves three unmet original criteria as open: prone RV/
 **2026-11-21 — Read CVP and venous inflow together.** The guided PEEP exercise uses the healthy passive preset, Pin, the two readings on the CVP tile and the measured inflow dot in Guyton Mean. The reference table integrates pressure and caval flow over the same minute in both states.
 
 **2026-11-21 — Shared links to a section.** Corrected a page lookup error reproduced with the encoded link to the guided CVP reading. Links with encoded separators open the same section as links from the manual contents.
+
+**2026-11-21 — Explain the higher CVP and lower venous return at the point of use.** The PEEP exercise works through the pressure difference across the atrial wall and the pressure difference along the venous pathway before asking the reader to reproduce the manoeuvre. Both calculations and the measured flow share a one-minute window.

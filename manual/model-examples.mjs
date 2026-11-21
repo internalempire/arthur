@@ -5,7 +5,7 @@
 // The writer and test suite both regenerate these blocks from a fresh Simulator.
 
 import { Simulator, COMPARTMENTS } from '../src/model/simulator.js';
-import { createCirculationState } from '../src/model/circulation.js';
+import { createCirculationState, venousReturnBackPressure } from '../src/model/circulation.js';
 import { defaultParams, GROUPS, PARAMETERS } from '../src/model/parameters.js';
 import { SCENARIOS } from '../src/model/scenarios.js';
 import { RECRUITMENT_PROFILES } from '../src/model/recruitment.js';
@@ -604,28 +604,41 @@ function healthyCvpReturnBlock() {
   const reference = patient.fork();
   patient.setParam('peep', 15);
 
-  const rows = [reference, patient].map(sim => {
+  const readings = [reference, patient].map(sim => {
     sim.advance(120, true);
-    let atrialPressure = 0, transmuralPressure = 0, cavalVolumeMl = 0;
     const seconds = 60;
+    let atrialPressure = 0, surroundingPressure = 0, reservoirPressure = 0, downstreamPressure = 0;
+    let cavalVolumeMl = 0;
     const stop = sim.observeManoeuvre({ sample(world) {
       if (!world.validObservation()) throw new Error('Invalid healthy PEEP observation');
-      atrialPressure += world.circ.p.ra * world.dt;
-      transmuralPressure += world.circ.p.raTm * world.dt;
-      cavalVolumeMl += world.circ.q.vr * world.dt;
+      const { p, q } = world.circ;
+      atrialPressure += p.ra * world.dt;
+      surroundingPressure += (p.ppl + p.pPeri) * world.dt;
+      reservoirPressure += p.pmsf * world.dt;
+      downstreamPressure += venousReturnBackPressure(p.ra, p.pCrit) * world.dt;
+      cavalVolumeMl += q.vr * world.dt;
     } });
     sim.advance(seconds, true);
     stop();
-    const cavalFlow = (cavalVolumeMl / 1000) / (seconds / 60);
-    return `| ${sim.params.peep} | ${fixed(atrialPressure / seconds, 1)} | ${fixed(transmuralPressure / seconds, 1)} | ${fixed(cavalFlow, 2)} |`;
+    const inside = atrialPressure / seconds, outside = surroundingPressure / seconds;
+    const upstream = reservoirPressure / seconds, downstream = downstreamPressure / seconds;
+    const outsideTerm = outside < 0 ? `(${fixed(outside, 1)})` : fixed(outside, 1);
+    return {
+      peep: sim.params.peep,
+      distension: `${fixed(inside, 1)} − ${outsideTerm} = **${fixed(inside - outside, 1)}**`,
+      gradient: `${fixed(upstream, 1)} − ${fixed(downstream, 1)} = **${fixed(upstream - downstream, 1)}**`,
+      flow: fixed((cavalVolumeMl / 1000) / (seconds / 60), 2),
+    };
   });
-
+  const [low, high] = readings;
   return [
-    '*Model reference. Both branches start from the same settled patient with the baroreflex off. After 120 simulated seconds at each PEEP, pressures and net caval inflow are averaged over the next minute.*',
+    `| What changes in the same patient? | PEEP ${low.peep} cmH₂O | PEEP ${high.peep} cmH₂O |`,
+    '|---|---:|---:|',
+    `| Pressure distending the atrium (CVP − pressure outside the heart), mmHg | ${low.distension} | ${high.distension} |`,
+    `| Pressure driving venous return (upstream − effective downstream pressure), mmHg | ${low.gradient} | ${high.gradient} |`,
+    `| Net blood flow entering the right atrium from the cava, L/min | **${low.flow}** | **${high.flow}** |`,
     '',
-    '| PEEP (cmH₂O) | CVP vs atmosphere (mmHg) | Transmural CVP (mmHg) | Net caval inflow (L/min) |',
-    '|---:|---:|---:|---:|',
-    ...rows,
+    '*Both states start from the same patient, with fixed blood volume and the baroreflex off. Each column is a one-minute mean after 120 simulated seconds at that PEEP. Inside and outside pressures share the atmospheric zero.*',
   ].join('\n');
 }
 

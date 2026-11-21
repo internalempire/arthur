@@ -2,6 +2,10 @@
 
 Updated: 2026-11-21
 
+## Explain the two pressure differences in the healthy PEEP exercise — November 21
+
+The quick start explains the higher atmospheric CVP and lower inflow before the monitor instructions. The example generator samples pressure inside and outside the right atrium, upstream reservoir pressure, effective downstream pressure and signed caval flow over matched minute windows. It applies the model’s caval backpressure relation at each time step before averaging.
+
 ## Opening shared links to manual sections — November 21
 
 A link to the healthy PEEP reading could display “Not found” when the section separator arrived URL-encoded. The manual now recognizes literal and encoded separators before looking up the page and scrolling to the heading. The CVP exercise has a navigation regression check for both forms.
