@@ -281,3 +281,5 @@ The independent audit preserves three unmet original criteria as open: prone RV/
 **2026-11-21 — Shared links to a section.** Corrected a page lookup error reproduced with the encoded link to the guided CVP reading. Links with encoded separators open the same section as links from the manual contents.
 
 **2026-11-21 — Explain the higher CVP and lower venous return at the point of use.** The PEEP exercise works through the pressure difference across the atrial wall and the pressure difference along the venous pathway before asking the reader to reproduce the manoeuvre. Both calculations and the measured flow share a one-minute window.
+
+**2026-11-21 — Follow one inspiration and locate venous backpressure.** The opening scenario and quick start guide the reader through Caval flow, Pause and the Time cursor. The PEEP reading locates transmural CVP in Numerical tiles and uses the Guyton pressure readings to distinguish atrial backpressure from flow limitation at the abdominal cava.

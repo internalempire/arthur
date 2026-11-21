@@ -12,7 +12,7 @@ The application opens on the settled *Healthy, breathing spontaneously* referenc
 
 The two healthy presets describe different circulations. They differ in initial blood volume, systemic vascular resistance and RV contractility. Use the following comparison to see **which way the pressures move during inspiration**.
 
-1. In *Healthy, breathing spontaneously*, watch pleural pressure, CVP and the Guyton operating point during inspiration.
+1. In *Healthy, breathing spontaneously*, select **Caval flow** above the traces and press **Pause**. Move the **Time cursor** across a single inspiration, identified by rising lung volume. On the same time axis, follow pleural pressure, CVP and blood flow into the right atrium. Compare the pattern across the breath, allowing for the smaller fluctuations with each heartbeat. Press **Play** to continue.
 2. Select *Healthy, passive volume control*.
 3. Compare the direction of the pleural-pressure and measured-CVP swings.
 
@@ -36,11 +36,15 @@ During positive-pressure inflation, pleural pressure rises; during spontaneous i
 *Both states start from the same patient, with fixed blood volume and the baroreflex off. Each column is a one-minute mean after 120 simulated seconds at that PEEP. Inside and outside pressures share the atmospheric zero.*
 <!-- END GENERATED: healthy-cvp-return -->
 
-The first subtraction is **across the atrial wall**. The second is **along the path blood travels**. Its upstream term is the pressure in the systemic venous reservoir (Arthur’s mean systemic filling pressure). The effective downstream term also accounts for the pressure around the abdominal cava. External pressure can narrow this vein and limit inflow even when atrial pressure is low.
+The first subtraction is **across the atrial wall**. The second is **along the path blood travels**, from the systemic venous reservoir through the abdominal vena cava to the right atrium. Its upstream term is the pressure in that reservoir (Arthur’s mean systemic filling pressure). **Effective downstream pressure** means the backpressure that returning blood must overcome. When the cava is held open and atrial pressure is well above the cava’s closing pressure, atrial pressure sets that backpressure. When atrial pressure falls well below the closing pressure, the surrounding abdomen can narrow the cava. Lowering atrial pressure further then draws little extra blood through the narrowed segment. Raising abdominal pressure can raise this closing pressure even at the same atrial pressure. Arthur makes the transition gradual as the two pressures approach each other.
+
+In this PEEP exercise, both atrial pressure and the cava’s closing pressure rise. To see which is higher in a given patient, open **?** on **Guyton diagram** and compare **Right atrial pressure (respiratory mean)** with **Critical closing pressure (respiratory mean)**. **Gradient for venous return** gives the remaining driving pressure. Subtract that gradient from **Mean systemic filling pressure (respiratory mean)** to recover the effective downstream pressure to the precision displayed. Read **Venous inflow (respiratory mean)** for the resulting flow in L/min.
+
+*Where does the closing pressure come from?* Open **?** on **Thoracic schematic** to find **Abdominal pressure** in cmH₂O. Arthur assumes the cava can withstand 5 cmH₂O of external compression. It subtracts this allowance from abdominal pressure and converts the result to mmHg for the Guyton diagram. The allowance is a fixed model assumption. The thoracic schematic gives a current reading and the Guyton rows above average across a breath. Arthur represents one aggregate caval pathway, so these readings cannot separate flows from the upper and lower body.
 
 **See it on the monitor**
 
-1. Select **Healthy, passive volume control** at PEEP 5 cmH₂O. Read the **CVP** tile and its **transmural** line. In **Guyton diagram**, select **Mean**. The filled dot shows right atrial pressure horizontally and net caval inflow vertically. Open **?** for **Venous inflow (respiratory mean)** and **Gradient for venous return**.
+1. Select **Healthy, passive volume control** at PEEP 5 cmH₂O. Scroll **below the graphs** to **Numerical tiles** and expand it if closed. Find **CVP** (if hidden, choose **+** and then **CVP**). The large number is the pressure a catheter zeroed to atmosphere would read. The smaller **transmural** value underneath subtracts the pressure around the heart (pleural pressure plus any additional pericardial pressure). The CVP beside the vascular waveform is the atmospheric reading. Return to **Guyton diagram** and select **Mean**. The filled dot shows right atrial pressure horizontally and net caval inflow vertically. Open **?** for **Venous inflow (respiratory mean)** and **Gradient for venous return**.
 2. Press **Pin** and raise only PEEP to **15 cmH₂O**. Watch pleural pressure rise. Select **Caval flow** to follow blood entering the atrium during each breath.
 3. Once the pattern repeats, the mean dot lies **further right and lower**, showing higher pressure in the receiving chamber and less blood arriving per minute. Compare the transmural readings at similar phases of the breath. The tile smooths pressures over three seconds and the dot averages inflow over a breath, so individual screen readings can differ slightly from the minute means above.
 
