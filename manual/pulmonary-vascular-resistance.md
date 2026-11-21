@@ -67,6 +67,8 @@ Start with one stable state and Pin it. Change PEEP alone and follow three quest
 
 Allow complete breaths and several beats for a persistent comparison. Immediate pulmonary venous emptying and delayed RV-to-LV delivery can differ from the eventual response. The arrows in [Mechanisms](numeric-tiles.md#read-the-shared-mechanisms) describe coupled pathways; they do not isolate the contribution of each one.
 
+In the passive ARDS preset with a weak RV, raising PEEP from 5 to 15 cmH₂O changes mean aortic output only slightly. The pressure at the venous end of the small vessels matters because it partly opposes compression by alveolar pressure. A change in the pressure drop across these vessels can coexist with a small change in the amount the two ventricles eject. Follow the [scenario comparison](scenarios.md#ards-with-right-ventricular-failure) to see both.
+
 ## In the model
 
 The **Reference open-lung resistance at FRC** control sets a geometric reference: how the represented bed would resist flow if its alveolar-exposed outlet were distended. It depends on strain in aerated units, the open/closed lung mixture and hypoxic tone. The running circuit additionally includes pressure-dependent narrowing of the middle outlet, three pressure-bearing blood stores and a fixed venous outlet resistance.

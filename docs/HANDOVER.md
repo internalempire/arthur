@@ -2,6 +2,12 @@
 
 Updated: 2026-11-21
 
+## Pulmonary resistance partition and the ARDS PEEP comparison — November 21
+
+The clinician chose to keep the current equal split of the extra-alveolar reference resistance between the arterial and venous sides. The segment exposed to alveolar pressure, the additional precapillary disease load and the fixed venous outlet have separate contributions. The isolated Hakim comparison reproduced the central gradient rise over the positive-inflation range of 5 to 15 mmHg. Agreement on the distribution of pressure drops and their response to imposed flow was partial. The occlusions defined functional boundaries in canine lobes and did not identify a human venous fraction.
+
+Moving part of the extra-alveolar reference resistance to the venous side at fixed reference total affected local pressures but had little effect on the settled aortic output response to PEEP in either tested passive preset. Sensitivity to the pressure-dependent narrowing itself was greater in ARDS with a weak RV. Teach that opening, filling and ejection can change while net output changes little. Keep the small sign and magnitude specific to the prescription. The [scenario guide](../manual/scenarios.md#ards-with-right-ventricular-failure) distinguishes a same-lung PEEP 5 versus 15 cmH₂O comparison from changing opening potential at equal high PEEP. The numerical experiments remain private in `outputs/Arthur-Hakim-2026-11-21/` and `outputs/Arthur-PEEP-quota-venosa-2026-11-21/`. The next proposed diagnostic step is arterial pulse pressure and RV ejection under increased precapillary resistance. See [planned work](../manual/_todo.md#pulmonary-review-checkpoint).
+
 ## Reading a Pin comparison — November 21
 
 Side-by-side columns in Live comparisons and Mechanisms distinguish the settings held by each Pin from the settings of the current patient. The earlier arrow was being read as a sequence of interventions. The manual illustrates two Pins during a PEEP change and gives a same-beat volume balance for the Guyton dot and crossing. Timed intervention records retain their chronological labels. The underlying patients, curves and measurement windows are unchanged.

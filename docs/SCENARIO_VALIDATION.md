@@ -184,6 +184,7 @@ and derived PVR is elevated. The exact settled values, including end-expiratory
 closure, are generated from the executable prescription in the
 [scenario manual](../manual/scenarios.md#ards-with-right-ventricular-failure).
 The wedge and derived-PVR tiles are cautioned when the minimum Pv − Palv over the last complete breath is negative, or a fresh complete breath is still pending after a setting change or hold. A non-negative minimum does not establish regional catheter validity.
+With the preset opening profile held fixed, supine passive PEEP 5 versus 15 cmH₂O gives a small fall in mean aortic output. Its magnitude and sign have limited external support. Read the integrated reference in the scenario guide alongside RV filling, pulmonary arterial pressure and ejection. The comparison below changes the opening profile at the same higher PEEP and answers a different question.
 At higher PEEP, making the compromised component non-reopenable increases
 pulmonary vascular and RV load and lowers output compared with its reopenable
 counterpart. Prone positioning opens more lung and lowers the geometric resistance reference, but its combined chest-wall, abdominal and opening transformation raises plateau pressure. This pressure response is the first mismatch to resolve when comparing the model manoeuvre with clinical proning. RV/LV volume ratio also increases rather than showing the intended RV unloading. A lower geometric resistance coefficient therefore does not establish a lower total RV load.

@@ -111,7 +111,7 @@ export const DOCUMENTED_EXAMPLE_TARGETS = [
   { file: 'manual/inferior-vena-cava.md', ids: ['ivc-respiratory-calibre'] },
   { file: 'manual/pmsf-and-occlusions.md', ids: ['pmsf-occlusions'] },
   { file: 'manual/pulmonary-artery-wedge-pressure.md', ids: ['wedge-peep-examples'] },
-  { file: 'manual/scenarios.md', ids: ['swing-scenario', 'ards-scenario', 'scenario-overrides'] },
+  { file: 'manual/scenarios.md', ids: ['swing-scenario', 'ards-peep-output', 'ards-scenario', 'scenario-overrides'] },
   { file: 'manual/baroreflex.md', ids: ['baroreflex-septic'] },
   { file: 'manual/recruitment-and-ri.md', ids: ['opening-profiles'] },
   { file: 'manual/hysteresis.md', ids: ['hysteresis-example'] },
@@ -599,6 +599,25 @@ function swingScenarioBlock() {
   ].join('\n');
 }
 
+function ardsPeepOutputBlock() {
+  const scenario = SCENARIOS.find(({ id }) => id === 'ards-rv');
+  const outputs = [5, 15].map(peep => {
+    const simulator = settledSimulator({ ...scenario.params, peep });
+    simulator.advance(60, true);
+    let aorticVolumeMl = 0;
+    const stop = simulator.observeManoeuvre({
+      sample(world) {
+        if (!world.validObservation()) throw new Error('Invalid ARDS PEEP observation');
+        aorticVolumeMl += world.circ.q.av * world.dt;
+      },
+    });
+    simulator.advance(60, true);
+    stop();
+    return aorticVolumeMl / 1000; // Litres ejected in one minute.
+  });
+  return `**Reference reading.** At PEEP 5 and 15 cmH₂O, mean aortic output is about **${fixed(outputs[0], 2)} and ${fixed(outputs[1], 2)} L/min**, respectively. Each level is allowed 120 simulated seconds to settle. Blood crossing the aortic valve is then summed over 60 seconds. The four-breath history in the interface uses a shorter averaging window.`;
+}
+
 function ardsScenarioState(overrides) {
   const scenario = SCENARIOS.find(({ id }) => id === 'ards-rv');
   if (!scenario) throw new Error('ARDS example: scenario is missing');
@@ -755,6 +774,7 @@ export function renderDocumentedExampleBlocks() {
     ['cardiac-tamponade', cardiacTamponadeBlock()],
     ['ivc-respiratory-calibre', ivcRespiratoryBlock()],
     ['swing-scenario', swingScenarioBlock()],
+    ['ards-peep-output', ardsPeepOutputBlock()],
     ['ards-scenario', ardsScenarioBlock()],
     ['baroreflex-septic', baroreflexSepticBlock()],
     ['opening-profiles', recruitmentCohortBlock()],

@@ -6,13 +6,11 @@
 
 ## Pulmonary review checkpoint
 
-The pulmonary circuit now uses three pressure-bearing stores. Its volume/flow residence estimate imposes no delay. The remaining questions are specific:
+**Pulmonary arterial pulse pressure and RV ejection** are the next proposed check. Start with the healthy passive circulation. Increase only precapillary resistance, keeping the ventilator settings, heart rate and prescribed blood volume fixed. At the same respiratory phase compare pulmonary arterial systolic, diastolic and mean pressures, RV stroke volume and the pressure decay after the pulmonary valve closes. Compare with human measurements under compatible flow and downstream filling pressures. Clinical catheter data show that the relation between resistance and compliance depends on wedge pressure. Consider a change to arterial compliance only if a discrepancy alters the teaching interpretation of RV load. [Tedford et al., human catheterisation data](https://pubmed.ncbi.nlm.nih.gov/22131357/)
 
-- Assess arterial pulse pressure and RV pulsatile loading under declared pressure and flow conditions. Fixed arterial compliance does not impose a universal RC constant. A new resistance–compliance relation needs a demonstrated teaching benefit before adoption.
-- Reconcile the retained geometric resistance law with segmental inflation data. The isolated-protocol comparison reproduces the central resistance rise but not Hakim's venous-gradient direction; Peták's positive-inflation effect is much smaller than the model analogue. Separate anatomical segment definitions, pressure boundaries and species/size from a proposed constitutive correction. Do not fit coefficients merely to restore a preferred whole-circuit result.
-- Seek matched evidence for absolute pulmonary storage and the magnitude/phase of RV-to-LV respiratory variation. The fixed storage coefficients, extra-alveolar traction and collapse smoothing are not a human quantitative calibration. Varying middle compliance also changes the adopted collapse pressure scale; it is not an isolated intervention on storage.
+The size of the resistance increase under positive inflation in the Peták preparation also remains an open comparison. Revisit it when the experimental pressure boundaries and the model conditions can be matched.
 
-Resume with the middle pressure drop in the Hakim constant-inflow experiment. The positive-pressure analogue of Peták and the coupled ARDS comparison identify narrowing at the middle outlet as a material sensitivity. Substantive work beyond the current authorization still needs a clinician-facing explanation and agreement. A small PPV cannot be attributed to long blood residence time alone.
+Seek matched evidence for absolute pulmonary blood volume and the size and timing of RV-to-LV respiratory variation. The fixed storage coefficients, extra-alveolar traction and degree of pressure-dependent narrowing have limited quantitative validation in humans. Varying middle compliance also changes the pressure scale for narrowing. Keep both effects explicit when interpreting a storage experiment.
 
 ## Model
 
