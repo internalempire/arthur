@@ -6,7 +6,7 @@ export const SCENARIOS = [
   {
     id: 'healthy-spont',
     name: 'Healthy, breathing spontaneously',
-    note: 'Select Caval flow above the traces, then press Pause. Move the Time cursor across one inspiration, where lung volume rises. As pleural pressure falls, measured central venous pressure falls too, yet more blood flows into the right atrium. The pressure stretching its wall rises because the pressure outside falls further. Press Play to continue.',
+    note: 'Select Caval flow above the traces. Let one complete breath pass, then press Pause. Move the Time cursor across the most recent inspiration, where lung volume rises. As pleural pressure falls, measured central venous pressure falls too, yet more blood flows into the right atrium. The pressure stretching its wall rises because the pressure outside falls further. Press Play to continue.',
     // A physiological resting effort gives a roughly 420 mL spontaneous tidal
     // volume. Moderate filling and low-normal RV elastance place the resting
     // circulation beyond the model's steep preload limb while retaining normal

@@ -4,7 +4,7 @@ Updated: 2026-11-21
 
 ## First bedside observation and the abdominal cava — November 21
 
-The starting spontaneous scenario now names the steps to display caval flow, pause and locate inspiration by rising lung volume. The quick start locates transmural CVP beneath the atmospheric reading in Numerical tiles. The PEEP exercise explains when atrial pressure sets forward backpressure and when narrowing of the abdominal cava limits further increases in inflow. It identifies the matched respiratory-mean readings in the Guyton disclosure. These are teaching-text changes. The numerical example, pressure–flow law and preset prescriptions are unchanged.
+The starting spontaneous scenario now names the steps to display caval flow, let a complete breath enter the cursor history, pause and locate inspiration by rising lung volume. The quick start locates transmural CVP beneath the atmospheric reading in Numerical tiles. The PEEP exercise explains when atrial pressure sets forward backpressure and when narrowing of the abdominal cava limits further increases in inflow. It identifies the matched respiratory-mean readings in the Guyton disclosure. These are teaching-text changes. The numerical example, pressure–flow law and preset prescriptions are unchanged.
 
 ## Explain the two pressure differences in the healthy PEEP exercise — November 21
 

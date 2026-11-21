@@ -12,7 +12,7 @@ The application opens on the settled *Healthy, breathing spontaneously* referenc
 
 The two healthy presets describe different circulations. They differ in initial blood volume, systemic vascular resistance and RV contractility. Use the following comparison to see **which way the pressures move during inspiration**.
 
-1. In *Healthy, breathing spontaneously*, select **Caval flow** above the traces and press **Pause**. Move the **Time cursor** across a single inspiration, identified by rising lung volume. On the same time axis, follow pleural pressure, CVP and blood flow into the right atrium. Compare the pattern across the breath, allowing for the smaller fluctuations with each heartbeat. Press **Play** to continue.
+1. In *Healthy, breathing spontaneously*, select **Caval flow** above the traces. Let one complete breath pass, then press **Pause**. Move the **Time cursor** across the most recent inspiration, identified by rising lung volume. On the same time axis, follow pleural pressure, CVP and blood flow into the right atrium. Compare the pattern across the breath, allowing for fluctuations with each heartbeat. Press **Play** to continue.
 2. Select *Healthy, passive volume control*.
 3. Compare the direction of the pleural-pressure and measured-CVP swings.
 
