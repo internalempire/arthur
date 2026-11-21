@@ -2,6 +2,10 @@
 
 Updated: 2026-11-21
 
+## Superimpose one selected live reference — November 21
+
+**Show reference traces** compares two respiratory-mean Guyton constructions, complete Campbell breaths, complete RV and LV beats ending before inspiration, and total open-lung resistance references with end-expiratory markers. The Guyton comparison keeps the estimated crossings on the curves and reports signed caval inflow beneath them. Acquisition follows integrator breath boundaries even during accelerated playback and stops when hidden. Past-cursor views continue to show only the historical patient. Physiological prescriptions and pressure–flow laws are unchanged. The separate interpretation of extra-alveolar geometry and added precapillary load remains open for discussion.
+
 ## First bedside observation and the abdominal cava — November 21
 
 The starting spontaneous scenario now names the steps to display caval flow, let a complete breath enter the cursor history, pause and locate inspiration by rising lung volume. The quick start locates transmural CVP beneath the atmospheric reading in Numerical tiles. The PEEP exercise explains when atrial pressure sets forward backpressure and when narrowing of the abdominal cava limits further increases in inflow. It identifies the matched respiratory-mean readings in the Guyton disclosure. These are teaching-text changes. The numerical example, pressure–flow law and preset prescriptions are unchanged.

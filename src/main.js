@@ -15,6 +15,7 @@ import { PresentationHistory } from './ui/presentation-history.js';
 import { createComparisonDisclosure } from './ui/comparison-disclosure.js';
 import { createMechanismsDisclosure } from './ui/mechanisms-disclosure.js';
 import { LivePins, MAX_LIVE_PINS, createLivePinTable } from './ui/live-pins.js';
+import { createPinPlots } from './ui/pin-plots.js';
 
 theme.init();
 
@@ -22,6 +23,7 @@ const sim = new Simulator();
 const presentationHistory = new PresentationHistory();
 let selectedSnapshot = null;
 const livePins = new LivePins();
+const pinPlots = createPinPlots(sim, livePins);
 let running = true;
 let dirty = true;
 
@@ -44,6 +46,13 @@ const pvrCurve = createPvrCurve(el('pvr'), { onViewChange: invalidate });
 const thorax = createThorax(el('thorax'));
 const stats = createStats(el('stats'), { banner: el('invalid-banner') });
 const pinTable = createLivePinTable(el('pinned-states'), livePins, () => {
+  pinPlots.sync();
+  renderComparison(selectedSnapshot ?? sim);
+  dirty = true;
+});
+el('show-pin-plots').addEventListener('change', event => {
+  pinPlots.setEnabled(event.target.checked);
+  if (pinPlots.enabled) guyton.exitDeep();
   renderComparison(selectedSnapshot ?? sim);
   dirty = true;
 });
@@ -194,6 +203,7 @@ function clearTrails(includeRecordedWindow = false) {
 function resetPresentationHistory() {
   history.close();
   livePins.clear();
+  pinPlots.sync();
   dirty = true;
   presentationHistory.clear();
   const snapshot = presentationHistory.capture(sim, { force: true });
@@ -230,7 +240,7 @@ function renderComparison(view) {
   const historical = inspectingPast();
   const reference = historical ? null : livePins.selected;
   stats.render(view.metrics, reference?.sim.metrics ?? null, reference ? `State ${reference.id}` : '');
-  pinTable.render(sim, { historical, running });
+  pinTable.render(sim, { historical, running, plots: pinPlots.enabled, cycleStatus: pinPlots.cycleStatus(running) });
   const context = { current: sim, reference: livePins.selected, historical, running };
   mechanisms.sync(context);
   distribution.sync(context);
@@ -256,12 +266,14 @@ pinState.addEventListener('click', () => {
   if (inspectingPast()) return;
   const state = livePins.add(sim);
   if (!state) return;
+  pinPlots.sync(state.sim);
   renderComparison(selectedSnapshot ?? sim);
   showStateStatus(`State ${state.id} pinned. It keeps evolving independently with these settings.`);
   dirty = true;
 });
 unpinStates.addEventListener('click', () => {
   livePins.clear();
+  pinPlots.sync();
   renderComparison(selectedSnapshot ?? sim);
   (pinState.disabled ? playPause : pinState).focus();
   showStateStatus('All live references removed.');
@@ -362,6 +374,25 @@ document.addEventListener('keydown', (e) => {
 
 // ----------------------------------------------------------------- main loop
 let statsClock = 0;
+let comparisonStart = null;
+
+function drawDiagrams(view, colors) {
+  if (pinPlots.render(colors, inspectingPast())) {
+    comparisonStart ??= view.time;
+    return;
+  }
+  if (comparisonStart !== null && view.time !== comparisonStart) {
+    // The single-patient canvases were not sampled during this interval.
+    // Joining the two ends would draw an invented breath or inflow path.
+    guyton.clearTrail();
+    campbell.clearTrail();
+  }
+  comparisonStart = null;
+  guyton.render(view, colors);
+  campbell.render(view, colors);
+  pvLoops.render(view, colors);
+  pvrCurve.render(view, colors);
+}
 
 function draw() {
   const colors = theme.colors;
@@ -369,10 +400,7 @@ function draw() {
   syncTimeline(view);
   waveforms.render(sim, colors);
   waveforms.renderReadouts(view.metrics, colors, view);
-  guyton.render(view, colors);
-  campbell.render(view, colors);
-  pvLoops.render(view, colors);
-  pvrCurve.render(view, colors);
+  drawDiagrams(view, colors);
   thorax.render(view, colors);
   renderComparison(view);
   descriptions.render(view);
@@ -413,10 +441,7 @@ function frame(now) {
     const view = selectedSnapshot ?? sim;
     syncTimeline(view);
     waveforms.render(sim, colors);
-    guyton.render(view, colors);
-    campbell.render(view, colors);
-    pvLoops.render(view, colors);
-    pvrCurve.render(view, colors);
+    drawDiagrams(view, colors);
     thorax.render(view, colors);
 
     statsClock += dtWall;

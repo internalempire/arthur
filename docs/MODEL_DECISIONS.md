@@ -89,8 +89,10 @@ remains future work. Manual figures derive their intercepts from the actual
 Pin references continue exact copies of the full integrator state, using the same
 step and physiological calculation as the current patient. The four-reference cap
 bounds computational work; unselected references also advance. No reduced surrogate,
-equilibration job or phase-forcing is introduced. Traces and analytical panels are
-rendered for the current patient only; the selected reference supplies tile values.
+equilibration job or phase-forcing is introduced. The selected reference supplies
+tile values. On request, four panels compare it with the current patient on
+common axes, using respiratory means or each state's own respiratory boundary.
+The time waveforms follow the current patient.
 The table compares reference controls to current controls, not changes between
 successive pins. Presentation-history snapshots cannot be restarted as full worlds.
 

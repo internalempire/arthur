@@ -28,7 +28,13 @@ Read both ventricles together. A pulmonary load increase may shift the RV toward
 - **Greater ejection load:** end-systolic volume can increase and the loop narrow. A changed pulmonary resistance coefficient is only one component of RV load.
 - **Different contraction or chamber interaction:** the end-systolic position changes, but a single effective ESPVR line cannot distinguish intrinsic contractility from the contribution of the other ventricle.
 
-For a PEEP comparison, inspect filling and loop width in both ventricles alongside Ppl and cardiac output. Lower LV transmural end-ejection pressure with a narrower loop is not evidence that output has improved. A Pin preserves a reference in the tiles; it does not overlay a second patient’s loops here.
+For a PEEP comparison, inspect filling and loop width in both ventricles alongside Ppl and cardiac output. Lower LV transmural end-ejection pressure with a narrower loop is not evidence that output has improved.
+
+## Compare two beats
+
+With **Show reference traces** enabled, each ventricle displays two complete pressure–volume loops. Solid is current; dashed is the selected pin. Each belongs to the most recent beat that finished by the start of that patient's next inspiration. The beats can end at slightly different distances from inspiration, especially when heart rates differ. Their pressures are transmural and their widths are the differences between maximum and minimum chamber volume in mL.
+
+Read the two ventricles together. In passive ventilation, adding precapillary load at the same PEEP can leave the Campbell breaths superimposed while the RV reaches a higher pressure and the LV fills less. Changing the reference row leaves the patient you control at its current settings.
 
 ## In the model
 

@@ -119,6 +119,8 @@ The monitor opens with the waveforms and the Guyton diagram in Mean. Select Live
 
 Values can be marked *caution* or withheld as *unavailable* when their assumptions are absent. See **[Numerical tiles](manual/numeric-tiles.md)** and **[Interpretability](manual/interpretability.md)**.
 
+Choose **Pin → Show reference traces** to compare the current patient with one independently evolving state in Guyton, Campbell, the ventricular pressure–volume loops and the total pulmonary resistance reference. Try the [same-patient PEEP comparison](manual/numeric-tiles.md#compare-the-traces).
+
 Choose **Pin → Blood distribution** to see where blood accumulates or leaves as settings change. The five regions share one scale in mL. Compare the [effects of venous tone and an applied blood dose](manual/controls-volume.md#where-does-the-blood-go).
 
 With a live reference pinned, **Mechanisms** opens an optional comparison map of venous return, pulmonary loading and storage, ventricular filling and ejection, and systemic output. It shows combined state differences, not the isolated contribution of individual interventions. The vanilla-JavaScript module and map are created on request; closing removes the view, and no additional simulations or Deep CO jobs run. See [Numerical tiles](manual/numeric-tiles.md#read-the-shared-mechanisms).

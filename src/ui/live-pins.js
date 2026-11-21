@@ -23,8 +23,8 @@ export class LivePins {
   }
   clear() { this.states = []; this.selectedId = null; this.nextId = 1; }
   advance(seconds) {
-    // Reference traces are not drawn. Silent advancement still updates every
-    // physiological state, beat history and averaging window used by the tiles.
+    // Pins skip the full waveform rings. Optional graph observers still see
+    // the same respiratory boundaries, PV beats and averaging windows.
     for (const state of this.states) state.sim.advance(seconds, true);
   }
 }
@@ -100,6 +100,7 @@ export function createPinSettingsRows(body) {
 export function createLivePinTable(container, pins, onChange) {
   container.innerHTML = `
     <div class="pin-heading"><h2>Live comparisons</h2><span class="pin-summary"></span><button type="button" class="btn" id="show-mechanisms" aria-controls="mechanisms" aria-expanded="false">Mechanisms</button><button type="button" class="btn" id="show-distribution" aria-controls="distribution" aria-expanded="false">Blood distribution</button></div>
+    <label class="pin-plot-choice"><input type="checkbox" id="show-pin-plots" aria-controls="guyton campbell pvloops pvr"> Show reference traces</label>
     <p class="pin-message"></p>
     <table class="pin-table" aria-label="Settings of each pinned state and the current patient">${pinColumnHead()}</table>
     <p class="pin-help">All states keep evolving; Pause stops them together. Different heart or breathing rates can shift their cycles. Settings and total blood volume do not describe previous manoeuvres or pressure history.</p>`;
@@ -108,7 +109,7 @@ export function createLivePinTable(container, pins, onChange) {
   const message = container.querySelector('.pin-message');
   const rows = new Map();
 
-  function render(sim, { historical = false, running = true } = {}) {
+  function render(sim, { historical = false, running = true, plots = false, cycleStatus = '' } = {}) {
     container.hidden = pins.states.length === 0;
     if (container.hidden) {
       for (const { group } of rows.values()) group.remove();
@@ -119,8 +120,13 @@ export function createLivePinTable(container, pins, onChange) {
     const currentTotal = volumeControlReadings(sim).total;
     summary.textContent = `${pins.states.length}/${MAX_LIVE_PINS} references · ${running ? 'Running' : 'Paused'}`;
     const selected = pins.selected;
+    const toggle = container.querySelector('#show-pin-plots');
+    toggle.checked = plots;
+    toggle.disabled = historical;
     message.textContent = historical
       ? 'Inspecting the past: live reference values are hidden. Return to the latest instant or press Play to compare.'
+      : plots ? `Solid: current patient · Dashed: State ${selected.id}. Filled point: current · Ring: reference. `
+        + cycleStatus
       : `${selected ? `State ${selected.id}` : 'Reference'} is shown below the current tile values.`;
     for (const [id, { group }] of rows) {
       if (!pins.states.some(state => state.id === id)) { group.remove(); rows.delete(id); }

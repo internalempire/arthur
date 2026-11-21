@@ -1184,6 +1184,21 @@ input[type="range"]:disabled { cursor: not-allowed; }
 .pinned-states[hidden] { display: none; }
 .pin-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .pin-heading h2 { font-size: 14px; margin: 0; }
+.pin-plot-choice { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; margin-top: 6px; }
+.pin-plot-choice input { accent-color: var(--ink); }
+.show-pin-plot > :not(.pin-plot-layer) { visibility: hidden; }
+.panel .pin-plot-layer { position: absolute; inset: 8px; height: auto; display: flex; gap: 8px; }
+.grid .panel > .pin-plot-layer { height: auto; }
+.pin-plot-layer[hidden] { display: none; }
+.pin-plot { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.pin-plot h3 { margin: 0; font-size: 13px; }
+.pin-plot-paper { position: relative; flex: 1; min-height: 0; }
+.pin-plot p { margin: 0; font-size: 12px; line-height: 1.35; color: var(--ink-secondary); font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  .grid .panel-pv.show-pin-plot { height: 450px; }
+  .panel-pv .pin-plot-layer { flex-direction: column; }
+  .pin-plot { min-height: 0; }
+}
 .pin-summary, .pin-help { color: var(--ink-secondary); }
 .pin-message { margin: 6px 0 10px; }
 .pin-table { width: 100%; border-collapse: collapse; table-layout: fixed; }

@@ -366,6 +366,39 @@ check('returning to fast mode terminates an active worker immediately',
 const { checkMechanismsUI } = await import('./mechanisms-ui.mjs');
 await checkMechanismsUI(check);
 
+const { PinCycles } = await import('../src/ui/pin-cycles.js');
+{
+  const patient = new Simulator();
+  patient.applyScenario(SCENARIOS.find(s => s.id === 'healthy-vcv'));
+  const unobserved = patient.fork();
+  const cycles = new PinCycles();
+  const stop = patient.observePlotCycles(cycles);
+  patient.advance(13, true);
+  unobserved.advance(13, true);
+  check('a silent pin records a complete breath and its preceding beat without altering the circulation',
+    cycles.complete?.rv.length > 2 && cycles.complete?.lv.length > 2 &&
+    cycles.complete.volume === patient.resp.lastEndExpiratoryVolume &&
+    cycles.complete.breath.at(-2) === patient.resp.endExpiratoryPpl &&
+    cycles.complete.resistance > 0 && patient.circ.vRv === unobserved.circ.vRv);
+  const saved = cycles.complete;
+  const nextPin = patient.fork();
+  nextPin.setParam('peep', 15);
+  nextPin.advance(11, true);
+  check('changing a new pin does not reset or overwrite the source cycle', cycles.complete === saved);
+  patient.setParam('peep', 15);
+  patient.advance(1, true);
+  check('no mixed-setting cycle is shown after a PEEP step', cycles.complete === null);
+  patient.advance(12, true);
+  check('a complete new breath replaces the lower-PEEP cycle', cycles.complete?.volume > saved.volume + 0.5);
+  patient.startHold('expiratory', 3);
+  check('arming a hold discards the interrupted comparison cycle', cycles.complete === null);
+  patient.advance(15, true);
+  const finalTime = cycles.complete?.endTime;
+  stop();
+  patient.advance(6, true);
+  check('closing the comparison stops capture', Number.isFinite(finalTime) && cycles.complete.endTime === finalTime);
+}
+
 const { checkBloodDistribution } = await import('./blood-distribution-ui.mjs');
 checkBloodDistribution(check);
 

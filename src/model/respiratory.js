@@ -458,6 +458,7 @@ export function stepRespiratory(p, r, dt) {
   // volume. With hysteresis on, use the branch the lung is actually occupying.
   if (r.prevPhase === 'exp' && r.phase === 'insp') {
     r.endExpiratoryPl = r.pl;
+    r.endExpiratoryPpl = r.ppl;
     if (r.openingCycleActive && r.lastOpenSample !== null) {
       r.lastClosedEndExpiratory = 1 - r.lastOpenSample;
       r.lastOpenExcursion = r.openingCycleMax - r.openingCycleMin;

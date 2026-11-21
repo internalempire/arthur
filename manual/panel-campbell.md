@@ -59,6 +59,12 @@ With passive ventilation, compare the same delivered tidal volume at different c
 
 The diagram separates lung recoil, chest-wall recoil and muscle pressure. It does not calculate metabolic effort, fatigue or the clinical benefit of unloading respiratory muscles. A visible loop or a larger muscle-pressure segment should not be converted into an oxygen cost of breathing.
 
+## Compare two breaths
+
+Turn on **Show reference traces** in **Live comparisons**. The solid and dashed trajectories show one complete breath each. Read from the filled end-expiratory point for the current patient and from the ring for the pin. Dotted lines locate the relaxed chest wall at the plotted volumes. When the two walls have the same relation, Arthur draws it once. At the same absolute volume the horizontal distance from a patient's trajectory to its own relaxed wall gives muscle pressure.
+
+In passive volume control, raising PEEP may move the entire breath upward and to the right even with the same tidal volume. The upward shift shows the higher end-expiratory volume; the rightward shift shows the higher pressure around the heart. Alternatively, changing only precapillary vascular load can leave both breaths superimposed while the RV pressure–volume loops separate. The overlap is informative in its own right.
+
 ## Zooming the diagram
 
 The diagram opens at **300%** around the current pleural-pressure–volume point, making the tidal trajectory and the muscle-pressure separation visible without an initial adjustment. The `+` and `−` controls enlarge or reduce this view. Both axes are magnified, and the centre remains fixed: the axes do not chase the moving point during the breath.

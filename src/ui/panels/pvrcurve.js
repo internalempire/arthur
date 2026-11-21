@@ -33,6 +33,36 @@ export function pvrZoomDomain(fullYHi, focusY, factor = 1) {
   return { yLo, yHi: yLo + span };
 }
 
+export function openLungResistanceCurve(p) {
+  const landmarks = {
+    rv: lungVolumeAtPl(p, 0, 1),
+    frc: pvrComponents(p, 0, 0, 1).vascularFrc,
+    tlc: p.lungCapacity,
+  };
+  const xLo = landmarks.rv;
+  const xHi = landmarks.tlc;
+  const samples = 120;
+  const alveolar = [], extraAlveolar = [], total = [];
+  let yHi = 0;
+  for (let i = 0; i < samples; i++) {
+    const v = xLo + ((xHi - xLo) * i) / (samples - 1);
+    // Hold the lung open and use the integrator's resistance partition.
+    // Prescribed excess load enters the upstream component; the two curves
+    // still sum to the geometric reference, excluding the distal outlet.
+    const comp = pvrComponents(p, v, null, 1);
+    const parts = pulmonaryResistancePartition(p, comp);
+    const a = parts.middleResistance * RESISTANCE_TO_WOOD;
+    const e = parts.extraResistanceTotal * RESISTANCE_TO_WOOD;
+    const j = parts.geometricResistance * RESISTANCE_TO_WOOD;
+    alveolar.push(v, a);
+    extraAlveolar.push(v, e);
+    total.push(v, j);
+    yHi = Math.max(yHi, a, e, j);
+  }
+
+  return { landmarks, alveolar, extraAlveolar, total, peak: yHi };
+}
+
 export function createPvrCurve(canvas, { onViewChange } = {}) {
   const panel = new Panel(canvas, { padding: [22, 16, 50, 48] });
   let vMinSeen = Infinity, vMaxSeen = -Infinity, breathSeen = -1;
@@ -117,32 +147,9 @@ export function createPvrCurve(canvas, { onViewChange } = {}) {
     // this keeps the whole right limb visible when compliance changes without
     // silently redefining the lung's maximum size. `vascularFrc` is where the
     // two slopes cancel and the total curve reaches its minimum.
-    const landmarks = {
-      rv: lungVolumeAtPl(p, 0, 1),
-      frc: pvrComponents(p, r.lungVolume).vascularFrc,
-      tlc: p.lungCapacity,
-    };
-    const xLo = landmarks.rv;
-    const xHi = landmarks.tlc;
-    const samples = 120;
-    const alveolar = [], extraAlveolar = [], total = [];
-    let yHi = 0;
-    for (let i = 0; i < samples; i++) {
-      const v = xLo + ((xHi - xLo) * i) / (samples - 1);
-      // Hold the lung open and use the integrator's resistance partition.
-      // Prescribed excess load enters the upstream component; the two curves
-      // still sum to the geometric reference, excluding the distal outlet.
-      const comp = pvrComponents(p, v, null, 1);
-      const parts = pulmonaryResistancePartition(p, comp);
-      const a = parts.middleResistance * RESISTANCE_TO_WOOD;
-      const e = parts.extraResistanceTotal * RESISTANCE_TO_WOOD;
-      const j = parts.geometricResistance * RESISTANCE_TO_WOOD;
-      alveolar.push(v, a);
-      extraAlveolar.push(v, e);
-      total.push(v, j);
-      yHi = Math.max(yHi, a, e, j);
-    }
-
+    const { landmarks, alveolar, extraAlveolar, total, peak } = openLungResistanceCurve(p);
+    const xLo = landmarks.rv, xHi = landmarks.tlc;
+    let yHi = peak;
     const patient = pvrComponents(p, r.lungVolume, r.plSolved, r.openFraction);
     const patientPvr = pulmonaryResistancePartition(p, patient).geometricResistance * RESISTANCE_TO_WOOD;
     const patientVisible = r.lungVolume >= xLo && r.lungVolume <= xHi;

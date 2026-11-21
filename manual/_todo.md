@@ -14,6 +14,8 @@ Seek matched evidence for absolute pulmonary blood volume and the size and timin
 
 ## Model
 
+- Discuss how to distinguish the pure extra-alveolar volume dependence from the additional prescribed precapillary load in the single-patient resistance panel. Check both components across lung volumes with the same open-lung geometry before considering any change to the resistance law.
+
 ### Resolve the prone prescription's pressure response
 
 The current ARDS position transformation combines increased opening with a stiffer chest wall and higher abdominal pressure. Plateau rises substantially and the whole-circuit RV/LV volume ratio does not fall, despite lower isolated geometric resistance. First examine the respiratory pressure response under a declared comparison; clinical prone unloading studies also changed airway pressure and PaCO2, and the latter mechanism is absent here. Keep the original RV/LV criterion visibly open. Do not tune the pulmonary law or substitute a favorable component readout for net RV unloading.

@@ -105,8 +105,14 @@ class CycleRing {
 // by structuredClone, so a Pin never inherits another world's observer.
 const volumeObserver = Symbol('volumeObserver');
 const historyObserver = Symbol('historyObserver');
+const plotObserver = Symbol('plotObserver');
 
 export class Simulator {
+  observePlotCycles(observer) {
+    this[plotObserver] = observer;
+    return () => { if (this[plotObserver] === observer) delete this[plotObserver]; };
+  }
+
   observeBloodVolumes(observer) {
     this[volumeObserver] = observer;
     return () => { if (this[volumeObserver] === observer) delete this[volumeObserver]; };
@@ -199,6 +205,8 @@ export class Simulator {
 
   /** A setting change or occlusion starts a new observation interval. */
   invalidateBreathObservations() {
+    this.lastBreathResetTime = this.time;
+    this[plotObserver]?.reset();
     this[volumeObserver]?.reset(this.resp.breathCount);
     this.pulmonaryMarginBreath = this.resp.breathCount;
     this.pulmonaryMarginMin = Infinity;
@@ -386,6 +394,11 @@ export class Simulator {
         this.ema ? this.ema.map : positioned.baroSetPoint, dt);
       applyBaroreflex(this.effective, positioned, outflow);
       stepRespiratory(this.effective, this.resp, dt);
+      // The first inspiratory step can also finish a heartbeat. Pick the beat
+      // already complete at end-expiration, before that cardiac step runs.
+      if (this.resp.breathCount !== this.pulmonaryMarginBreath) {
+        this[plotObserver]?.boundary(this, !this.resp.hold && !this.resp.holdPending);
+      }
       stepCirculation(this.effective, this.circ, this.resp, dt);
       this.time += dt;
       this.accumulate();
@@ -464,6 +477,7 @@ export class Simulator {
     this.cycleAorticVolume += c.q.av * this.dt;
     this.cycleFlowDuration += this.dt;
     if (this.cycleTick++ % Math.max(1, Math.round(1 / (CYCLE_HZ * this.dt))) === 0) {
+      this[plotObserver]?.sample(this);
       this[volumeObserver]?.sample(this);
       this.cycle.ra.push(c.p.ra);
       this.cycle.flow.push((c.q.vr * 60) / 1000);
@@ -561,6 +575,7 @@ export class Simulator {
         if (this.measuredPoints.length > 8) this.measuredPoints.shift();
       }
       this[historyObserver]?.interrupt('Hold completed');
+      this.lastBreathResetTime = this.time;
       this.resp.hold = null;
       this.resp.holdElapsed = 0;
       this.resp.holdStartPaw = null;

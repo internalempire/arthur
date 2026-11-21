@@ -50,7 +50,20 @@ State 1 continues breathing at PEEP 0 and State 2 at PEEP 5. Their physiological
 
 An applied blood dose appears as **Total blood volume**. Both columns give the actual totals in litres. Δ beside the current total is current minus reference in mL. The comparison updates when the dose is applied. Matching settings and blood totals can still leave two patients with different lung opening or regional blood volumes after different manoeuvres.
 
-Each state has **Unpin** to stop and remove that reference. **Unpin all** removes all references. Removing the last Pin hides the comparison area and its open panels. Selecting or removing a reference does not change the current patient's settings. The graphs and waveform traces continue to describe the current patient; the comparison is displayed in the tiles and in the optional Mechanisms and Blood distribution views.
+Each state has **Unpin** to stop and remove that reference. **Unpin all** removes all references. Removing the last Pin hides the comparison area and its open panels. Selecting another state changes the reference in the tiles and in the open comparison views. The time waveforms continue to follow the patient you control.
+
+### Compare the traces
+
+Pin **Healthy, passive volume control** at PEEP 5 cmH₂O, turn on **Show reference traces** in **Live comparisons**, and raise only PEEP to 15 cmH₂O. Leave the simulation running for two breaths. Follow the solid line for the patient at PEEP 15 and the dashed line for the selected reference breathing at PEEP 5. Both use the same axes. A larger excursion can expand a scale to fit both states. Selecting another row changes the dashed reference across the four panels together. Clear the checkbox to return to the single-patient plots.
+
+| Look at | Question the comparison answers |
+|---|---|
+| [Guyton](panel-guyton.md#compare-two-pinned-settings) | At what right atrial pressure and flow do the two curves cross in each state? Compare net caval inflow on the line beneath the plot. |
+| [Campbell](panel-campbell.md#compare-two-breaths) | Does the same tidal volume start at a higher lung volume and require a higher pleural pressure? Follow one complete breath per state. |
+| [Right and left ventricles](panel-pv-loops.md#compare-two-beats) | At comparable respiratory timing, does either ventricle fill to a different volume, reach a different pressure or eject through a narrower volume range? |
+| [Pulmonary vessels](panel-pvr-curve.md#compare-two-end-expiratory-states) | Did inflation move the end-expiratory point along a shared reference curve, or did the reference curve itself change? |
+
+The filled point belongs to the current patient and the open ring to the selected reference in Campbell and the pulmonary vascular plot. When their coordinates coincide the ring surrounds the point. Each state contributes its own latest complete breath. The comparison reports how long ago each breath ended. After activation, a change of settings or a hold, a dash in place of a number means that the required observation is still unavailable. Use **Play** to collect it. If an assisted patient stops triggering, the age of the last complete breath keeps increasing. Use the time waveforms for the sequence of events inside a breath.
 
 ### Time, phases and paused inspection
 
@@ -85,7 +98,7 @@ With a Pin selected, open **Blood distribution** beside **Mechanisms**. Read tot
 
 ### Lifetime and computational scope
 
-Choosing a preset, loading a patient file or resetting the simulation clears the references. They are not saved in patient files and do not survive page reloads. References run the same physiological equations and integration step as the current patient, without additional plotted traces or a Deep CO calculation. Computational work grows with the number of references; the four-reference limit bounds this cost. Removing an unused reference releases its simulation.
+Choosing a preset, loading a patient file or resetting the simulation clears the references. They are not saved in patient files and do not survive page reloads. Each pin runs the full simulation at the same time step. Showing reference traces also records recent cycles in the current patient and the live references so that you can switch between them. Only the selected reference is plotted. Hiding the traces stops this recording. Deep CO runs separately on request in the single-patient view. Removing an unused reference releases its simulation.
 
 ---
 

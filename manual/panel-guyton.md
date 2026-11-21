@@ -66,6 +66,12 @@ Select **Exit Deep CO** to cancel the experiment and return to the selected Mean
 
 In deep mode, **VR Mean** uses the settled reference pressure and resistance determinants paired with the cardiac-response experiment. **VR Live** uses all three current determinants together and withholds the predicted crossing. Both measured markers use breath means from the displayed patient. The trail shows the patient’s heartbeat-smoothed inflow. The deep relation is a settled loading analysis, not a breath-by-breath replacement for the dynamic view.
 
+## Compare two pinned settings
+
+Select a state in **Live comparisons** and turn on **Show reference traces**. Both blue lines show forward venous return and both red lines show estimated RV function. The solid pair belongs to the current patient, the dashed pair to the selected reference. Each labelled cross marks equal flow on that pair of curves using its own respiratory mean. The line below reports each circulation's net caval inflow, including any backward flow. After a setting change, Arthur waits for fresh pressure and flow averages for the changed state.
+
+A rise in PEEP can move the crossing to a higher atmospheric right atrial pressure while measured inflow falls. To investigate accumulation of blood in the right heart, compare caval inflow and RV ejection **within the same state over the same interval**. Subtracting the flows shown for two different states answers a different question. Hiding the reference traces restores the single-patient display and its controls.
+
 ## How the cardiac-output curve is measured
 
 The analysis first settles a separate reference with the selected respiratory mechanics and effective cardiac/vascular parameters. Autonomic feedback is held fixed: heart rate, contractility, arterial resistance and the total manual-plus-reflex venous capacity reduction retain their sampled values, without counting the manual contribution twice. Body-position effects are applied once to the selected respiratory prescription.

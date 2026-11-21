@@ -400,6 +400,6 @@ export function createGuyton(canvas, { onViewChange = () => {} } = {}) {
     deepClock = 'mean';
   }
 
-  return { render, clearTrail, curveClock: () => curveClock,
+  return { render, clearTrail, exitDeep: () => responseJob.setEnabled(false), curveClock: () => curveClock,
     responseMode: () => responseJob.isEnabled() ? 'deep' : 'fast' };
 }

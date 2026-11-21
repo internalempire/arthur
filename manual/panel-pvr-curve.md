@@ -32,6 +32,12 @@ Raise PEEP while keeping the other settings fixed and follow three observations:
 
 The lowest point of the purple curve is therefore not an “optimal PEEP” target. This panel does not balance oxygenation, regional injury, systemic venous return or total cardiac output. If a substantially closed lung lies below the displayed fully open RV landmark, the Current reference point is outside the horizontal domain and is omitted; that is a plotting limit, not evidence that the simulation has stopped.
 
+## Compare two end-expiratory states
+
+Create a Pin and select **Show reference traces**. The plot draws the **total** open-lung reference curve for each state over its own volume range. A shared curve is drawn once. The filled point and the ring locate the current patient and pin at the end of their respective complete breaths. Each point uses that state's actual lung opening and hypoxic vascular tone. The plots and the caption use geometric resistance in Wood units.
+
+Try changing only PEEP in the healthy passive patient. Both points can occupy different volumes on the same reference curve. In a partially closed lung a change in the fraction open can also move a point away from that curve. Then compare two states at the same PEEP but with different **Reference open-lung resistance at FRC** settings. The background curves themselves separate. Check RV pressure and ejection in the ventricular loops to see what the heart experiences. The total geometric coefficient alone cannot determine flow or total RV afterload.
+
 ## In the model
 
 The two reference limbs are calculated with the open fraction fixed at one. Their sum is the fully open geometric reference. The Current reference point is calculated separately from the equivalent parallel open/closed conductance mixture. Recruitment and HPV affect that mixture; the reference limbs retain a fully open population. The same reference coefficient is partitioned across the three connections in the running circuit, where middle-outlet narrowing and the distal venous resistance add to its load.

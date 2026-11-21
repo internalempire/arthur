@@ -49,7 +49,7 @@ Manual search covers the full text of every written page, not only its title and
 
 The tiles combine direct model measurements, derived physiological indices and internal coefficients. These are not interchangeable categories. A quality message may mark an index for caution or withhold it when its assumptions are absent. [Numerical tiles](numeric-tiles.md) follows every readout from state through calculation to interpretation; [Interpretability](interpretability.md) explains the badge rules, and [pulmonary artery wedge pressure](pulmonary-artery-wedge-pressure.md) provides the detailed example of why a familiar bedside name can require qualification.
 
-Creating the first reference with **Pin** reveals **Live comparisons** above the plots. Its **Mechanisms** button opens an optional map linking the shared heart–lung pathways to their combined result. It compares current and reference measurements without isolating individual intervention effects; it is created only on request. See [the comparison and mechanisms guide](numeric-tiles.md#read-the-shared-mechanisms).
+Creating the first reference with **Pin** reveals **Live comparisons** above the plots. **Show reference traces** superimposes the selected state in Guyton, Campbell, ventricular pressure–volume loops and the total pulmonary resistance reference. Try the [same-patient PEEP comparison](numeric-tiles.md#compare-the-traces). Its **Mechanisms** button opens an optional map linking the shared heart–lung pathways to their combined result. It compares current and reference measurements without isolating individual intervention effects; it is created only on request. See [the comparison and mechanisms guide](numeric-tiles.md#read-the-shared-mechanisms).
 
 ### The six visual panels
 
