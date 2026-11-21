@@ -73,6 +73,13 @@ section('Multiple references, selection and removal');
   assert.equal(changes[0].text, 'PEEP: 10 → 15 cmH₂O');
   assert.equal(changes[1].text, 'Body position: Supine → Prone');
   assert.equal(changes[2].text, 'Compromised lung: 0 → 40 %');
+  assert.deepEqual(changes.map(({ label, reference, current }) => [label, reference, current]), [
+    ['PEEP', '10 cmH₂O', '15 cmH₂O'], ['Body position', 'Supine', 'Prone'], ['Compromised lung', '0 %', '40 %'],
+  ]);
+  const twoPins = [0, 5].map(peep => pinSettingChanges({ ...params, peep }, { ...params, peep: 10 })[0]);
+  assert.deepEqual(twoPins.map(({ reference, current }) => [reference, current]), [
+    ['0 cmH₂O', '10 cmH₂O'], ['5 cmH₂O', '10 cmH₂O'],
+  ]);
   assert.deepEqual(pinSettingChanges(params, params), []);
   check('table differences have an explicit direction, clinical labels and displayed units', true);
 

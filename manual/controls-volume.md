@@ -34,7 +34,7 @@ Blood enters or leaves the systemic venous reservoir, initially changing its str
 
 Selecting a scenario establishes its own starting volume and zero cumulative balance. Reset of a Custom patient restarts its current prescription and retains its applied balance and starting reference. Saving and loading retain both; a version-2 file without the reference uses its own prescribed volume as the starting point. Scenario selection, Reset and loading discard an unsubmitted dose. A prepared dose is not saved or copied into a Pin. The phenotype marker describes the applied patient prescription, so it can remain present while the selector reads zero.
 
-Pin and the optional Mechanisms view compare **actual total blood volume**, reference → current, with the difference in mL. This persists after the selector returns to zero and accumulates across applications. Each reference retains its own blood and continues circulating independently; capacity-only changes do not create a blood-total difference. The comparison describes the resulting states, not the timing or count of earlier applications.
+Pin and the optional Mechanisms view compare **actual total blood volume**, in separate Reference and Current columns, with the current-minus-reference difference in mL beside the current total. This persists after the selector returns to zero and accumulates across applications. Each reference retains its own blood and continues circulating independently; capacity-only changes do not create a blood-total difference. The comparison describes the resulting states, not the timing or count of earlier applications.
 
 ### Venous tone effect
 

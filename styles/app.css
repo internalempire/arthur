@@ -1179,19 +1179,18 @@ input[type="range"]:disabled { cursor: not-allowed; }
 .pin-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .pin-table th, .pin-table td { text-align: left; padding: 8px; vertical-align: top; border-top: 1px solid var(--border); }
 .pin-table thead th { color: var(--ink-secondary); font-size: 11px; font-weight: 500; }
-.pin-table th:first-child { width: 122px; }
-.pin-table th:last-child { width: 76px; }
-.pin-table td:last-child { text-align: right; }
+.pin-table thead th:first-child { width: 40%; }
+.pin-table th, .pin-table td { overflow-wrap: anywhere; }
+.pin-table tbody th[scope="row"] { font-weight: 500; }
+.pin-table td { font-variant-numeric: tabular-nums; }
+.pin-state-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .pin-selected { background: var(--wash); }
 .pin-choice { display: flex; align-items: center; gap: 7px; cursor: pointer; min-height: 28px; }
 .pin-choice input { margin: 0; accent-color: var(--text-flow); }
-.pin-changes { white-space: pre-line; overflow-wrap: anywhere; line-height: 1.6; }
 .pin-remove { padding: 4px 9px; font-size: 11px; }
 .pin-help { margin: 9px 0 0; font-size: 11px; line-height: 1.5; }
 @media (max-width: 600px) {
   .pinned-states { padding: 10px 8px; }
-  .pin-table th:first-child { width: 90px; }
-  .pin-table th:last-child { width: 65px; }
   .pin-table th, .pin-table td { padding: 7px 4px; }
 }
 
@@ -1200,8 +1199,7 @@ input[type="range"]:disabled { cursor: not-allowed; }
 .mechanisms[hidden], .mechanisms [hidden] { display: none; }
 .mechanisms h2 { font-size: 17px; margin: 0; }
 .mechanism-context { color: var(--ink-secondary); margin: 4px 0; }
-.mechanism-settings { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; }
-.mechanism-settings li { border: 1px solid var(--border); border-radius: 6px; padding: 5px 9px; background: var(--wash); overflow-wrap: anywhere; }
+.mechanism-settings { margin-block: 8px; }
 .mechanism-timing, .mechanism-clock { color: var(--ink-secondary); font-size: 11px; }
 .mechanism-map { position: relative; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px 28px; margin: 20px 0; padding-right: 22px; }
 .mechanism-edges { position: absolute; width: 100%; height: 100%; overflow: visible; pointer-events: none; color: var(--ink-secondary); }

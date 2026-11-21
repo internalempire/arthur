@@ -53,7 +53,7 @@ This preset combines high aggregate pulmonary vascular load with a vulnerable ri
 - Controls with a coloured dot differ from the model's neutral reference parameter set. The mark explains how the present phenotype was constructed; it does not label that setting abnormal or unsafe.
 - Reselect the named preset before starting a new baseline. **Reset** restarts the current prescription; in *Custom* it keeps your settings and applied blood. It also clears occlusion points from the Guyton panel.
 - Use Play/Pause and the waveform time cursor to inspect a frame; pausing does not create a physiological hold.
-- Use **Pin** to create up to four independently evolving references. The first Pin opens **Live comparisons** above the plots. Select a row there to show its values beneath the current values in the tiles; each row has **Unpin**, and **Unpin all** clears the comparison. [Live comparisons](numeric-tiles.md#pin-values-for-a-comparison) explains timing and parameter differences.
+- Use **Pin** to create up to four independently evolving references. The first Pin opens **Live comparisons** above the plots. Read each state’s settings under **Reference** and the settings of the patient you control under **Current**. Select a state to see its measurements below the current tile values. Each state has **Unpin**, and **Unpin all** clears the comparison. [Live comparisons](numeric-tiles.md#pin-values-for-a-comparison) explains timing and parameter differences.
 - Absolute numbers are model outputs, not patient targets.
 
 ## Save and reload a custom patient

@@ -1,6 +1,10 @@
 # Project handover
 
-Updated: 2026-11-20
+Updated: 2026-11-21
+
+## Reading a Pin comparison — November 21
+
+Side-by-side columns in Live comparisons and Mechanisms distinguish the settings held by each Pin from the settings of the current patient. The earlier arrow was being read as a sequence of interventions. The manual illustrates two Pins during a PEEP change and gives a same-beat volume balance for the Guyton dot and crossing. Timed intervention records retain their chronological labels. The underlying patients, curves and measurement windows are unchanged.
 
 ## Guyton markers and live comparisons — November 20
 

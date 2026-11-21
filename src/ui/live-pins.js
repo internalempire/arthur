@@ -38,32 +38,72 @@ function displayValue(parameter, value) {
 
 /** Compare applied settings and actual blood totals, never the pending UI dose. */
 export function pinSettingChanges(reference, current, { referenceTotal, currentTotal } = {}) {
-  const changes = PARAMETERS.filter(p => p.id !== 'stressedVolume' && reference[p.id] !== current[p.id]).map(p => ({
-    id: p.id,
-    text: `${p.label}: ${displayValue(p, reference[p.id])} → ${displayValue(p, current[p.id])}${p.unit ? ` ${p.unit}` : ''}`,
-  }));
+  const changes = PARAMETERS.filter(p => p.id !== 'stressedVolume' && reference[p.id] !== current[p.id]).map(p => {
+    const before = displayValue(p, reference[p.id]);
+    const now = displayValue(p, current[p.id]);
+    const unit = p.unit ? ` ${p.unit}` : '';
+    return {
+      id: p.id, label: p.label, reference: before + unit, current: now + unit,
+      text: `${p.label}: ${before} → ${now}${unit}`,
+    };
+  });
   const totalsAvailable = Number.isFinite(referenceTotal) && Number.isFinite(currentTotal);
   const difference = totalsAvailable ? currentTotal - referenceTotal : current.stressedVolume - reference.stressedVolume;
   // Ignore floating-point conservation noise, far below the displayed precision.
-  if (Math.abs(difference) > 1e-6) changes.unshift({
-    id: 'totalBloodVolume',
-    text: totalsAvailable
-      ? `Total blood volume: ${(referenceTotal / 1000).toFixed(2)} → ${(currentTotal / 1000).toFixed(2)} L (${signedVolume(Number(difference.toFixed(3)))} mL)`
-      : `Total blood volume change: ${signedVolume(Number(difference.toFixed(3)))} mL`,
-  });
+  if (Math.abs(difference) > 1e-6) {
+    const delta = signedVolume(Number(difference.toFixed(3))) + ' mL';
+    const before = totalsAvailable ? (referenceTotal / 1000).toFixed(2) : null;
+    const now = totalsAvailable ? (currentTotal / 1000).toFixed(2) : null;
+    changes.unshift({
+      id: 'totalBloodVolume', label: 'Total blood volume', reference: totalsAvailable ? before + ' L' : '—',
+      current: totalsAvailable ? `${now} L (Δ ${delta})` : `Δ ${delta}`,
+      text: totalsAvailable ? `Total blood volume: ${before} → ${now} L (${delta})` : `Total blood volume change: ${delta}`,
+    });
+  }
   return changes;
+}
+
+// The two patient columns are also used by the optional mechanisms view.
+export function pinColumnHead() {
+  const italian = navigator.language.toLowerCase().startsWith('it');
+  const headings = italian ? ['Parametro', 'Riferimento', 'Attuale'] : ['Setting', 'Reference', 'Current'];
+  return `<thead lang="${italian ? 'it' : 'en'}"><tr>${headings.map(label => `<th scope="col">${label}</th>`).join('')}</tr></thead>`;
+}
+
+// Preserve any state selector in the first row while updating the values below it.
+export function createPinSettingsRows(body) {
+  const retainedRows = body.rows.length;
+  let previous;
+  return changes => {
+    const key = changes.map(change => change.text).join('\n');
+    if (key === previous) return;
+    previous = key;
+    while (body.rows.length > retainedRows) body.deleteRow(-1);
+    if (!changes.length) {
+      const cell = body.insertRow().insertCell();
+      cell.colSpan = 3;
+      cell.textContent = 'Same settings and total blood volume';
+      return;
+    }
+    for (const change of changes) {
+      const row = body.insertRow();
+      const label = document.createElement('th');
+      label.scope = 'row';
+      label.textContent = change.label;
+      row.appendChild(label);
+      row.insertCell().textContent = change.reference;
+      row.insertCell().textContent = change.current;
+    }
+  };
 }
 
 export function createLivePinTable(container, pins, onChange) {
   container.innerHTML = `
     <div class="pin-heading"><h2>Live comparisons</h2><span class="pin-summary"></span><button type="button" class="btn" id="show-mechanisms" aria-controls="mechanisms" aria-expanded="false">Mechanisms</button><button type="button" class="btn" id="show-distribution" aria-controls="distribution" aria-expanded="false">Blood distribution</button></div>
     <p class="pin-message"></p>
-    <table class="pin-table">
-      <thead><tr><th scope="col">Tile reference</th><th scope="col">Settings / blood volume: reference → current</th><th scope="col"><span class="visually-hidden">Remove reference</span></th></tr></thead>
-      <tbody></tbody>
-    </table>
+    <table class="pin-table" aria-label="Settings of each pinned state and the current patient">${pinColumnHead()}</table>
     <p class="pin-help">All states keep evolving; Pause stops them together. Different heart or breathing rates can shift their cycles. Settings and total blood volume do not describe previous manoeuvres or pressure history.</p>`;
-  const body = container.querySelector('tbody');
+  const table = container.querySelector('.pin-table');
   const summary = container.querySelector('.pin-summary');
   const message = container.querySelector('.pin-message');
   const rows = new Map();
@@ -71,7 +111,8 @@ export function createLivePinTable(container, pins, onChange) {
   function render(sim, { historical = false, running = true } = {}) {
     container.hidden = pins.states.length === 0;
     if (container.hidden) {
-      if (rows.size) { body.replaceChildren(); rows.clear(); }
+      for (const { group } of rows.values()) group.remove();
+      rows.clear();
       return;
     }
     const params = sim.params;
@@ -81,39 +122,39 @@ export function createLivePinTable(container, pins, onChange) {
     message.textContent = historical
       ? 'Inspecting the past: live reference values are hidden. Return to the latest instant or press Play to compare.'
       : `${selected ? `State ${selected.id}` : 'Reference'} is shown below the current tile values.`;
-    for (const [id, row] of rows) {
-      if (!pins.states.some(state => state.id === id)) { row.remove(); rows.delete(id); }
+    for (const [id, { group }] of rows) {
+      if (!pins.states.some(state => state.id === id)) { group.remove(); rows.delete(id); }
     }
     for (const state of pins.states) {
       let row = rows.get(state.id);
       if (!row) {
-        row = document.createElement('tr');
-        row.dataset.pinId = state.id;
-        row.innerHTML = '<th scope="row"><label class="pin-choice"><input type="radio" name="tile-reference"><span></span></label></th><td class="pin-changes"></td><td><button type="button" class="btn pin-remove">Unpin</button></td>';
-        row.querySelector('input').setAttribute('aria-label', `Compare with State ${state.id}`);
-        row.querySelector('.pin-choice span').textContent = `State ${state.id}`;
-        row.querySelector('input').addEventListener('change', () => { pins.select(state.id); onChange(); });
-        const remove = row.querySelector('.pin-remove');
+        const group = table.createTBody();
+        group.dataset.pinId = state.id;
+        const heading = group.insertRow();
+        heading.innerHTML = '<th scope="rowgroup" colspan="3"><div class="pin-state-heading"><label class="pin-choice"><input type="radio" name="tile-reference"><span></span></label><button type="button" class="btn pin-remove">Unpin</button></div></th>';
+        const choice = heading.querySelector('input');
+        choice.setAttribute('aria-label', `Compare with State ${state.id}`);
+        heading.querySelector('.pin-choice span').textContent = `State ${state.id}`;
+        choice.addEventListener('change', () => { pins.select(state.id); onChange(); });
+        const remove = heading.querySelector('.pin-remove');
         remove.setAttribute('aria-label', `Unpin State ${state.id}`);
         remove.addEventListener('click', () => {
           pins.remove(state.id);
           onChange();
           // Removing a focused row must leave a usable keyboard destination.
           const pinButton = document.getElementById('pin-state');
-          (body.querySelector('input:checked')
+          (table.querySelector('input:checked')
             ?? (pinButton.disabled ? document.getElementById('playpause') : pinButton)).focus();
         });
-        body.appendChild(row);
+        row = { group, choice, renderSettings: createPinSettingsRows(group) };
         rows.set(state.id, row);
       }
-      row.querySelector('input').checked = pins.selectedId === state.id;
-      row.classList.toggle('pin-selected', pins.selectedId === state.id);
+      row.choice.checked = pins.selectedId === state.id;
+      row.group.classList.toggle('pin-selected', pins.selectedId === state.id);
       const changes = pinSettingChanges(state.sim.params, params, {
         referenceTotal: volumeControlReadings(state.sim).total, currentTotal,
       });
-      const cell = row.querySelector('.pin-changes');
-      const text = changes.map(change => change.text).join('\n') || 'Same settings and total blood volume';
-      if (cell.textContent !== text) cell.textContent = text;
+      row.renderSettings(changes);
     }
   }
   return { render };

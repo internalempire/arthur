@@ -1,5 +1,5 @@
 import { volumeControlReadings } from './volume-controls.js';
-import { pinSettingChanges } from './live-pins.js';
+import { createPinSettingsRows, pinColumnHead, pinSettingChanges } from './live-pins.js';
 
 const instant = 'instantaneous';
 const mean = '3 s exponential mean';
@@ -87,8 +87,8 @@ function setText(node, text) { if (node.textContent !== text) node.textContent =
 export function createMechanismsPanel(host) {
   host.innerHTML = `
     <header><h2>Heart–lung mechanisms</h2><p class="mechanism-context"></p></header>
-    <p>Settings below read reference → current. The map shows their <strong>combined result</strong>; arrows show physiological links, not the contribution of each intervention. Dashed links concern surrounding pressure and LV ejection.</p>
-    <ul class="mechanism-settings" aria-label="Changed control settings"></ul>
+    <p>The table compares settings for the selected state and the current patient. The map shows their <strong>combined result</strong>; arrows show physiological links, not the contribution of each intervention. Dashed links concern surrounding pressure and LV ejection.</p>
+    <table class="pin-table mechanism-settings" aria-label="Changed control settings">${pinColumnHead()}<tbody></tbody></table>
     <p class="mechanism-timing">Large value: current patient · below: selected reference · Δ: current − reference. Each number keeps its labelled measurement window. Cycles can drift out of phase; pinning does not establish equilibrium.</p>
     <p class="mechanism-history" hidden>Inspecting the past: live comparisons are hidden. Return to the latest instant or press Play.</p>
     <div class="mechanism-live">
@@ -102,7 +102,7 @@ export function createMechanismsPanel(host) {
   const cards = new Map();
   let selected = 'output';
   let context = null;
-  let settingsKey = '';
+  const renderSettings = createPinSettingsRows(host.querySelector('.mechanism-settings tbody'));
   let detailRows = [];
   let suspended = false;
   let destroyed = false;
@@ -203,15 +203,7 @@ export function createMechanismsPanel(host) {
     const changes = pinSettingChanges(next.reference.sim.params, next.current.params, {
       referenceTotal: volumeControlReadings(next.reference.sim).total, currentTotal: volumeControlReadings(next.current).total,
     });
-    const key = JSON.stringify(changes);
-    if (key !== settingsKey) {
-      settingsKey = key;
-      const list = host.querySelector('.mechanism-settings');
-      list.replaceChildren();
-      for (const text of changes.length ? changes.map(change => change.text) : ['Same settings and total blood volume; previous histories may differ.']) {
-        const item = document.createElement('li'); item.textContent = text; list.appendChild(item);
-      }
-    }
+    renderSettings(changes);
     updateReadings();
   }
   return { render, destroy() { destroyed = true; observer.disconnect(); context = null; host.replaceChildren(); } };
