@@ -644,21 +644,34 @@ function healthyCvpReturnBlock() {
 
 function ardsPeepOutputBlock() {
   const scenario = SCENARIOS.find(({ id }) => id === 'ards-rv');
-  const outputs = [5, 15].map(peep => {
-    const simulator = settledSimulator({ ...scenario.params, peep });
-    simulator.advance(60, true);
-    let aorticVolumeMl = 0;
-    const stop = simulator.observeManoeuvre({
-      sample(world) {
+  const rows = [
+    '| Opening profile of the compromised lung | CO at PEEP 5 (L/min) | CO at PEEP 15 (L/min) | Change (L/min) | Change from own baseline |',
+    '|---|---:|---:|---:|---:|',
+  ];
+  for (const [label, profile] of [['Reopenable, no memory', 'equilibrium'], ['Non-reopenable', 'closed']]) {
+    const baseline = new Simulator();
+    baseline.applyScenario(scenario);
+    baseline.setParam('recruitmentProfile', profile);
+    baseline.setParam('peep', 5);
+    baseline.advance(60, true);
+    baseline.advance(60, true);
+    const [low, high] = [5, 15].map(peep => {
+      const sim = baseline.fork();
+      if (peep === 15) sim.setParam('peep', peep);
+      sim.advance(60, true);
+      sim.advance(60, true);
+      let volumeMl = 0;
+      const stop = sim.observeManoeuvre({ sample(world) {
         if (!world.validObservation()) throw new Error('Invalid ARDS PEEP observation');
-        aorticVolumeMl += world.circ.q.av * world.dt;
-      },
+        volumeMl += world.circ.q.av * world.dt;
+      } });
+      sim.advance(60, true);
+      stop();
+      return volumeMl / 1000; // Litres ejected in one minute.
     });
-    simulator.advance(60, true);
-    stop();
-    return aorticVolumeMl / 1000; // Litres ejected in one minute.
-  });
-  return `**Reference reading.** At PEEP 5 and 15 cmH₂O, mean aortic output is about **${fixed(outputs[0], 2)} and ${fixed(outputs[1], 2)} L/min**, respectively. Each level is allowed 120 simulated seconds to settle. Blood crossing the aortic valve is then summed over 60 seconds. The four-breath history in the interface uses a shorter averaging window.`;
+    rows.push(`| ${label} | ${fixed(low, 2)} | ${fixed(high, 2)} | ${fixed(high - low, 2)} | ${fixed(100 * (high - low) / low, 1)}% |`);
+  }
+  return [...rows, '', '*PEEP in cmH₂O. For each profile, two copies of the same settled PEEP 5 state are followed at PEEP 5 and 15. After 120 simulated seconds at each setting, blood crossing the aortic valve is integrated over one minute. Pressure history uses four complete breaths and can give slightly different readings.*'].join('\n');
 }
 
 function ardsScenarioState(overrides) {

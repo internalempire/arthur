@@ -1,6 +1,10 @@
 # Project handover
 
-Updated: 2026-11-21
+Updated: 2026-11-26
+
+## Compare both ARDS opening profiles over the same PEEP step — November 26
+
+The scenario exercise and quick start now take both the reopenable and non-reopenable profiles from PEEP 5 to 15 cmH₂O. The executable example compares each profile with its own settled baseline and integrates forward aortic flow over a minute. The separate comparison at PEEP 20 answers what differs between profiles at the same high airway pressure. The change concerns the teaching exercise and its example generator.
 
 ## Superimpose one selected live reference — November 21
 

@@ -50,10 +50,9 @@ In this PEEP exercise, both atrial pressure and the cava’s closing pressure ri
 
 ## Minute 6–8: compare recruitment with distension
 
-1. Select *ARDS with right ventricular failure*.
-2. Note compromised fraction, opening profile, closed fraction at end expiration, opening excursion, plateau pressure, both the internal PVR coefficient and derived PVR with its quality badge, and RV:LV volume ratio.
-3. Raise PEEP gradually.
-4. Return to the preset, select the Non-reopenable opening profile, and repeat the same PEEP change.
+1. Select *ARDS with right ventricular failure*. Keep the preset opening profile and set PEEP to **5 cmH₂O**.
+2. After settling, start **Pressure history** and record four complete breaths. Raise only PEEP to **15 cmH₂O**. Once the circulation settles again, compare end-expiratory closure and mean aortic output in the two intervals.
+3. Note the readings, reselect the preset and choose **Non-reopenable**. Repeat the same 5 to 15 cmH₂O step with a new recording. Which profile loses more output relative to its own baseline? [Compare your readings with the two reference runs](scenarios.md#ards-with-right-ventricular-failure).
 
 With recruitable lung, some added pressure opens units and distributes inflation across a larger aerated volume. Without recruitment, more of the pressure distends the already open lung. Compare both lungs at the same PEEP as well as each lung before and after the step. A recruitable lung can have a lower RV cost than a non-reopenable lung at high PEEP while its own output still falls after the increase. This distinction prevents “less harmful” from becoming “improved output”. The comparison demonstrates why equal PEEP is not equal lung stress or equal RV load. See [lung opening profiles](recruitment-and-ri.md) and [pulmonary vascular resistance](pulmonary-vascular-resistance.md).
 

@@ -59,13 +59,22 @@ The presets are not miniature patient records and they do not predict treatment 
 
 **Question.** How does recruitability change the balance between opening lung and loading the right ventricle?
 
-**Change PEEP in the same lung.** The preset starts with PEEP set to 12 cmH₂O. Keep its passive ventilation and opening profile, set PEEP to 5 cmH₂O and let the breathing pattern and cardiac output settle. Pin that state and start **Pressure history**. Record at least four complete breaths at 5, then change only PEEP to 15 cmH₂O. After the circulation has settled again, compare the two intervals. The history averages aortic output across four complete breaths. The CO tile describes the latest completed heartbeat and can move as the patient breathes. [Pressure history](panel-waveforms.md#record-a-pressure-history)
+**Compare the same PEEP step in two opening profiles.**
+
+1. Select *ARDS with right ventricular failure*. The preset starts at PEEP 12 cmH₂O. Leave **Opening profile** at **Reopenable, no memory** and set PEEP to **5 cmH₂O**. Let the circulation settle. Pin this state and start **Pressure history**.
+2. Record at least four complete breaths at 5. Raise only PEEP to **15 cmH₂O**. After the circulation settles, compare the two intervals in the history. Write down mean aortic output at both levels. The CO tile reads the latest completed heartbeat.
+3. Reselect the preset, choose **Non-reopenable** and repeat from **PEEP 5** with a fresh recording. Keep the compromised fraction, tissue stiffness, ventilator settings, blood volume and heart settings the same. Compare the change from each profile’s own baseline. [Recording a pressure history](panel-waveforms.md#record-a-pressure-history)
 
 <!-- BEGIN GENERATED: ards-peep-output -->
-**Reference reading.** At PEEP 5 and 15 cmH₂O, mean aortic output is about **4.20 and 4.11 L/min**, respectively. Each level is allowed 120 simulated seconds to settle. Blood crossing the aortic valve is then summed over 60 seconds. The four-breath history in the interface uses a shorter averaging window.
+| Opening profile of the compromised lung | CO at PEEP 5 (L/min) | CO at PEEP 15 (L/min) | Change (L/min) | Change from own baseline |
+|---|---:|---:|---:|---:|
+| Reopenable, no memory | 4.20 | 4.11 | -0.09 | -2.0% |
+| Non-reopenable | 4.01 | 3.61 | -0.39 | -9.8% |
+
+*PEEP in cmH₂O. For each profile, two copies of the same settled PEEP 5 state are followed at PEEP 5 and 15. After 120 simulated seconds at each setting, blood crossing the aortic valve is integrated over one minute. Pressure history uses four complete breaths and can give slightly different readings.*
 <!-- END GENERATED: ards-peep-output -->
 
-**Read the response.** Look first at end-expiratory opening and transpulmonary pressure. Opening units lets blood flow more readily through poorly perfused regions. Inflation can also compress small vessels exposed to alveolar pressure, and rising pleural pressure can reduce right-heart filling. In this comparison, RV end-diastolic volume falls, mean pulmonary arterial pressure rises and the RV ejects slightly less blood per beat. Follow LV filling and mean aortic output to see the net effect. Its small size is the useful observation here. The exact change depends on how readily the small vessels narrow and on the blood pressure at their venous end. In an individual patient with ARDS, the same PEEP change can produce a different direction of response.
+**Why does output fall less when lung can reopen?** Look first at the fraction still closed at end expiration. Opening units shares tidal inflation across more tissue and allows blood to pass more readily through previously poorly perfused regions. If the compromised lung stays closed, the remaining open units take the inflation and their small vessels are exposed to compression. Raising PEEP also changes the pressure around the heart and the pressure driving blood from the abdomen into the chest. Compare RV filling and ejection in the ventricular loops, then read the net effect on aortic output. In this pair of simulations reopening attenuates the fall. The small remaining change in the reopenable profile is sensitive to how readily small vessels narrow. Its direction in an individual patient cannot be inferred from this example.
 
 **Change opening potential at the same PEEP.** For the separate comparison in the table below, reselect the preset and Pin the settled starting state at PEEP 12 cmH₂O. Raise PEEP to 20 cmH₂O and let the state settle. Pin again before selecting **Non-reopenable**, keeping the compromised fraction, tissue compliance, lung capacity and cardiac controls fixed. Compare the two high-PEEP states to see what reopening contributes at the same airway pressure.
 
